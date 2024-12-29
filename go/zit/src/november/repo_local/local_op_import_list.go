@@ -12,10 +12,7 @@ func (u *Repo) ImportList(
 	list *sku.List,
 	importer store.Importer,
 ) (err error) {
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Lock)
 
 	coPrinter := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
@@ -39,19 +36,18 @@ func (u *Repo) ImportList(
 		if co.GetState() == checked_out_state.Conflicted {
 			hasConflicts = true
 
-			if err = coPrinter(co); err != nil {
-				err = errors.Wrap(err)
-				return
+			if !importer.DontPrint {
+				if err = coPrinter(co); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			continue
 		}
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Unlock)
 
 	if hasConflicts {
 		err = store.ErrNeedsMerge

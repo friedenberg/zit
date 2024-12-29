@@ -19,7 +19,7 @@ func init() {
 	)
 }
 
-func (c Reindex) GetEnvironmentInitializeOptions() repo_local.Options {
+func (c Reindex) GetLocalRepoOptions() repo_local.Options {
 	return repo_local.OptionsAllowConfigReadError
 }
 

@@ -3,7 +3,9 @@ package repo_remote
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -53,7 +55,7 @@ func (remote *HTTP) MakeInventoryList(
 	if request, err = http.NewRequestWithContext(
 		remote.remote.Context,
 		"GET",
-		"/inventory_list",
+		"/inventory_lists",
 		strings.NewReader(qg.String()),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -97,24 +99,15 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
+	bf := remoteHTTP.remote.GetStore().GetInventoryListStore().FormatForVersion(
+		remoteHTTP.remote.GetConfig().GetStoreVersion(),
+	)
+
 	b := bytes.NewBuffer(nil)
 
-	printer := remoteHTTP.remote.MakePrinterBoxArchive(b, true)
-
-	var sk *sku.Transacted
-	var hasMore bool
-
-	for {
-		sk, hasMore = list.Pop()
-
-		if !hasMore {
-			break
-		}
-
-		if err = printer(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if _, err = bf.WriteInventoryListBlob(list, b); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var request *http.Request
@@ -122,7 +115,7 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	if request, err = http.NewRequestWithContext(
 		remoteHTTP.remote.Context,
 		"POST",
-		"/inventory_list",
+		"/inventory_lists",
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -136,22 +129,11 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
-	bf := remoteHTTP.remote.GetStore().GetInventoryListStore().FormatForVersion(
-		remoteHTTP.remote.GetConfig().GetStoreVersion(),
-	)
+	io.Copy(os.Stderr, response.Body)
 
-	list = sku.MakeList()
+	// TODO read shas from body
+	// TODO post blobs to remote
 
-	if err = inventory_list_blobs.ReadInventoryListBlob(
-		bf,
-		bufio.NewReader(response.Body),
-		list,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 	return
 }
 

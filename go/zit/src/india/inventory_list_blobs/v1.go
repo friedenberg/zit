@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
@@ -18,20 +17,6 @@ type V1 struct {
 
 func (v V1) GetListFormat() sku.ListFormat {
 	return v
-}
-
-func (v V1) makePrinter(
-	out interfaces.WriterAndStringWriter,
-) interfaces.FuncIter[*sku.Transacted] {
-	return string_format_writer.MakeDelim(
-		"\n",
-		out,
-		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return v.Box.WriteStringFormat(w, o)
-			},
-		),
-	)
 }
 
 func (s V1) WriteInventoryListBlob(

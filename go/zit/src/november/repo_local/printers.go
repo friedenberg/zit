@@ -10,20 +10,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-func (u *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	po := u.config.PrintOptions.
+func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
+	po := repo.config.PrintOptions.
 		WithPrintShas(true).
 		WithExcludeFields(true)
 
-	sw := u.StringFormatWriterSkuBoxTransacted(
+	sw := repo.StringFormatWriterSkuBoxTransacted(
 		po,
-		u.FormatColorOptionsOut(),
+		repo.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
-		u.GetOutFile(),
+		repo.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
@@ -33,23 +33,23 @@ func (u *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 }
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
-func (u *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
-	po := u.config.PrintOptions.
+func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
+	po := repo.config.PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false)
 
-	sw := u.StringFormatWriterSkuBoxCheckedOut(
+	sw := repo.StringFormatWriterSkuBoxCheckedOut(
 		po,
-		u.FormatColorOptionsOut(),
+		repo.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
-			ConfigDryRunReader: u.GetConfig(),
+			ConfigDryRunReader: repo.GetConfig(),
 		},
 	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
-		u.GetOutFile(),
+		repo.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.CheckedOut) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
@@ -70,7 +70,7 @@ func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 
 	return string_format_writer.MakeDelim(
 		"\n",
-		u.GetOutFile(),
+		u.GetUIFile(),
 		p,
 	)
 }
@@ -103,7 +103,7 @@ func (u *Repo) PrinterCheckedOut(
 
 	out := string_format_writer.MakeDelim(
 		"\n",
-		u.GetOutFile(),
+		u.GetUIFile(),
 		u.StringFormatWriterSkuBoxCheckedOut(
 			po,
 			oo.ColorOptionsErr,

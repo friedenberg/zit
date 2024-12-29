@@ -66,7 +66,7 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	o := repo_layout.WriteOptions{
 		Age:             &ag,
 		CompressionType: c.CompressionType,
-		Writer:          u.GetOutFile(),
+		Writer:          u.GetUIFile(),
 	}
 
 	{

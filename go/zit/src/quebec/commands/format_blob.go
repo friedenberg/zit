@@ -115,7 +115,7 @@ func (c *FormatBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	}
 
 	if _, err := f.WriteStringFormatWithMode(
-		u.GetOutFile(),
+		u.GetUIFile(),
 		object,
 		checkout_mode.BlobOnly,
 	); err != nil {
@@ -174,7 +174,7 @@ func (c *FormatBlob) FormatFromStdin(
 		return
 	}
 
-	if _, err = wt.WriteTo(u.GetOutFile()); err != nil {
+	if _, err = wt.WriteTo(u.GetUIFile()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

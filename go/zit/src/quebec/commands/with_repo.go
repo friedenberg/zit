@@ -23,7 +23,7 @@ func (cmd commandWithRepo) Run(
 	options := repo_local.OptionsEmpty
 
 	if og, ok := cmd.Command.(repo_local.OptionsGetter); ok {
-		options = og.GetEnvironmentInitializeOptions()
+		options = og.GetLocalRepoOptions()
 	}
 
 	cmdArgs := cmd.Args()

@@ -22,6 +22,10 @@ func init() {
 	)
 }
 
+func (c Serve) GetLocalRepoOptions() repo_local.Options {
+	return repo_local.OptionsUIFileIsStderr
+}
+
 func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
 	// TODO switch network to be RemoteServeType
 	var network, address string

@@ -16,6 +16,9 @@ var ErrNeedsMerge = errors.NewNormal("needs merge")
 
 type BlobCopyResult struct {
 	*sku.Transacted
+
+	// -1: no remote blob store and the blob doesn't exist locally
+	// -2: no remote blob store and the blob exists locally
 	N int64
 }
 
@@ -24,6 +27,7 @@ type Importer struct {
 	RemoteBlobStore    interfaces.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
 	sku.ParentNegotiator
+	DontPrint bool
 }
 
 func (s Importer) Import(
@@ -35,6 +39,11 @@ func (s Importer) Import(
 	}
 
 	if external.GetGenre() == genres.InventoryList {
+		if s.RemoteBlobStore == nil {
+			err = errors.Errorf("RemoteBlobStore is nil")
+			return
+		}
+
 		if co, err = s.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -156,12 +165,29 @@ func (importer Importer) importLeafSku(
 func (c Importer) importBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
+	blobSha := sk.GetBlobSha()
+
 	if c.RemoteBlobStore == nil {
-		err = errors.Errorf("nil blob store")
+		// when this is a dumb HTTP remote, we expect local to push the missing
+		// objects to us after the import call
+
+		n := int64(-1)
+
+		if c.GetDirectoryLayout().HasBlob(blobSha) {
+			n = -2
+		}
+
+		if c.BlobCopierDelegate != nil {
+			if err = c.BlobCopierDelegate(
+				BlobCopyResult{Transacted: sk, N: n},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
 		return
 	}
-
-	blobSha := sk.GetBlobSha()
 
 	var n int64
 

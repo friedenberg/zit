@@ -13,12 +13,14 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 func (env *Repo) InitializeListener(
@@ -248,11 +250,11 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// TODO add path multiplexing to handle versions
 func (local *Repo) ServeRequest(request Request) (response Response) {
 	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
 
 	switch request.MethodPath {
-	// TODO rename to blob
 	case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
 		var shString strings.Builder
 
@@ -295,11 +297,38 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 			response.Body = rc
 		}
 
+	case MethodPath{"POST", "/blobs"}:
+		var wc interfaces.ShaWriteCloser
+
+		{
+			var err error
+
+			if wc, err = local.GetRepoLayout().BlobWriter(); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		if _, err := io.Copy(wc, request.Body); err != nil {
+			response.Error(err)
+			return
+		}
+
+		if err := wc.Close(); err != nil {
+			response.Error(err)
+			return
+		}
+
+		sh := wc.GetShaLike()
+
+		response.StatusCode = http.StatusCreated
+		response.Body = io.NopCloser(strings.NewReader(sh.GetShaString()))
+
 		// 	case MethodPath{"GET", "/object"}:
 
 		// 	case MethodPath{"POST", "/object"}:
 
-	case MethodPath{"GET", "/inventory_list"}:
+	case MethodPath{"GET", "/inventory_lists"}:
 		var qgString strings.Builder
 
 		if _, err := io.Copy(&qgString, request.Body); err != nil {
@@ -357,7 +386,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 		response.Body = io.NopCloser(b)
 
-	case MethodPath{"POST", "/inventory_list"}:
+	case MethodPath{"POST", "/inventory_lists"}:
 		bf := local.GetStore().GetInventoryListStore().FormatForVersion(
 			local.GetConfig().GetStoreVersion(),
 		)
@@ -369,23 +398,37 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 			bufio.NewReader(request.Body),
 			list,
 		); err != nil {
-			local.CancelWithError(err)
+			response.Error(err)
+			return
 		}
 
-		importer := local.MakeImporter(false)
+		b := bytes.NewBuffer(nil)
 
-		// importer.RemoteBlobStore = remote.GetBlobStore()
-		importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
-			Local: local,
-			// Remote: remote,
+		importer := local.MakeImporter(false)
+		importer.DontPrint = true
+		importer.BlobCopierDelegate = func(result store.BlobCopyResult) (err error) {
+			if result.N != -1 {
+				return
+			}
+
+			sh := sha.GetPool().Get()
+			sha.GetPool().Put(sh)
+			sh.ResetWithShaLike(result.GetBlobSha())
+			fmt.Fprintf(b, "%s\n", sh)
+
+			return
 		}
 
 		if err := local.ImportList(
 			list,
 			importer,
 		); err != nil {
-			local.CancelWithError(err)
+			response.Error(err)
+			return
 		}
+
+		response.StatusCode = http.StatusCreated
+		response.Body = io.NopCloser(b)
 
 	default:
 		response.StatusCode = http.StatusNotFound

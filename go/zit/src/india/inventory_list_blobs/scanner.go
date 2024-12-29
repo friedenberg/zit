@@ -17,7 +17,7 @@ func makeScanner(
 	in io.Reader,
 	of object_inventory_format.Format,
 	op object_inventory_format.Options,
-) FormatInventoryListScanner {
+) *scanner {
 	return &scanner{
 		ringBuffer: catgut.MakeRingBuffer(in, 0),
 		format:     of,

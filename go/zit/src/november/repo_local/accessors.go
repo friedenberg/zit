@@ -13,6 +13,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
+func (u *Repo) GetUIFile() interfaces.WriterAndStringWriter {
+  return u.fileUI
+}
+
 func (u *Repo) GetTime() time.Time {
 	return time.Now()
 }

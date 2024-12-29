@@ -14,7 +14,7 @@ func makePrinter(
 	out io.Writer,
 	of object_inventory_format.Formatter,
 	op object_inventory_format.Options,
-) FormatInventoryListPrinter {
+) *printer {
 	return &printer{
 		format:            of,
 		options:           op,

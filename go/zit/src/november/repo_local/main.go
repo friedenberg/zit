@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -30,6 +31,8 @@ import (
 
 type Repo struct {
 	*env.Env
+
+	fileUI interfaces.WriterAndStringWriter
 
 	sunrise ids.Tai
 
@@ -101,16 +104,21 @@ func Make(
 ) (repo *Repo) {
 	repo = &Repo{
 		Env:            env,
+		fileUI:         env.GetOutFile(),
 		DormantCounter: query.MakeDormantCounter(),
+	}
+
+	if options.GetUIFileIsStderr() {
+		repo.fileUI = env.GetErrFile()
 	}
 
 	repo.config.Reset()
 
-	if err := repo.Initialize(options); err != nil {
+	if err := repo.initialize(options); err != nil {
 		env.CancelWithError(err)
 	}
 
-  repo.After(repo.Flush)
+	repo.After(repo.Flush)
 
 	return
 }
@@ -121,35 +129,35 @@ func (u *Repo) GetRepo() repo.Repo {
 
 // TODO investigate removing unnecessary resets like from organize
 func (u *Repo) Reset() (err error) {
-	return u.Initialize(OptionsEmpty)
+	return u.initialize(OptionsEmpty)
 }
 
-func (u *Repo) Initialize(options Options) (err error) {
-	if err = u.Flush(); err != nil {
+func (repo *Repo) initialize(options Options) (err error) {
+	if err = repo.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	u.sunrise = ids.NowTai()
+	repo.sunrise = ids.NowTai()
 
 	ui.TodoP4("find a better place for this")
 	{
-		if u.GetCLIConfig().Verbose && !u.GetCLIConfig().Quiet {
+		if repo.GetCLIConfig().Verbose && !repo.GetCLIConfig().Quiet {
 			ui.SetVerbose(true)
 		} else {
 			ui.SetOutput(io.Discard)
 		}
 
-		if u.GetCLIConfig().Todo {
+		if repo.GetCLIConfig().Todo {
 			ui.SetTodoOn()
 		}
 
 		standortOptions := repo_layout.Options{
-			BasePath: u.GetCLIConfig().BasePath,
+			BasePath: repo.GetCLIConfig().BasePath,
 		}
 
-		if u.layout, err = repo_layout.Make(
-			u.Env,
+		if repo.layout, err = repo_layout.Make(
+			repo.Env,
 			standortOptions,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -157,30 +165,30 @@ func (u *Repo) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.fileEncoder = store_fs.MakeFileEncoder(u.layout, &u.config)
+	repo.fileEncoder = store_fs.MakeFileEncoder(repo.layout, &repo.config)
 
-	if err = u.dormantIndex.Load(
-		u.layout,
+	if err = repo.dormantIndex.Load(
+		repo.layout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion())
-	boxFormatArchive := u.MakeBoxArchive(true)
+	objectFormat := object_inventory_format.FormatForVersion(repo.GetConfig().GetStoreVersion())
+	boxFormatArchive := repo.MakeBoxArchive(true)
 
-	u.blobStore = blob_store.Make(
-		u.layout,
-		u.MakeLuaVMPoolBuilder(),
+	repo.blobStore = blob_store.Make(
+		repo.layout,
+		repo.MakeLuaVMPoolBuilder(),
 		objectFormat,
 		boxFormatArchive,
 	)
 
-	if err = u.config.Initialize(
-		u.layout,
-		u.GetCLIConfig(),
-		&u.dormantIndex,
-		u.blobStore,
+	if err = repo.config.Initialize(
+		repo.layout,
+		repo.GetCLIConfig(),
+		&repo.dormantIndex,
+		repo.blobStore,
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil
@@ -198,55 +206,55 @@ func (u *Repo) Initialize(options Options) (err error) {
 	// }
 	ofo := object_inventory_format.Options{Tai: true}
 
-	if err = u.store.Initialize(
-		u.GetConfig(),
-		u.layout,
+	if err = repo.store.Initialize(
+		repo.GetConfig(),
+		repo.layout,
 		objectFormat,
-		u.sunrise,
-		u.MakeLuaVMPoolBuilder(),
-		u.makeQueryBuilder().
+		repo.sunrise,
+		repo.MakeLuaVMPoolBuilder(),
+		repo.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
 		boxFormatArchive,
-		u.blobStore,
+		repo.blobStore,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
 	}
 
-	ui.Log().Printf("store version: %s", u.GetConfig().GetStoreVersion())
+	ui.Log().Printf("store version: %s", repo.GetConfig().GetStoreVersion())
 
 	var sfs *store_fs.Store
 
-	k := u.GetConfig()
+	k := repo.GetConfig()
 
 	if sfs, err = store_fs.Make(
 		k,
-		u.PrinterFDDeleted(),
+		repo.PrinterFDDeleted(),
 		k.GetFileExtensions(),
-		u.GetRepoLayout(),
+		repo.GetRepoLayout(),
 		ofo,
-		u.fileEncoder,
+		repo.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	u.externalStores = map[ids.RepoId]*external_store.Store{
+	repo.externalStores = map[ids.RepoId]*external_store.Store{
 		{}: {
 			StoreLike: sfs,
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				k,
-				u.GetRepoLayout(),
-				u.PrinterTransactedDeleted(),
+				repo.GetRepoLayout(),
+				repo.PrinterTransactedDeleted(),
 			),
 		},
 	}
 
-	if err = u.store.SetExternalStores(
-		u.externalStores,
+	if err = repo.store.SetExternalStores(
+		repo.externalStores,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to set external stores")
 		return
@@ -254,28 +262,28 @@ func (u *Repo) Initialize(options Options) (err error) {
 
 	ui.Log().Print("done initing checkout store")
 
-	ptl := u.PrinterTransacted()
+	ptl := repo.PrinterTransacted()
 
 	lw := store.UIDelegate{
 		TransactedNew:     ptl,
 		TransactedUpdated: ptl,
 		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
-			if !u.config.PrintOptions.PrintUnchanged {
+			if !repo.config.PrintOptions.PrintUnchanged {
 				return
 			}
 
 			return ptl(sk)
 		},
-		CheckedOutCheckedOut: u.PrinterCheckedOut(
+		CheckedOutCheckedOut: repo.PrinterCheckedOut(
 			box_format.CheckedOutHeaderState{},
 		),
 	}
 
-	u.store.SetUIDelegate(lw)
+	repo.store.SetUIDelegate(lw)
 
-	u.storesInitialized = true
+	repo.storesInitialized = true
 
-	u.luaSkuFormat = u.SkuFormatBoxTransactedNoColor()
+	repo.luaSkuFormat = repo.SkuFormatBoxTransactedNoColor()
 
 	return
 }

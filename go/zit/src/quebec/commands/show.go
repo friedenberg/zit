@@ -60,7 +60,7 @@ func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	{
 		var err error
 
-		if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
+		if f, err = u.MakeFormatFunc(c.Format, u.GetUIFile()); err != nil {
 			u.CancelWithError(err)
 		}
 	}

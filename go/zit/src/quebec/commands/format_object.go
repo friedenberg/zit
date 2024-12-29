@@ -114,7 +114,7 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 	}
 
 	if _, err := f.WriteStringFormatWithMode(
-		u.GetOutFile(),
+		u.GetUIFile(),
 		object,
 		c.CheckoutMode,
 	); err != nil {
@@ -173,7 +173,7 @@ func (c *FormatObject) FormatFromStdin(
 		return
 	}
 
-	if _, err = wt.WriteTo(u.GetOutFile()); err != nil {
+	if _, err = wt.WriteTo(u.GetUIFile()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -32,7 +32,7 @@ func (u *Repo) MakeFormatFunc(
 	out interfaces.WriterAndStringWriter,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
 	if out == nil {
-		out = u.GetOutFile()
+		out = u.GetUIFile()
 	}
 
 	if strings.HasPrefix(v, "type.") {
@@ -613,7 +613,7 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list":
-		p := u.MakePrinterBoxArchive(u.GetOutFile(), true)
+		p := u.MakePrinterBoxArchive(u.GetUIFile(), true)
 
 		f = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
@@ -625,7 +625,7 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list-sans-tai":
-		p := u.MakePrinterBoxArchive(u.GetOutFile(), false)
+		p := u.MakePrinterBoxArchive(u.GetUIFile(), false)
 
 		f = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
@@ -786,7 +786,7 @@ func (u *Repo) makeTypFormatter(
 	typeBlobStore := u.GetStore().GetBlobStore().GetType()
 
 	if out == nil {
-		out = u.GetOutFile()
+		out = u.GetUIFile()
 	}
 
 	switch v {

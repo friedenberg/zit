@@ -33,7 +33,7 @@ func (c CatBlobShas) RunWithRepo(u *repo_local.Repo, _ ...string) {
 	if err := u.GetRepoLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
-			_, err = fmt.Fprintln(u.GetOutFile(), s)
+			_, err = fmt.Fprintln(u.GetUIFile(), s)
 			return
 		},
 	); err != nil {

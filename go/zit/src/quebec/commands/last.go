@@ -67,7 +67,7 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 		{
 			var err error
 
-			if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
+			if f, err = u.MakeFormatFunc(c.Format, u.GetUIFile()); err != nil {
 				u.CancelWithError(err)
 			}
 		}
