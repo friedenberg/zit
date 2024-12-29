@@ -10,6 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -98,8 +100,10 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
+	// TODO local / remote version negotiation
+
 	bf := remoteHTTP.remote.GetStore().GetInventoryListStore().FormatForVersion(
-		remoteHTTP.remote.GetConfig().GetStoreVersion(),
+		immutable_config.CurrentStoreVersion,
 	)
 
 	b := bytes.NewBuffer(nil)
@@ -128,10 +132,27 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
+	if response.StatusCode >= 300 {
+		var sb strings.Builder
+
+		if _, err = io.Copy(&sb, response.Body); err != nil {
+		}
+
+		err = errors.Errorf("remote responded with error: %q", &sb)
+		return
+	}
+
+	ui.Log().Print(request, response)
+	ui.Log().Print(response.Body)
+
 	br := bufio.NewReader(response.Body)
 	eof := false
 
+	remoteHTTP.remote.ContinueOrPanicOnDone()
+
 	for !eof {
+		remoteHTTP.remote.ContinueOrPanicOnDone()
+
 		var line string
 		line, err = br.ReadString('\n')
 
@@ -201,6 +222,8 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			}
 		}()
 	}
+
+	ui.Log().Print("done")
 
 	return
 }

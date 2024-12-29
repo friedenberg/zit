@@ -126,6 +126,7 @@ func (c CatBlob) copy(
 			rc.Sha.GetShaLike().GetShaString(),
 			u.GetUIFile(),
 			rc.ReadCloser,
+      true,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

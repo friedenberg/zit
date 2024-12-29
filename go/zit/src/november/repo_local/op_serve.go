@@ -153,6 +153,7 @@ func (repo *Repo) ServeStdio() (err error) {
 
 		var request *http.Request
 
+		// TODO listen for cancel signal and give up on read
 		if request, err = http.ReadRequest(br); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
@@ -192,6 +193,7 @@ func (repo *Repo) ServeStdio() (err error) {
 			return
 		}
 
+		// TODO listen for cancel signal and give up on write
 		if err = bw.Flush(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -252,6 +254,8 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 // TODO add path multiplexing to handle versions
 func (local *Repo) ServeRequest(request Request) (response Response) {
+	defer local.ContinueOrPanicOnDone()
+
 	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
 
 	switch request.MethodPath {
@@ -372,6 +376,8 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		var hasMore bool
 
 		for {
+			local.ContinueOrPanicOnDone()
+
 			sk, hasMore = list.Pop()
 
 			if !hasMore {
@@ -407,6 +413,8 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		importer := local.MakeImporter(false)
 		// importer.DontPrint = true
 		importer.BlobCopierDelegate = func(result store.BlobCopyResult) (err error) {
+			local.ContinueOrPanicOnDone()
+
 			if result.N != -1 {
 				return
 			}
@@ -428,7 +436,10 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		}
 
 		response.StatusCode = http.StatusCreated
-		response.Body = io.NopCloser(b)
+
+		if b.Len() > 0 {
+			response.Body = io.NopCloser(b)
+		}
 
 	default:
 		response.StatusCode = http.StatusNotFound

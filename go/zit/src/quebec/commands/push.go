@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -37,4 +38,6 @@ func (c Push) RunWithRemoteAndQuery(
 	); err != nil {
 		local.CancelWithError(err)
 	}
+
+	ui.Log().Print("done")
 }

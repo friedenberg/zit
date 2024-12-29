@@ -5,8 +5,10 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -25,14 +27,16 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
 		return
 	}
 
-	roundTripper.Stderr = os.Stderr
-
 	roundTripper.Args = []string{
 		"zit",
 		"serve",
-		// "-verbose",
-		"-",
 	}
+
+	if remote.GetConfig().Verbose {
+		roundTripper.Args = append(roundTripper.Args, "-verbose")
+	}
+
+	roundTripper.Args = append(roundTripper.Args, "-")
 
 	if err = roundTripper.initialize(remote); err != nil {
 		err = errors.Wrap(err)
@@ -51,15 +55,18 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
 		return
 	}
 
-	roundTripper.Stderr = os.Stderr
-
 	roundTripper.Args = []string{
+		"ssh",
 		arg,
 		"zit",
 		"serve",
-		// "-verbose",
-		"-",
 	}
+
+	if remote.GetConfig().Verbose {
+		roundTripper.Args = append(roundTripper.Args, "-verbose")
+	}
+
+	roundTripper.Args = append(roundTripper.Args, "-")
 
 	if err = roundTripper.initialize(remote); err != nil {
 		err = errors.Wrap(err)
@@ -72,6 +79,27 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
 func (roundTripper *HTTPRoundTripperStdio) initialize(
 	remote *repo_local.Repo,
 ) (err error) {
+	// roundTripper.Stderr = os.Stderr
+	var stderrReadCloser io.ReadCloser
+
+	if stderrReadCloser, err = roundTripper.StderrPipe(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	go func() {
+		if _, err = delim_io.CopyWithPrefixOnDelim(
+			'\n',
+			"remote",
+			os.Stderr,
+			stderrReadCloser,
+			false,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
 	if roundTripper.WriteCloser, err = roundTripper.StdinPipe(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -89,6 +117,33 @@ func (roundTripper *HTTPRoundTripperStdio) initialize(
 	if err = roundTripper.Start(); err != nil {
 		err = errors.Wrapf(err, "%#v", roundTripper.Cmd)
 		return
+	}
+
+	remote.After(roundTripper.cancel)
+
+	return
+}
+
+func (roundTripper *HTTPRoundTripperStdio) cancel() (err error) {
+	if roundTripper.Process != nil {
+		if err = roundTripper.WriteCloser.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = roundTripper.Process.Signal(syscall.SIGHUP); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = roundTripper.Wait(); err != nil {
+		if errors.Is(err, os.ErrProcessDone) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

@@ -521,6 +521,7 @@ func (u *Repo) MakeFormatFunc(
 					sb.String(),
 					out,
 					r,
+          true,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -562,6 +563,7 @@ func (u *Repo) MakeFormatFunc(
 				sb.String(),
 				out,
 				r,
+        true,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

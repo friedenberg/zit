@@ -29,13 +29,11 @@ type Env struct {
 func MakeDefault(
 	layout dir_layout.Layout,
 ) *Env {
-	return &Env{
-		Context: errors.MakeContextDefault(),
-		in:      fd.MakeStd(os.Stdin),
-		out:     fd.MakeStd(os.Stdout),
-		err:     fd.MakeStd(os.Stderr),
-		Layout:  layout,
-	}
+	return Make(
+		errors.MakeContextDefault(),
+		config_mutable_cli.Config{},
+		layout,
+	)
 }
 
 func Make(

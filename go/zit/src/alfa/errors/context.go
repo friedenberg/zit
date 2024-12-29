@@ -18,6 +18,8 @@ type Context struct {
 	context.Context
 	cancel context.CancelCauseFunc
 
+	signals chan os.Signal
+
 	lock          sync.Mutex
 	doAfter       []FuncWithStackInfo
 	doAfterErrors []error // TODO expose and use
@@ -33,6 +35,7 @@ func MakeContext(in context.Context) *Context {
 	return &Context{
 		Context: ctx,
 		cancel:  cancel,
+		signals: make(chan os.Signal, 1),
 	}
 }
 
@@ -60,19 +63,26 @@ func (c *Context) SetCancelOnSIGINT() {
 	c.SetCancelOnSignals(syscall.SIGINT)
 }
 
-func (c *Context) SetCancelOnSignals(
-	signals ...os.Signal,
-) {
-	ch := make(chan os.Signal, 1)
+func (c *Context) SetCancelOnSIGHUP() {
+	c.SetCancelOnSignals(syscall.SIGHUP)
+}
 
-	signal.Notify(ch, signals...)
-
-	go func() {
-		c.cancel(Signal{Signal: <-ch})
-	}()
+func (c *Context) SetCancelOnSignals(signals ...os.Signal) {
+	signal.Notify(c.signals, signals...)
 }
 
 func (c *Context) Run(f func(*Context)) error {
+	go func() {
+		select {
+		case <-c.Done():
+		case <-c.signals:
+			// c.cancel(Signal{Signal: sig})
+			c.cancel(errContextCancelled)
+		}
+
+		signal.Stop(c.signals)
+	}()
+
 	func() {
 		defer c.cancel(errContextCancelled)
 		defer func() {
@@ -82,6 +92,8 @@ func (c *Context) Run(f func(*Context)) error {
 				}
 			}
 		}()
+
+		// time.AfterFunc(3e9, c.Cancel)
 
 		f(c)
 	}()
@@ -161,6 +173,10 @@ func (c *Context) MustFlush(flusher Flusher) {
 // TODO make this private and part of the run method
 func (c *Context) Cancel() {
 	defer c.ContinueOrPanicOnDone()
+	c.cancelWithoutPanic()
+}
+
+func (c *Context) cancelWithoutPanic() {
 	c.cancel(errContextCancelled)
 }
 

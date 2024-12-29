@@ -27,6 +27,8 @@ func (c Serve) GetLocalRepoOptions() repo_local.Options {
 }
 
 func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
+	u.SetCancelOnSIGHUP()
+
 	// TODO switch network to be RemoteServeType
 	var network, address string
 

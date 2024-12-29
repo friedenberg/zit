@@ -2,6 +2,7 @@ package repo_local
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -29,8 +30,12 @@ func (u *Repo) ImportList(
 		if co, err = importer.Import(
 			sk,
 		); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sk)
-			return
+			if errors.Is(err, collections.ErrExists) {
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "Sku: %s", sk)
+				return
+			}
 		}
 
 		if co.GetState() == checked_out_state.Conflicted {

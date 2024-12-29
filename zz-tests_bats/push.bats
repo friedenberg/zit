@@ -232,7 +232,7 @@ function push_history_default { # @test
 	EOM
 }
 
-function push_history_default_stdio_local { # @test
+function push_history_default_stdio_local_once { # @test
 	mkdir -p them || exit 1
 
 	pushd them || exit 1
@@ -249,8 +249,8 @@ function push_history_default_stdio_local { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
+		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
+		remote: [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
 	EOM
 
 	pushd them || exit 1
@@ -261,4 +261,44 @@ function push_history_default_stdio_local { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 	popd || exit 1
+}
+
+function push_history_default_stdio_local_twice { # @test
+	mkdir -p them || exit 1
+
+	pushd them || exit 1
+	run_zit_init -override-xdg-with-cwd
+	assert_success
+	popd || exit 1
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	run_zit push \
+		-remote-type stdio-local \
+		them \
+		:z
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
+		remote: [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
+	EOM
+
+	pushd them || exit 1
+	run_zit show :zettel
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+	popd || exit 1
+
+	run_zit push \
+		-remote-type stdio-local \
+		them \
+		:z
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+	EOM
 }

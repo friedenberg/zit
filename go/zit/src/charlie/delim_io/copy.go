@@ -9,11 +9,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
+// Copies each `delim` suffixed segment from src to dst, and for each segment,
+// adds the passed in prefix string.
+//
+// Useful for taking a Reader and adding a prefix for every line, like how `git`
+// shows `remote: <line>` for all remote stderr output.
 func CopyWithPrefixOnDelim(
 	delim byte,
 	prefix string,
 	dst io.Writer,
 	src io.Reader,
+	includeLineNo bool,
 ) (n int64, err error) {
 	br := pool.GetBufioReader().Get()
 	defer pool.GetBufioReader().Put(br)
@@ -51,7 +57,15 @@ func CopyWithPrefixOnDelim(
 		}
 
 		bw.WriteString(prefix)
-		fmt.Fprintf(bw, ":%d:\t", lineNo)
+		fmt.Fprint(bw, ":")
+
+		if includeLineNo {
+			fmt.Fprintf(bw, "%d:", lineNo)
+		}
+
+		fmt.Fprint(bw, " ")
+		// fmt.Fprint(bw, "\t")
+
 		bw.Write(bytes.TrimSuffix(rawLine, []byte{delim}))
 		bw.WriteByte(delim)
 
