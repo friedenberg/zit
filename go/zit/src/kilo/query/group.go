@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -436,7 +435,6 @@ func (qg *Group) ContainsExternalSku(
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if !qg.ContainsSkuCheckedOutState(state) {
-		ui.Debug().Print(state)
 		return
 	}
 

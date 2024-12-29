@@ -8,15 +8,29 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
-
-	run_zit checkout :z,t,e
 }
 
 teardown() {
 	rm_from_version "$version"
 }
 
+function prepare_checkouts() {
+	run_zit checkout :z,t,e
+	assert_success
+	assert_output_unsorted - <<-EOM
+		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
 function clean_all { # @test
+	prepare_checkouts
 	run_zit clean .
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -36,6 +50,7 @@ function clean_all { # @test
 }
 
 function clean_zettels { # @test
+	prepare_checkouts
 	run_zit clean .z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -58,6 +73,7 @@ function clean_zettels { # @test
 }
 
 function clean_all_dirty_wd { # @test
+	prepare_checkouts
 	cat >one/uno.zettel <<-EOM
 		---
 		# wildly different
@@ -116,6 +132,7 @@ function clean_all_dirty_wd { # @test
 }
 
 function clean_all_force_dirty_wd { # @test
+	prepare_checkouts
 	cat >one/uno.zettel <<-EOM
 		---
 		# wildly different
@@ -172,6 +189,7 @@ function clean_all_force_dirty_wd { # @test
 }
 
 function clean_hidden { # @test
+	prepare_checkouts
 	run_zit show one/uno
 	assert_success
 	assert_output - <<-EOM
@@ -219,7 +237,8 @@ function clean_hidden { # @test
 	EOM
 }
 
-function clean_mode_akte { # @test
+function clean_mode_blob_hidden { # @test
+	prepare_checkouts
 	run_zit organize -mode commit-directly :z <<-EOM
 		- [one/uno  !md zz-archive tag-3 tag-4] wow the first
 	EOM
@@ -246,6 +265,22 @@ function clean_mode_akte { # @test
 	assert_output_unsorted - <<-EOM
 		          deleted [one/uno.md]
 		          deleted [one/dos.zettel]
+		          deleted [one/]
+	EOM
+}
+
+function clean_mode_blob { # @test
+	run_zit checkout -mode blob one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
+		                   one/uno.md]
+	EOM
+
+	run_zit clean .
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [one/uno.md]
 		          deleted [one/]
 	EOM
 }

@@ -309,6 +309,10 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 		return
 	}
 
+	if _, ok = q.ExternalObjectIds[k]; ok {
+		return
+	}
+
 	if _, ok = q.ObjectIds[k]; ok {
 		return
 	}

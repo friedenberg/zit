@@ -69,47 +69,6 @@ func (c Clean) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Clean) shouldClean(
-	u *repo_local.Repo,
-	co sku.SkuType,
-	eqwk *query.Group,
-) bool {
-	if c.force {
-		return true
-	}
-
-	state := co.GetState()
-
-	switch state {
-	case checked_out_state.CheckedOut:
-		return sku.InternalAndExternalEqualsWithoutTai(co)
-
-	case checked_out_state.Recognized:
-		return !eqwk.ExcludeRecognized
-	}
-
-	if c.includeParent {
-		mutter := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(mutter)
-
-		err := u.GetStore().GetStreamIndex().ReadOneObjectId(
-			co.GetSku().GetObjectId().String(),
-			mutter,
-		)
-
-		errors.PanicIfError(err)
-
-		if object_metadata.EqualerSansTai.Equals(
-			&co.GetSkuExternal().GetSku().Metadata,
-			&mutter.Metadata,
-		) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (c Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
@@ -185,10 +144,7 @@ func (c Clean) runOrganize(u *repo_local.Repo, qg *query.Group) (err error) {
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Lock)
 
 	if err = changes.Removed.Each(
 		func(el sku.SkuType) (err error) {
@@ -206,10 +162,48 @@ func (c Clean) runOrganize(u *repo_local.Repo, qg *query.Group) (err error) {
 		return
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Unlock)
 
 	return
+}
+
+func (c Clean) shouldClean(
+	u *repo_local.Repo,
+	co sku.SkuType,
+	qg *query.Group,
+) bool {
+	if c.force {
+		return true
+	}
+
+	state := co.GetState()
+
+	switch state {
+	case checked_out_state.CheckedOut:
+		return sku.InternalAndExternalEqualsWithoutTai(co)
+
+	case checked_out_state.Recognized:
+		return !qg.ExcludeRecognized
+	}
+
+	if c.includeParent {
+		mutter := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(mutter)
+
+		err := u.GetStore().GetStreamIndex().ReadOneObjectId(
+			co.GetSku().GetObjectId().String(),
+			mutter,
+		)
+
+		errors.PanicIfError(err)
+
+		if object_metadata.EqualerSansTai.Equals(
+			&co.GetSkuExternal().GetSku().Metadata,
+			&mutter.Metadata,
+		) {
+			return true
+		}
+	}
+
+	return false
 }
