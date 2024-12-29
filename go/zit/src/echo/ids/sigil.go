@@ -159,7 +159,7 @@ func (i *Sigil) Set(v string) (err error) {
 }
 
 func (i Sigil) GetSha() *sha.Sha {
-	return sha.FromString(i.String())
+	return sha.FromStringContent(i.String())
 }
 
 func (i Sigil) Byte() byte {

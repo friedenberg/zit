@@ -164,7 +164,7 @@ func (g *Genre) ReadFromTokenScanner(
 }
 
 func (i Genre) GetSha() *sha.Sha {
-	return sha.FromString(i.String())
+	return sha.FromStringContent(i.String())
 }
 
 func (i Genre) Byte() byte {

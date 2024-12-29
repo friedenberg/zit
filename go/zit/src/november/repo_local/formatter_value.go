@@ -584,8 +584,8 @@ func (u *Repo) MakeFormatFunc(
 
 	case "probe-shas":
 		f = func(z *sku.Transacted) (err error) {
-			sh1 := sha.FromString(z.GetObjectId().String())
-			sh2 := sha.FromString(z.GetObjectId().String() + z.GetTai().String())
+			sh1 := sha.FromStringContent(z.GetObjectId().String())
+			sh2 := sha.FromStringContent(z.GetObjectId().String() + z.GetTai().String())
 			defer sha.GetPool().Put(sh1)
 			defer sha.GetPool().Put(sh2)
 			_, err = fmt.Fprintln(out, z.GetObjectId(), sh1, sh2)

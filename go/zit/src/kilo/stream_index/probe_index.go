@@ -91,7 +91,7 @@ func (s *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
-	sh := sha.FromString(str)
+	sh := sha.FromStringContent(str)
 	defer sha.GetPool().Put(sh)
 
 	ui.Log().Print(str, sh, o, loc)

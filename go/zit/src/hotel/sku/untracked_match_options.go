@@ -100,7 +100,7 @@ func MakeUnsureMatchMapsCollector(
 				k = e.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeDescription:
-				k = sha.FromString(e.Metadata.Description.String()).GetBytes()
+				k = sha.FromStringContent(e.Metadata.Description.String()).GetBytes()
 
 			default:
 				continue
@@ -137,7 +137,7 @@ func MakeUnsureMatchMapsMatcher(
 				k = sk.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeDescription:
-				k = sha.FromString(sk.Metadata.Description.String()).GetBytes()
+				k = sha.FromStringContent(sk.Metadata.Description.String()).GetBytes()
 
 			default:
 				continue

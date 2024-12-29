@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -129,10 +128,79 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
-	io.Copy(os.Stderr, response.Body)
+	br := bufio.NewReader(response.Body)
+	eof := false
 
-	// TODO read shas from body
-	// TODO post blobs to remote
+	for !eof {
+		var line string
+		line, err = br.ReadString('\n')
+
+		if err == io.EOF {
+			err = nil
+			eof = true
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if line == "" {
+			continue
+		}
+
+		func() {
+			var expected, actual sha.Sha
+
+			if err = expected.Set(strings.TrimSpace(line)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			var rc interfaces.ShaReadCloser
+
+			if rc, err = remoteHTTP.remote.GetRepoLayout().BlobReader(
+				&expected,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, rc)
+
+			if request, err = http.NewRequestWithContext(
+				remoteHTTP.remote.Context,
+				"POST",
+				"/blobs",
+				rc,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			var response *http.Response
+
+			if response, err = remoteHTTP.Do(request); err != nil {
+				err = errors.Errorf("failed to read response: %w", err)
+				return
+			}
+
+			var shString strings.Builder
+
+			if _, err = io.Copy(&shString, response.Body); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = expected.AssertEqualsShaLike(&actual); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}()
+	}
 
 	return
 }

@@ -72,10 +72,10 @@ func MakeShaFromPath(p string) (s *Sha, err error) {
 }
 
 func FromFormatString(f string, vs ...interface{}) *Sha {
-	return FromString(fmt.Sprintf(f, vs...))
+	return FromStringContent(fmt.Sprintf(f, vs...))
 }
 
-func FromString(s string) *Sha {
+func FromStringContent(s string) *Sha {
 	hash := hash256Pool.Get()
 	defer hash256Pool.Put(hash)
 
@@ -89,7 +89,7 @@ func FromString(s string) *Sha {
 }
 
 func FromStringer(v interfaces.Stringer) *Sha {
-	return FromString(v.String())
+	return FromStringContent(v.String())
 }
 
 func FromHash(h hash.Hash) (s *Sha) {

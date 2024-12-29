@@ -405,7 +405,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		b := bytes.NewBuffer(nil)
 
 		importer := local.MakeImporter(false)
-		importer.DontPrint = true
+		// importer.DontPrint = true
 		importer.BlobCopierDelegate = func(result store.BlobCopyResult) (err error) {
 			if result.N != -1 {
 				return
