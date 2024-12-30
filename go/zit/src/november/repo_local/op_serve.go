@@ -145,16 +145,18 @@ func (env *Repo) Serve(listener net.Listener) (err error) {
 }
 
 func (repo *Repo) ServeStdio() (err error) {
-  repo.After(repo.GetIn().Close)
-	br := bufio.NewReader(repo.GetIn())
-	bw := bufio.NewWriter(repo.GetOut())
+	// shuts down the server when the main context is complete (on SIGHUP / SIGINT).
+	repo.After(repo.GetIn().GetFile().Close)
+	repo.After(repo.GetOut().GetFile().Close)
+
+	br := bufio.NewReader(repo.GetIn().GetFile())
+	bw := bufio.NewWriter(repo.GetOut().GetFile())
 
 	for {
 		repo.ContinueOrPanicOnDone()
 
 		var request *http.Request
 
-		// TODO listen for cancel signal and give up on read
 		if request, err = http.ReadRequest(br); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
@@ -190,13 +192,22 @@ func (repo *Repo) ServeStdio() (err error) {
 		}
 
 		if err = responseModified.Write(bw); err != nil {
-			err = errors.Wrap(err)
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 
-		// TODO listen for cancel signal and give up on write
 		if err = bw.Flush(); err != nil {
-			err = errors.Wrap(err)
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 	}

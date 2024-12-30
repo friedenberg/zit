@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -32,7 +32,7 @@ import (
 type Repo struct {
 	*env.Env
 
-	fileUI interfaces.WriterAndStringWriter
+	ui fd.Std
 
 	sunrise ids.Tai
 
@@ -104,12 +104,12 @@ func Make(
 ) (repo *Repo) {
 	repo = &Repo{
 		Env:            env,
-		fileUI:         env.GetOutFile(),
+		ui:             env.GetOut(),
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
 	if options.GetUIFileIsStderr() {
-		repo.fileUI = env.GetErrFile()
+		repo.ui = env.GetErr()
 	}
 
 	repo.config.Reset()

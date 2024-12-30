@@ -163,7 +163,6 @@ func (kc *compiled) SetNeedsRecompile(reason string) {
 }
 
 func (kc *compiled) setNeedsRecompile(reason string) {
-	ui.Log().FunctionName(1)
 	kc.changes = append(kc.changes, reason)
 }
 

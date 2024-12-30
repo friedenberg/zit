@@ -8,7 +8,7 @@ import (
 )
 
 type devPrinter struct {
-	prodPrinter
+	printer
 	includesStack bool
 }
 
@@ -22,7 +22,7 @@ func (p devPrinter) Print(a ...interface{}) (err error) {
 		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
 
-	return p.prodPrinter.Print(a...)
+	return p.printer.Print(a...)
 }
 
 func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
@@ -36,7 +36,7 @@ func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
 		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
 
-	return p.prodPrinter.Printf(f, a...)
+	return p.printer.Printf(f, a...)
 }
 
 func (p devPrinter) Caller(i int, vs ...interface{}) {
@@ -48,7 +48,7 @@ func (p devPrinter) Caller(i int, vs ...interface{}) {
 
 	vs = append([]interface{}{st}, vs...)
 	// TODO-P4 strip trailing newline and add back
-	p.prodPrinter.Print(vs...)
+	p.printer.Print(vs...)
 }
 
 func (p devPrinter) CallerNonEmpty(i int, v interface{}) {

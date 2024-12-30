@@ -1,7 +1,6 @@
 package repo_local
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -13,15 +12,19 @@ func (env *Repo) MakeImporter(
 	}
 
 	if printCopies {
-		importer.BlobCopierDelegate = func(result store.BlobCopyResult) error {
-			// TODO switch to Err and fix test
-			return ui.Out().Printf(
-				"copied Blob %s (%d bytes)",
-				result.GetBlobSha(),
-				result.N,
-			)
-		}
+		importer.BlobCopierDelegate = env.MakeBlobCopierDelegate()
 	}
 
 	return
+}
+
+func (env *Repo) MakeBlobCopierDelegate() func(store.BlobCopyResult) error {
+	return func(result store.BlobCopyResult) error {
+		// TODO switch to Err and fix test
+		return env.GetUI().Printf(
+			"copied Blob %s (%d bytes)",
+			result.GetBlobSha(),
+			result.N,
+		)
+	}
 }

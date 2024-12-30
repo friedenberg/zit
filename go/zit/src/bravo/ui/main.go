@@ -10,7 +10,6 @@ import (
 var (
 	SetOutput = log.SetOutput
 	verbose   bool
-	isTest    bool
 )
 
 func init() {
@@ -28,7 +27,6 @@ func SetVerbose(on bool) {
 }
 
 func SetTesting() {
-	isTest = true
 	errors.SetTesting()
 	SetVerbose(true)
 }
@@ -37,47 +35,38 @@ func IsVerbose() bool {
 	return verbose
 }
 
-type ProdPrinter interface {
+type Printer interface {
+	GetPrinter() Printer
+	GetFile() *os.File
+	IsTty() bool
 	Print(v ...interface{}) error
 	Printf(format string, v ...interface{}) error
 }
 
 type DevPrinter interface {
-	ProdPrinter
+	Printer
 	Caller(i int, vs ...interface{})
 	FunctionName(skip int)
 }
 
 var (
-	printerOut, printerErr   prodPrinter
+	printerOut, printerErr   printer
 	printerLog, printerDebug devPrinter
 	printerBatsTestBody      devPrinter
 )
 
 func init() {
-	printerOut = prodPrinter{
-		f:  os.Stdout,
-		on: true,
-	}
-
-	printerErr = prodPrinter{
-		f:  os.Stderr,
-		on: true,
-	}
+	printerOut = MakePrinterOn(os.Stdout, true)
+	printerErr = MakePrinterOn(os.Stderr, true)
 
 	printerLog = devPrinter{
-		prodPrinter: prodPrinter{
-			f: os.Stderr,
-		},
+		printer:       printerErr.withOn(false),
 		includesStack: true,
 	}
 
+	// TODO-P2 determine if on thru compilation
 	printerDebug = devPrinter{
-		prodPrinter: prodPrinter{
-			f: os.Stderr,
-			// TODO-P2 determine thru compilation
-			on: true,
-		},
+		printer:       printerErr,
 		includesStack: true,
 	}
 
@@ -85,21 +74,18 @@ func init() {
 	envVarFilter := "BATS_TEST_BODY"
 	_, printerBatsTestBodyOn := os.LookupEnv(envVarFilter)
 
+	// TODO-P2 determine thru compilation
 	printerBatsTestBody = devPrinter{
-		prodPrinter: prodPrinter{
-			f: os.Stderr,
-			// TODO-P2 determine thru compilation
-			on: printerBatsTestBodyOn,
-		},
+		printer:       printerErr.withOn(printerBatsTestBodyOn),
 		includesStack: true,
 	}
 }
 
-func Out() ProdPrinter {
+func Out() Printer {
 	return printerOut
 }
 
-func Err() ProdPrinter {
+func Err() Printer {
 	return printerErr
 }
 

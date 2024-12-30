@@ -18,6 +18,7 @@ type Env struct {
 	in  fd.Std
 	out fd.Std
 	err fd.Std
+	ui  fd.Std
 
 	dir_layout.Layout
 
@@ -66,7 +67,7 @@ func (u *Env) GetIn() fd.Std {
 }
 
 func (u *Env) GetInFile() io.Reader {
-	return u.in.File
+	return u.in.GetFile()
 }
 
 func (u *Env) GetOut() fd.Std {
@@ -74,7 +75,7 @@ func (u *Env) GetOut() fd.Std {
 }
 
 func (u *Env) GetOutFile() interfaces.WriterAndStringWriter {
-	return u.out.File
+	return u.out.GetFile()
 }
 
 func (u *Env) GetErr() fd.Std {
@@ -82,7 +83,7 @@ func (u *Env) GetErr() fd.Std {
 }
 
 func (u *Env) GetErrFile() interfaces.WriterAndStringWriter {
-	return u.err.File
+	return u.err.GetFile()
 }
 
 func (u *Env) GetCLIConfig() config_mutable_cli.Config {

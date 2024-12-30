@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/primordial"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"github.com/google/shlex"
 )
@@ -118,7 +119,7 @@ func (editor Editor) openWithArgs(fs ...string) (err error) {
 		allArgs...,
 	)
 
-	if files.IsTty(os.Stdin) {
+	if primordial.IsTty(os.Stdin) {
 		cmd.Stdin = os.Stdin
 	}
 

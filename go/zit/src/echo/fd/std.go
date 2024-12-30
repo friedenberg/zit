@@ -3,21 +3,15 @@ package fd
 import (
 	"os"
 
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type Std struct {
-	*os.File
-	IsTty bool
+	ui.Printer
 }
 
 func MakeStd(f *os.File) Std {
 	return Std{
-		File:  f,
-		IsTty: files.IsTty(f),
+		Printer: ui.MakePrinter(f),
 	}
-}
-
-func (f Std) GetFile() *os.File {
-	return f.File
 }

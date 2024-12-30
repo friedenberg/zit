@@ -12,12 +12,12 @@ func (u *Repo) FormatOutputOptions() (o string_format_writer.OutputOptions) {
 }
 
 func (u *Repo) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetOut().IsTty || !u.config.PrintOptions.PrintColors
+	o.OffEntirely = !u.GetOut().IsTty() || !u.config.PrintOptions.PrintColors
 	return
 }
 
 func (u *Repo) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetErr().IsTty || !u.config.PrintOptions.PrintColors
+	o.OffEntirely = !u.GetErr().IsTty() || !u.config.PrintOptions.PrintColors
 	return
 }
 

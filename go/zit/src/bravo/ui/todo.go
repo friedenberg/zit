@@ -11,7 +11,7 @@ var todo todoPrinter
 
 func init() {
 	todo = todoPrinter{
-		prodPrinter: prodPrinter{
+		printer: printer{
 			f: os.Stderr,
 		},
 		includesStack: true,

@@ -153,7 +153,11 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 			var err error
 
 			if zts, err = opCreateFromPath.Run(args...); err != nil {
-				u.CancelWithError(err)
+				if errors.IsNotExist(err) {
+					u.CancelWithBadRequestf("Expected a valid file path. Did you mean to add `-description`?")
+				} else {
+					u.CancelWithError(err)
+				}
 			}
 		}
 	}

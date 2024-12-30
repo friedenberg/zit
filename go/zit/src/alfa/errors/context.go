@@ -12,7 +12,24 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var errContextCancelled = New("context cancelled")
+var errContextCancelled errContextCancelledExpected
+
+type errContextCancelledExpected struct {
+	error
+}
+
+func (err errContextCancelledExpected) Error() string {
+	if err.error == nil {
+		return "context cancelled"
+	} else {
+		return fmt.Sprintf("context cancelled: %s", err.error)
+	}
+}
+
+func (err errContextCancelledExpected) Is(target error) bool {
+	_, ok := target.(errContextCancelledExpected)
+	return ok
+}
 
 type Context struct {
 	context.Context
@@ -51,10 +68,18 @@ func (c *Context) Cause() error {
 	return nil
 }
 
-func (c *Context) ContinueOrPanicOnDone() {
+func (c *Context) Continue() bool {
 	select {
 	default:
+		return true
+
 	case <-c.Done():
+		return false
+	}
+}
+
+func (c *Context) ContinueOrPanicOnDone() {
+	if !c.Continue() {
 		panic(errContextCancelled)
 	}
 }
@@ -75,9 +100,8 @@ func (c *Context) Run(f func(*Context)) error {
 	go func() {
 		select {
 		case <-c.Done():
-		case <-c.signals:
-			// c.cancel(Signal{Signal: sig})
-			c.cancel(errContextCancelled)
+		case sig := <-c.signals:
+			c.cancel(errContextCancelledExpected{Signal{Signal: sig}})
 		}
 
 		signal.Stop(c.signals)
@@ -87,13 +111,21 @@ func (c *Context) Run(f func(*Context)) error {
 		defer c.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
-				if r != errContextCancelled {
-					panic(r)
+				var err error
+
+				{
+					var ok bool
+
+					if err, ok = r.(error); !ok {
+						panic(r)
+					}
+				}
+
+				if !Is(err, errContextCancelledExpected{}) {
+					panic(err)
 				}
 			}
 		}()
-
-		// time.AfterFunc(3e9, c.Cancel)
 
 		f(c)
 	}()

@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -34,14 +33,12 @@ func (s *Store) QueryTransacted(
 	qg *query.Group,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	ui.Log().FunctionName(0)
 	var e query.Executor
 
 	if e, err = s.makeQueryExecutor(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	ui.Log().FunctionName(0)
 
 	if err = e.ExecuteTransacted(f); err != nil {
 		err = errors.Wrap(err)
