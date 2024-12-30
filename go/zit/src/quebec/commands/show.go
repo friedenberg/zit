@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -51,6 +52,7 @@ func (c Show) DefaultGenres() ids.Genre {
 }
 
 func (c Show) RunWithQuery(repo *repo_local.Repo, qg *query.Group) {
+	ui.Log().FunctionName(0)
 	var f interfaces.FuncIter[*sku.Transacted]
 
 	if c.Format == "" && qg.IsExactlyOneObjectId() {
@@ -98,6 +100,8 @@ func (c Show) RunWithQuery(repo *repo_local.Repo, qg *query.Group) {
 			return
 		}
 	}
+
+	ui.Log().FunctionName(0)
 
 	if err := repo.GetStore().QueryTransacted(
 		qg,

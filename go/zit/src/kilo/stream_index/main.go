@@ -405,7 +405,7 @@ func (s *Index) readOneLoc(
 	return
 }
 
-func (i *Index) readFrom(
+func (i *Index) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -434,7 +434,7 @@ func (i *Index) readFrom(
 		wg.Add(1)
 
 		go func(p *Page, openFileCh chan struct{}) {
-			ui.Log().Print("starting query on page %d: %q", p.PageId.Index, qg)
+			ui.Log().Printf("starting query on page %d: %q", p.PageId.Index, qg)
 			defer wg.Done()
 			defer func() {
 				openFileCh <- struct{}{}
@@ -476,11 +476,4 @@ func (i *Index) readFrom(
 	}
 
 	return
-}
-
-func (i *Index) ReadQuery(
-	qg sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	return i.readFrom(qg, w)
 }

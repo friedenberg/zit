@@ -166,19 +166,7 @@ func (s *Store) Open(
 	return
 }
 
-func (s *Store) MakeQueryExecutorPrimitive(
-	qg sku.PrimitiveQueryGroup,
-) (e query.ExecutorPrimitive, err error) {
-	e = query.MakeExecutorPrimitive(
-		qg,
-		s.GetStreamIndex().ReadQuery,
-		s.ReadOneInto,
-	)
-
-	return
-}
-
-func (s *Store) MakeQueryExecutor(
+func (s *Store) makeQueryExecutor(
 	qg *query.Group,
 ) (e query.Executor, err error) {
 	if qg == nil {
@@ -192,7 +180,7 @@ func (s *Store) MakeQueryExecutor(
 
 	e = query.MakeExecutorWithExternalStore(
 		qg,
-		s.GetStreamIndex().ReadQuery,
+		s.GetStreamIndex().ReadPrimitiveQuery,
 		s.ReadOneInto,
 		es,
 	)

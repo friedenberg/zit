@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -124,11 +125,13 @@ func (e *Executor) ExecuteSkuType(
 func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
+	ui.Log().FunctionName(0)
 	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+	ui.Log().FunctionName(0)
 
 	// TODO tease apart the reliance on dotOperatorActive here
 	if e.dotOperatorActive {

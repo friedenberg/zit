@@ -149,7 +149,7 @@ func (s *Store) SetExternalStores(
 			FuncRealize:        s.tryRealize,
 			FuncCommit:         s.tryRealizeAndOrStore,
 			FuncReadOneInto:    s.GetStreamIndex().ReadOneObjectId,
-			FuncPrimitiveQuery: s.GetStreamIndex().ReadQuery,
+			FuncPrimitiveQuery: s.GetStreamIndex().ReadPrimitiveQuery,
 		}
 
 		es.Layout = s.GetDirectoryLayout()
