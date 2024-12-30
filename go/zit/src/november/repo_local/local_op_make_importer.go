@@ -20,10 +20,9 @@ func (env *Repo) MakeImporter(
 
 func (env *Repo) MakeBlobCopierDelegate() func(store.BlobCopyResult) error {
 	return func(result store.BlobCopyResult) error {
-		// TODO switch to Err and fix test
 		return env.GetUI().Printf(
 			"copied Blob %s (%d bytes)",
-			result.GetBlobSha(),
+			result.Sha,
 			result.N,
 		)
 	}
