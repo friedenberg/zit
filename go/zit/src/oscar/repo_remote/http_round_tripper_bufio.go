@@ -20,11 +20,6 @@ func (roundTripper *HTTPRoundTripperBufio) RoundTrip(
 		return
 	}
 
-	if err = request.Body.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = roundTripper.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return

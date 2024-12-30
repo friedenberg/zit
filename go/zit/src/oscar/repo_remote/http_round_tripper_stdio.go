@@ -91,7 +91,7 @@ func (roundTripper *HTTPRoundTripperStdio) initialize(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			"remote",
-			os.Stderr,
+      remote.GetUI(),
 			stderrReadCloser,
 			false,
 		); err != nil {

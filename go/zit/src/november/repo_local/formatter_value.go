@@ -519,9 +519,9 @@ func (u *Repo) MakeFormatFunc(
 				if _, err = delim_io.CopyWithPrefixOnDelim(
 					'\n',
 					sb.String(),
-					out,
+					u.GetOut(),
 					r,
-          true,
+					true,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -561,9 +561,9 @@ func (u *Repo) MakeFormatFunc(
 			if _, err = delim_io.CopyWithPrefixOnDelim(
 				'\n',
 				sb.String(),
-				out,
+				u.GetOut(),
 				r,
-        true,
+				true,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

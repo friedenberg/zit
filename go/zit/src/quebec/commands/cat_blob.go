@@ -124,9 +124,9 @@ func (c CatBlob) copy(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			rc.Sha.GetShaLike().GetShaString(),
-			u.GetUIFile(),
+			u.GetUI(),
 			rc.ReadCloser,
-      true,
+			true,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -1,12 +1,13 @@
 package delim_io
 
 import (
-	"bytes"
 	"fmt"
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 // Copies each `delim` suffixed segment from src to dst, and for each segment,
@@ -17,7 +18,7 @@ import (
 func CopyWithPrefixOnDelim(
 	delim byte,
 	prefix string,
-	dst io.Writer,
+	dst ui.Printer,
 	src io.Reader,
 	includeLineNo bool,
 ) (n int64, err error) {
@@ -25,20 +26,17 @@ func CopyWithPrefixOnDelim(
 	defer pool.GetBufioReader().Put(br)
 	br.Reset(src)
 
-	bw := pool.GetBufioWriter().Get()
-	defer pool.GetBufioWriter().Put(bw)
-	defer errors.DeferredFlusher(&err, bw)
-	bw.Reset(dst)
-
 	var (
 		eof    bool
 		lineNo int
 	)
 
-	for !eof {
-		var rawLine []byte
+	var sb strings.Builder
 
-		rawLine, err = br.ReadBytes(delim)
+	for !eof {
+		var rawLine string
+
+		rawLine, err = br.ReadString(delim)
 		n1 := len(rawLine)
 		n += int64(n1)
 
@@ -56,18 +54,20 @@ func CopyWithPrefixOnDelim(
 			}
 		}
 
-		bw.WriteString(prefix)
-		fmt.Fprint(bw, ":")
+		sb.WriteString(prefix)
+		fmt.Fprint(&sb, ":")
 
 		if includeLineNo {
-			fmt.Fprintf(bw, "%d:", lineNo)
+			fmt.Fprintf(&sb, "%d:", lineNo)
 		}
 
-		fmt.Fprint(bw, " ")
+		fmt.Fprint(&sb, " ")
 		// fmt.Fprint(bw, "\t")
 
-		bw.Write(bytes.TrimSuffix(rawLine, []byte{delim}))
-		bw.WriteByte(delim)
+		sb.WriteString(strings.TrimSuffix(rawLine, string([]byte{delim})))
+
+		dst.Print(sb.String())
+		sb.Reset()
 
 		lineNo++
 	}
