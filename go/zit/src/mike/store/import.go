@@ -15,7 +15,8 @@ import (
 var ErrNeedsMerge = errors.NewNormal("needs merge")
 
 type BlobCopyResult struct {
-	*sku.Transacted
+	*sku.Transacted // may be nil
+	interfaces.Sha  // may not be nil
 
 	// -1: no remote blob store and the blob doesn't exist locally
 	// -2: no remote blob store and the blob exists locally
@@ -27,7 +28,6 @@ type Importer struct {
 	RemoteBlobStore    interfaces.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
 	sku.ParentNegotiator
-	DontPrint bool
 }
 
 func (s Importer) Import(
@@ -179,7 +179,11 @@ func (c Importer) importBlobIfNecessary(
 
 		if c.BlobCopierDelegate != nil {
 			if err = c.BlobCopierDelegate(
-				BlobCopyResult{Transacted: sk, N: n},
+				BlobCopyResult{
+					Transacted: sk,
+					Sha:        blobSha,
+					N:          n,
+				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -208,7 +212,11 @@ func (c Importer) importBlobIfNecessary(
 
 	if c.BlobCopierDelegate != nil {
 		if err = c.BlobCopierDelegate(
-			BlobCopyResult{Transacted: sk, N: n},
+			BlobCopyResult{
+				Transacted: sk,
+				Sha:        blobSha,
+				N:          n,
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return

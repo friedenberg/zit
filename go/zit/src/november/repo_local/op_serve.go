@@ -325,9 +325,15 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 			}
 		}
 
-		if _, err := io.Copy(wc, request.Body); err != nil {
-			response.Error(err)
-			return
+		var n int64
+
+		{
+			var err error
+
+			if n, err = io.Copy(wc, request.Body); err != nil {
+				response.Error(err)
+				return
+			}
 		}
 
 		if err := wc.Close(); err != nil {
@@ -336,6 +342,18 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		}
 
 		sh := wc.GetShaLike()
+
+		blobCopierDelegate := local.MakeBlobCopierDelegate()
+
+		if err := blobCopierDelegate(
+			store.BlobCopyResult{
+				Sha: sh,
+				N:   n,
+			},
+		); err != nil {
+			response.Error(err)
+			return
+		}
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(strings.NewReader(sh.GetShaString()))
@@ -423,7 +441,6 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		b := bytes.NewBuffer(nil)
 
 		importer := local.MakeImporter(false)
-		// importer.DontPrint = true
 		importer.BlobCopierDelegate = func(result store.BlobCopyResult) (err error) {
 			local.ContinueOrPanicOnDone()
 

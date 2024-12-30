@@ -41,11 +41,9 @@ func (u *Repo) ImportList(
 		if co.GetState() == checked_out_state.Conflicted {
 			hasConflicts = true
 
-			if !importer.DontPrint {
-				if err = coPrinter(co); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if err = coPrinter(co); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			continue
