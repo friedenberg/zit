@@ -85,15 +85,13 @@ func registerCommandWithQuery(
 	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
-			cweq := &commandWithQuery{}
+			cmd := &commandWithQuery{
+				CommandWithQuery: makeFunc(f),
+			}
 
-			f.Var(&cweq.RepoId, "kasten", "none or Browser")
-			f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
-			f.BoolVar(&cweq.ExcludeRecognized, "exclude-recognized", false, "")
+			cmd.SetFlagSet(f)
 
-			cweq.CommandWithQuery = makeFunc(f)
-
-			return cweq
+			return cmd
 		},
 	)
 }
@@ -105,13 +103,13 @@ func registerCommandWithRemoteAndQuery(
 	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
-			c := &commandWithRemoteAndQuery{
+			cmd := &commandWithRemoteAndQuery{
 				CommandWithRemoteAndQuery: cwraq,
 			}
 
-			c.SetFlagSet(f)
+			cmd.SetFlagSet(f)
 
-			return c
+			return cmd
 		},
 	)
 }

@@ -145,6 +145,7 @@ func (env *Repo) Serve(listener net.Listener) (err error) {
 }
 
 func (repo *Repo) ServeStdio() (err error) {
+  repo.After(repo.GetIn().Close)
 	br := bufio.NewReader(repo.GetIn())
 	bw := bufio.NewWriter(repo.GetOut())
 

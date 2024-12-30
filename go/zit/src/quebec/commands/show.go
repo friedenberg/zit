@@ -50,7 +50,7 @@ func (c Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
+func (c Show) RunWithQuery(repo *repo_local.Repo, qg *query.Group) {
 	var f interfaces.FuncIter[*sku.Transacted]
 
 	if c.Format == "" && qg.IsExactlyOneObjectId() {
@@ -60,8 +60,8 @@ func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	{
 		var err error
 
-		if f, err = u.MakeFormatFunc(c.Format, u.GetUIFile()); err != nil {
-			u.CancelWithError(err)
+		if f, err = repo.MakeFormatFunc(c.Format, repo.GetUIFile()); err != nil {
+			repo.CancelWithError(err)
 		}
 	}
 
@@ -99,10 +99,10 @@ func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		}
 	}
 
-	if err := u.GetStore().QueryTransacted(
+	if err := repo.GetStore().QueryTransacted(
 		qg,
 		quiter.MakeSyncSerializer(f),
 	); err != nil {
-		u.CancelWithError(err)
+		repo.CancelWithError(err)
 	}
 }

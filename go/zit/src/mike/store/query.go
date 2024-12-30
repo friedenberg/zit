@@ -87,6 +87,24 @@ func (s *Store) QuerySkuType(
 	return
 }
 
+func (s *Store) QueryExactlyOne(
+	qg *query.Group,
+) (sk *sku.Transacted, err error) {
+	var e query.Executor
+
+	if e, err = s.MakeQueryExecutor(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if sk, err = e.ExecuteExactlyOne(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, err error) {
 	blobShaBytes = make(map[sha.Bytes][]string)
 	var l sync.Mutex

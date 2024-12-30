@@ -409,6 +409,7 @@ func (i *Index) readFrom(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
+	ui.Log().Print("starting query: %q", qg)
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 	me := errors.MakeMulti()
@@ -433,6 +434,7 @@ func (i *Index) readFrom(
 		wg.Add(1)
 
 		go func(p *Page, openFileCh chan struct{}) {
+			ui.Log().Print("starting query on page %d: %q", p.PageId.Index, qg)
 			defer wg.Done()
 			defer func() {
 				openFileCh <- struct{}{}
