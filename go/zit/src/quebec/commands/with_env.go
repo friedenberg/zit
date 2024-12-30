@@ -25,14 +25,20 @@ func (cmd commandWithEnv) Run(
 		dependencies.Debug,
 	)
 
+	var options env.Options
+
+	if og, ok := cmd.Command.(env.OptionsGetter); ok {
+		options = og.GetEnvOptions()
+	}
+
 	env := env.Make(
 		dependencies.Context,
 		dependencies.Config,
 		dirLayout,
+		options,
 	)
 
 	cmdArgs := cmd.Args()
-
 
 	cmd.Command.RunWithEnv(env, cmdArgs...)
 }

@@ -18,7 +18,8 @@ func (cmd *RepoLocal) SetFlagSet(f *flag.FlagSet) {
 func (c RepoLocal) MakeRepoLocal(
 	context *errors.Context,
 	config config_mutable_cli.Config,
-	options repo_local.Options,
+	envOptions env.Options,
+	repoOptions repo_local.Options,
 ) *repo_local.Repo {
 	layout := dir_layout.MakeDefault(
 		context,
@@ -29,7 +30,8 @@ func (c RepoLocal) MakeRepoLocal(
 		context,
 		config,
 		layout,
+		envOptions,
 	)
 
-	return repo_local.Make(env, options)
+	return repo_local.Make(env, repoOptions)
 }

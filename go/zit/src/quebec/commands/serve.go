@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net"
 
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -22,8 +23,10 @@ func init() {
 	)
 }
 
-func (c Serve) GetLocalRepoOptions() repo_local.Options {
-	return repo_local.OptionsUIFileIsStderr
+func (c Serve) GetEnvOptions() env.Options {
+	return env.Options{
+		UIFileIsStderr: true,
+	}
 }
 
 func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {

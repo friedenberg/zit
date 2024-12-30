@@ -13,6 +13,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
+	options env.Options,
 ) (remoteHTTP *HTTP, err error) {
 	var remote *repo_local.Repo
 
@@ -20,6 +21,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 		context,
 		config,
 		xdgDotenvPath,
+		options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

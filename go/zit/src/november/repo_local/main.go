@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -31,8 +30,6 @@ import (
 
 type Repo struct {
 	*env.Env
-
-	ui fd.Std
 
 	sunrise ids.Tai
 
@@ -56,6 +53,7 @@ func MakeFromConfigAndXDGDotenvPath(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
+	options env.Options,
 ) (local *Repo, err error) {
 	dotenv := xdg.Dotenv{
 		XDG: &xdg.XDG{},
@@ -88,6 +86,7 @@ func MakeFromConfigAndXDGDotenvPath(
 		context,
 		config,
 		dirLayout,
+		options,
 	)
 
 	local = Make(
@@ -104,12 +103,7 @@ func Make(
 ) (repo *Repo) {
 	repo = &Repo{
 		Env:            env,
-		ui:             env.GetOut(),
 		DormantCounter: query.MakeDormantCounter(),
-	}
-
-	if options.GetUIFileIsStderr() {
-		repo.ui = env.GetErr()
 	}
 
 	repo.config.Reset()

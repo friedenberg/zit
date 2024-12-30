@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -70,6 +71,7 @@ func (c Clone) Run(
 		if local, err = c.BigBang.Start(
 			dependencies.Context,
 			dependencies.Config,
+			env.Options{},
 		); err != nil {
 			local.CancelWithError(err)
 		}

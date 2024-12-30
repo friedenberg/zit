@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -45,6 +46,7 @@ func (c Init) Run(
 		if repo, err = c.BigBang.Start(
 			dependencies.Context,
 			dependencies.Config,
+      env.Options{},
 		); err != nil {
 			repo.CancelWithError(err)
 		}

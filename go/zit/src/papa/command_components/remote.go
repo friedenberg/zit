@@ -30,6 +30,7 @@ func (c Remote) MakeRemote(
 			env.Context,
 			env.GetCLIConfig(),
 			remoteArg,
+			env.GetOptions(),
 		); err != nil {
 			env.CancelWithErrorAndFormat(
 				err,
@@ -70,6 +71,7 @@ func (c Remote) MakeRemote(
 			env.Context,
 			env.GetCLIConfig(),
 			remoteArg,
+			env.GetOptions(),
 		); err != nil {
 			env.CancelWithErrorAndFormat(
 				err,

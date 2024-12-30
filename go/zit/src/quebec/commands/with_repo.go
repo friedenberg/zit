@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -20,10 +21,16 @@ func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
 func (cmd commandWithRepo) Run(
 	dependencies Dependencies,
 ) {
-	options := repo_local.OptionsEmpty
+	var envOptions env.Options
+
+	if og, ok := cmd.Command.(env.OptionsGetter); ok {
+		envOptions = og.GetEnvOptions()
+	}
+
+	repoOptions := repo_local.OptionsEmpty
 
 	if og, ok := cmd.Command.(repo_local.OptionsGetter); ok {
-		options = og.GetLocalRepoOptions()
+		repoOptions = og.GetLocalRepoOptions()
 	}
 
 	cmdArgs := cmd.Args()
@@ -31,7 +38,8 @@ func (cmd commandWithRepo) Run(
 	repo := cmd.MakeRepoLocal(
 		dependencies.Context,
 		dependencies.Config,
-		options,
+		envOptions,
+		repoOptions,
 	)
 
 	switch {

@@ -15,10 +15,12 @@ import (
 type Env struct {
 	*errors.Context
 
+	options Options
+
 	in  fd.Std
+	ui  fd.Std
 	out fd.Std
 	err fd.Std
-	ui  fd.Std
 
 	dir_layout.Layout
 
@@ -34,6 +36,7 @@ func MakeDefault(
 		errors.MakeContextDefault(),
 		config_mutable_cli.Config{},
 		layout,
+		Options{},
 	)
 }
 
@@ -41,14 +44,22 @@ func Make(
 	context *errors.Context,
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
+	options Options,
 ) *Env {
 	e := &Env{
 		Context:   context,
+		options:   options,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
 		cliConfig: kCli,
 		Layout:    dirLayout,
+	}
+
+	if options.UIFileIsStderr {
+		e.ui = e.err
+	} else {
+		e.ui = e.out
 	}
 
 	{
@@ -62,12 +73,24 @@ func Make(
 	return e
 }
 
+func (u Env) GetOptions() Options {
+	return u.options
+}
+
 func (u *Env) GetIn() fd.Std {
 	return u.in
 }
 
 func (u *Env) GetInFile() io.Reader {
 	return u.in.GetFile()
+}
+
+func (u *Env) GetUI() fd.Std {
+	return u.ui
+}
+
+func (u *Env) GetUIFile() interfaces.WriterAndStringWriter {
+	return u.ui.GetFile()
 }
 
 func (u *Env) GetOut() fd.Std {

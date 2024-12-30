@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -13,14 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
-
-func (u *Repo) GetUI() fd.Std {
-	return u.ui
-}
-
-func (u *Repo) GetUIFile() interfaces.WriterAndStringWriter {
-	return u.ui.GetFile()
-}
 
 func (u *Repo) GetTime() time.Time {
 	return time.Now()

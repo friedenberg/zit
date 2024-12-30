@@ -50,6 +50,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 func (bb BigBang) Start(
 	context *errors.Context,
 	config config_mutable_cli.Config,
+	options env.Options,
 ) (u *Repo, err error) {
 	dirLayout := dir_layout.MakeDefaultAndInitialize(
 		context,
@@ -61,6 +62,7 @@ func (bb BigBang) Start(
 		context,
 		config,
 		dirLayout,
+		options,
 	)
 
 	u = Make(env, OptionsEmpty)
