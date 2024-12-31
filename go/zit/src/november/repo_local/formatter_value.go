@@ -884,7 +884,7 @@ func (u *Repo) makeTypFormatter(
 
 			f := vm.GetField(vm.Top, "on_pre_commit")
 
-			ui.Out().Print(f.String())
+			u.GetUI().Print(f.String())
 
 			return
 		}

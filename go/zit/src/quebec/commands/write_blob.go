@@ -83,9 +83,9 @@ func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if hasBlob {
 			if c.Check {
-				ui.Out().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
+				u.GetUI().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
 			} else {
-				ui.Out().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
+				u.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
 			}
 		} else {
 			ui.Err().Printf("%s %s (untracked)", a.GetShaLike(), a.Path)

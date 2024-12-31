@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -258,7 +257,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 
 LOOP:
 	for ts.Scan() {
-		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
+		t, tokenType, _ := ts.GetTokenAndTypeAndParts()
 		n += t.Len()
 
 		if t.EqualsString(" ") || t.EqualsString("\n") {
@@ -286,7 +285,6 @@ LOOP:
 				break LOOP
 			} else {
 				if tokenType == token_types.TypeField {
-					ui.Debug().Print(tokenParts)
 					continue
 				}
 

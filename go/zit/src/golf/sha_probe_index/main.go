@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type (
@@ -19,14 +20,14 @@ type (
 	pageInterface interface {
 		GetIndexPage() pageInterface
 		commonInterface
-		PrintAll() error
+		PrintAll(*env.Env) error
 		errors.Flusher
 	}
 
 	Index interface {
 		GetIndex() Index
 		commonInterface
-		PrintAll() error
+		PrintAll(*env.Env) error
 		errors.Flusher
 	}
 )
@@ -116,7 +117,7 @@ func (e *object_probe_index) ReadMany(sh *Sha, locs *[]*sha.Sha) (err error) {
 	return e.pages[i].ReadMany(sh, locs)
 }
 
-func (e *object_probe_index) PrintAll() (err error) {
+func (*object_probe_index) PrintAll(_ *env.Env) (err error) {
 	return
 }
 

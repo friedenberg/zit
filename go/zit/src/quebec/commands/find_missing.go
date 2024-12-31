@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -45,9 +44,9 @@ func (c FindMissing) RunWithRepo(
 		oids, ok := lookupStored[sh.GetBytes()]
 
 		if ok {
-			ui.Out().Printf("%s (checked in as %q)", &sh, oids)
+			u.GetUI().Printf("%s (checked in as %q)", &sh, oids)
 		} else {
-			ui.Out().Printf("%s (missing)", &sh)
+			u.GetUI().Printf("%s (missing)", &sh)
 		}
 	}
 }

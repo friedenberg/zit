@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
 
@@ -21,14 +22,14 @@ type (
 	pageInterface interface {
 		GetObjectProbeIndexPage() pageInterface
 		commonInterface
-		PrintAll() error
+		PrintAll(*env.Env) error
 		errors.Flusher
 	}
 
 	Index interface {
 		GetObjectProbeIndex() Index
 		commonInterface
-		PrintAll() error
+		PrintAll(*env.Env) error
 		errors.Flusher
 	}
 )
@@ -210,11 +211,11 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 	return wg.GetError()
 }
 
-func (e *object_probe_index) PrintAll() (err error) {
+func (e *object_probe_index) PrintAll(env *env.Env) (err error) {
 	for i := range e.pages {
 		p := &e.pages[i]
 
-		if err = p.PrintAll(); err != nil {
+		if err = p.PrintAll(env); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

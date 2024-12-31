@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -45,17 +44,13 @@ func (c ReadBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 			return
 		}
 
-		var sh *sha.Sha
-
 		{
 			var err error
 
-			if sh, err = c.readOneBlob(u, entry); err != nil {
+			if _, err = c.readOneBlob(u, entry); err != nil {
 				u.CancelWithError(err)
 			}
 		}
-
-		ui.Debug().Print(sh)
 	}
 }
 

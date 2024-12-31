@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
@@ -61,7 +60,7 @@ func (c Mergetool) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1 and use Err
-		ui.Out().Printf("nothing to merge")
+		u.GetUI().Printf("nothing to merge")
 		return
 	}
 

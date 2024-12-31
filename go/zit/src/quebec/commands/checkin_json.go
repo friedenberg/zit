@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -50,7 +49,5 @@ func (c CheckinJson) RunWithRepo(
 				u.CancelWithError(err)
 			}
 		}
-
-		ui.Debug().Print(entry)
 	}
 }

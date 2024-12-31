@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strconv"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -55,7 +54,7 @@ func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
 	)
 
 	for i, h := range hs {
-		ui.Out().Printf("%d: %s", i, h)
+		repo.GetUI().Printf("%d: %s", i, h)
 	}
 
 	return

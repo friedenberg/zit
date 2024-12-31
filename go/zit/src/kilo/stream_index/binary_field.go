@@ -7,7 +7,6 @@ import (
 	"math"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 )
@@ -71,16 +70,16 @@ var errContentLengthDoesNotMatchContent = errors.New(
 )
 
 func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
-	defer func() {
-		r := recover()
+	// defer func() {
+	// 	r := recover()
 
-		if r == nil {
-			return
-		}
+	// 	if r == nil {
+	// 		return
+	// 	}
 
-		ui.Debug().Print(bf.Content.Len(), bf.ContentLength)
-		panic(r)
-	}()
+	// 	ui.Debug().Print(bf.Content.Len(), bf.ContentLength)
+	// 	panic(r)
+	// }()
 
 	if bf.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge

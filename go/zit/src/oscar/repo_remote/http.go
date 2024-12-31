@@ -21,10 +21,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
-// type HTTPClient interface {
-// 	Do(req *http.Request) (*http.Response, error)
-// }
-
 type HTTP struct {
 	http.Client
 	remote *repo_local.Repo
@@ -142,9 +138,6 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
-	ui.Log().Print(request, response)
-	ui.Log().Print(response.Body)
-
 	br := bufio.NewReader(response.Body)
 	eof := false
 
@@ -155,6 +148,7 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 
 		var line string
 		line, err = br.ReadString('\n')
+		ui.Debug().Print(line, err)
 
 		if err == io.EOF {
 			err = nil
@@ -174,6 +168,8 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			err = errors.Wrap(err)
 			return
 		}
+
+		ui.Debug().Print(&expected)
 
 		// Closed by the http client's transport (our roundtripper calling
 		// request.Write)
@@ -204,6 +200,8 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
+
+		ui.Debug().Print(response.Status)
 
 		var shString strings.Builder
 

@@ -8,12 +8,12 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type page struct {
@@ -234,7 +234,7 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 	return
 }
 
-func (e *page) PrintAll() (err error) {
+func (e *page) PrintAll(env *env.Env) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -255,7 +255,7 @@ func (e *page) PrintAll() (err error) {
 			return
 		}
 
-		ui.Out().Printf("%s", &current)
+		env.GetUI().Printf("%s", &current)
 	}
 }
 

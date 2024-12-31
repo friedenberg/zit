@@ -148,7 +148,7 @@ func (c CreateFromPaths) Run(
 			pathRel := c.GetRepoLayout().RelToCwdOrSame(f.GetPath())
 
 			// TODO-P2 move to printer
-			ui.Out().Printf("[%s] (deleted)", pathRel)
+			c.GetUI().Printf("[%s] (deleted)", pathRel)
 
 			return
 		},
