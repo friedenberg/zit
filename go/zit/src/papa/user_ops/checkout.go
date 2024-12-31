@@ -133,11 +133,10 @@ func (op Checkout) RunQuery(
 
 		var qg *query.Group
 
-		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
+		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel)).
+			WithCheckedOut(zsc)
 
-		if qg, err = builder.WithCheckedOut(
-			zsc,
-		).BuildQueryGroup(); err != nil {
+		if qg, err = builder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
