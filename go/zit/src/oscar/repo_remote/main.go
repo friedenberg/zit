@@ -28,7 +28,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 	}
 
 	remoteHTTP = &HTTP{
-		remote: remote,
+		Repo: remote,
 	}
 
 	var httpRoundTripper HTTPRoundTripperUnixSocket
@@ -61,7 +61,7 @@ func MakeRemoteStdioLocal(
 	)
 
 	remoteHTTP = &HTTP{
-		remote: remote,
+		Repo: remote,
 	}
 
 	var httpRoundTripper HTTPRoundTripperStdio
@@ -88,7 +88,7 @@ func MakeRemoteStdioSSH(
 	)
 
 	remoteHTTP = &HTTP{
-		remote: remote,
+		Repo: remote,
 	}
 
 	var httpRoundTripper HTTPRoundTripperStdio

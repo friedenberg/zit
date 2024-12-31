@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -23,18 +24,18 @@ import (
 
 type HTTP struct {
 	http.Client
-	remote *repo_local.Repo
+	*repo_local.Repo
 }
 
-func (remote *HTTP) GetRepo() repo.Repo {
-	return remote
+func (repo *HTTP) GetRepo() repo.Repo {
+	return repo
 }
 
-func (remote *HTTP) GetBlobStore() interfaces.BlobStore {
-	return &HTTPBlobStore{remote: remote}
+func (repo *HTTP) GetBlobStore() interfaces.BlobStore {
+	return &HTTPBlobStore{repo: repo}
 }
 
-func (remote *HTTP) MakeQueryGroup(
+func (repo *HTTP) MakeQueryGroup(
 	metaBuilder any,
 	repoId ids.RepoId,
 	externalQueryOptions sku.ExternalQueryOptions,
@@ -44,13 +45,13 @@ func (remote *HTTP) MakeQueryGroup(
 	return
 }
 
-func (remote *HTTP) MakeInventoryList(
+func (repo *HTTP) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		remote.remote.Context,
+		repo.Repo.Context,
 		"GET",
 		"/inventory_lists",
 		strings.NewReader(qg.String()),
@@ -61,13 +62,13 @@ func (remote *HTTP) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = remote.Do(request); err != nil {
+	if response, err = repo.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
 
-	bf := remote.remote.GetStore().GetInventoryListStore().FormatForVersion(
-		remote.remote.GetConfig().GetStoreVersion(),
+	bf := repo.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+		repo.Repo.GetConfig().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -98,7 +99,7 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 
 	// TODO local / remote version negotiation
 
-	bf := remoteHTTP.remote.GetStore().GetInventoryListStore().FormatForVersion(
+	bf := remoteHTTP.Repo.GetStore().GetInventoryListStore().FormatForVersion(
 		immutable_config.CurrentStoreVersion,
 	)
 
@@ -109,23 +110,25 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
-	var request *http.Request
-
-	if request, err = http.NewRequestWithContext(
-		remoteHTTP.remote.Context,
-		"POST",
-		"/inventory_lists",
-		b,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var response *http.Response
 
-	if response, err = remoteHTTP.Do(request); err != nil {
-		err = errors.Errorf("failed to read response: %w", err)
-		return
+	{
+		var request *http.Request
+
+		if request, err = http.NewRequestWithContext(
+			remoteHTTP.Repo.Context,
+			"POST",
+			"/inventory_lists",
+			b,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if response, err = remoteHTTP.Do(request); err != nil {
+			err = errors.Errorf("failed to read response: %w", err)
+			return
+		}
 	}
 
 	if response.StatusCode >= 300 {
@@ -139,38 +142,14 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	}
 
 	br := bufio.NewReader(response.Body)
-	eof := false
 
-	remoteHTTP.remote.ContinueOrPanicOnDone()
+	remoteHTTP.Repo.ContinueOrPanicOnDone()
 
-	var shas []*sha.Sha
+	var shas sha.Slice
 
-	for !eof {
-		remoteHTTP.remote.ContinueOrPanicOnDone()
-
-		var line string
-		line, err = br.ReadString('\n')
-
-		if err == io.EOF {
-			err = nil
-			eof = true
-		} else if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if line == "" {
-			continue
-		}
-
-		sh := sha.GetPool().Get()
-
-		if err = sh.Set(strings.TrimSpace(line)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		shas = append(shas, sh)
+	if _, err = shas.ReadFrom(br); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = response.Body.Close(); err != nil {
@@ -179,62 +158,84 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	}
 
 	for _, expected := range shas {
-		var actual sha.Sha
-
-		// Closed by the http client's transport (our roundtripper calling
-		// request.Write)
-		var rc interfaces.ShaReadCloser
-
-		if rc, err = remote.GetBlobStore().BlobReader(
-			expected,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if request, err = http.NewRequestWithContext(
-			remoteHTTP.remote.Context,
-			"POST",
-			"/blobs",
-			rc,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		request.TransferEncoding = []string{"chunked"}
-
-		var response *http.Response
-
-		if response, err = remoteHTTP.Do(request); err != nil {
-			err = errors.Errorf("failed to read response: %w", err)
-			return
-		}
-
-		var shString strings.Builder
-
-		if _, err = io.Copy(&shString, response.Body); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = response.Body.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = expected.AssertEqualsShaLike(&actual); err != nil {
+		if err = remoteHTTP.WriteBlobToRemote(remote, expected); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	ui.Log().Print("done")
+
+	return
+}
+
+func (remote *HTTP) WriteBlobToRemote(
+	local repo.Repo,
+	expected *sha.Sha,
+) (err error) {
+	var actual sha.Sha
+
+	// Closed by the http client's transport (our roundtripper calling
+	// request.Write)
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = local.GetBlobStore().BlobReader(
+		expected,
+	); err != nil {
+		if repo_layout.IsErrBlobMissing(err) {
+			// TODO make an option to collect this error at the present it, and an
+			// option to fetch it from another remote store
+			ui.Err().Printf("Blob missing locally: %q", expected)
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	var request *http.Request
+
+	if request, err = http.NewRequestWithContext(
+		remote.Repo.Context,
+		"POST",
+		"/blobs",
+		rc,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	request.TransferEncoding = []string{"chunked"}
+
+	var response *http.Response
+
+	if response, err = remote.Do(request); err != nil {
+		err = errors.Errorf("failed to read response: %w", err)
+		return
+	}
+
+	var shString strings.Builder
+
+	if _, err = io.Copy(&shString, response.Body); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = response.Body.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = expected.AssertEqualsShaLike(&actual); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -247,7 +248,7 @@ func (remote *HTTP) ReadObjectHistory(
 }
 
 type HTTPBlobStore struct {
-	remote *HTTP
+	repo *HTTP
 }
 
 func (blobStore *HTTPBlobStore) GetBlobStore() interfaces.BlobStore {
@@ -261,12 +262,12 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if request, err = http.NewRequestWithContext(
-			blobStore.remote.remote.Context,
+			blobStore.repo.Repo.Context,
 			"HEAD",
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
 		); err != nil {
-			blobStore.remote.remote.CancelWithError(err)
+			blobStore.repo.Repo.CancelWithError(err)
 		}
 	}
 
@@ -275,8 +276,8 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	{
 		var err error
 
-		if response, err = blobStore.remote.Do(request); err != nil {
-			blobStore.remote.remote.CancelWithError(err)
+		if response, err = blobStore.repo.Do(request); err != nil {
+			blobStore.repo.Repo.CancelWithError(err)
 		}
 	}
 
@@ -296,7 +297,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		blobStore.remote.remote.Context,
+		blobStore.repo.Repo.Context,
 		"GET",
 		"/blobs",
 		strings.NewReader(sh.GetShaLike().GetShaString()),
@@ -307,7 +308,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 
 	var response *http.Response
 
-	if response, err = blobStore.remote.Do(request); err != nil {
+	if response, err = blobStore.repo.Do(request); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
