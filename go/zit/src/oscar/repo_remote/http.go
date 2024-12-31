@@ -143,12 +143,13 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 
 	remoteHTTP.remote.ContinueOrPanicOnDone()
 
+	var shas []*sha.Sha
+
 	for !eof {
 		remoteHTTP.remote.ContinueOrPanicOnDone()
 
 		var line string
 		line, err = br.ReadString('\n')
-		ui.Debug().Print(line, err)
 
 		if err == io.EOF {
 			err = nil
@@ -162,21 +163,30 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			continue
 		}
 
-		var expected, actual sha.Sha
+		sh := sha.GetPool().Get()
 
-		if err = expected.Set(strings.TrimSpace(line)); err != nil {
+		if err = sh.Set(strings.TrimSpace(line)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		ui.Debug().Print(&expected)
+		shas = append(shas, sh)
+	}
+
+	if err = response.Body.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, expected := range shas {
+		var actual sha.Sha
 
 		// Closed by the http client's transport (our roundtripper calling
 		// request.Write)
 		var rc interfaces.ShaReadCloser
 
 		if rc, err = remote.GetBlobStore().BlobReader(
-			&expected,
+			expected,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -200,8 +210,6 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
-
-		ui.Debug().Print(response.Status)
 
 		var shString strings.Builder
 

@@ -314,12 +314,6 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		}
 
 	case MethodPath{"POST", "/blobs"}:
-		defer func() {
-			if r := recover(); r != nil {
-				local.GetUI().Printf("panicked: %s", r)
-				panic(r)
-			}
-		}()
 		var wc interfaces.ShaWriteCloser
 
 		{
@@ -330,8 +324,6 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 				return
 			}
 		}
-
-		local.GetUI().Print("made blob writer")
 
 		var n int64
 
@@ -344,16 +336,12 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 			}
 		}
 
-		local.GetUI().Printf("copied %d bytes to blob writer", n)
-
 		if err := wc.Close(); err != nil {
 			response.Error(err)
 			return
 		}
-		local.GetUI().Printf("closed writer")
 
 		sh := wc.GetShaLike()
-		local.GetUI().Printf("got sha: %s", sh)
 
 		blobCopierDelegate := local.MakeBlobCopierDelegate()
 
