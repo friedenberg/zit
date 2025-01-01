@@ -162,6 +162,7 @@ func (importer Importer) importLeafSku(
 
 	var commitOptions sku.CommitOptions
 
+	// TODO extra commit option setting into its own function
 	if commitOptions, err = importer.MergeCheckedOutIfNecessary(
 		co,
 		importer.ParentNegotiator,

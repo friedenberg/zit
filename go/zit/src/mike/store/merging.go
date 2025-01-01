@@ -18,6 +18,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
 	commitOptions.Mode = object_mode.ModeImport
+	commitOptions.DontValidate = true
 
 	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
 		return
