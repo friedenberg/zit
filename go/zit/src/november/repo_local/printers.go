@@ -1,9 +1,11 @@
 package repo_local
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -113,6 +115,24 @@ func (u *Repo) PrinterCheckedOut(
 	)
 
 	return out
+}
+
+func (u *Repo) PrinterCheckedOutConflictsForRemoteTransfers(
+) interfaces.FuncIter[*sku.CheckedOut] {
+  p := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
+
+	return func(co *sku.CheckedOut) (err error) {
+    if co.GetState() != checked_out_state.Conflicted {
+      return
+    }
+
+    if err = p(co); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
+
+    return
+  }
 }
 
 func (u *Repo) MakePrinterBoxArchive(

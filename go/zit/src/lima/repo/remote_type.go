@@ -16,7 +16,18 @@ const (
 	RemoteTypePortHTTP
 	RemoteTypeStdioLocal
 	RemoteTypeStdioSSH
+	_RemoteTypeMax
 )
+
+func GetAllRemoteTypes() []RemoteType {
+	types := make([]RemoteType, 0)
+
+	for i := RemoteTypeUnspecified + 1; i < _RemoteTypeMax; i++ {
+		types = append(types, RemoteType(i))
+	}
+
+	return types
+}
 
 func (t *RemoteType) Set(v string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(v)) {

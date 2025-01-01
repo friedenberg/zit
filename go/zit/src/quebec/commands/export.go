@@ -88,6 +88,8 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	var hasMore bool
 
 	for {
+		u.ContinueOrPanicOnDone()
+
 		sk, hasMore = list.Pop()
 
 		if !hasMore {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -14,10 +15,6 @@ import (
 type Dependencies struct {
 	*errors.Context
 	config_mutable_cli.Config
-}
-
-type CommandWithFlags interface {
-	SetFlagSet(*flag.FlagSet)
 }
 
 type Command interface {
@@ -109,6 +106,20 @@ func registerCommandWithRemoteAndQuery(
 
 			cmd.SetFlagSet(f)
 
+			return cmd
+		},
+	)
+}
+
+// TODO explore a different flag and command model
+func registerCommandWithFlags(
+	n string,
+	cmd interfaces.CommandComponent,
+) {
+	registerCommand(
+		n,
+		func(f *flag.FlagSet) interfaces.CommandComponent {
+			cmd.SetFlagSet(f)
 			return cmd
 		},
 	)

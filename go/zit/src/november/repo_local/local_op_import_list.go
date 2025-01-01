@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -15,10 +14,17 @@ func (u *Repo) ImportList(
 ) (err error) {
 	u.Must(u.Lock)
 
-	coPrinter := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
+	var hasConflicts bool
 
-	var co *sku.CheckedOut
-	hasConflicts := false
+	oldPrinter := importer.CheckedOutPrinter
+
+	importer.CheckedOutPrinter = func(co *sku.CheckedOut) (err error) {
+		if co.GetState() == checked_out_state.Conflicted {
+			hasConflicts = true
+		}
+
+		return oldPrinter(co)
+	}
 
 	for {
 		sk, ok := list.Pop()
@@ -27,7 +33,7 @@ func (u *Repo) ImportList(
 			break
 		}
 
-		if co, err = importer.Import(
+		if _, err = importer.Import(
 			sk,
 		); err != nil {
 			if errors.Is(err, collections.ErrExists) {
@@ -36,17 +42,6 @@ func (u *Repo) ImportList(
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}
-		}
-
-		if co.GetState() == checked_out_state.Conflicted {
-			hasConflicts = true
-
-			if err = coPrinter(co); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			continue
 		}
 	}
 

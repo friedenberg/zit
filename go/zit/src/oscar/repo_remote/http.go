@@ -88,7 +88,7 @@ func (repo *HTTP) MakeInventoryList(
 func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Group,
-	printCopies bool,
+	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
@@ -157,10 +157,12 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 		return
 	}
 
-	for _, expected := range shas {
-		if err = remoteHTTP.WriteBlobToRemote(remote, expected); err != nil {
-			err = errors.Wrap(err)
-			return
+	if options.IncludeBlobs {
+		for _, expected := range shas {
+			if err = remoteHTTP.WriteBlobToRemote(remote, expected); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

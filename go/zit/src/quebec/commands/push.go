@@ -29,11 +29,12 @@ func (c Push) RunWithRemoteAndQuery(
 	local *repo_local.Repo,
 	remote repo.Repo,
 	qg *query.Group,
+	options repo.RemoteTransferOptions,
 ) {
 	if err := remote.PullQueryGroupFromRemote(
 		local,
 		qg,
-		true,
+		options.WithPrintCopies(true),
 	); err != nil {
 		local.CancelWithError(err)
 	}

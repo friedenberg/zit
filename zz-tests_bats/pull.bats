@@ -155,6 +155,14 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
+	run_zit show +z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+	EOM
+
 	run_zit pull \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
@@ -163,12 +171,8 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 	assert_failure
 	assert_output - <<-EOM
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		       conflicted [one/uno]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
-		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		       conflicted [one/dos]
 		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -183,12 +187,33 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 		        untracked [to_add @05b22ebd6705f9ac35e6e4736371df50b03d0e50f85865861fd1f377c4c76e23]
 	EOM
 
+	run_zit show +z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+	EOM
+
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		          deleted [one/dos.conflict]
 		          deleted [one/uno.conflict]
 		          deleted [one/]
+	EOM
+
+	# TODO make sure merging includes the REMOTE in addition to the MERGED
+	run_zit show +z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
 	run_zit show -format text one/dos
@@ -212,6 +237,82 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 	EOM
 
 	try_add_new_after_pull
+}
+
+function pull_history_zettel_typ_etikett_yes_conflicts_allowed_remote_first { # @test
+	set_xdg "$BATS_TEST_TMPDIR"
+	run_zit_init_disable_age
+
+	run_zit new -edit=false - <<-EOM
+		---
+		# zettel after clone description
+		! md
+		---
+
+		zettel after clone body
+	EOM
+
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @13af191e86dcd8448565157de81919f19337656787f3d0fdd90b5335d2170f3f !md "zettel after clone description"]
+	EOM
+
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	run_zit pull \
+		-allow-merge-conflicts \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
+		+zettel,typ,etikett
+
+	assert_failure
+	assert_output - <<-EOM
+		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		       conflicted [one/uno]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		needs merge
+	EOM
+
+	run_zit status
+	assert_success
+	assert_output_unsorted - <<-EOM
+		        untracked [to_add @05b22ebd6705f9ac35e6e4736371df50b03d0e50f85865861fd1f377c4c76e23]
+	EOM
+
+	run_zit show -format text one/dos
+	assert_success
+	assert_output - <<-EOM
+		---
+		# zettel with multiple etiketten
+		- this_is_the_first
+		- this_is_the_second
+		! md
+		---
+
+		zettel with multiple etiketten body
+	EOM
+
+	run_zit show one/uno+
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @13af191e86dcd8448565157de81919f19337656787f3d0fdd90b5335d2170f3f !md "zettel after clone description"]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
 }
 
 function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
@@ -251,8 +352,6 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 	assert_failure
 	assert_output - <<-EOM
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		       conflicted [one/uno]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
@@ -272,6 +371,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
 	assert_success
 	assert_output - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		          deleted [one/uno.conflict]
 		          deleted [one/]
 	EOM
@@ -336,6 +436,43 @@ function pull_history_default_no_conflict { # @test
 	assert_output - <<-EOM
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
+
+	try_add_new_after_pull
+}
+
+function pull_history_zettels_no_conflict_no_blobs { # @test
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	run_zit_init_disable_age
+	run_zit pull \
+		-include-blobs=false \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
+		+zettel
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
+
+	run_zit show one/dos+
+	assert_success
+	assert_output - <<-EOM
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+	EOM
+
+	run_zit show -format blob one/dos
+	assert_failure
 
 	try_add_new_after_pull
 }

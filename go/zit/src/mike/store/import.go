@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -23,11 +24,22 @@ type BlobCopyResult struct {
 	N int64
 }
 
+type ImporterOptions struct {
+	RemoteBlobStore     interfaces.BlobStore
+	PrintCopies         bool
+	AllowMergeConflicts bool
+	BlobCopierDelegate  interfaces.FuncIter[BlobCopyResult]
+	ParentNegotiator    sku.ParentNegotiator
+	CheckedOutPrinter   interfaces.FuncIter[*sku.CheckedOut]
+}
+
 type Importer struct {
 	*Store
-	RemoteBlobStore    interfaces.BlobStore
-	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
+	RemoteBlobStore     interfaces.BlobStore
+	BlobCopierDelegate  interfaces.FuncIter[BlobCopyResult]
+	AllowMergeConflicts bool
 	sku.ParentNegotiator
+	CheckedOutPrinter interfaces.FuncIter[*sku.CheckedOut]
 }
 
 func (s Importer) Import(
@@ -49,6 +61,12 @@ func (s Importer) Import(
 			return
 		}
 	} else {
+		// TODO address this terrible hack? How should config objects be handled by
+		// remotes?
+		if external.GetGenre() == genres.Config {
+			return
+		}
+
 		if co, err = s.importLeafSku(external); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -118,7 +136,10 @@ func (importer Importer) importLeafSku(
 	}
 
 	ui.TodoP4("cleanup")
-	if err = importer.ReadOneInto(co.GetSkuExternal().GetObjectId(), co.GetSku()); err != nil {
+	if err = importer.ReadOneInto(
+		co.GetSkuExternal().GetObjectId(),
+		co.GetSku(),
+	); err != nil {
 		if collections.IsErrNotFound(err) {
 			if err = importer.tryRealizeAndOrStore(
 				co.GetSkuExternal(),
@@ -144,17 +165,35 @@ func (importer Importer) importLeafSku(
 	if commitOptions, err = importer.MergeCheckedOutIfNecessary(
 		co,
 		importer.ParentNegotiator,
+		importer.AllowMergeConflicts,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	if co.GetState() == checked_out_state.Conflicted {
+		if !importer.AllowMergeConflicts {
+			if err = importer.CheckedOutPrinter(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
+	// TODO set this in a better way
 	commitOptions.ChangeIsHistorical = true
 
 	if err = importer.tryRealizeAndOrStore(
 		co.GetSkuExternal(),
 		commitOptions,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = importer.CheckedOutPrinter(co); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -14,7 +14,7 @@ import (
 type Clone struct {
 	*flag.FlagSet
 	repo_local.BigBang
-	command_components.Remote
+	command_components.RemoteTransfer
 	command_components.QueryGroup
 }
 
@@ -47,7 +47,7 @@ func (cmd *Clone) GetFlagSet() *flag.FlagSet {
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.FlagSet = f
 	cmd.BigBang.AddToFlagSet(f)
-	cmd.Remote.SetFlagSet(f)
+	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 }
 
@@ -84,7 +84,7 @@ func (c Clone) Run(
 	if err := local.PullQueryGroupFromRemote(
 		remote,
 		qg,
-		true,
+		c.RemoteTransferOptions.WithPrintCopies(true),
 	); err != nil {
 		local.CancelWithError(err)
 	}

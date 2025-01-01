@@ -13,6 +13,7 @@ import (
 func (s *Store) MergeCheckedOutIfNecessary(
 	co *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,
+	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
 	commitOptions.Mode = object_mode.ModeCommit
 
@@ -64,12 +65,16 @@ func (s *Store) MergeCheckedOutIfNecessary(
 		conflicted,
 	); err != nil {
 		if sku.IsErrMergeConflict(err) {
-			if err = s.GetStoreFS().GenerateConflictMarker(
-				conflicted,
-				conflicted.CheckedOut,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+			err = nil
+
+			if !allowMergeConflicts {
+				if err = s.GetStoreFS().GenerateConflictMarker(
+					conflicted,
+					conflicted.CheckedOut,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			co.SetState(checked_out_state.Conflicted)

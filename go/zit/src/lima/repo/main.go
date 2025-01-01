@@ -24,7 +24,7 @@ type Repo interface {
 	PullQueryGroupFromRemote(
 		remote Repo,
 		qg *query.Group,
-		printCopies bool,
+		options RemoteTransferOptions,
 	) (err error)
 
 	ReadObjectHistory(

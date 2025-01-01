@@ -2,6 +2,7 @@ package command_components
 
 import (
 	"flag"
+	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
@@ -15,7 +16,7 @@ type Remote struct {
 }
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&cmd.RemoteType, "remote-type", "TODO")
+	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
 }
 
 func (c Remote) MakeRemote(

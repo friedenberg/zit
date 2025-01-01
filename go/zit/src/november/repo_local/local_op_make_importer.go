@@ -5,13 +5,20 @@ import (
 )
 
 func (env *Repo) MakeImporter(
-	printCopies bool,
+	options store.ImporterOptions,
 ) (importer store.Importer) {
 	importer = store.Importer{
-		Store: env.GetStore(),
+		Store:               env.GetStore(),
+		RemoteBlobStore:     options.RemoteBlobStore,
+		BlobCopierDelegate:  options.BlobCopierDelegate,
+		AllowMergeConflicts: options.AllowMergeConflicts,
+		ParentNegotiator:    options.ParentNegotiator,
+		CheckedOutPrinter:   options.CheckedOutPrinter,
 	}
 
-	if printCopies {
+	if importer.BlobCopierDelegate == nil &&
+		importer.RemoteBlobStore != nil &&
+		options.PrintCopies {
 		importer.BlobCopierDelegate = env.MakeBlobCopierDelegate()
 	}
 

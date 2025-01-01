@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
@@ -17,22 +18,21 @@ type CommandWithRemoteAndQuery interface {
 		local *repo_local.Repo,
 		remote repo.Repo,
 		qg *query.Group,
+		options repo.RemoteTransferOptions,
 	)
 }
 
 type commandWithRemoteAndQuery struct {
-	command_components.Remote
+	command_components.RemoteTransfer
 	command_components.QueryGroup
 	CommandWithRemoteAndQuery
 }
 
 func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
-	f.Var(&cmd.RemoteType, "remote-type", "TODO")
-	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
-	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
+	cmd.RemoteTransfer.SetFlagSet(f)
+	cmd.QueryGroup.SetFlagSet(f)
 
-	if cwf, ok := cmd.CommandWithRemoteAndQuery.(CommandWithFlags); ok {
+	if cwf, ok := cmd.CommandWithRemoteAndQuery.(interfaces.CommandComponent); ok {
 		cwf.SetFlagSet(f)
 	}
 }
@@ -92,5 +92,5 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 
 	remote := c.MakeRemote(local.Env, args[0])
 
-	c.RunWithRemoteAndQuery(local, remote, qg)
+	c.RunWithRemoteAndQuery(local, remote, qg, c.RemoteTransferOptions)
 }

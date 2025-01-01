@@ -174,7 +174,7 @@ function clone_history_zettel_typ_etikett_stdio_ssh { # @test
 	try_add_new_after_clone
 }
 
-function clone_history_default { # @test
+function clone_history_default_allow_conflicts { # @test
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -191,7 +191,6 @@ function clone_history_default { # @test
 		\[.+\..+ @.+ !inventory_list-v1]
 		\[.+\..+ @.+ !inventory_list-v1]
 		\[.+\..+ @.+ !inventory_list-v1]
-		\[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
 		\[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]

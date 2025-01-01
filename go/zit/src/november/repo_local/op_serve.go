@@ -440,8 +440,13 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 		b := bytes.NewBuffer(nil)
 
-		importer := local.MakeImporter(false)
-		importer.BlobCopierDelegate = func(result store.BlobCopyResult) (err error) {
+		importerOptions := store.ImporterOptions{
+			CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+		}
+
+		importerOptions.BlobCopierDelegate = func(
+			result store.BlobCopyResult,
+		) (err error) {
 			local.ContinueOrPanicOnDone()
 
 			if result.N != -1 {
@@ -455,6 +460,8 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 			return
 		}
+
+		importer := local.MakeImporter(importerOptions)
 
 		if err := local.ImportList(
 			list,

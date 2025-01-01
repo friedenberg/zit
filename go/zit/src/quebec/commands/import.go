@@ -92,15 +92,20 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 		local.CancelWithError(err)
 	}
 
-	importer := local.MakeImporter(c.PrintCopies)
+	importerOptions := store.ImporterOptions{
+		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+	}
 
 	if c.Blobs != "" {
-		importer.RemoteBlobStore = repo_layout.MakeBlobStore(
+		importerOptions.RemoteBlobStore = repo_layout.MakeBlobStore(
 			c.Blobs,
 			&ag,
 			c.CompressionType,
 		)
 	}
+
+	importerOptions.PrintCopies = c.PrintCopies
+	importer := local.MakeImporter(importerOptions)
 
 	if err := local.ImportList(
 		list,

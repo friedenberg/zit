@@ -5,12 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Group,
-	printCopies bool,
+	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
@@ -19,13 +20,22 @@ func (local *Repo) PullQueryGroupFromRemote(
 		return
 	}
 
-	importer := local.MakeImporter(printCopies)
+	importerOptions := store.ImporterOptions{
+		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+		AllowMergeConflicts: options.AllowMergeConflicts,
+	}
 
-	importer.RemoteBlobStore = remote.GetBlobStore()
-	importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
+	if options.IncludeBlobs {
+		importerOptions.RemoteBlobStore = remote.GetBlobStore()
+	}
+
+	importerOptions.ParentNegotiator = ParentNegotiatorFirstAncestor{
 		Local:  local,
 		Remote: remote,
 	}
+
+	importerOptions.PrintCopies = options.PrintCopies
+	importer := local.MakeImporter(importerOptions)
 
 	if err = local.ImportList(
 		list,
