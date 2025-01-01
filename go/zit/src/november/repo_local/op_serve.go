@@ -173,7 +173,8 @@ func (repo *Repo) ServeStdio() (err error) {
 					Method: request.Method,
 					Path:   request.URL.Path,
 				},
-				Body: request.Body,
+				Headers: request.Header,
+				Body:    request.Body,
 			},
 		)
 
@@ -224,7 +225,8 @@ type MethodPath struct {
 
 type Request struct {
 	MethodPath
-	Body io.ReadCloser
+	Headers http.Header
+	Body    io.ReadCloser
 }
 
 type Response struct {
@@ -244,6 +246,7 @@ func (r *Response) Error(err error) {
 func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	request := Request{
 		MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
+		Headers:    req.Header,
 		Body:       req.Body,
 	}
 
@@ -423,6 +426,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		response.Body = io.NopCloser(b)
 
 	case MethodPath{"POST", "/inventory_lists"}:
+		// TODO get version from header?
 		bf := local.GetStore().GetInventoryListStore().FormatForVersion(
 			local.GetConfig().GetStoreVersion(),
 		)
@@ -442,6 +446,10 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 		importerOptions := store.ImporterOptions{
 			CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+		}
+
+		if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
+			importerOptions.AllowMergeConflicts = true
 		}
 
 		importerOptions.BlobCopierDelegate = func(

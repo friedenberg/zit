@@ -125,6 +125,10 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 			return
 		}
 
+		if options.AllowMergeConflicts {
+			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
+		}
+
 		if response, err = remoteHTTP.Do(request); err != nil {
 			err = errors.Errorf("failed to read response: %w", err)
 			return
