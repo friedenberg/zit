@@ -39,6 +39,7 @@ func (s *Store) tryRealize(
 		}
 	}
 
+	// modify pre commit hooks to support import
 	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
 		if s.config.IgnoreHookErrors {
 			err = nil

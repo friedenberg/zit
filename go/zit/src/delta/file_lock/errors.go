@@ -1,6 +1,10 @@
 package file_lock
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+)
 
 type ErrLockRequired struct {
 	Operation string
@@ -16,4 +20,37 @@ func (e ErrLockRequired) Error() string {
 		"lock required for operation: %q",
 		e.Operation,
 	)
+}
+
+type ErrUnableToAcquireLock struct {
+	Path string
+}
+
+func (e ErrUnableToAcquireLock) Error() string {
+	return fmt.Sprintf("repo is currently locked")
+}
+
+func (e ErrUnableToAcquireLock) Is(target error) bool {
+	_, ok := target.(ErrUnableToAcquireLock)
+	return ok
+}
+
+func (e ErrUnableToAcquireLock) GetHelpfulError() errors.Helpful {
+	return e
+}
+
+func (e ErrUnableToAcquireLock) GetRetryableError() errors.Retryable {
+	return e
+}
+
+func (e ErrUnableToAcquireLock) ErrorCause() []string {
+	return []string{}
+}
+
+func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
+	return []string{}
+}
+
+func (e ErrUnableToAcquireLock) Recover(ctx *errors.Context) {
+  // TODO delete existing lock
 }

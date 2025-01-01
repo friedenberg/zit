@@ -28,7 +28,8 @@ const (
 	ModeRealizeWithProto = ModeUpdateTai | ModeApplyProto | ModeHooks
 	ModeRealizeSansProto = ModeUpdateTai | ModeHooks
 	ModeReindex          = ModeLatest
-	ModeCommit           = ModeReindex | ModeAddToInventoryList | ModeHooks
+	ModeImport           = ModeReindex | ModeAddToInventoryList
+	ModeCommit           = ModeImport | ModeHooks
 	ModeCreate           = ModeCommit | ModeApplyProto
 )
 

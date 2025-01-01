@@ -10,14 +10,16 @@ import (
 )
 
 // TODO combine with other method in this file
+// Makes hard assumptions about the availability of the blobs associated with
+// the *sku.CheckedOut.
 func (s *Store) MergeCheckedOutIfNecessary(
 	co *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
-	commitOptions.Mode = object_mode.ModeCommit
+	commitOptions.Mode = object_mode.ModeImport
 
-	if co.GetSku().Metadata.Sha().IsNull() {
+	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
 		return
 	}
 

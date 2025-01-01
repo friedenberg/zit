@@ -128,8 +128,7 @@ func (s *Store) tryPreCommitHooks(
 	mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
-	if !o.Mode.Contains(object_mode.ModeHooks) &&
-		!o.Mode.Contains(object_mode.ModeAddToInventoryList) {
+	if !o.Mode.Contains(object_mode.ModeHooks) {
 		return
 	}
 
@@ -186,6 +185,7 @@ func (s *Store) tryPreCommitHooks(
 			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
 
 			if ui.Continue("hook failed", err) {
+				// TODO fix this to properly continue past the failure
 				err = nil
 			} else {
 				return

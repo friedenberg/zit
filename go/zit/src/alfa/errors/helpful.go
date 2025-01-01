@@ -6,3 +6,8 @@ type Helpful interface {
 	ErrorCause() []string
 	ErrorRecovery() []string
 }
+
+type Retryable interface {
+	GetRetryableError() Retryable
+	Recover(*Context)
+}

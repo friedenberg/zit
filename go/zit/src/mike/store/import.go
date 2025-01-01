@@ -145,7 +145,7 @@ func (importer Importer) importLeafSku(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
-					Mode:               object_mode.ModeCommit,
+					Mode:               object_mode.ModeImport,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
 					ChangeIsHistorical: true,

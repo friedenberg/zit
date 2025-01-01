@@ -23,6 +23,7 @@ func Continue(header string, err error) (shouldContinue bool) {
 	}
 
 	if answer == 'y' || answer == 'Y' {
+		Err().Printf("continuing...")
 		shouldContinue = true
 	}
 

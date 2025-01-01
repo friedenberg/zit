@@ -46,9 +46,9 @@ func (l *Lock) Lock() (err error) {
 	}
 
 	ui.Log().Caller(2, "locking "+l.Path())
-	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
+	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 0o755); err != nil {
 		if errors.Is(err, fs.ErrExist) {
-			err = errors.Wrapf(err, "lockfile already exists, unable to acquire lock: %s", l.Path())
+			err = ErrUnableToAcquireLock{Path: l.Path()}
 		} else {
 			err = errors.Wrap(err)
 		}

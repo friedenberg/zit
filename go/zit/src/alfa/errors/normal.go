@@ -31,6 +31,7 @@ func (e errBadRequest) Error() string {
 	return e.error.Error()
 }
 
+// TODO refactor NewNormal into something that combines helpful and stack trace
 func NewNormal(v string) errNormal {
 	return errNormal{string: v}
 }
