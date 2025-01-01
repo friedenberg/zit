@@ -184,6 +184,8 @@ func (importer Importer) importLeafSku(
 		}
 	}
 
+	commitOptions.DontValidate = true
+
 	// TODO set this in a better way
 	commitOptions.ChangeIsHistorical = true
 

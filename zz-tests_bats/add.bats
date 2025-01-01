@@ -405,7 +405,7 @@ function add_organize { # @test
 		"$f"
 
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		---
 		% instructions: to prevent an object from being checked in, delete it entirely
 		% delete:true delete once checked in

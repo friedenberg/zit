@@ -319,8 +319,14 @@ func (blobStore *HTTPBlobStore) BlobReader(
 		return
 	}
 
-	if response.StatusCode != http.StatusOK {
-		err = errors.Errorf("remote error: %d", response.StatusCode)
+	// TODO refactor this into a common structure
+	if response.StatusCode >= 300 {
+		var sb strings.Builder
+
+		if _, err = io.Copy(&sb, response.Body); err != nil {
+		}
+
+		err = errors.Errorf("remote responded with error: %q", &sb)
 		return
 	}
 
