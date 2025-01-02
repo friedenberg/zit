@@ -11,7 +11,7 @@ type DormantRemove struct{}
 
 func init() {
 	registerCommand(
-		"schlummernd-remove",
+		"dormant-remove",
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &DormantRemove{}
 

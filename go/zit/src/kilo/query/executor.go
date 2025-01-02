@@ -39,14 +39,6 @@ type Executor struct {
 	Out interfaces.FuncIter[sku.ExternalLike]
 }
 
-func MakeExecutor(
-	qg *Group,
-	fpq sku.FuncPrimitiveQuery,
-	froi sku.FuncReadOneInto,
-) Executor {
-	return MakeExecutorWithExternalStore(qg, fpq, froi, nil)
-}
-
 func MakeExecutorWithExternalStore(
 	qg *Group,
 	fpq sku.FuncPrimitiveQuery,

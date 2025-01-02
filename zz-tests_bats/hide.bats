@@ -22,7 +22,7 @@ function mark_one_as_hidden { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit schlummernd-add tag-3
+	run_zit dormant-add tag-3
 	assert_success
 	assert_output ''
 
@@ -37,7 +37,7 @@ function mark_one_as_hidden { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit schlummernd-remove tag-3
+	run_zit dormant-remove tag-3
 	assert_success
 	assert_output ''
 

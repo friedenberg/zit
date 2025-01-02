@@ -11,7 +11,7 @@ type DormantAdd struct{}
 
 func init() {
 	registerCommand(
-		"schlummernd-add",
+		"dormant-add",
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &DormantAdd{}
 

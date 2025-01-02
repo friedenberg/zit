@@ -94,7 +94,7 @@ function checkin_simple_one_zettel { # @test
 }
 
 function checkin_two_zettel_hidden { # @test
-	run_zit schlummernd-add etikett-one tag-3
+	run_zit dormant-add etikett-one tag-3
 	assert_success
 
 	run_zit checkin .z

@@ -329,7 +329,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 }
 
 function organize_hides_hidden_tags_from_organize { # @test
-	run_zit schlummernd-add zz-archive
+	run_zit dormant-add zz-archive
 	assert_success
 	assert_output ''
 

@@ -211,7 +211,7 @@ function status_zettel_akte_checkout { # @test
 
 function status_zettel_hidden { # @test
 	checkout_everything
-	run_zit schlummernd-add tag-3
+	run_zit dormant-add tag-3
 	assert_success
 
 	run_zit show :z

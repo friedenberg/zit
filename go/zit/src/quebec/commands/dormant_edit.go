@@ -21,7 +21,7 @@ type DormantEdit struct{}
 
 func init() {
 	registerCommand(
-		"schlummernd-edit",
+		"dormant-edit",
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &DormantEdit{}
 
@@ -32,7 +32,7 @@ func init() {
 
 func (c DormantEdit) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
-		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
+		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
 
 	var sh interfaces.Sha
@@ -62,10 +62,9 @@ func (c DormantEdit) RunWithRepo(u *repo_local.Repo, args ...string) {
 		u.CancelWithError(err)
 		return
 	}
-
-	return
 }
 
+// TODO refactor into common
 func (c DormantEdit) editInVim(
 	u *repo_local.Repo,
 ) (sh interfaces.Sha, err error) {
@@ -78,7 +77,6 @@ func (c DormantEdit) editInVim(
 
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().
-			WithFileType("zit-konfig").
 			Build(),
 	}
 
@@ -95,6 +93,7 @@ func (c DormantEdit) editInVim(
 	return
 }
 
+// TODO refactor into common
 func (c DormantEdit) makeTempKonfigFile(
 	u *repo_local.Repo,
 ) (p string, err error) {
@@ -126,6 +125,7 @@ func (c DormantEdit) makeTempKonfigFile(
 	return
 }
 
+// TODO refactor into common
 func (c DormantEdit) readTempKonfigFile(
 	u *repo_local.Repo,
 	p string,

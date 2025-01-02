@@ -100,7 +100,7 @@ function show_simple_one_zettel_checked_out { # @test
 }
 
 function show_simple_one_zettel_hidden { # @test
-	run_zit schlummernd-add tag-3
+	run_zit dormant-add tag-3
 	assert_success
 	assert_output ''
 
@@ -123,7 +123,7 @@ function show_simple_one_zettel_hidden { # @test
 }
 
 function show_simple_one_zettel_hidden_past { # @test
-	run_zit schlummernd-add tag-1
+	run_zit dormant-add tag-1
 	assert_success
 	assert_output ''
 
