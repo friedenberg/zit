@@ -35,7 +35,7 @@ func (k Config) GetStoreVersion() interfaces.StoreVersion {
 }
 
 func (k *Config) AddToFlagSet(f *flag.FlagSet) {
-	k.CompressionType.AddToFlagSet(f)
+	k.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(
 		&k.LockInternalFiles,

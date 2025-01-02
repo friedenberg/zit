@@ -29,7 +29,7 @@ func init() {
 			}
 
 			f.Var(&c.AgeIdentity, "age-identity", "")
-			c.CompressionType.AddToFlagSet(f)
+			c.CompressionType.SetFlagSet(f)
 
 			return c
 		},

@@ -405,6 +405,7 @@ func (s *Index) readOneLoc(
 	return
 }
 
+// TODO add support for *errors.Context closure
 func (i *Index) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
@@ -441,7 +442,6 @@ func (i *Index) ReadPrimitiveQuery(
 			}()
 
 			for !isDone() {
-
 				var err1 error
 
 				if err1 = p.CopyJustHistory(

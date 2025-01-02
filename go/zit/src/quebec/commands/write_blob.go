@@ -32,7 +32,7 @@ func init() {
 
 			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")
 			f.Var(&c.AgeIdentity, "age-identity", "")
-			c.CompressionType.AddToFlagSet(f)
+			c.CompressionType.SetFlagSet(f)
 
 			f.Var(&c.UtilityBefore, "utility-before", "")
 			f.Var(&c.UtilityAfter, "utility-after", "")

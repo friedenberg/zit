@@ -1,4 +1,17 @@
 
+build-and-test: build test
+  
+commit: \
+    build-and-test \
+    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
+
+#    ____ _
+#   / ___| | ___  __ _ _ __
+#  | |   | |/ _ \/ _` | '_ \
+#  | |___| |  __/ (_| | | | |
+#   \____|_|\___|\__,_|_| |_|
+#
+
 clean-go-cache:
   go clean -cache
 
@@ -9,10 +22,24 @@ clean-go: clean-go-cache clean-go-modcache
 
 clean: clean-go
 
+#   _   _           _       _
+#  | | | |_ __   __| | __ _| |_ ___
+#  | | | | '_ \ / _` |/ _` | __/ _ \
+#  | |_| | |_) | (_| | (_| | ||  __/
+#   \___/| .__/ \__,_|\__,_|\__\___|
+#        |_|
+
 update-go:
   env GOPROXY=direct go get -u -t ./...
 
 update: update-go
+
+#   ____        _ _     _
+#  | __ ) _   _(_) | __| |
+#  |  _ \| | | | | |/ _` |
+#  | |_) | |_| | | | (_| |
+#  |____/ \__,_|_|_|\__,_|
+#
 
 build-go-generate:
   go generate ./...
@@ -24,16 +51,32 @@ build-go: build-go-generate build-go-binary
 
 build: build-go
 
-test-go-vuln:
+#    ____ _               _
+#   / ___| |__   ___  ___| | __
+#  | |   | '_ \ / _ \/ __| |/ /
+#  | |___| | | |  __/ (__|   <
+#   \____|_| |_|\___|\___|_|\_\
+#
+
+check-go-vuln:
   govulncheck ./...
 
-test-go-vet:
+check-go-vet:
   go vet ./... || true
+
+check: check-go-vuln check-go-vet
+
+#   _____         _
+#  |_   _|__  ___| |_
+#    | |/ _ \/ __| __|
+#    | |  __/\__ \ |_
+#    |_|\___||___/\__|
+#
 
 test-go-unit:
   go test -v ./...
 
-test-go: test-go-vuln test-go-vet test-go-unit
+test-go: test-go-unit
 
 test-bats-generate:
   ./zz-tests_bats/migration/generate_fixture.bash
@@ -51,8 +94,6 @@ test-bats: test-bats-generate \
     (test-bats-targets "zz-tests_bats/*.bats" "zz-tests_bats/migration/*.bats")
 
 test: test-go test-bats
-
-build-and-test: build test
 
 git-add-and-commit *PATHS:
   #! /usr/bin/env fish
@@ -75,7 +116,3 @@ git-add-and-commit *PATHS:
 
   echo "pushing..." >&2
   git push
-  
-commit: \
-    build-and-test \
-    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")

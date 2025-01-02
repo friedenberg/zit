@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -15,9 +16,9 @@ type Fsck struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"fsck",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Fsck{
 				Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
 			}
@@ -29,11 +30,14 @@ func init() {
 	)
 }
 
-func (c Fsck) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c Fsck) RunWithQuery(
+	u *repo_local.Repo,
+	qg *query.Group,
+) {
 	p := u.PrinterTransacted()
 
-	if err := u.GetStore().QueryPrimitive(
-		sku.MakePrimitiveQueryGroup(),
+	if err := u.GetStore().QueryTransacted(
+		qg,
 		func(sk *sku.Transacted) (err error) {
 			if !c.Genres.Contains(sk.GetGenre()) {
 				return

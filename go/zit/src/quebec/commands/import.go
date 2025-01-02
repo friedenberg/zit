@@ -12,16 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 // Switch to External store
 type Import struct {
 	immutable_config.StoreVersion
-	InventoryList   string
-	Blobs           string
-	AgeIdentity     age.Identity
-	CompressionType immutable_config.CompressionType
-	PrintCopies     bool
+	InventoryList string
+	command_components.RemoteBlobStore
+	PrintCopies bool
 	sku.Proto
 }
 
@@ -30,15 +29,12 @@ func init() {
 		"import",
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Import{
-				StoreVersion:    immutable_config.CurrentStoreVersion,
-				CompressionType: immutable_config.CompressionTypeDefault,
+				StoreVersion: immutable_config.CurrentStoreVersion,
 			}
 
 			f.Var(&c.StoreVersion, "store-version", "")
 			f.StringVar(&c.InventoryList, "inventory-list", "", "")
-			f.StringVar(&c.Blobs, "blobs", "", "")
-			f.Var(&c.AgeIdentity, "age-identity", "")
-			c.CompressionType.AddToFlagSet(f)
+			c.RemoteBlobStore.SetFlagSet(f)
 			f.BoolVar(&c.PrintCopies, "print-copies", true, "output when blobs are copied")
 
 			c.Proto.AddToFlagSet(f)
@@ -97,11 +93,13 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 	}
 
 	if c.Blobs != "" {
-		importerOptions.RemoteBlobStore = repo_layout.MakeBlobStore(
-			c.Blobs,
-			&ag,
-			c.CompressionType,
-		)
+		{
+			var err error
+
+			if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(); err != nil {
+				local.CancelWithError(err)
+			}
+		}
 	}
 
 	importerOptions.PrintCopies = c.PrintCopies

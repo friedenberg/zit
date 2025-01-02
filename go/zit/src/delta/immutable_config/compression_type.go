@@ -35,7 +35,7 @@ const (
 
 type CompressionType string
 
-func (ct *CompressionType) AddToFlagSet(f *flag.FlagSet) {
+func (ct *CompressionType) SetFlagSet(f *flag.FlagSet) {
 	f.Var(ct, "compression-type", "")
 }
 

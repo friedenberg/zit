@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type blobStore struct {
@@ -153,18 +154,23 @@ func (s blobStore) blobReaderFrom(
 	return
 }
 
-func MakeCopyingBlobStore(local, remote interfaces.BlobStore) CopyingBlobStore {
+func MakeCopyingBlobStore(
+	env *env.Env,
+	local, remote interfaces.BlobStore,
+) CopyingBlobStore {
 	if local == nil {
 		panic("nil local blob store")
 	}
 
 	return CopyingBlobStore{
+		Env:    env,
 		local:  local,
 		remote: remote,
 	}
 }
 
 type CopyingBlobStore struct {
+	*env.Env
 	local, remote interfaces.BlobStore
 }
 
@@ -197,7 +203,7 @@ func (s CopyingBlobStore) BlobReader(
 
 	var n int64
 
-	if n, err = CopyBlob(s.local, s.remote, sh.GetShaLike()); err != nil {
+	if n, err = CopyBlob(s.Env, s.local, s.remote, sh.GetShaLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -208,6 +214,7 @@ func (s CopyingBlobStore) BlobReader(
 }
 
 func CopyBlobIfNecessary(
+	env *env.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobShaGetter interfaces.ShaGetter,
@@ -227,10 +234,12 @@ func CopyBlobIfNecessary(
 		return
 	}
 
-	return CopyBlob(dst, src, blobSha)
+	return CopyBlob(env, dst, src, blobSha)
 }
 
+// TODO make this honor context closure and abort early
 func CopyBlob(
+	env *env.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobSha interfaces.Sha,
@@ -255,6 +264,8 @@ func CopyBlob(
 		return
 	}
 
+	// TODO should this be closed with an error when the shas don't match to
+	// prevent a garbage object in the store?
 	defer errors.DeferredCloser(&err, wc)
 
 	if n, err = io.Copy(wc, rc); err != nil {

@@ -154,7 +154,7 @@ func Make(
 		)
 	}
 
-	s.CopyingBlobStore = MakeCopyingBlobStore(s.local, s.remote)
+	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
 		basePath:         s.basePath,

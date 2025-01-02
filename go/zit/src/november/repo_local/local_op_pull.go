@@ -21,8 +21,9 @@ func (local *Repo) PullQueryGroupFromRemote(
 	}
 
 	importerOptions := store.ImporterOptions{
-		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+		CheckedOutPrinter:   local.PrinterCheckedOutConflictsForRemoteTransfers(),
 		AllowMergeConflicts: options.AllowMergeConflicts,
+		ExcludeObjects:      !options.IncludeObjects,
 	}
 
 	if options.IncludeBlobs {

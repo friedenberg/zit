@@ -444,6 +444,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 		b := bytes.NewBuffer(nil)
 
+		// TODO make option to read from headers
 		importerOptions := store.ImporterOptions{
 			CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
 		}

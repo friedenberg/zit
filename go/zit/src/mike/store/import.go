@@ -25,6 +25,7 @@ type BlobCopyResult struct {
 }
 
 type ImporterOptions struct {
+	ExcludeObjects      bool
 	RemoteBlobStore     interfaces.BlobStore
 	PrintCopies         bool
 	AllowMergeConflicts bool
@@ -35,6 +36,7 @@ type ImporterOptions struct {
 
 type Importer struct {
 	*Store
+	ExcludeObjects      bool
 	RemoteBlobStore     interfaces.BlobStore
 	BlobCopierDelegate  interfaces.FuncIter[BlobCopyResult]
 	AllowMergeConflicts bool
@@ -42,32 +44,21 @@ type Importer struct {
 	CheckedOutPrinter interfaces.FuncIter[*sku.CheckedOut]
 }
 
-func (s Importer) Import(
+func (importer Importer) Import(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	if err = s.importBlobIfNecessary(external); err != nil {
+	if err = importer.ImportBlobIfNecessary(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if external.GetGenre() == genres.InventoryList {
-		if s.RemoteBlobStore == nil {
-			err = errors.Errorf("RemoteBlobStore is nil")
-			return
-		}
-
-		if co, err = s.importInventoryList(external); err != nil {
+		if co, err = importer.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		// TODO address this terrible hack? How should config objects be handled by
-		// remotes?
-		if external.GetGenre() == genres.Config {
-			return
-		}
-
-		if co, err = s.importLeafSku(external); err != nil {
+		if co, err = importer.importLeafSku(external); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -76,29 +67,41 @@ func (s Importer) Import(
 	return
 }
 
-func (s Importer) importInventoryList(
+func (importer Importer) importInventoryList(
 	el *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	if el.GetGenre() == genres.InventoryList {
-		if err = s.GetBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
-			el,
-			func(sk *sku.Transacted) (err error) {
-				if _, err = s.Import(
-					sk,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if importer.RemoteBlobStore == nil {
+		err = errors.Errorf("RemoteBlobStore is nil")
+		return
 	}
 
-	if co, err = s.importLeafSku(
+	if el.GetGenre() != genres.InventoryList {
+		err = errors.Errorf(
+			"Expected genre %q but got %q",
+			genres.InventoryList,
+			el.GetGenre(),
+		)
+		return
+	}
+
+	if err = importer.GetBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
+		el,
+		func(sk *sku.Transacted) (err error) {
+			if _, err = importer.Import(
+				sk,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if co, err = importer.importLeafSku(
 		el,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -111,6 +114,16 @@ func (s Importer) importInventoryList(
 func (importer Importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
+	if importer.ExcludeObjects {
+		return
+	}
+
+	// TODO address this terrible hack? How should config objects be handled by
+	// remotes?
+	if external.GetGenre() == genres.Config {
+		return
+	}
+
 	co = store_fs.GetCheckedOutPool().Get()
 
 	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
@@ -205,7 +218,7 @@ func (importer Importer) importLeafSku(
 	return
 }
 
-func (c Importer) importBlobIfNecessary(
+func (c Importer) ImportBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
 	blobSha := sk.GetBlobSha()
@@ -239,6 +252,7 @@ func (c Importer) importBlobIfNecessary(
 	var n int64
 
 	if n, err = repo_layout.CopyBlobIfNecessary(
+		c.GetDirectoryLayout().Env,
 		c.GetDirectoryLayout(),
 		c.RemoteBlobStore,
 		blobSha,

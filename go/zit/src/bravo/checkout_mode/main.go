@@ -18,6 +18,7 @@ const (
 	MetadataAndBlob
 	BlobOnly
 
+  // TODO remove?
 	BlobRecognized // should never be set via flags
 )
 

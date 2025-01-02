@@ -9,6 +9,7 @@ func (env *Repo) MakeImporter(
 ) (importer store.Importer) {
 	importer = store.Importer{
 		Store:               env.GetStore(),
+		ExcludeObjects:      options.ExcludeObjects,
 		RemoteBlobStore:     options.RemoteBlobStore,
 		BlobCopierDelegate:  options.BlobCopierDelegate,
 		AllowMergeConflicts: options.AllowMergeConflicts,
