@@ -12,16 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type New struct {
 	ids.RepoId
-	Delete bool
-	Count  int
+	Count int
 	// TODO combine organize and edit and refactor
-	Organize  bool
-	Edit      bool
+	command_components.Checkout
 	PrintOnly bool
 	Filter    script_value.ScriptValue
 	Shas      bool
@@ -44,27 +43,6 @@ func init() {
 				"treat arguments as blobs that are already checked in",
 			)
 
-			f.BoolVar(
-				&c.Delete,
-				"delete",
-				false,
-				"delete the zettel and blob after successful checkin",
-			)
-
-			f.BoolVar(
-				&c.Organize,
-				"organize",
-				false,
-				"open organize",
-			)
-
-			f.BoolVar(
-				&c.Edit,
-				"edit",
-				true,
-				"create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes",
-			)
-
 			f.IntVar(
 				&c.Count,
 				"count",
@@ -79,6 +57,7 @@ func init() {
 			)
 
 			c.AddToFlagSet(f)
+			c.Checkout.SetFlagSet(f)
 
 			return c
 		},

@@ -9,12 +9,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Edit struct {
 	// TODO-P3 add force
-	Delete       bool
+	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
 
@@ -26,12 +27,8 @@ func init() {
 				CheckoutMode: checkout_mode.MetadataOnly,
 			}
 
-			f.BoolVar(
-				&c.Delete,
-				"delete",
-				false,
-				"delete the zettel and blob after successful checkin",
-			)
+			c.Checkout.SetFlagSet(f)
+
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return c

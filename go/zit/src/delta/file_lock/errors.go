@@ -44,11 +44,16 @@ func (e ErrUnableToAcquireLock) GetRetryableError() errors.Retryable {
 }
 
 func (e ErrUnableToAcquireLock) ErrorCause() []string {
-	return []string{}
+	return []string{
+    "A previous operation that acquired the repo lock failed.",
+    "The lock is intentionally left behind in case recovery is necessary.",
+  }
 }
 
 func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
-	return []string{}
+	return []string{
+    fmt.Sprintf("The lockfile needs to removed (`rm %q`).", e.Path),
+  }
 }
 
 func (e ErrUnableToAcquireLock) Recover(ctx *errors.Context) {

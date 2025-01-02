@@ -8,25 +8,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Checkin struct {
-	Delete     bool
 	IgnoreBlob bool
 	Proto      sku.Proto
 
-	Organize           bool
+	command_components.Checkout
+
 	CheckoutBlobAndRun string
 	OpenBlob           bool
-	Edit               bool
 }
 
 func init() {
 	f := func(f *flag.FlagSet) CommandWithQuery {
 		c := &Checkin{}
-
-		f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 
 		f.BoolVar(
 			&c.IgnoreBlob,
@@ -42,16 +40,8 @@ func init() {
 			"checkout each Blob and run a utility",
 		)
 
-		f.BoolVar(
-			&c.Edit,
-			"edit",
-			false,
-			"edit each checked in object",
-		)
-
-		f.BoolVar(&c.Organize, "organize", false, "")
-
 		c.Proto.AddToFlagSet(f)
+		c.Checkout.SetFlagSet(f)
 
 		return c
 	}
