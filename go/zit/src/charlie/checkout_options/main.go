@@ -12,9 +12,9 @@ type Options struct {
 }
 
 type OptionsWithoutMode struct {
-	Force                bool
-	AllowConflicted      bool
-	FSOptionsWithoutMode FSOptionsWithoutMode
+	Force           bool
+	AllowConflicted bool
+	GenericOptions  FSOptionsWithoutMode
 }
 
 type FSOptionsWithoutMode struct {

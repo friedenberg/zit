@@ -37,7 +37,7 @@ func (s *Store) checkoutOneForReal(
 	}
 
 	// delete the existing checkout if it exists in the cwd
-	if options.FSOptionsWithoutMode.Path == checkout_options.PathDefault {
+	if options.GenericOptions.Path == checkout_options.PathDefault {
 		if err = s.RemoveItem(item); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -78,7 +78,7 @@ func (s *Store) checkoutOneForReal(
 	}
 
 	if err = s.fileEncoder.Encode(
-		options.FSOptionsWithoutMode.TextFormatterOptions,
+		options.GenericOptions.TextFormatterOptions,
 		co.GetSkuExternal(),
 		item,
 	); err != nil {
@@ -116,7 +116,7 @@ func (s *Store) setBlobIfNecessary(
 	info checkoutFileNameInfo,
 ) (err error) {
 	if info.inlineBlob && options.CheckoutMode.IncludesMetadata() ||
-		options.FSOptionsWithoutMode.ForceInlineBlob || !options.CheckoutMode.IncludesBlob() {
+		options.GenericOptions.ForceInlineBlob || !options.CheckoutMode.IncludesBlob() {
 		i.MutableSetLike.Del(&i.Blob)
 		i.Blob.Reset()
 		return
@@ -212,7 +212,7 @@ func (s *Store) SetFilenameForTransacted(
 ) (err error) {
 	cwd := s.dirLayout.GetCwd()
 
-	if options.FSOptionsWithoutMode.Path == checkout_options.PathTempLocal {
+	if options.GenericOptions.Path == checkout_options.PathTempLocal {
 		var f *os.File
 
 		if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
@@ -313,7 +313,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		return
 	}
 
-	options.FSOptionsWithoutMode.Path = checkout_options.PathTempLocal
+	options.GenericOptions.Path = checkout_options.PathTempLocal
 
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *sku.FSItem

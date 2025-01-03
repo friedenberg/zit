@@ -69,7 +69,7 @@ func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 	}
 
 	if !c.Workspace {
-		opEdit.FSOptionsWithoutMode.Path = checkout_options.PathTempLocal
+		opEdit.GenericOptions.Path = checkout_options.PathTempLocal
 	}
 
 	if _, err := opEdit.RunQuery(eqwk); err != nil {

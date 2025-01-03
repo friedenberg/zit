@@ -38,7 +38,7 @@ func (op Diff) Run(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					FSOptionsWithoutMode: checkout_options.FSOptionsWithoutMode{
+					GenericOptions: checkout_options.FSOptionsWithoutMode{
 						Path: checkout_options.PathTempLocal,
 					},
 				},
