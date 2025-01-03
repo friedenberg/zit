@@ -78,10 +78,11 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
-    // TODO only expose this when it's a workspace checkout
-		if err = s.ui.CheckedOutCheckedOut(co); err != nil {
-			err = errors.Wrap(err)
-			return
+		if !options.NoWorkspace {
+			if err = s.ui.CheckedOutCheckedOut(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		if err = f(co); err != nil {

@@ -63,14 +63,14 @@ func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 	}
 
 	opEdit := user_ops.Checkout{
-		Repo:    u,
-		Options: options,
-		Edit:    true,
+		Repo:      u,
+		Options:   options,
+		Edit:      true,
 	}
 
-	// if !c.Workspace {
-	// 	opEdit.StoreSpecificOptions.Path = checkout_options.PathTempLocal
-	// }
+  if !c.Workspace {
+    opEdit.Options.NoWorkspace = true
+  }
 
 	if _, err := opEdit.RunQuery(eqwk); err != nil {
 		u.CancelWithError(err)
