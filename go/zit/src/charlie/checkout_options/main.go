@@ -12,19 +12,9 @@ type Options struct {
 }
 
 type OptionsWithoutMode struct {
-	Force           bool
-	AllowConflicted bool
-	GenericOptions  FSOptionsWithoutMode
-}
-
-type FSOptionsWithoutMode struct {
-	Path            Path
-	ForceInlineBlob bool
-	AllowConflicted bool
-	TextFormatterOptions
-}
-
-func (c *FSOptionsWithoutMode) AddToFlagSet(f *flag.FlagSet) {
+	Force                bool
+	AllowConflicted      bool
+	StoreSpecificOptions any
 }
 
 func (c *Options) AddToFlagSet(f *flag.FlagSet) {

@@ -193,7 +193,7 @@ func (s *Store) checkoutOneForMerge(
 		CheckoutMode: mode,
 		OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 			Force: true,
-			GenericOptions: checkout_options.FSOptionsWithoutMode{
+			StoreSpecificOptions: CheckoutOptions{
 				AllowConflicted: true,
 				Path:            checkout_options.PathTempLocal,
 				ForceInlineBlob: true,

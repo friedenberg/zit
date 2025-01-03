@@ -307,7 +307,7 @@ func (s *Store) asBlobSaver() sku.BlobSaver {
 }
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
-	options checkout_options.FSOptionsWithoutMode,
+	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
 	return

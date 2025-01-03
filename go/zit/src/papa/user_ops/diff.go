@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -38,7 +39,7 @@ func (op Diff) Run(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					GenericOptions: checkout_options.FSOptionsWithoutMode{
+					StoreSpecificOptions: store_fs.CheckoutOptions{
 						Path: checkout_options.PathTempLocal,
 					},
 				},

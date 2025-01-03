@@ -50,7 +50,10 @@ func (s *Store) prepareFSItemForCheckOut(
 	options checkout_options.Options,
 	co *sku.CheckedOut,
 ) (item *sku.FSItem, alreadyCheckedOut bool, err error) {
-	if s.config.IsDryRun() || options.GenericOptions.Path == checkout_options.PathTempLocal {
+	fsOptions := GetCheckoutOptionsFromOptions(options)
+
+	if s.config.IsDryRun() ||
+		fsOptions.Path == checkout_options.PathTempLocal {
 		item = &sku.FSItem{}
 		item.Reset()
 		return

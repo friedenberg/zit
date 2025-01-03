@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -148,7 +149,7 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					GenericOptions: checkout_options.FSOptionsWithoutMode{
+					StoreSpecificOptions: store_fs.CheckoutOptions{
 						TextFormatterOptions: cotfo,
 					},
 				},

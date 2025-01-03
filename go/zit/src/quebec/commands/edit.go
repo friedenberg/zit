@@ -68,9 +68,9 @@ func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 		Edit:    true,
 	}
 
-	if !c.Workspace {
-		opEdit.GenericOptions.Path = checkout_options.PathTempLocal
-	}
+	// if !c.Workspace {
+	// 	opEdit.StoreSpecificOptions.Path = checkout_options.PathTempLocal
+	// }
 
 	if _, err := opEdit.RunQuery(eqwk); err != nil {
 		u.CancelWithError(err)
