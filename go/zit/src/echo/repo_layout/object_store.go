@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -17,23 +16,6 @@ type ObjectStore struct {
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
 	dir_layout.TemporaryFS
-}
-
-func (s Layout) HasObject(
-	g interfaces.GenreGetter,
-	sh sha.ShaLike,
-) (ok bool) {
-	var d string
-	var err error
-
-	if d, err = s.DirObjectGenre(g); err != nil {
-		return
-	}
-
-	p := id.Path(sh.GetShaLike(), d)
-	ok = files.Exists(p)
-
-	return
 }
 
 func (s ObjectStore) objectReader(

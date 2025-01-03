@@ -14,7 +14,9 @@ teardown() {
 	rm_from_version "$version"
 }
 
-function edit_and_change { # @test
+# bats file_tags=user_story:workspace
+
+function edit_and_change_workspace { # @test
 	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
 	run_zit edit one/uno
 	assert_success
@@ -30,12 +32,43 @@ function edit_and_change { # @test
 	EOM
 }
 
-function edit_and_dont_change { # @test
+function edit_and_dont_change_workspace { # @test
 	export EDITOR="true"
 	run_zit edit one/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+
+	run_zit show -format blob one/uno
+	assert_success
+	assert_output - <<-EOM
+		last time
+	EOM
+}
+
+function edit_and_change_no_workspace { # @test
+	skip
+	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
+	run_zit edit -use-workspace=false one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @85eb98a5c8f7ccc354f35b846bb24adc1764e88cb907f63293f6902aa105af58]
+	EOM
+
+	run_zit show -format blob one/uno
+	assert_success
+	assert_output - <<-EOM
+		this is the body 2
+	EOM
+}
+
+function edit_and_dont_change_no_workspace { # @test
+	skip
+	export EDITOR="true"
+	run_zit edit -use-workspace=false one/uno
+	assert_success
+	assert_output - <<-EOM
 	EOM
 
 	run_zit show -format blob one/uno

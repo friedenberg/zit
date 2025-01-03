@@ -12,20 +12,19 @@ type Options struct {
 }
 
 type OptionsWithoutMode struct {
-	Force           bool
+	Force                bool
+	AllowConflicted      bool
+	FSOptionsWithoutMode FSOptionsWithoutMode
+}
+
+type FSOptionsWithoutMode struct {
 	Path            Path
 	ForceInlineBlob bool
 	AllowConflicted bool
 	TextFormatterOptions
 }
 
-func (c *OptionsWithoutMode) AddToFlagSet(f *flag.FlagSet) {
-	f.BoolVar(
-		&c.Force,
-		"force",
-		false,
-		"force update checked out zettels, even if they will overwrite existing checkouts",
-	)
+func (c *FSOptionsWithoutMode) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (c *Options) AddToFlagSet(f *flag.FlagSet) {

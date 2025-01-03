@@ -148,7 +148,9 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					TextFormatterOptions: cotfo,
+					FSOptionsWithoutMode: checkout_options.FSOptionsWithoutMode{
+						TextFormatterOptions: cotfo,
+					},
 				},
 			},
 			Edit: true,

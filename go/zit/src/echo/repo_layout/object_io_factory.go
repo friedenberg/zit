@@ -4,6 +4,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+// TODO remove this in favor of using an append-only locked log of inventory
+// lists
 func (s Layout) ObjectReaderWriterFactory(
 	g interfaces.GenreGetter,
 ) interfaces.ObjectIOFactory {

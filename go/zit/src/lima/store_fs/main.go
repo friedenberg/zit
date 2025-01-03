@@ -26,32 +26,32 @@ func init() {
 }
 
 func Make(
-	k sku.Config,
-	dp interfaces.FuncIter[*fd.FD],
+	config sku.Config,
+	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
-	st repo_layout.Layout,
-	ofo object_inventory_format.Options,
+	layout repo_layout.Layout,
+	inventoryFormatOptions object_inventory_format.Options,
 	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
 	fs = &Store{
-		config:         k,
-		deletedPrinter: dp,
-		dirLayout:      st,
+		config:         config,
+		deletedPrinter: deletedPrinter,
+		dirLayout:      layout,
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
-		dir:            st.GetCwd(),
-		dirItems:       makeObjectsWithDir(st.GetCwd(), fileExtensions, st),
+		dir:            layout.GetCwd(),
+		dirItems:       makeObjectsWithDir(layout.GetCwd(), fileExtensions, layout),
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
 		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		objectFormatOptions: ofo,
+		objectFormatOptions: inventoryFormatOptions,
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				DirLayout: st.Layout,
-				BlobStore: st,
+				DirLayout: layout.Layout,
+				BlobStore: layout,
 			},
 		),
 	}
@@ -65,7 +65,7 @@ type Store struct {
 	metadataTextParser  object_metadata.TextParser
 	dirLayout           repo_layout.Layout
 	fileEncoder         FileEncoder
-	ic                  ids.InlineTypeChecker
+	inlineTypeChecker   ids.InlineTypeChecker
 	fileExtensions      interfaces.FileExtensionGetter
 	dir                 string
 	objectFormatOptions object_inventory_format.Options

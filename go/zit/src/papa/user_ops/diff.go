@@ -38,7 +38,9 @@ func (op Diff) Run(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					Path: checkout_options.PathTempLocal,
+					FSOptionsWithoutMode: checkout_options.FSOptionsWithoutMode{
+						Path: checkout_options.PathTempLocal,
+					},
 				},
 			},
 			remoteCheckedOut.GetSku(),

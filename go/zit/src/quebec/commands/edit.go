@@ -15,6 +15,7 @@ import (
 
 type Edit struct {
 	// TODO-P3 add force
+	Workspace bool
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
@@ -24,12 +25,14 @@ func init() {
 		"edit",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Edit{
+				Workspace:    true,
 				CheckoutMode: checkout_mode.MetadataOnly,
 			}
 
 			c.Checkout.SetFlagSet(f)
 
-			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
+			f.Var(&c.CheckoutMode, "mode", "mode for checking out the object")
+			f.BoolVar(&c.Workspace, "use-workspace", true, "checkout the object into the current workspace (CWD)")
 
 			return c
 		},
@@ -63,6 +66,10 @@ func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 		Repo:    u,
 		Options: options,
 		Edit:    true,
+	}
+
+	if !c.Workspace {
+		opEdit.FSOptionsWithoutMode.Path = checkout_options.PathTempLocal
 	}
 
 	if _, err := opEdit.RunQuery(eqwk); err != nil {
