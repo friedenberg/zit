@@ -4,26 +4,12 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func init() {
 	gob.Register(Transacted{})
-}
-
-// TODO rename and switch to no object.Mode
-type CommitOptions struct {
-	ids.RepoId
-	object_mode.Mode // TODO rename
-	ids.Clock
-	Proto              *Transacted
-	ChangeIsHistorical bool
-	DontAddMissingTags bool
-	DontAddMissingType bool
-	DontValidate       bool
-	DontRunHooks       bool
 }
 
 type (

@@ -2,7 +2,6 @@ package repo_local
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -43,9 +42,9 @@ func (e *Repo) LockAndCommitOrganizeResults(
 		func(changed sku.SkuType) (err error) {
 			if err = e.GetStore().CreateOrUpdate(
 				changed.GetSkuExternal(),
-				object_mode.Make(
-					object_mode.ModeMergeCheckedOut,
-				),
+				sku.StoreOptions{
+					MergeCheckedOut: true,
+				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return

@@ -118,6 +118,7 @@ func (c *Store) Initialize(
 		c.GetDirectoryLayout(),
 		c.GetConfig(),
 		c.GetDirectoryLayout().DirCacheObjects(),
+		c.sunrise,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

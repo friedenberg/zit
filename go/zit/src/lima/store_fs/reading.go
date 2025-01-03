@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -19,7 +18,9 @@ func (s *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 
 	if external, err = s.ReadExternalFromItem(
 		sku.CommitOptions{
-			Mode: object_mode.ModeUpdateTai,
+			StoreOptions: sku.StoreOptions{
+				UpdateTai: true,
+			},
 		},
 		item,
 		internal,

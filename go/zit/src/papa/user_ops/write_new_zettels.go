@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -73,7 +72,9 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 
 	if err = c.GetStore().CreateOrUpdate(
 		zt,
-		object_mode.ModeApplyProto,
+		sku.StoreOptions{
+			ApplyProto: true,
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

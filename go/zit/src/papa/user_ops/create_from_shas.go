@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -67,7 +66,9 @@ func (c CreateFromShas) Run(
 	for _, z := range toCreate {
 		if err = c.GetStore().CreateOrUpdate(
 			z,
-			object_mode.ModeApplyProto,
+			sku.StoreOptions{
+				ApplyProto: true,
+			},
 		); err != nil {
 			// TODO-P2 add file for error handling
 			c.handleStoreError(z, "", err)

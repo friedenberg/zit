@@ -11,7 +11,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -190,7 +189,7 @@ func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
 
 	if err = u.GetStore().CreateOrUpdate(
 		o,
-		object_mode.ModeCreate,
+		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -234,7 +233,7 @@ func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
 
 	if err = u.GetStore().CreateOrUpdate(
 		newConfig,
-		object_mode.ModeCreate,
+		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -11,7 +11,7 @@ func (s *Store) validate(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
-	if o.DontValidate {
+	if !o.Validate {
 		return
 	}
 

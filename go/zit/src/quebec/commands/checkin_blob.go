@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -159,9 +158,9 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	for _, z := range zettels {
 		if err := u.GetStore().CreateOrUpdate(
 			z,
-			object_mode.Make(
-				object_mode.ModeMergeCheckedOut,
-			),
+			sku.StoreOptions{
+				MergeCheckedOut: true,
+			},
 		); err != nil {
 			u.CancelWithError(err)
 		}

@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -84,7 +83,9 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 		if err = s.HydrateExternalFromItem(
 			sku.CommitOptions{
-				Mode: object_mode.ModeUpdateTai,
+				StoreOptions: sku.StoreOptions{
+					UpdateTai: true,
+				},
 			},
 			item,
 			co.GetSku(),

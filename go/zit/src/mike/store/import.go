@@ -3,7 +3,6 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -158,11 +157,9 @@ func (importer Importer) importLeafSku(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
-					Mode:               object_mode.ModeImport,
-					DontValidate:       true,
+					StoreOptions:       sku.GetStoreOptionsImport(),
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
-					ChangeIsHistorical: true,
 				},
 			); err != nil {
 				err = errors.WrapExcept(err, collections.ErrExists)
@@ -197,10 +194,7 @@ func (importer Importer) importLeafSku(
 		}
 	}
 
-	commitOptions.DontValidate = true
-
-	// TODO set this in a better way
-	commitOptions.ChangeIsHistorical = true
+	commitOptions.Validate = false
 
 	if err = importer.tryRealizeAndOrStore(
 		co.GetSkuExternal(),

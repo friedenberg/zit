@@ -2,7 +2,6 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -40,7 +39,9 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 
 	if err = s.HydrateExternalFromItem(
 		sku.CommitOptions{
-			Mode: object_mode.ModeUpdateTai,
+			StoreOptions: sku.StoreOptions{
+				UpdateTai: true,
+			},
 		},
 		kfp,
 		sk,

@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -49,7 +48,7 @@ func (c EditConfig) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := u.GetStore().CreateOrUpdate(
 		sk,
-		object_mode.ModeLatest,
+		sku.StoreOptions{},
 	); err != nil {
 		u.CancelWithError(err)
 	}

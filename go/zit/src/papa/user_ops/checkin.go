@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
@@ -95,7 +94,9 @@ func (op Checkin) Run(
 
 			if err = u.GetStore().CreateOrUpdate(
 				external,
-				object_mode.ModeApplyProto,
+				sku.StoreOptions{
+					ApplyProto: true,
+				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -104,7 +105,7 @@ func (op Checkin) Run(
 			if op.Proto.Apply(external, genres.Zettel) {
 				if err = u.GetStore().CreateOrUpdate(
 					external.GetSku(),
-					object_mode.ModeEmpty,
+					sku.StoreOptions{},
 				); err != nil {
 					err = errors.Wrap(err)
 					return

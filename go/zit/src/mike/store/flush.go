@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -46,7 +45,7 @@ func (s *Store) FlushInventoryList(
 			inventoryListSku,
 			inventoryListSku.GetObjectId().String(),
 			sku.CommitOptions{
-				Mode: object_mode.ModeLatest,
+				StoreOptions: sku.StoreOptions{},
 			},
 		); err != nil {
 			err = errors.Wrap(err)

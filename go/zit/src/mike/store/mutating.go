@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -29,7 +28,7 @@ func (s *Store) tryRealize(
 
 	kinder := el.GetSku()
 
-	if mutter == nil && o.Contains(object_mode.ModeApplyProto) {
+	if mutter == nil && o.ApplyProto {
 		s.protoZettel.Apply(kinder, kinder)
 	}
 
@@ -84,9 +83,7 @@ func (s *Store) tryRealizeAndOrStore(
 	ui.Log().Printf("%s -> %s", o, child)
 
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() &&
-		o.ContainsAny(
-			object_mode.ModeAddToInventoryList,
-		) {
+		o.AddToInventoryList {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
 		})
@@ -95,10 +92,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	// TAI must be set before calculating object sha
-	if o.ContainsAny(
-		object_mode.ModeAddToInventoryList,
-		object_mode.ModeUpdateTai,
-	) {
+	if o.UpdateTai {
 		if o.Clock == nil {
 			o.Clock = s
 		}
@@ -106,9 +100,7 @@ func (s *Store) tryRealizeAndOrStore(
 		child.SetTai(o.Clock.GetTai())
 	}
 
-	if o.ContainsAny(
-		object_mode.ModeAddToInventoryList,
-	) && (child.ObjectId.IsEmpty() ||
+	if o.AddToInventoryList && (child.ObjectId.IsEmpty() ||
 		child.GetGenre() == genres.None ||
 		child.GetGenre() == genres.Blob) {
 		var ken *ids.ZettelId
@@ -141,7 +133,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Contains(object_mode.ModeAddToInventoryList) {
+	if o.AddToInventoryList {
 		if err = s.addMissingTypeAndTags(o, child); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -154,14 +146,14 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	// short circuits if the parent is equal to the child
-	if o.Mode != object_mode.ModeReindex &&
+	if o.AddToInventoryList &&
 		parent != nil &&
 		ids.Equals(child.GetObjectId(), parent.GetObjectId()) &&
 		child.Metadata.EqualsSansTai(&parent.Metadata) {
 
 		sku.TransactedResetter.ResetWithExceptFields(child, parent)
 
-		if o.Mode.Contains(object_mode.ModeLatest) {
+		if s.sunrise.Less(child.GetTai()) {
 			if err = s.ui.TransactedUnchanged(child); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -178,7 +170,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Mode.Contains(object_mode.ModeLatest) {
+	if s.sunrise.Less(child.GetTai()) {
 		if err = s.GetConfig().AddTransacted(
 			child,
 			parent,
@@ -187,22 +179,21 @@ func (s *Store) tryRealizeAndOrStore(
 			err = errors.Wrap(err)
 			return
 		}
-
-		if child.GetGenre() == genres.Zettel {
-			if err = s.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
-				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
-					ui.Log().Printf("object id does not contain value: %s", err)
-					err = nil
-				} else {
-					err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
-					return
-				}
-			}
-		}
-
 	}
 
-	if o.Contains(object_mode.ModeAddToInventoryList) {
+	if child.GetGenre() == genres.Zettel {
+		if err = s.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
+			if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
+				ui.Log().Printf("object id does not contain value: %s", err)
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
+				return
+			}
+		}
+	}
+
+	if o.AddToInventoryList {
 		ui.Log().Print("adding to bestandsaufnahme", o, child)
 		if err = s.commitTransacted(child, parent); err != nil {
 			err = errors.Wrap(err)
@@ -210,7 +201,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 	}
 
-	if o.Contains(object_mode.ModeLatest) {
+	if o.AddToInventoryList {
 		if err = s.GetStreamIndex().Add(
 			child,
 			child.GetObjectId().String(),
@@ -240,7 +231,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	}
 
-	if o.Contains(object_mode.ModeMergeCheckedOut) {
+	if o.MergeCheckedOut {
 		if err = s.ReadExternalAndMergeIfNecessary(
 			child,
 			parent,
@@ -343,7 +334,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		sku.CommitOptions{Mode: object_mode.ModeCommit},
+		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -489,7 +480,7 @@ func (s *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
 
 func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 	o := sku.CommitOptions{
-		Mode: object_mode.ModeReindex,
+		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
 	if err = s.tryRealizeAndOrStore(sk, o); err != nil {

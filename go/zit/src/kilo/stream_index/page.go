@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -25,10 +24,10 @@ type PageId = sha.PageId
 
 type Page struct {
 	PageId
+	sunrise ids.Tai
 	*probe_index
 	// All, Schwanzen  Page
 	added, addedLatest *sku.TransactedHeap
-	flushMode          object_mode.Mode
 	hasChanges         bool
 	directoryLayout    repo_layout.Layout
 	config             *config.Compiled
@@ -40,6 +39,7 @@ func (pt *Page) initialize(
 	i *Index,
 ) {
 	pt.directoryLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
+	pt.sunrise = i.sunrise
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedLatest = sku.MakeTransactedHeap()
@@ -94,7 +94,7 @@ func (pt *Page) add(
 
 	sku.TransactedResetter.ResetWith(z, z1)
 
-	if options.Contains(object_mode.ModeLatest) && !options.ChangeIsHistorical {
+	if pt.sunrise.Less(z.GetTai()) {
 		pt.addedLatest.Add(z)
 	} else {
 		pt.added.Add(z)

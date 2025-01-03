@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -165,7 +164,9 @@ func (s *Store) MakeMergedTransacted(
 
 	if err = s.HydrateExternalFromItem(
 		sku.CommitOptions{
-			Mode: object_mode.ModeUpdateTai,
+			StoreOptions: sku.StoreOptions{
+				UpdateTai: true,
+			},
 		},
 		mergedItem,
 		conflicted.GetSku(),

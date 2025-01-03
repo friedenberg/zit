@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -73,7 +72,7 @@ func (s *Store) HydrateExternalFromItem(
 	}
 
 	// Don't apply the proto object as that would artificially create deltas
-	o.Del(object_mode.ModeApplyProto)
+	o.StoreOptions.ApplyProto = false
 
 	if err = s.externalStoreSupplies.FuncCommit(
 		external,

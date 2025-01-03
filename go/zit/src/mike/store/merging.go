@@ -3,7 +3,6 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -17,8 +16,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
-	commitOptions.Mode = object_mode.ModeImport
-	commitOptions.DontValidate = true
+	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
 
 	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
 		return
@@ -28,7 +26,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 
 	// TODO add checkout_mode.BlobOnly
 	if co.GetSku().Metadata.Sha().Equals(co.GetSkuExternal().Metadata.Sha()) {
-		commitOptions.Mode = object_mode.ModeEmpty
+		commitOptions.StoreOptions = sku.StoreOptions{}
 		return
 	} else if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().Metadata) {
 		if !co.GetSku().Metadata.Tai.Less(co.GetSkuExternal().Metadata.Tai) {

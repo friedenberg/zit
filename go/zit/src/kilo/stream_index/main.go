@@ -51,6 +51,7 @@ func init() {
 
 type Index struct {
 	directoryLayout repo_layout.Layout
+	sunrise         ids.Tai
 	mutable_config  *config.Compiled
 	path            string
 	interfaces.CacheIOFactory
@@ -63,9 +64,11 @@ func MakeIndex(
 	s repo_layout.Layout,
 	k *config.Compiled,
 	dir string,
+	sunrise ids.Tai,
 ) (i *Index, err error) {
 	i = &Index{
 		directoryLayout: s,
+		sunrise:         sunrise,
 		mutable_config:  k,
 		path:            dir,
 		CacheIOFactory:  s,
