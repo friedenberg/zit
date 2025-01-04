@@ -1,13 +1,13 @@
 package box_scanner
 
 import (
+	"bytes"
 	"io"
 	"unicode"
 	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/box"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 type Scanner struct {
@@ -15,7 +15,7 @@ type Scanner struct {
 
 	tokenTypeProbably box.TokenType
 
-	scanned       catgut.String
+	scanned       bytes.Buffer
 	scannedOffset int
 	seq           Seq
 
