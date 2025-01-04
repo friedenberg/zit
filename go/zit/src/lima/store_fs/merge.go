@@ -195,7 +195,7 @@ func (s *Store) checkoutOneForMerge(
 			Force: true,
 			StoreSpecificOptions: CheckoutOptions{
 				AllowConflicted: true,
-				Path:            checkout_options.PathTempLocal,
+				Path:            PathOptionTempLocal,
 				ForceInlineBlob: true,
 			},
 		},

@@ -39,7 +39,7 @@ func (s *Store) checkoutOneForReal(
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	// delete the existing checkout if it exists in the cwd
-	if fsOptions.Path == checkout_options.PathDefault {
+	if fsOptions.Path == PathOptionDefault {
 		if err = s.RemoveItem(item); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -219,7 +219,7 @@ func (s *Store) SetFilenameForTransacted(
 
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
-	if fsOptions.Path == checkout_options.PathTempLocal {
+	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
 		if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
@@ -321,7 +321,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	}
 
 	fsOptions := GetCheckoutOptionsFromOptionsWithoutMode(options)
-	fsOptions.Path = checkout_options.PathTempLocal
+	fsOptions.Path = PathOptionTempLocal
 	options.StoreSpecificOptions = fsOptions
 
 	var replacement *sku.CheckedOut

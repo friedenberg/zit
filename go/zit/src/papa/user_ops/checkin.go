@@ -234,6 +234,8 @@ func (c Checkin) openBlobIfNecessary(
 		Utility: c.CheckoutBlobAndRun,
 	}
 
+	opCheckout.Workspace = true
+
 	if _, err = opCheckout.Run(objects); err != nil {
 		err = errors.Wrap(err)
 		return

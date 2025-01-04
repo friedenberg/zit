@@ -40,7 +40,7 @@ func (op Diff) Run(
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					StoreSpecificOptions: store_fs.CheckoutOptions{
-						Path: checkout_options.PathTempLocal,
+						Path: store_fs.PathOptionTempLocal,
 					},
 				},
 			},

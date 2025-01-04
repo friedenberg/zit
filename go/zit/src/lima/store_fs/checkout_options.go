@@ -6,8 +6,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 )
 
+//go:generate stringer -type=PathOption
+type PathOption int
+
+const (
+	PathOptionDefault = PathOption(iota)
+	PathOptionLeft
+	PathOptionMiddle
+	PathOptionRight
+	PathOptionTempLocal
+	PathOptionTempOS
+)
+
 type CheckoutOptions struct {
-	Path            checkout_options.Path
+	Path            PathOption
 	ForceInlineBlob bool
 	AllowConflicted bool
 	checkout_options.TextFormatterOptions
@@ -29,6 +41,10 @@ func GetCheckoutOptionsFromOptionsWithoutMode(
 
 	default:
 		panic(fmt.Sprintf("expected %T or nil but got %T", fsOptions, t))
+	}
+
+	if !options.Workspace {
+		fsOptions.Path = PathOptionTempLocal
 	}
 
 	return

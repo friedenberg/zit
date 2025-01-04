@@ -57,6 +57,8 @@ func (c Checkout) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		Options:  c.CheckoutOptions,
 	}
 
+	opCheckout.Options.Workspace = true
+
 	if _, err := opCheckout.RunQuery(qg); err != nil {
 		u.CancelWithError(err)
 	}
