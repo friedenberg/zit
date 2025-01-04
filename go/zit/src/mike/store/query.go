@@ -15,7 +15,7 @@ func (s *Store) QueryPrimitive(
 	qg sku.PrimitiveQueryGroup,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-  e := query.MakeExecutorPrimitive(
+	e := query.MakeExecutorPrimitive(
 		qg,
 		s.GetStreamIndex().ReadPrimitiveQuery,
 		s.ReadOneInto,

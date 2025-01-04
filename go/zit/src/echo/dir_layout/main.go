@@ -148,12 +148,12 @@ func MakeWithXDG(
 ) (s Layout) {
 	s.Context = context
 
-  if err := s.beforeXDG.initialize(do); err != nil {
-    s.CancelWithError(err)
+	if err := s.beforeXDG.initialize(do); err != nil {
+		s.CancelWithError(err)
 	}
 
-  if err := s.initializeXDG(xdg); err != nil {
-    s.CancelWithError(err)
+	if err := s.initializeXDG(xdg); err != nil {
+		s.CancelWithError(err)
 	}
 
 	return

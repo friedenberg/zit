@@ -46,7 +46,7 @@ func (c Init) Run(
 		if repo, err = c.BigBang.Start(
 			dependencies.Context,
 			dependencies.Config,
-      env.Options{},
+			env.Options{},
 		); err != nil {
 			repo.CancelWithError(err)
 		}

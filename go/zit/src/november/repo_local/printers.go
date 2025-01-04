@@ -117,22 +117,21 @@ func (u *Repo) PrinterCheckedOut(
 	return out
 }
 
-func (u *Repo) PrinterCheckedOutConflictsForRemoteTransfers(
-) interfaces.FuncIter[*sku.CheckedOut] {
-  p := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
+func (u *Repo) PrinterCheckedOutConflictsForRemoteTransfers() interfaces.FuncIter[*sku.CheckedOut] {
+	p := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	return func(co *sku.CheckedOut) (err error) {
-    if co.GetState() != checked_out_state.Conflicted {
-      return
-    }
+		if co.GetState() != checked_out_state.Conflicted {
+			return
+		}
 
-    if err = p(co); err != nil {
-      err = errors.Wrap(err)
-      return
-    }
+		if err = p(co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-    return
-  }
+		return
+	}
 }
 
 func (u *Repo) MakePrinterBoxArchive(

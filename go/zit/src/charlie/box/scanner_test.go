@@ -1,4 +1,4 @@
-package box_scanner
+package box
 
 import (
 	"fmt"
