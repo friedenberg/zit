@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/box"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
@@ -135,7 +134,7 @@ func getTokenScannerTestCases() []tokenScannerTestCase {
 }
 
 type testToken struct {
-	box.TokenType
+	TokenType
 	Contents string
 }
 
@@ -143,7 +142,7 @@ func (token testToken) String() string {
 	return fmt.Sprintf("%s %s", token.TokenType, token.Contents)
 }
 
-func makeTestToken(tt box.TokenType, contents string) testToken {
+func makeTestToken(tt TokenType, contents string) testToken {
 	return testToken{
 		TokenType: tt,
 		Contents:  contents,
@@ -156,7 +155,7 @@ func makeTestSeq(tokens ...any) (ts testSeq) {
 	for i := 0; i < len(tokens); i += 2 {
 		ts = append(ts,
 			makeTestToken(
-				tokens[i].(box.TokenType),
+				tokens[i].(TokenType),
 				tokens[i+1].(string),
 			),
 		)
@@ -186,107 +185,107 @@ func getScannerTestCases() []scannerTestCase {
 		{
 			input: "testing:e,t,k",
 			expected: []testSeq{
-				makeTestSeq(box.TokenTypeIdentifier, "testing"),
-				makeTestSeq(box.TokenTypeOperator, ":"),
-				makeTestSeq(box.TokenTypeIdentifier, "e"),
-				makeTestSeq(box.TokenTypeOperator, ","),
-				makeTestSeq(box.TokenTypeIdentifier, "t"),
-				makeTestSeq(box.TokenTypeOperator, ","),
-				makeTestSeq(box.TokenTypeIdentifier, "k"),
+				makeTestSeq(TokenTypeIdentifier, "testing"),
+				makeTestSeq(TokenTypeOperator, ":"),
+				makeTestSeq(TokenTypeIdentifier, "e"),
+				makeTestSeq(TokenTypeOperator, ","),
+				makeTestSeq(TokenTypeIdentifier, "t"),
+				makeTestSeq(TokenTypeOperator, ","),
+				makeTestSeq(TokenTypeIdentifier, "k"),
 			},
 		},
 		{
 			input: "[area-personal, area-work]:etikett",
 			expected: []testSeq{
-				makeTestSeq(box.TokenTypeOperator, "["),
-				makeTestSeq(box.TokenTypeIdentifier, "area-personal"),
-				makeTestSeq(box.TokenTypeOperator, ","),
-				makeTestSeq(box.TokenTypeOperator, " "),
-				makeTestSeq(box.TokenTypeIdentifier, "area-work"),
-				makeTestSeq(box.TokenTypeOperator, "]"),
-				makeTestSeq(box.TokenTypeOperator, ":"),
-				makeTestSeq(box.TokenTypeIdentifier, "etikett"),
+				makeTestSeq(TokenTypeOperator, "["),
+				makeTestSeq(TokenTypeIdentifier, "area-personal"),
+				makeTestSeq(TokenTypeOperator, ","),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeIdentifier, "area-work"),
+				makeTestSeq(TokenTypeOperator, "]"),
+				makeTestSeq(TokenTypeOperator, ":"),
+				makeTestSeq(TokenTypeIdentifier, "etikett"),
 			},
 		},
 		{
 			input: " [ uno/dos ] bez",
 			expected: []testSeq{
-				makeTestSeq(box.TokenTypeOperator, " "),
-				makeTestSeq(box.TokenTypeOperator, "["),
-				makeTestSeq(box.TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, "["),
+				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					box.TokenTypeIdentifier, "uno",
-					box.TokenTypeOperator, "/",
-					box.TokenTypeIdentifier, "dos",
+					TokenTypeIdentifier, "uno",
+					TokenTypeOperator, "/",
+					TokenTypeIdentifier, "dos",
 				),
-				makeTestSeq(box.TokenTypeOperator, " "),
-				makeTestSeq(box.TokenTypeOperator, "]"),
-				makeTestSeq(box.TokenTypeOperator, " "),
-				makeTestSeq(box.TokenTypeIdentifier, "bez"),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, "]"),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeIdentifier, "bez"),
 			},
 		},
 		{
 			input: "md.type",
 			expected: []testSeq{
 				makeTestSeq(
-					box.TokenTypeIdentifier, "md",
-					box.TokenTypeOperator, ".",
-					box.TokenTypeIdentifier, "type",
+					TokenTypeIdentifier, "md",
+					TokenTypeOperator, ".",
+					TokenTypeIdentifier, "type",
 				),
 			},
 		},
 		{
 			input: "[md.type]",
 			expected: []testSeq{
-				makeTestSeq(box.TokenTypeOperator, "["),
+				makeTestSeq(TokenTypeOperator, "["),
 				makeTestSeq(
-					box.TokenTypeIdentifier, "md",
-					box.TokenTypeOperator, ".",
-					box.TokenTypeIdentifier, "type",
+					TokenTypeIdentifier, "md",
+					TokenTypeOperator, ".",
+					TokenTypeIdentifier, "type",
 				),
-				makeTestSeq(box.TokenTypeOperator, "]"),
+				makeTestSeq(TokenTypeOperator, "]"),
 			},
 		},
 		{
 			input: "[uno/dos !pdf zz-inbox]",
 			expected: []testSeq{
-				makeTestSeq(box.TokenTypeOperator, "["),
+				makeTestSeq(TokenTypeOperator, "["),
 				makeTestSeq(
-					box.TokenTypeIdentifier, "uno",
-					box.TokenTypeOperator, "/",
-					box.TokenTypeIdentifier, "dos",
+					TokenTypeIdentifier, "uno",
+					TokenTypeOperator, "/",
+					TokenTypeIdentifier, "dos",
 				),
-				makeTestSeq(box.TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					box.TokenTypeOperator, "!",
-					box.TokenTypeIdentifier, "pdf",
+					TokenTypeOperator, "!",
+					TokenTypeIdentifier, "pdf",
 				),
-				makeTestSeq(box.TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					box.TokenTypeIdentifier, "zz-inbox",
+					TokenTypeIdentifier, "zz-inbox",
 				),
-				makeTestSeq(box.TokenTypeOperator, "]"),
+				makeTestSeq(TokenTypeOperator, "]"),
 			},
 		},
 		{
 			input: `/browser/bookmark-1FuOLQOYZAsP/ "Get Help" url="https://support.\"mozilla.org/products/firefox"`,
 			expected: []testSeq{
 				makeTestSeq(
-					box.TokenTypeOperator, "/",
-					box.TokenTypeIdentifier, "browser",
-					box.TokenTypeOperator, "/",
-					box.TokenTypeIdentifier, "bookmark-1FuOLQOYZAsP",
-					box.TokenTypeOperator, "/",
+					TokenTypeOperator, "/",
+					TokenTypeIdentifier, "browser",
+					TokenTypeOperator, "/",
+					TokenTypeIdentifier, "bookmark-1FuOLQOYZAsP",
+					TokenTypeOperator, "/",
 				),
-				makeTestSeq(box.TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					box.TokenTypeLiteral, "Get Help",
+					TokenTypeLiteral, "Get Help",
 				),
-				makeTestSeq(box.TokenTypeOperator, " "),
+				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					box.TokenTypeIdentifier, "url",
-					box.TokenTypeOperator, "=",
-					box.TokenTypeLiteral, `https://support."mozilla.org/products/firefox`,
+					TokenTypeIdentifier, "url",
+					TokenTypeOperator, "=",
+					TokenTypeLiteral, `https://support."mozilla.org/products/firefox`,
 				),
 			},
 		},
@@ -330,30 +329,30 @@ func TestTokenScanner(t1 *testing.T) {
 
 // 	type stringWithType struct {
 // 		Value     string
-// 		TokenType box.TokenType
+// 		TokenType TokenType
 // 	}
 
 // 	expected := []stringWithType{
-// 		{Value: "[", TokenType: box.TokenTypeOperator},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: box.TokenTypeIdentifier},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "!toml-bookmark", TokenType: box.TokenTypeIdentifier},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "zz-site-org-mozilla-support", TokenType: box.TokenTypeIdentifier},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "!browser-bookmark", TokenType: box.TokenTypeIdentifier},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: `"Get Help"`, TokenType: box.TokenTypeLiteral},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: box.TypeField},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "zz-site-org-mozilla-support", TokenType: box.TokenTypeIdentifier},
-// 		{Value: "]", TokenType: box.TokenTypeOperator},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Get", TokenType: box.TokenTypeIdentifier},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Help", TokenType: box.TokenTypeIdentifier},
+// 		{Value: "[", TokenType: TokenTypeOperator},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: TokenTypeIdentifier},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "!toml-bookmark", TokenType: TokenTypeIdentifier},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "!browser-bookmark", TokenType: TokenTypeIdentifier},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: `"Get Help"`, TokenType: TokenTypeLiteral},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TypeField},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier},
+// 		{Value: "]", TokenType: TokenTypeOperator},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Get", TokenType: TokenTypeIdentifier},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Help", TokenType: TokenTypeIdentifier},
 // 	}
 
 // 	var scanner TokenScanner
@@ -385,57 +384,57 @@ func TestTokenScanner(t1 *testing.T) {
 
 // 	type stringWithTypeAndParts struct {
 // 		Value     string
-// 		TokenType box.TokenType
+// 		TokenType TokenType
 // 		Seq
 // 	}
 
 // 	expected := []stringWithTypeAndParts{
-// 		{Value: "[", TokenType: box.TokenTypeOperator},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
+// 		{Value: "[", TokenType: TokenTypeOperator},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
 // 		{
-// 			Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 			Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 				[]uint8("/browser/bookmark-1FuOLQOYZAsP/"),
 // 				[]byte{},
 // 			},
 // 		},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "!toml-bookmark", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "!toml-bookmark", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("!toml-bookmark"),
 // 			[]byte{},
 // 		}},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "zz-site-org-mozilla-support", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("zz-site-org-mozilla-support"),
 // 			[]byte{},
 // 		}},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "!browser-bookmark", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "!browser-bookmark", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("!browser-bookmark"),
 // 			[]byte{},
 // 		}},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: `"Get Help"`, TokenType: box.TokenTypeLiteral, Seq: Seq{
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: `"Get Help"`, TokenType: TokenTypeLiteral, Seq: Seq{
 // 			[]uint8("Get Help"),
 // 			[]byte{},
 // 		}},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: box.TypeField, Seq: Seq{
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TypeField, Seq: Seq{
 // 			[]uint8("url"),
 // 			[]uint8(`https://support.\"mozilla.org/products/firefox`),
 // 		}},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "zz-site-org-mozilla-support", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("zz-site-org-mozilla-support"),
 // 			[]byte{},
 // 		}},
-// 		{Value: "]", TokenType: box.TokenTypeOperator},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Get", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "]", TokenType: TokenTypeOperator},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Get", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("Get"),
 // 			[]byte{},
 // 		}},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Help", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Help", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("Help"),
 // 			[]byte{},
 // 		}},
@@ -467,30 +466,30 @@ func TestTokenScanner(t1 *testing.T) {
 
 // 	type stringWithTypeAndParts struct {
 // 		Value string
-// 		box.TokenType
+// 		TokenType
 // 		Seq
 // 	}
 
 // 	expected := []stringWithTypeAndParts{
-// 		{Value: "[", TokenType: box.TokenTypeOperator},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: box.TypeField, Seq: Seq{
+// 		{Value: "[", TokenType: TokenTypeOperator},
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TypeField, Seq: Seq{
 // 			[]uint8("url"),
 // 			[]uint8(`https://support.\"mozilla.org/products/firefox`),
 // 		}},
-// 		{Value: "\n", TokenType: box.TokenTypeOperator},
-// 		{Value: "zz-site-org-mozilla-support", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "\n", TokenType: TokenTypeOperator},
+// 		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("zz-site-org-mozilla-support"),
 // 			[]byte{},
 // 		}},
-// 		{Value: "]", TokenType: box.TokenTypeOperator},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Get", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: "]", TokenType: TokenTypeOperator},
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Get", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("Get"),
 // 			[]byte{},
 // 		}},
-// 		{Value: " ", TokenType: box.TokenTypeOperator},
-// 		{Value: "Help", TokenType: box.TokenTypeIdentifier, Seq: Seq{
+// 		{Value: " ", TokenType: TokenTypeOperator},
+// 		{Value: "Help", TokenType: TokenTypeIdentifier, Seq: Seq{
 // 			[]uint8("Help"),
 // 			[]byte{},
 // 		}},
@@ -517,7 +516,7 @@ func TestTokenScanner(t1 *testing.T) {
 // }
 
 type typeAndParts struct {
-	TokenType          box.TokenType
+	TokenType          TokenType
 	Token, Left, Right string
 }
 
@@ -532,53 +531,53 @@ type tokenScannerTypesAndPartsTestCase struct {
 // 			input: `[/firefox-ddog/bookmark-5nSmpin9cwMc title="Equipment Recommendations" url="https://atlassian.net/"] Equipment Recommendations`,
 // 			expected: []typeAndParts{
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     "[",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "/firefox-ddog/bookmark-5nSmpin9cwMc",
 // 					Left:      "/firefox-ddog/bookmark-5nSmpin9cwMc",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     " ",
 // 				},
 // 				{
-// 					TokenType: box.TypeField,
+// 					TokenType: TypeField,
 // 					Token:     `title="Equipment Recommendations"`,
 // 					Left:      `title`,
 // 					Right:     `Equipment Recommendations`,
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     " ",
 // 				},
 // 				{
-// 					TokenType: box.TypeField,
+// 					TokenType: TypeField,
 // 					Token:     `url="https://atlassian.net/"`,
 // 					Left:      `url`,
 // 					Right:     `https://atlassian.net/`,
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     "]",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     " ",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "Equipment",
 // 					Left:      "Equipment",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     " ",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "Recommendations",
 // 					Left:      "Recommendations",
 // 				},
@@ -624,37 +623,37 @@ type tokenScannerTypesAndPartsTestCase struct {
 // 			input: `[/firefox-ddog/bookmark-5nSmpin9cwMc title="Equipment Recommendations" url="https://atlassian.net/"] Equipment Recommendations`,
 // 			expected: []typeAndParts{
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     "[",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "/firefox-ddog/bookmark-5nSmpin9cwMc",
 // 					Left:      "/firefox-ddog/bookmark-5nSmpin9cwMc",
 // 				},
 // 				{
-// 					TokenType: box.TypeField,
+// 					TokenType: TypeField,
 // 					Token:     `title="Equipment Recommendations"`,
 // 					Left:      `title`,
 // 					Right:     `Equipment Recommendations`,
 // 				},
 // 				{
-// 					TokenType: box.TypeField,
+// 					TokenType: TypeField,
 // 					Token:     `url="https://atlassian.net/"`,
 // 					Left:      `url`,
 // 					Right:     `https://atlassian.net/`,
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeOperator,
+// 					TokenType: TokenTypeOperator,
 // 					Token:     "]",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "Equipment",
 // 					Left:      "Equipment",
 // 				},
 // 				{
-// 					TokenType: box.TokenTypeIdentifier,
+// 					TokenType: TokenTypeIdentifier,
 // 					Token:     "Recommendations",
 // 					Left:      "Recommendations",
 // 				},

@@ -2,8 +2,15 @@ package box_scanner
 
 import (
 	"strings"
+)
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/box"
+//go:generate stringer -type=SeqType
+type SeqType int
+
+const (
+	SeqTypeUnknown    = SeqType(iota)
+	SeqTypeIdentifier // one/uno, tag, !type, /browser/bookmark-1, @abcd
+	SeqTypeField      // url=blah blob=hello contents="wow" contents="wow with\" quote"
 )
 
 type Seq []Token
@@ -12,7 +19,7 @@ func (a Seq) EqualsSeq(b Seq) bool {
 	return false
 }
 
-func (seq *Seq) Add(tokenType box.TokenType, contents []byte) {
+func (seq *Seq) Add(tokenType TokenType, contents []byte) {
 	*seq = append(*seq, Token{TokenType: tokenType, Contents: contents})
 }
 

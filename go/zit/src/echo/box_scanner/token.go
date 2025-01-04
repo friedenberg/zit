@@ -2,13 +2,21 @@ package box_scanner
 
 import (
 	"fmt"
+)
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/box"
+//go:generate stringer -type=TokenType
+type TokenType int
+
+const (
+	TokenTypeIncomplete = TokenType(iota)
+	TokenTypeOperator   // " =,.:+?^[]"
+	TokenTypeIdentifier // ["one", "uno", "tag", "one", "type", "/browser/bookmark-1", "@sha"...]
+	TokenTypeLiteral    // ["\"some text\"", "\"some text \\\" with escape\""]
 )
 
 type Token struct {
 	Contents []byte
-	box.TokenType
+	TokenType
 }
 
 func (token Token) String() string {
@@ -16,8 +24,8 @@ func (token Token) String() string {
 }
 
 func (src Token) Clone() (dst Token) {
-  dst = src
-  dst.Contents = make([]byte, len(src.Contents))
-  copy(dst.Contents, src.Contents)
-  return
+	dst = src
+	dst.Contents = make([]byte, len(src.Contents))
+	copy(dst.Contents, src.Contents)
+	return
 }

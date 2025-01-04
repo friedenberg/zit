@@ -1,4 +1,4 @@
-package box
+package box_scanner
 
 const (
 	OpOr            = ','

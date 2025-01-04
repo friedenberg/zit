@@ -6,14 +6,13 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/box"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 type Scanner struct {
 	io.RuneScanner
 
-	tokenTypeProbably box.TokenType
+	tokenTypeProbably TokenType
 
 	scanned       bytes.Buffer
 	scannedOffset int
@@ -29,7 +28,7 @@ func (ts *Scanner) Reset(r io.RuneScanner) {
 	ts.RuneScanner = r
 	ts.scanned.Reset()
 	ts.scannedOffset = 0
-	ts.tokenTypeProbably = box.TokenTypeIncomplete
+	ts.tokenTypeProbably = TokenTypeIncomplete
 	ts.seq.Reset()
 	ts.err = nil
 	ts.unscan = nil
@@ -76,7 +75,7 @@ func (ts *Scanner) CanScan() (ok bool) {
 func (scanner *Scanner) resetBeforeNextScan() {
 	scanner.scanned.Reset()
 	scanner.scannedOffset = 0
-	scanner.tokenTypeProbably = box.TokenTypeIncomplete
+	scanner.tokenTypeProbably = TokenTypeIncomplete
 	scanner.seq.Reset()
 }
 
@@ -117,7 +116,7 @@ func (scanner *Scanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 		case r == '"' || r == '\'':
 			if !scanner.consumeLiteralOrFieldValue(
 				r,
-				box.TokenTypeLiteral,
+				TokenTypeLiteral,
 			) {
 				ok = false
 				return
@@ -135,12 +134,12 @@ func (scanner *Scanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 				continue
 			} else {
 				scanner.scanned.WriteRune(r)
-				scanner.appendTokenWithTypeToSeq(box.TokenTypeOperator)
+				scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 				return
 			}
 
 		case !isOperator:
-			scanner.tokenTypeProbably = box.TokenTypeIdentifier
+			scanner.tokenTypeProbably = TokenTypeIdentifier
 			scanner.scanned.WriteRune(r)
 			afterFirst = true
 			continue
@@ -185,7 +184,7 @@ func (ts *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
 	return ts.scan(false)
 }
 
-func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType box.TokenType) {
+func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType TokenType) {
 	if b := scanner.scanned.Bytes()[scanner.scannedOffset:]; len(b) > 0 {
 		scanner.seq.Add(tokenType, b)
 		scanner.scannedOffset += len(b)
@@ -222,14 +221,14 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			return
 		}
 
-		isOperator := box.IsOperator(r, !dotOperatorAsSplit)
+		isOperator := IsOperator(r, !dotOperatorAsSplit)
 		isSpace := unicode.IsSpace(r)
 
 		switch {
 		case r == '"' || r == '\'':
 			if !scanner.consumeLiteralOrFieldValue(
 				r,
-				box.TokenTypeLiteral,
+				TokenTypeLiteral,
 			) {
 				ok = false
 				return
@@ -239,7 +238,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 
 		case !afterFirst && isOperator:
 			scanner.scanned.WriteRune(r)
-			scanner.appendTokenWithTypeToSeq(box.TokenTypeOperator)
+			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 
 			if isSpace {
 				if !scanner.ConsumeSpacesOrErrorOnFalse() {
@@ -250,16 +249,16 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 
 			return
 
-		case !isOperator && !box.IsSequenceOperator(r):
-			scanner.tokenTypeProbably = box.TokenTypeIdentifier
+		case !isOperator && !IsSequenceOperator(r):
+			scanner.tokenTypeProbably = TokenTypeIdentifier
 			scanner.scanned.WriteRune(r)
 			afterFirst = true
 			continue
 
-		case box.IsSequenceOperator(r):
+		case IsSequenceOperator(r):
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 			scanner.scanned.WriteRune(r)
-			scanner.appendTokenWithTypeToSeq(box.TokenTypeOperator)
+			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 			continue
 
 		default: // wasSplitRune && afterFirst
@@ -336,7 +335,7 @@ func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 // TODO add support for ellipis
 func (scanner *Scanner) consumeLiteralOrFieldValue(
 	start rune,
-	tt box.TokenType,
+	tt TokenType,
 ) (ok bool) {
 	ok = true
 
@@ -374,13 +373,13 @@ func (scanner *Scanner) consumeLiteralOrFieldValue(
 
 func (ts *Scanner) consumeField(start rune) bool {
 	ts.scanned.WriteRune(start)
-	ok := ts.consumeIdentifierLike(box.TokenTypeLiteral)
+	ok := ts.consumeIdentifierLike(TokenTypeLiteral)
 	return ok
 }
 
 // TODO add support for ellipsis
 func (ts *Scanner) consumeIdentifierLike(
-	tt box.TokenType,
+	tt TokenType,
 ) (ok bool) {
 	ok = true
 
@@ -399,7 +398,7 @@ func (ts *Scanner) consumeIdentifierLike(
 			return
 		}
 
-		isOperator := box.IsOperator(r, true)
+		isOperator := IsOperator(r, true)
 
 		switch {
 		case r == '"' || r == '\'':
