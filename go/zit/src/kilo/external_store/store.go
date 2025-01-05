@@ -243,7 +243,9 @@ func (s *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
 	return
 }
 
-func (es *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
+func (es *Store) GetObjectIdsForString(
+  v string,
+) (k []sku.ExternalObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return

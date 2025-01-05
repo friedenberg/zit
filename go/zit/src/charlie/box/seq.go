@@ -15,6 +15,14 @@ const (
 
 type Seq []Token
 
+func (seq Seq) Len() int {
+	return len(seq)
+}
+
+func (seq Seq) At(idx int) Token {
+	return seq[idx]
+}
+
 func (a Seq) EqualsSeq(b Seq) bool {
 	return false
 }
@@ -49,4 +57,44 @@ func (src Seq) Clone() (dst Seq) {
 
 func (seq *Seq) Reset() {
 	*seq = Seq([]Token{})
+}
+
+type TokenTypes []TokenType
+
+func (actual TokenTypes) Equals(expected ...TokenType) bool {
+	if len(actual) != len(expected) {
+		return false
+	}
+
+	for i, a := range actual {
+		if a != expected[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (seq Seq) GetTokenTypes() TokenTypes {
+	out := make(TokenTypes, seq.Len())
+
+	for i := range out {
+		out[i] = seq.At(i).TokenType
+	}
+
+	return out
+}
+
+func (seq Seq) MatchAll(tokens ...TokenMatcher) bool {
+	if len(tokens) != seq.Len() {
+		return false
+	}
+
+	for i, m := range tokens {
+		if !m.Match(seq.At(i)) {
+			return false
+		}
+	}
+
+	return true
 }

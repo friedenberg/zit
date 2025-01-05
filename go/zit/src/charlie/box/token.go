@@ -14,6 +14,10 @@ const (
 	TokenTypeLiteral    // ["\"some text\"", "\"some text \\\" with escape\""]
 )
 
+func (expected TokenType) Match(actual Token) bool {
+	return actual.TokenType == expected
+}
+
 type Token struct {
 	Contents []byte
 	TokenType
