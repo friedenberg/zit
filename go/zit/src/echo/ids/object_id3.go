@@ -23,33 +23,33 @@ func (oid *objectId2) ReadFromSeq(
 		return
 
 		// tag
-	case seq.MatchAll(box.TokenTypeLiteral):
+	case seq.MatchAll(box.TokenTypeIdentifier):
 		oid.g = genres.Tag
 		oid.right.Write(seq.At(0).Contents)
 		return
 
 		// !type
-	case seq.MatchAll(box.TokenMatcherOp(box.OpType), box.TokenTypeLiteral):
+	case seq.MatchAll(box.TokenMatcherOp(box.OpType), box.TokenTypeIdentifier):
 		oid.g = genres.Type
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// %tag
-	case seq.MatchAll(box.TokenMatcherOp(box.OpVirtual), box.TokenTypeLiteral):
+	case seq.MatchAll(box.TokenMatcherOp(box.OpVirtual), box.TokenTypeIdentifier):
 		oid.g = genres.Tag
 		oid.middle = box.OpVirtual
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// /repo
-	case seq.MatchAll(box.TokenMatcherOp(box.OpPathSeparator), box.TokenTypeLiteral):
+	case seq.MatchAll(box.TokenMatcherOp(box.OpPathSeparator), box.TokenTypeIdentifier):
 		oid.g = genres.Repo
 		oid.middle = box.OpPathSeparator
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// @sha
-	case seq.MatchAll(box.TokenMatcherOp('@'), box.TokenTypeLiteral):
+	case seq.MatchAll(box.TokenMatcherOp('@'), box.TokenTypeIdentifier):
 		oid.g = genres.Blob
 		oid.middle = '@'
 		oid.right.Write(seq.At(1).Contents)
@@ -57,18 +57,37 @@ func (oid *objectId2) ReadFromSeq(
 
 		// zettel/id
 	case seq.MatchAll(
-		box.TokenTypeLiteral,
+		box.TokenTypeIdentifier,
 		box.TokenMatcherOp(box.OpPathSeparator),
-		box.TokenTypeLiteral,
+		box.TokenTypeIdentifier,
 	):
 		oid.g = genres.Zettel
-		oid.right.Write(seq.At(0).Contents)
+		oid.left.Write(seq.At(0).Contents)
 		oid.middle = box.OpPathSeparator
 		oid.right.Write(seq.At(2).Contents)
 		return
 
+		// sec.asec
+	case seq.MatchAll(
+		box.TokenTypeIdentifier,
+		box.TokenMatcherOp(box.OpSigilExternal),
+		box.TokenTypeIdentifier,
+	):
+		var t Tai
+
+		if err = t.Set(seq.String()); err != nil {
+			err = errors.Errorf("unsupported seq: %q, %#v", seq, seq)
+			return
+		}
+
+		oid.g = genres.InventoryList
+		oid.left.Write(seq.At(0).Contents)
+		oid.middle = box.OpSigilExternal
+		oid.right.Write(seq.At(2).Contents)
+		return
+
 	default:
-		err = errors.Errorf("unsupported seq: %q", seq)
+		err = errors.Errorf("unsupported seq: %q, %#v", seq, seq)
 		return
 	}
 }

@@ -140,6 +140,17 @@ func (a Sigil) String() string {
 	return sb.String()
 }
 
+func (i *Sigil) SetByte(r byte) (err error) {
+	if v, ok := mapRuneToSigil[rune(r)]; ok {
+		i.Add(v)
+	} else {
+		err = errors.Wrap(errInvalidSigil(r))
+		return
+	}
+
+	return
+}
+
 func (i *Sigil) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)

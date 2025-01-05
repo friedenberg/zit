@@ -98,3 +98,28 @@ func (seq Seq) MatchAll(tokens ...TokenMatcher) bool {
 
 	return true
 }
+
+func (seq Seq) MatchEnd(tokens ...TokenMatcher) bool {
+	if len(tokens) > seq.Len() {
+		return false
+	}
+
+	return seq[seq.Len()-len(tokens):].MatchAll(tokens...)
+}
+
+func (seq Seq) PartitionFavoringRight(
+	m TokenMatcher,
+) (ok bool, left, right Seq, partition Token) {
+	for i := seq.Len() - 1; i >= 0; i-- {
+		partition = seq.At(i)
+
+		if m.Match(partition) {
+			ok = true
+			left = seq[:i]
+			right = seq[i+1:]
+			return
+		}
+	}
+
+	return
+}

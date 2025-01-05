@@ -183,6 +183,12 @@ type scannerTestCase struct {
 func getScannerTestCases() []scannerTestCase {
 	return []scannerTestCase{
 		{
+			input: ":",
+			expected: []testSeq{
+				makeTestSeq(TokenTypeOperator, ":"),
+			},
+		},
+		{
 			input: "testing:e,t,k",
 			expected: []testSeq{
 				makeTestSeq(TokenTypeIdentifier, "testing"),

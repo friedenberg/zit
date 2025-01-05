@@ -21,58 +21,72 @@ func TestQuery(t1 *testing.T) {
 
 	testCases := []testCase{
 		{
-			expected: "[[test,house] home]",
-			inputs:   []string{"[test, house] home"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[[test,house] home]",
+			inputs:    []string{"[test, house] home"},
 		},
 		{
-			expected: "[[test,house] home wow]",
-			inputs:   []string{"[test, house] home", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[[test,house] home wow]",
+			inputs:    []string{"[test, house] home", "wow"},
 		},
 		{
-			expected: "[^[test,house] home wow]",
-			inputs:   []string{"^[test, house] home", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[^[test,house] home wow]",
+			inputs:    []string{"^[test, house] home", "wow"},
 		},
 		{
-			expected: "[[test,house] ^home wow]",
-			inputs:   []string{"[test, house] ^home", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[[test,house] ^home wow]",
+			inputs:    []string{"[test, house] ^home", "wow"},
 		},
 		{
-			expected: "[[test,^house] home wow]",
-			inputs:   []string{"[test, ^house] home", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[[test,^house] home wow]",
+			inputs:    []string{"[test, ^house] home", "wow"},
 		},
 		{
-			expected: "[[test,house] home ^wow]",
-			inputs:   []string{"[test, house] home", "^wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[[test,house] home ^wow]",
+			inputs:    []string{"[test, house] home", "^wow"},
 		},
 		{
-			expected: "[^[[test,house] home] wow]",
-			inputs:   []string{"^[[test, house] home]", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[^[[test,house] home] wow]",
+			inputs:    []string{"^[[test, house] home]", "wow"},
 		},
 		{
-			expected: "^[[test,house] home]:Zettel wow",
-			inputs:   []string{"^[[test, house] home]:z", "wow"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "^[[test,house] home]:Zettel wow",
+			inputs:    []string{"^[[test, house] home]:z", "wow"},
 		},
 		{
-			expected: "[!md,home]:Zettel",
-			inputs:   []string{"[!md,home]:z"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "[!md,home]:Zettel",
+			inputs:    []string{"[!md,home]:z"},
 		},
 		{
-			expected: "!md?Zettel",
-			inputs:   []string{"!md?z"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "!md?Zettel",
+			inputs:    []string{"!md?z"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]+?Zettel",
-			inputs:   []string{"!md?z", "house+z", "ducks:e"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "ducks:Etikett [!md house]+?Zettel",
+			inputs:    []string{"!md?z", "house+z", "ducks:e"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]?Zettel",
-			inputs:   []string{"ducks:Etikett [!md house]?Zettel"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "ducks:Etikett [!md house]?Zettel",
+			inputs:    []string{"ducks:Etikett [!md house]?Zettel"},
 		},
 		{
-			expected: "ducks:Etikett [=!md house]?Zettel",
-			inputs:   []string{"ducks:Etikett [=!md house]?Zettel"},
+			stackInfo: test_logz.MakeStackInfo(&t, 0),
+			expected:  "ducks:Etikett [=!md house]?Zettel",
+			inputs:    []string{"ducks:Etikett [=!md house]?Zettel"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "ducks:Etikett [=!md house wow]:?Zettel",
 			expected:          "ducks:Etikett [=!md house wow]:?Zettel",
 			inputs: []string{
@@ -99,16 +113,19 @@ func TestQuery(t1 *testing.T) {
 			inputs:            []string{"one/uno:z"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: ":Konfig",
 			expected:          ":Konfig",
 			inputs:            []string{":konfig"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: ":Zettel",
 			expected:          ":Zettel",
 			inputs:            []string{":z"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: ":Kasten",
 			expected:          ":Kasten",
 			inputs:            []string{":k"},
@@ -151,13 +168,38 @@ func TestQuery(t1 *testing.T) {
 			expected:          "2109504781.792086:Bestandsaufnahme",
 			inputs:            []string{"[2109504781.792086]:b"},
 		},
+		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			expectedOptimized: "^etikett-two.Zettel",
+			expected:          "^etikett-two.Zettel",
+			inputs:            []string{"^etikett-two.z"},
+		},
+		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			expectedOptimized: "!md.Akte !md.Typ !md.Etikett !md.Zettel !md.Konfig !md.Bestandsaufnahme !md.Kasten",
+			expected:          "!md.Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
+			inputs:            []string{"!md."},
+		},
+		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			expectedOptimized: "-etikett-two.Zettel",
+			expected:          "-etikett-two.Zettel",
+			inputs:            []string{"-etikett-two.z"},
+		},
 	}
 
 	for _, tc := range testCases {
 		t1.Run(
 			strings.Join(tc.inputs, " "),
 			func(t1 *testing.T) {
-				t := test_logz.T{T: t1}
+				t := test_logz.TC{
+					T:         test_logz.T{T: t1},
+					StackInfo: tc.stackInfo,
+				}
+
 				sut := (&Builder{}).WithDefaultGenres(
 					tc.defaultGattung,
 				)
@@ -167,11 +209,9 @@ func TestQuery(t1 *testing.T) {
 				t.AssertNoError(err)
 				actual := m.String()
 
-				tcT := test_logz.TC{T: t, StackInfo: tc.stackInfo}
-
 				if tc.expected != actual {
-					tcT.Log("expected")
-					tcT.AssertEqual(tc.expected, actual)
+					t.Log("expected")
+					t.AssertEqual(tc.expected, actual)
 				}
 
 				if tc.expectedOptimized == "" {
@@ -181,9 +221,9 @@ func TestQuery(t1 *testing.T) {
 				actualOptimized := m.StringOptimized()
 
 				if tc.expectedOptimized != actualOptimized {
-					tcT.Log(m.StringDebug())
-					tcT.Log("expectedOptimized")
-					tcT.AssertEqual(tc.expectedOptimized, actualOptimized)
+					t.Log(m.StringDebug())
+					t.Log("expectedOptimized")
+					t.AssertEqual(tc.expectedOptimized, actualOptimized)
 				}
 			},
 		)

@@ -2,13 +2,12 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
@@ -31,7 +30,8 @@ type buildState struct {
 	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
-	ts                                  query_spec.TokenScanner
+
+	scanner box.Scanner
 }
 
 func (b *buildState) makeGroup() *Group {
@@ -100,9 +100,9 @@ func (b *buildState) build(
 	}
 
 	reader := catgut.MakeMultiRuneReader(remainingWithSpaces...)
-	b.ts.Reset(reader)
+	b.scanner.Reset(reader)
 
-	for b.ts.CanScan() {
+	for b.scanner.CanScan() {
 		if err = b.parseTokens(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -188,21 +188,11 @@ func (b *buildState) parseTokens() (err error) {
 	isExact := false
 
 LOOP:
-	for {
-		loopFunc := b.ts.Scan
+	for b.scanner.Scan() {
+		seq := b.scanner.GetSeq()
 
-		if len(stack) > 1 {
-			loopFunc = b.ts.ScanDotAllowedInIdentifiers
-		}
-
-		if !loopFunc() {
-			break
-		}
-
-		token, tokenType := b.ts.GetTokenAndType()
-
-		if tokenType == token_types.TypeOperator {
-			op := token.Bytes()[0]
+		if seq.MatchAll(box.TokenTypeOperator) {
+			op := seq.At(0).Contents[0]
 
 			switch op {
 			case '=':
@@ -242,21 +232,49 @@ LOOP:
 					return
 				}
 
-				b.ts.Unscan()
+				b.scanner.Unscan()
 
 				if err = b.parseSigilsAndGenres(q); err != nil {
-					err = errors.Wrapf(err, "Token: %q", token)
+					err = errors.Wrapf(err, "Seq: %q", seq)
 					return
 				}
 
 				continue LOOP
 			}
 		} else {
+			if ok, left, right, partition := seq.PartitionFavoringRight(
+				box.TokenMatcherOp(box.OpSigilExternal),
+			); ok {
+				switch {
+				case right.MatchAll(box.TokenTypeIdentifier):
+					if err = q.AddString(string(right.At(0).Contents)); err != nil {
+						err = nil
+					} else {
+						if err = b.addSigilFromOp(q, partition.Contents[0]); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						seq = left
+					}
+
+				case right.Len() == 0:
+					if err = b.addSigilFromOp(q, partition.Contents[0]); err != nil {
+						err = nil
+					} else {
+						seq = left
+					}
+				}
+			}
+
 			k := ObjectId{
 				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
-			if err = k.GetObjectId().Set(token.String()); err != nil {
+			// TODO if this fails, permit an external store to try to read this as an
+			// external object ID. And if that fails, try to remove the last two
+			// elements as per the above and read that and force the genre and sigils
+			if err = k.GetObjectId().ReadFromSeq(seq); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -318,7 +336,7 @@ LOOP:
 		}
 	}
 
-	if err = b.ts.Error(); err != nil {
+	if err = b.scanner.Error(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -343,46 +361,66 @@ LOOP:
 	return
 }
 
-func (b *buildState) parseSigilsAndGenres(
-	q *Query,
-) (err error) {
-	for b.ts.ScanOnly(token_types.TypeOperator) {
-		token := b.ts.GetToken()
+func (b *buildState) addSigilFromOp(q *Query, op byte) (err error) {
+	var s ids.Sigil
 
-		op := token.String()[0]
-
-		switch op {
-		default:
-			b.ts.Unscan()
-			return
-
-		case '.':
-			b.qg.dotOperatorActive = true
-			fallthrough
-
-		case ':', '+', '?':
-			var s ids.Sigil
-
-			if err = s.Set(token.String()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
-				err = errors.BadRequestf("this query cannot contain the %q sigil", s)
-				return
-			}
-
-			q.Sigil.Add(s)
-		}
-	}
-
-	if err = b.ts.Error(); err != nil {
+	if err = s.SetByte(op); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = q.ReadFromTokenScanner(&b.ts); err != nil {
+	if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
+		err = errors.BadRequestf("this query cannot contain the %q sigil", s)
+		return
+	}
+
+	q.Sigil.Add(s)
+
+	return
+}
+
+func (b *buildState) parseSigilsAndGenres(
+	q *Query,
+) (err error) {
+	for b.scanner.Scan() {
+		seq := b.scanner.GetSeq()
+
+		if seq.MatchAll(box.TokenTypeOperator) {
+			op := seq.At(0).Contents[0]
+
+			switch op {
+			default:
+				err = errors.Errorf("unexpected operator %q", seq)
+				return
+
+			case ' ':
+				return
+
+			case '.':
+				b.qg.dotOperatorActive = true
+				fallthrough
+
+			case ':', '+', '?':
+				if err = b.addSigilFromOp(q, op); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		} else if seq.MatchAll(box.TokenTypeIdentifier) {
+			b.scanner.Unscan()
+			break
+		} else {
+			err = errors.Errorf("expected operator but got %q", seq)
+			return
+		}
+	}
+
+	if err = b.scanner.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = q.ReadFromBoxScanner(&b.scanner); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

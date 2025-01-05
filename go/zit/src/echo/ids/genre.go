@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -123,6 +124,43 @@ func (gs *Genre) Set(v string) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (g *Genre) ReadFromBoxScanner(
+	scanner *box.Scanner,
+) (err error) {
+	for scanner.Scan() {
+		seq := scanner.GetSeq()
+
+		switch {
+		case seq.MatchAll(box.TokenTypeIdentifier):
+			// etikett type zettel kasten konfig
+			if err = g.AddString(string(seq.At(0).Contents)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case seq.MatchAll(box.TokenMatcherOp(box.OpOr)):
+			// ,
+			continue
+
+		case seq.MatchAll(box.TokenMatcherOp(box.OpAnd)):
+			// " "
+			scanner.Unscan()
+			return
+
+		default:
+			err = errors.Errorf("unsupported sequence: %q:%#v", seq, seq)
+			return
+		}
+	}
+
+	if err = scanner.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
