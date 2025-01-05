@@ -7,11 +7,12 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 type TokenScanner struct {
-	io.RuneScanner
+	box.Scanner
 	tokenTypeProbably token_types.TokenType
 	tokenType         token_types.TokenType
 	token             catgut.String
@@ -23,7 +24,7 @@ type TokenScanner struct {
 }
 
 func (ts *TokenScanner) Reset(r io.RuneScanner) {
-	ts.RuneScanner = r
+	ts.Scanner.Reset(r)
 	ts.token.Reset()
 	ts.tokenType = token_types.TypeIncomplete
 	ts.tokenTypeProbably = token_types.TypeIncomplete
@@ -41,7 +42,7 @@ func (ts *TokenScanner) ReadRune() (r rune, n int, err error) {
 		return
 	}
 
-	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
+	ts.lastRune, n, err = ts.Scanner.ReadRune()
 	ts.n += int64(n)
 
 	return ts.lastRune, n, err
@@ -49,7 +50,7 @@ func (ts *TokenScanner) ReadRune() (r rune, n int, err error) {
 
 // TODO add support for unscan
 func (ts *TokenScanner) UnreadRune() (err error) {
-	err = ts.RuneScanner.UnreadRune()
+	err = ts.Scanner.UnreadRune()
 
 	if err == nil {
 		ts.n -= int64(utf8.RuneLen(ts.lastRune))
