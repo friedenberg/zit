@@ -105,6 +105,8 @@ func (f *BoxTransacted) readStringFormatBox(
 			} else {
 				err = io.ErrUnexpectedEOF
 			}
+
+			return
 		}
 
 		t, _, parts := ts.GetTokenAndTypeAndParts()
