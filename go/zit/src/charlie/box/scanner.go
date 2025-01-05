@@ -54,6 +54,16 @@ func (ts *Scanner) ReadRune() (r rune, n int, err error) {
 
 // TODO add support for unscan
 func (ts *Scanner) UnreadRune() (err error) {
+	if ts.unscan {
+		err = errors.Errorf(
+			"cannot unread rune while unscanned: %q:%#v",
+			ts.seq,
+			ts.seq,
+		)
+
+		return
+	}
+
 	err = ts.RuneScanner.UnreadRune()
 
 	if err == nil {
@@ -193,7 +203,7 @@ func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType TokenType) {
 func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 	if scanner.unscan {
 		ok = true
-    scanner.unscan = false
+		scanner.unscan = false
 		return
 	}
 
