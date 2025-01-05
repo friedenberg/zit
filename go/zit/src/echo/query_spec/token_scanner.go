@@ -235,7 +235,7 @@ func (ts *TokenScanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			return
 		}
 
-		isOperator := isOperator(r, !dotOperatorAsSplit)
+		isOperator := box.IsOperator(r, !dotOperatorAsSplit)
 		isSpace := unicode.IsSpace(r)
 
 		switch {
@@ -412,7 +412,7 @@ func (ts *TokenScanner) consumeIdentifierLike(
 			return
 		}
 
-		isOperator := IsOperator(r)
+		isOperator := box.IsOperator(r, false)
 
 		switch {
 		case r == '"' || r == '\'':

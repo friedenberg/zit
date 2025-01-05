@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -132,9 +132,9 @@ func (e *Exp) Add(m sku.Query) (err error) {
 
 func (matcher *Exp) Operator() rune {
 	if matcher.Or {
-		return query_spec.OpOr
+		return box.OpOr
 	} else {
-		return query_spec.OpAnd
+		return box.OpAnd
 	}
 }
 
@@ -147,7 +147,7 @@ func (e *Exp) StringDebug() string {
 		sb.WriteRune('^')
 	}
 
-	sb.WriteRune(query_spec.OpGroupOpen)
+	sb.WriteRune(box.OpGroupOpen)
 	fmt.Fprintf(&sb, "(%d)", len(e.Children))
 
 	for i, m := range e.Children {
@@ -158,7 +158,7 @@ func (e *Exp) StringDebug() string {
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteRune(query_spec.OpGroupClose)
+	sb.WriteRune(box.OpGroupClose)
 
 	return sb.String()
 }
@@ -187,7 +187,7 @@ func (e *Exp) String() string {
 		sb.WriteString(e.Children[0].String())
 
 	default:
-		sb.WriteRune(query_spec.OpGroupOpen)
+		sb.WriteRune(box.OpGroupOpen)
 
 		for i, m := range e.Children {
 			if i > 0 {
@@ -197,7 +197,7 @@ func (e *Exp) String() string {
 			sb.WriteString(m.String())
 		}
 
-		sb.WriteRune(query_spec.OpGroupClose)
+		sb.WriteRune(box.OpGroupClose)
 	}
 
 	return sb.String()

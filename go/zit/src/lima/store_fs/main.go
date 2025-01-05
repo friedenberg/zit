@@ -9,11 +9,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -164,13 +164,13 @@ func (fs *Store) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteRune(query_spec.OpGroupOpen)
+	sb.WriteRune(box.OpGroupOpen)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
 		if hasOne {
-			sb.WriteRune(query_spec.OpOr)
+			sb.WriteRune(box.OpOr)
 		}
 
 		sb.WriteString(v.String())
@@ -192,7 +192,7 @@ func (fs *Store) String() (out string) {
 		},
 	)
 
-	sb.WriteRune(query_spec.OpGroupClose)
+	sb.WriteRune(box.OpGroupClose)
 
 	out = sb.String()
 	return
