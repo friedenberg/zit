@@ -229,12 +229,25 @@ func (e *FD) FilePathSansExt() string {
 	return base[:len(base)-len(ext)]
 }
 
+func (e *FD) FileName() string {
+	return filepath.Base(e.path)
+}
+
 func (e *FD) FileNameSansExt() string {
 	return FileNameSansExt(e.path)
 }
 
 func (e *FD) FileNameSansExtRelTo(d string) (string, error) {
 	return FileNameSansExtRelTo(e.path, d)
+}
+
+func (e *FD) FilePathRelTo(d string) (string, error) {
+	rel, err := filepath.Rel(d, e.path)
+	if err != nil {
+		return "", err
+	}
+
+	return rel, nil
 }
 
 func (e *FD) DirBaseOnly() string {

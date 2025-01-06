@@ -43,6 +43,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 		ks := sk.ObjectId.String()
 
 		if err = tag.Set(ks); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
