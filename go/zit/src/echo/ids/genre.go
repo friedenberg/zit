@@ -6,13 +6,11 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 type Genre byte
@@ -159,41 +157,6 @@ func (g *Genre) ReadFromBoxScanner(
 	}
 
 	if err = scanner.Error(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (g *Genre) ReadFromTokenScanner(
-	ts *query_spec.TokenScanner,
-) (err error) {
-	for ts.Scan() {
-		token, tokenType := ts.GetTokenAndType()
-
-		switch tokenType {
-		case token_types.TypeOperator:
-			el := token.String()
-
-			if el == " " {
-				ts.Unscan()
-				return
-			}
-
-			if el == "," {
-				continue
-			}
-
-		case token_types.TypeIdentifier:
-			if err = g.AddString(token.String()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	if err = ts.Error(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-// TODO parse this directly
 // /repo/tag
 // /repo/zettel-id
 // /repo/!type
@@ -25,7 +24,12 @@ func (oid *objectId2) ReadFromSeq(
 		// tag
 	case seq.MatchAll(box.TokenTypeIdentifier):
 		oid.g = genres.Tag
-		oid.right.Write(seq.At(0).Contents)
+		oid.right.WriteLower(seq.At(0).Contents)
+
+		if oid.right.EqualsBytes(configBytes) {
+			oid.g = genres.Config
+		}
+
 		return
 
 		// !type

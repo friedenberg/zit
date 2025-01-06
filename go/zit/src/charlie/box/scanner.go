@@ -19,7 +19,7 @@ type Scanner struct {
 	seq           Seq
 
 	err      error
-	unscan   bool
+	unscan   *SeqRuneScanner
 	n        int64
 	lastRune rune
 }
@@ -31,19 +31,23 @@ func (ts *Scanner) Reset(r io.RuneScanner) {
 	ts.tokenTypeProbably = TokenTypeIncomplete
 	ts.seq.Reset()
 	ts.err = nil
-	ts.unscan = false
+	ts.unscan = nil
 	ts.n = 0
 }
 
 func (ts *Scanner) ReadRune() (r rune, n int, err error) {
-	if ts.unscan {
-		err = errors.Errorf(
-			"cannot read rune before reading existing unscanned Seq: %q:%#v",
-			ts.seq,
-			ts.seq,
-		)
+	if ts.unscan != nil {
+		r, n, err = ts.unscan.ReadRune()
 
-		return
+		if err == io.EOF {
+			ts.unscan = nil
+			// pass
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		} else {
+			return
+		}
 	}
 
 	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
@@ -54,12 +58,12 @@ func (ts *Scanner) ReadRune() (r rune, n int, err error) {
 
 // TODO add support for unscan
 func (ts *Scanner) UnreadRune() (err error) {
-	if ts.unscan {
-		err = errors.Errorf(
-			"cannot unread rune while unscanned: %q:%#v",
-			ts.seq,
-			ts.seq,
-		)
+	if ts.unscan != nil {
+		err = ts.unscan.UnreadRune()
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}
@@ -74,11 +78,11 @@ func (ts *Scanner) UnreadRune() (err error) {
 }
 
 func (ts *Scanner) Unscan() {
-	ts.unscan = true
+	ts.unscan = &SeqRuneScanner{Seq: ts.seq}
 }
 
 func (ts *Scanner) CanScan() (ok bool) {
-	return ts.unscan || ts.err == nil
+	return ts.unscan != nil || ts.err == nil
 }
 
 func (scanner *Scanner) resetBeforeNextScan() {
@@ -185,6 +189,16 @@ func (scanner *Scanner) resetBeforeNextScan() {
 // 	return
 // }
 
+func (ts *Scanner) ScanSkipSpace() (ok bool) {
+	if !ts.ConsumeSpacesOrErrorOnFalse() {
+		return
+	}
+
+	ok = ts.Scan()
+
+	return
+}
+
 func (ts *Scanner) Scan() (ok bool) {
 	return ts.scan(true)
 }
@@ -201,9 +215,9 @@ func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType TokenType) {
 }
 
 func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
-	if scanner.unscan {
+	if scanner.unscan.IsFull() {
 		ok = true
-		scanner.unscan = false
+		scanner.unscan = nil
 		return
 	}
 
@@ -231,6 +245,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 		}
 
 		isOperator := IsOperator(r, !dotOperatorAsSplit)
+		isSequenceOperator := IsSequenceOperator(r)
 		isSpace := unicode.IsSpace(r)
 
 		switch {
@@ -258,7 +273,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 
 			return
 
-		case !isOperator && !IsSequenceOperator(r):
+		case !isOperator && !isSequenceOperator:
 			scanner.tokenTypeProbably = TokenTypeIdentifier
 			scanner.scanned.WriteRune(r)
 			afterFirst = true
@@ -268,9 +283,10 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 			scanner.scanned.WriteRune(r)
 			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
+			afterFirst = true
 			continue
 
-		default: // wasSplitRune && afterFirst
+		default: // isOperator && afterFirst
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 
 			if r == '=' {
@@ -296,16 +312,6 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 // returns false, it means that a read error has occurred, not that no spaces
 // were consumed.
 func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
-	if ts.unscan {
-		ts.err = errors.Errorf(
-			"trying to consume spaces while unscanned: %q:%#v",
-			ts.seq,
-			ts.seq,
-		)
-
-		return
-	}
-
 	ok = true
 
 	for {

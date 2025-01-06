@@ -1,6 +1,7 @@
 package box
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -33,6 +34,18 @@ func (seq *Seq) Add(tokenType TokenType, contents []byte) {
 
 func (seq *Seq) AddToken(token Token) {
 	*seq = append(*seq, token)
+}
+
+func (seq Seq) StringDebug() string {
+	var sb strings.Builder
+
+	sb.WriteString("Seq{")
+	for _, t := range seq {
+		fmt.Fprintf(&sb, "%s:%q ", t.TokenType, t.Contents)
+	}
+	sb.WriteString("}")
+
+	return sb.String()
 }
 
 func (seq Seq) String() string {
@@ -99,18 +112,55 @@ func (seq Seq) MatchAll(tokens ...TokenMatcher) bool {
 	return true
 }
 
-func (seq Seq) MatchEnd(tokens ...TokenMatcher) bool {
+func (seq Seq) MatchEnd(tokens ...TokenMatcher) (ok bool, left, right Seq) {
 	if len(tokens) > seq.Len() {
-		return false
+		return
 	}
 
-	return seq[seq.Len()-len(tokens):].MatchAll(tokens...)
+	for i := seq.Len() - 1; i >= 0; i-- {
+		partition := seq.At(i)
+		j := len(tokens) - (seq.Len() - i)
+
+		if j < 0 {
+			break
+		}
+
+		m := tokens[j]
+
+		if !m.Match(partition) {
+			return
+		}
+
+		left = seq[:i]
+		right = seq[i:]
+	}
+
+	ok = true
+
+	return
 }
 
 func (seq Seq) PartitionFavoringRight(
 	m TokenMatcher,
 ) (ok bool, left, right Seq, partition Token) {
 	for i := seq.Len() - 1; i >= 0; i-- {
+		partition = seq.At(i)
+
+		if m.Match(partition) {
+			ok = true
+			left = seq[:i]
+			right = seq[i+1:]
+			return
+		}
+	}
+
+	return
+}
+
+func (seq Seq) PartitionFavoringLeft(
+	m TokenMatcher,
+) (ok bool, left, right Seq, partition Token) {
+	for i := range seq {
 		partition = seq.At(i)
 
 		if m.Match(partition) {

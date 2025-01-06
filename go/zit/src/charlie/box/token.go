@@ -1,9 +1,5 @@
 package box
 
-import (
-	"fmt"
-)
-
 //go:generate stringer -type=TokenType
 type TokenType int
 
@@ -24,7 +20,7 @@ type Token struct {
 }
 
 func (token Token) String() string {
-	return fmt.Sprintf("%s:%s", token.TokenType, token.Contents)
+	return string(token.Contents)
 }
 
 func (src Token) Clone() (dst Token) {

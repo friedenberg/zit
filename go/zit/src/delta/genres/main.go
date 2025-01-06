@@ -266,6 +266,8 @@ func (g *Genre) Set(v string) (err error) {
 	case strings.EqualFold(v, "akte"):
 		*g = Blob
 
+	case hasPrefixOrEquals("type", v):
+		fallthrough
 	case hasPrefixOrEquals("typ", v):
 		*g = Type
 

@@ -17,3 +17,19 @@ func (tokenMatcher TokenMatcherOp) Match(token Token) bool {
 
 	return true
 }
+
+func TokenMatcherOr(tm ...TokenMatcher) tokenMatcherOr {
+  return tokenMatcherOr(tm)
+}
+
+type tokenMatcherOr []TokenMatcher
+
+func (tokenMatcher tokenMatcherOr) Match(token Token) bool {
+	for _, t := range tokenMatcher {
+		if t.Match(token) {
+			return true
+		}
+	}
+
+	return false
+}

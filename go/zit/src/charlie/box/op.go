@@ -15,6 +15,7 @@ const (
 	OpPathSeparator = '/'
 	OpType          = '!'
 	OpVirtual       = '%'
+	OpBlob          = '@'
 )
 
 var mapOperators = map[rune]bool{
@@ -46,6 +47,7 @@ var mapSequenceOperators = map[rune]bool{
 	OpType:          true,
 	OpExact:         true,
 	OpVirtual:       true,
+	OpBlob:          true,
 }
 
 func IsSequenceOperator(r rune) (ok bool) {

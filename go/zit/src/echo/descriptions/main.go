@@ -28,7 +28,7 @@ func (b Description) String() string {
 }
 
 func (b Description) StringWithoutNewlines() string {
-	return strings.Replace(b.value, "\n", " ", -1)
+	return strings.ReplaceAll(b.value, "\n", " ")
 }
 
 func (b *Description) TodoSetManyCatgutStrings(

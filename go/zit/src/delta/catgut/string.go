@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"unicode"
 	"unicode/utf8"
 	"unsafe"
 
@@ -218,29 +217,7 @@ func (str *String) Grow(n int) {
 }
 
 func (str *String) Map(mapping func(r rune) rune, s []byte) (n int) {
-	str.Grow(len(s))
-	b := str.AvailableBuffer()
-
-	for i := 0; i < len(s); {
-		wid := 1
-		r := rune(s[i])
-
-		if r >= utf8.RuneSelf {
-			r, wid = utf8.DecodeRune(s[i:])
-		}
-
-		r = mapping(r)
-
-		if r >= 0 {
-			b = utf8.AppendRune(b, r)
-		}
-
-		i += wid
-	}
-
-	n, _ = str.Write(b)
-
-	return
+	return MapTo(&str.data, s, mapping)
 }
 
 func (str *String) WriteLowerOrError(s []byte) (err error) {
@@ -251,45 +228,7 @@ func (str *String) WriteLowerOrError(s []byte) (err error) {
 // WriteLower writes all Unicode letters mapped to
 // their lower case.
 func (str *String) WriteLower(s []byte) (n int) {
-	isASCII, hasUpper := true, false
-
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-
-		if c >= utf8.RuneSelf {
-			isASCII = false
-			break
-		}
-
-		hasUpper = hasUpper || ('A' <= c && c <= 'Z')
-	}
-
-	str.Grow(len(s))
-
-	if isASCII { // optimize for ASCII-only byte slices.
-		b := str.AvailableBuffer()
-
-		if !hasUpper {
-			n, _ = str.Write(append(b, s...))
-			return
-		}
-
-		for i := 0; i < len(s); i++ {
-			c := s[i]
-
-			if 'A' <= c && c <= 'Z' {
-				c += 'a' - 'A'
-			}
-
-			b = append(b, c)
-		}
-
-		n, _ = str.Write(b)
-
-		return
-	}
-
-	return str.Map(unicode.ToLower, s)
+	return WriteLower(&str.data, s)
 }
 
 func (dst *String) WriteRune(r rune) (int, error) {
