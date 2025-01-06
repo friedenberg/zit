@@ -147,7 +147,7 @@ func (f *BoxCheckedOut) makeFieldExternalObjectIdsIfNecessary(
 	case (item == nil || item.Len() == 0) && !sk.ExternalObjectId.IsEmpty():
 		oid := &sk.ExternalObjectId
 		// TODO quote as necessary
-		field.Value = (*ids.ObjectIdStringerSansRepo)(oid).String()
+		field.Value = (&ids.ObjectIdStringerSansRepo{oid}).String()
 
 	case item != nil:
 		switch item.GetCheckoutMode() {
@@ -169,7 +169,7 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 
 	empty = oid.IsEmpty()
 
-	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
+	oidString := (&ids.ObjectIdStringerSansRepo{oid}).String()
 
 	if f.abbr.ZettelId.Abbreviate != nil &&
 		oid.GetGenre() == genres.Zettel {
@@ -328,7 +328,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 
 	switch {
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.GetSkuExternal().ObjectId).String()
+		id.Value = (&ids.ObjectIdStringerSansRepo{&co.GetSkuExternal().ObjectId}).String()
 
 	case m.IncludesMetadata():
 		id.Value = f.relativePath.Rel(item.Object.GetPath())

@@ -112,9 +112,8 @@ func (f *BoxTransacted) readStringFormatBox(
 		t, _, parts := ts.GetTokenAndTypeAndParts()
 
 		if t.Bytes()[0] == '/' {
-			if err = o.ExternalObjectId.SetRaw(t.String()); err != nil {
+			if err = o.ExternalObjectId.Set(t.String()); err != nil {
 				err = errors.Wrap(err)
-				o.ExternalObjectId.Reset()
 				return
 			}
 		} else if err = o.ObjectId.ReadFromTokenAndParts(t, parts); err != nil {
@@ -185,8 +184,8 @@ LOOP_AFTER_OID:
 		case token_types.TypeIdentifier:
 			switch t.Bytes()[0] {
 			case '/':
-				if err = o.ExternalObjectId.SetRaw(t.String()); err != nil {
-					o.ExternalObjectId.Reset()
+				if err = o.ExternalObjectId.Set(t.String()); err != nil {
+					err = errors.Wrap(err)
 					return
 				}
 

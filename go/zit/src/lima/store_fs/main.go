@@ -352,9 +352,15 @@ func (s *Store) ReadFSItemFromExternal(
 	}
 
 	if sk.ExternalObjectId.IsEmpty() {
-		item.ExternalObjectId.ResetWith(&sk.ObjectId)
+    if err = item.ExternalObjectId.SetObjectIdLike(&sk.ObjectId); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
 	} else {
-		item.ExternalObjectId.ResetWith(&sk.ExternalObjectId)
+    if err = item.ExternalObjectId.SetObjectIdLike(&sk.ExternalObjectId); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
 	}
 
 	return

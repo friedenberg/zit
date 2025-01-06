@@ -101,7 +101,7 @@ func (i Item) GetDescription() (b descriptions.Description, err error) {
 
 func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 	if !i.Id.IsEmpty() {
-		if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
+		if err = e.ExternalObjectId.Set(i.Id.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -342,3 +342,27 @@ func (g *Genre) WriteTo(w io.Writer) (n int64, err error) {
 
 	return
 }
+
+func (i Genre) MarshalBinary() (b []byte, err error) {
+	b = []byte{i.Byte()}
+	return
+}
+
+func (i *Genre) UnmarshalBinary(b []byte) (err error) {
+	if len(b) != 1 {
+		err = errors.Errorf("expected exactly one byte but got %q", b)
+		return
+	}
+
+	*i = Genre(b[0])
+
+	return
+}
+
+func (i Genre) Byte() byte {
+	return byte(i)
+}
+
+func (i Genre) ReadByte() (byte, error) {
+	return i.Byte(), nil
+}

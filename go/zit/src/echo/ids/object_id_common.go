@@ -33,40 +33,18 @@ func MustObjectId(kp IdLike) (k *ObjectId) {
 	return
 }
 
-type ObjectIdStringerSansRepo ObjectId
+type ObjectIdStringerSansRepo struct {
+	ObjectIdLike
+}
 
 func (oid *ObjectIdStringerSansRepo) String() string {
-	var sb strings.Builder
-
-	switch oid.g {
-	case genres.Zettel:
-		sb.Write(oid.left.Bytes())
-
-		if oid.middle != '\x00' {
-			sb.WriteByte(oid.middle)
-		}
-
-		sb.Write(oid.right.Bytes())
-
-	case genres.Type:
-		sb.WriteRune('!')
-		sb.Write(oid.right.Bytes())
+	switch oid := oid.ObjectIdLike.(type) {
+	case *ObjectId:
+		return oid.StringSansRepo()
 
 	default:
-		if oid.left.Len() > 0 {
-			sb.Write(oid.left.Bytes())
-		}
-
-		if oid.middle != '\x00' {
-			sb.WriteByte(oid.middle)
-		}
-
-		if oid.right.Len() > 0 {
-			sb.Write(oid.right.Bytes())
-		}
+		return oid.String()
 	}
-
-	return sb.String()
 }
 
 type ObjectIdStringerWithRepo ObjectId

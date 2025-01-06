@@ -30,6 +30,7 @@ type (
 		interfaces.Stringer
 		// GetObjectId() *ObjectId
 		IsEmpty() bool
+		SetObjectIdLike(ObjectIdLike) error
 	}
 
 	ExternalObjectIdGetter interface {

@@ -65,7 +65,11 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 		// at a bare minimum, the internal object ID must always be set as there are
 		// hard assumptions about internal being valid throughout the reading cycle
-		co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
+		if err = co.GetSku().ObjectId.SetObjectIdLike(&item.ExternalObjectId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		hasInternal := true
 
 		if err = s.externalStoreSupplies.FuncReadOneInto(
@@ -174,8 +178,19 @@ func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return
 	}
 
-	co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
-	co.GetSkuExternal().ObjectId.ResetWith(&item.ExternalObjectId)
+	if err = co.GetSku().ObjectId.SetObjectIdLike(
+		&item.ExternalObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = co.GetSkuExternal().ObjectId.SetObjectIdLike(
+		&item.ExternalObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.readOneExternalBlob(
 		co.GetSkuExternal(),

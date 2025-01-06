@@ -1237,7 +1237,7 @@ function create_structured_zettels { # @test
 		---
 
 		- [/] first
-		- [/  !task tag-3] second
+		- [/ !task tag-3] second
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM

@@ -15,7 +15,7 @@ import (
 
 type FSItem struct {
 	// TODO refactor this to be a string and a genre that is tied to the state
-	ExternalObjectId ids.ObjectId
+	ExternalObjectId ids.ExternalObjectId
 
 	Object   fd.FD
 	Blob     fd.FD // TODO make set

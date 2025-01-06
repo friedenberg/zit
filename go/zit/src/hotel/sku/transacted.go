@@ -23,7 +23,7 @@ type Transacted struct {
 	// TODO add support for querying the below
 	RepoId           ids.RepoId
 	State            external_state.State
-	ExternalObjectId ids.ObjectId
+	ExternalObjectId ids.ExternalObjectId
 }
 
 func (t *Transacted) GetSkuExternal() *Transacted {

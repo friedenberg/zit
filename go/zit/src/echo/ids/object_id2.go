@@ -47,10 +47,6 @@ func (a *objectId2) GetObjectId() *objectId2 {
 	return a
 }
 
-func (a *objectId2) GetExternalObjectId() ExternalObjectIdLike {
-	return a
-}
-
 func (a *objectId2) Clone() (b *objectId2) {
 	b = getObjectIdPool2().Get()
 	b.ResetWithIdLike(a)
@@ -254,6 +250,40 @@ func (k2 *objectId2) SetRepoId(v string) (err error) {
 	}
 
 	return
+}
+
+func (oid *objectId2) StringSansRepo() string {
+	var sb strings.Builder
+
+	switch oid.g {
+	case genres.Zettel:
+		sb.Write(oid.left.Bytes())
+
+		if oid.middle != '\x00' {
+			sb.WriteByte(oid.middle)
+		}
+
+		sb.Write(oid.right.Bytes())
+
+	case genres.Type:
+		sb.WriteRune('!')
+		sb.Write(oid.right.Bytes())
+
+	default:
+		if oid.left.Len() > 0 {
+			sb.Write(oid.left.Bytes())
+		}
+
+		if oid.middle != '\x00' {
+			sb.WriteByte(oid.middle)
+		}
+
+		if oid.right.Len() > 0 {
+			sb.Write(oid.right.Bytes())
+		}
+	}
+
+	return sb.String()
 }
 
 func (k2 *objectId2) String() string {
@@ -755,6 +785,30 @@ func (a *objectId2) ResetWith(b *objectId2) {
 	}
 
 	b.repoId.CopyTo(&a.repoId)
+}
+
+func (a *objectId2) SetObjectIdLike(b ObjectIdLike) (err error) {
+	if b, ok := b.(*objectId2); ok {
+		a.g = b.g
+		b.left.CopyTo(&a.left)
+		b.right.CopyTo(&a.right)
+		a.middle = b.middle
+
+		if a.middle == '%' {
+			a.virtual = true
+		}
+
+		b.repoId.CopyTo(&a.repoId)
+
+		return
+	}
+
+	if a.SetWithGenre(b.String(), b.GetGenre()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (a *objectId2) ResetWithIdLike(b IdLike) (err error) {

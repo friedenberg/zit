@@ -566,7 +566,7 @@ func (d *dirItems) addOneObject(
 	if err != nil {
 		item.ExternalObjectId.SetGenre(item.ExternalObjectId.GetGenre())
 
-		if err = item.ExternalObjectId.SetRaw(objectIdString); err != nil {
+		if err = item.ExternalObjectId.Set(objectIdString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
