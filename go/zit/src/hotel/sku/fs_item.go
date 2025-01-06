@@ -17,11 +17,34 @@ type FSItem struct {
 	// TODO refactor this to be a string and a genre that is tied to the state
 	ExternalObjectId ids.ExternalObjectId
 
+	AnchorFD *fd.FD
+
 	Object   fd.FD
 	Blob     fd.FD // TODO make set
 	Conflict fd.FD
 
 	interfaces.MutableSetLike[*fd.FD]
+}
+
+func (ef *FSItem) WriteToExternalObjectId(
+	eoid *ids.ExternalObjectId,
+	cwd string,
+) (err error) {
+	eoid.SetGenre(ef.ExternalObjectId.GetGenre())
+
+	var relPath string
+
+	if relPath, err = ef.AnchorFD.FilePathRelTo(cwd); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = eoid.Set(relPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (ef *FSItem) String() string {
