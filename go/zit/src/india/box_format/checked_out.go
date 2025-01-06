@@ -169,7 +169,7 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 
 	empty = oid.IsEmpty()
 
-	oidString := (&ids.ObjectIdStringerSansRepo{oid}).String()
+	oidString := (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
 
 	if f.abbr.ZettelId.Abbreviate != nil &&
 		oid.GetGenre() == genres.Zettel {
