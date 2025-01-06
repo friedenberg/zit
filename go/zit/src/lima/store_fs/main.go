@@ -370,10 +370,10 @@ func (s *Store) WriteFSItemToExternal(
 	item *sku.FSItem,
 	tg sku.TransactedGetter,
 ) (err error) {
-	e := tg.GetSku()
-	e.Metadata.Fields = e.Metadata.Fields[:0]
+	external := tg.GetSku()
+	external.Metadata.Fields = external.Metadata.Fields[:0]
 
-	m := &e.Metadata
+	m := &external.Metadata
 	m.Tai = item.GetTai()
 
 	var mode checkout_mode.Mode
@@ -392,7 +392,7 @@ func (s *Store) WriteFSItemToExternal(
 		before := item.Blob.String()
 		after := s.dirLayout.Rel(before)
 
-		if err = e.ExternalObjectId.SetBlob(after); err != nil {
+		if err = external.ExternalObjectId.SetBlob(after); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -400,10 +400,10 @@ func (s *Store) WriteFSItemToExternal(
 	default:
 		k := &item.ExternalObjectId
 
-		e.ExternalObjectId.ResetWith(k)
+		external.ExternalObjectId.ResetWith(k)
 
-		if e.ExternalObjectId.String() != k.String() {
-			err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
+		if external.ExternalObjectId.String() != k.String() {
+			err = errors.Errorf("expected %q but got %q", k, &external.ExternalObjectId)
 		}
 	}
 
@@ -429,7 +429,7 @@ func (s *Store) WriteFSItemToExternal(
 			field.Key = "blob"
 		}
 
-		e.Metadata.Fields = append(e.Metadata.Fields, field)
+		external.Metadata.Fields = append(external.Metadata.Fields, field)
 	}
 
 	return
