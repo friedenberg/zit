@@ -34,7 +34,7 @@ func (t *Transacted) GetRepoId() ids.RepoId {
 	return t.RepoId
 }
 
-func (t *Transacted) GetExternalObjectId() ids.ExternalObjectId {
+func (t *Transacted) GetExternalObjectId() ids.ExternalObjectIdLike {
 	return &t.ExternalObjectId
 }
 

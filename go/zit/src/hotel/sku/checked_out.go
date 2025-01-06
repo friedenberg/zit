@@ -45,7 +45,7 @@ func (src *CheckedOut) Clone() *CheckedOut {
 	return dst
 }
 
-func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectId {
+func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectIdLike {
 	return t.GetSkuExternal().GetExternalObjectId()
 }
 

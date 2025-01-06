@@ -19,10 +19,7 @@ type Item struct {
 }
 
 func (i *Item) GetExternalObjectId() sku.ExternalObjectId {
-	return &ids.DumbObjectId{
-		Value: i.String(),
-		Genre: genres.Zettel,
-	}
+	return ids.MakeExternalObjectId(genres.Zettel, i.String())
 }
 
 func (i *Item) GetGenre() interfaces.Genre {

@@ -47,12 +47,8 @@ func (a *objectId2) GetObjectId() *objectId2 {
 	return a
 }
 
-func (a *objectId2) GetExternalObjectId() ExternalObjectId {
+func (a *objectId2) GetExternalObjectId() ExternalObjectIdLike {
 	return a
-}
-
-func (a *objectId2) CloneExternalObjectId() ExternalObjectId {
-	return a.Clone()
 }
 
 func (a *objectId2) Clone() (b *objectId2) {

@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	ExternalObjectId       = ids.ExternalObjectId
+	ExternalObjectId       = ids.ExternalObjectIdLike
 	ExternalObjectIdGetter = ids.ExternalObjectIdGetter
 
 	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error

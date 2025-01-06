@@ -32,20 +32,13 @@ type (
 		IsEmpty() bool
 	}
 
-	ExternalObjectId interface {
-		ObjectIdLike
-		interfaces.GenreGetter
-		interfaces.Stringer
-		ExternalObjectIdGetter
-		ExternalObjectIdCloner
-	}
-
 	ExternalObjectIdGetter interface {
-		GetExternalObjectId() ExternalObjectId
+		GetExternalObjectId() ExternalObjectIdLike
 	}
 
-	ExternalObjectIdCloner interface {
-		CloneExternalObjectId() ExternalObjectId
+	ExternalObjectIdLike interface {
+		ObjectIdLike
+		ExternalObjectIdGetter
 	}
 )
 
