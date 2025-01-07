@@ -67,8 +67,8 @@ func (op Checkout) RunWithKasten(
 
 func (op Checkout) RunQuery(
 	qg *query.Group,
-) (zsc sku.SkuTypeSetMutable, err error) {
-	zsc = sku.MakeSkuTypeSetMutable()
+) (checkedOut sku.SkuTypeSetMutable, err error) {
+	checkedOut = sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
 	onCheckedOut := func(col sku.SkuType) (err error) {
@@ -77,7 +77,7 @@ func (op Checkout) RunQuery(
 
 		cl := col.Clone()
 
-		if err = zsc.Add(cl); err != nil {
+		if err = checkedOut.Add(cl); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -107,7 +107,7 @@ func (op Checkout) RunQuery(
 			Repo:    op.Repo,
 		}
 
-		if err = eachBlobOp.Run(zsc); err != nil {
+		if err = eachBlobOp.Run(checkedOut); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -118,7 +118,7 @@ func (op Checkout) RunQuery(
 			qg.RepoId,
 			op.CheckoutMode,
 			op.PrinterHeader(),
-			zsc,
+			checkedOut,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -131,21 +131,10 @@ func (op Checkout) RunQuery(
 			return
 		}
 
-		var qg *query.Group
-
-		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel)).
-			WithCheckedOut(zsc)
-
-		if qg, err = builder.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		checkinOp := Checkin{}
-
-		if err = checkinOp.Run(
-			op.Repo,
-			qg,
+		if _, err = op.Checkin(
+			checkedOut,
+			sku.Proto{},
+			false,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
