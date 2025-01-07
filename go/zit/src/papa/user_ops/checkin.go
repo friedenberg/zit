@@ -5,13 +5,9 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -34,109 +30,36 @@ func (op Checkin) Run(
 	qg *query.Group,
 ) (err error) {
 	var l sync.Mutex
+
 	results := sku.MakeSkuTypeSetMutable()
+
+	if err = u.GetStore().QuerySkuType(
+		qg,
+		func(co sku.SkuType) (err error) {
+			l.Lock()
+			defer l.Unlock()
+
+			return results.Add(co.Clone())
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if op.Organize {
 		if err = op.runOrganize(u, qg, results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		if err = u.GetStore().QuerySkuType(
-			qg,
-			func(co sku.SkuType) (err error) {
-				l.Lock()
-				defer l.Unlock()
-
-				return results.Add(co.Clone())
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	var processed sku.TransactedMutableSet
 
-	processed := sku.MakeTransactedMutableSet()
-	sortedResults := quiter.ElementsSorted(
+	if processed, err = u.Checkin(
 		results,
-		func(left, right sku.SkuType) bool {
-			return left.String() < right.String()
-		},
-	)
-
-	for _, co := range sortedResults {
-		external := co.GetSkuExternal()
-
-		if co.GetState() == checked_out_state.Untracked &&
-			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
-				co.GetSkuExternal().GetGenre() == genres.Blob) {
-			if external.Metadata.IsEmpty() {
-				continue
-			}
-
-			if err = u.GetStore().UpdateTransactedFromBlobs(
-				co,
-			); err != nil {
-				if errors.Is(err, external_store.ErrUnsupportedOperation{}) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			external.ObjectId.Reset()
-
-			if err = u.GetStore().CreateOrUpdate(
-				external,
-				sku.StoreOptions{
-					ApplyProto: true,
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if op.Proto.Apply(external, genres.Zettel) {
-				if err = u.GetStore().CreateOrUpdate(
-					external.GetSku(),
-					sku.StoreOptions{},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		} else {
-			if err = u.GetStore().CreateOrUpdateCheckedOut(
-				co,
-				!op.Delete,
-			); err != nil {
-				err = errors.Wrapf(err, "CheckedOut: %s", co)
-				return
-			}
-		}
-
-		if !op.Delete {
-			continue
-		}
-
-		if err = u.GetStore().DeleteCheckedOut(co); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = processed.Add(co.GetSkuExternal().CloneTransacted()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = u.Unlock(); err != nil {
+		op.Proto,
+		op.Delete,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

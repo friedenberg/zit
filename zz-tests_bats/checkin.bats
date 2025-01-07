@@ -342,10 +342,19 @@ function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 		newest body
 	EOM
 
-	export EDITOR="bash -c 'echo > \"\$0\"'"
+	export EDITOR="true"
 	run_zit checkin -organize .
 	assert_success
-	assert_output ''
+	assert_output - <<-EOM
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
+		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+	EOM
 }
 
 # bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
