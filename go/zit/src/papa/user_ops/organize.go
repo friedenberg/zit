@@ -43,7 +43,7 @@ func (op Organize) RunWithQueryGroup(
 		return
 	}
 
-	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
+	if organizeResults, err = op.RunWithSkuType(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +67,7 @@ func (op Organize) RunWithTransacted(
 		skus.Add(clone)
 	}
 
-	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
+	if organizeResults, err = op.RunWithSkuType(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -75,7 +75,7 @@ func (op Organize) RunWithTransacted(
 	return
 }
 
-func (op Organize) RunWithExternalLike(
+func (op Organize) RunWithSkuType(
 	qg *query.Group,
 	skus sku.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
