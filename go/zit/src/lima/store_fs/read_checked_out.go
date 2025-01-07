@@ -7,6 +7,44 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func (s *Store) RefreshCheckedOut(
+	co *sku.CheckedOut,
+) (err error) {
+	var item *sku.FSItem
+
+	if item, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.HydrateExternalFromItem(
+		sku.CommitOptions{
+			StoreOptions: sku.StoreOptions{
+				UpdateTai: true,
+			},
+		},
+		item,
+		co.GetSku(),
+		co.GetSkuExternal(),
+	); err != nil {
+		if sku.IsErrMergeConflict(err) {
+			co.SetState(checked_out_state.Conflicted)
+
+			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
+				&co.GetSku().ObjectId,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
+			return
+		}
+	}
+
+	return
+}
+
 func (s *Store) ReadCheckedOutFromTransacted(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {

@@ -201,18 +201,11 @@ func (op Checkin) runOrganize(
 		return
 	}
 
-	if err = changes.After.Each(
-		func(co sku.SkuType) (err error) {
-			if err = results.Add(co.Clone()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for _, co := range changes.After.AllSkuAndIndex() {
+		if err = results.Add(co.Clone()); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	return
