@@ -120,7 +120,9 @@ func (eoid *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
 		return
 	}
 
-	eoid.value = string(b[1:])
+	if len(b) > 1 {
+		eoid.value = string(b[1:])
+	}
 
 	return
 }
