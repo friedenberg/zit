@@ -27,6 +27,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
+// TODO switch to using fd.Std
 func (u *Repo) MakeFormatFunc(
 	v string,
 	out interfaces.WriterAndStringWriter,

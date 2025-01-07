@@ -9,15 +9,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
+// TODO rename to FS
 type FSItem struct {
 	// TODO refactor this to be a string and a genre that is tied to the state
 	ExternalObjectId ids.ExternalObjectId
-
-	AnchorFD *fd.FD
 
 	Object   fd.FD
 	Blob     fd.FD // TODO make set
@@ -26,16 +26,44 @@ type FSItem struct {
 	interfaces.MutableSetLike[*fd.FD]
 }
 
+func (ef *FSItem) WriteToSku(
+	external *Transacted,
+	dirLayout dir_layout.Layout,
+) (err error) {
+	if err = ef.WriteToExternalObjectId(
+		&external.ExternalObjectId,
+		dirLayout,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (ef *FSItem) WriteToExternalObjectId(
 	eoid *ids.ExternalObjectId,
-	cwd string,
+	dirLayout dir_layout.Layout,
 ) (err error) {
 	eoid.SetGenre(ef.ExternalObjectId.GetGenre())
 
 	var relPath string
+	var anchorFD *fd.FD
 
-	if relPath, err = ef.AnchorFD.FilePathRelTo(cwd); err != nil {
-		err = errors.Wrap(err)
+	switch {
+	case !ef.Object.IsEmpty():
+		anchorFD = &ef.Object
+
+	case !ef.Blob.IsEmpty():
+		anchorFD = &ef.Blob
+
+	case !ef.Conflict.IsEmpty():
+		anchorFD = &ef.Conflict
+	}
+
+	relPath = dirLayout.RelToCwdOrSame(anchorFD.GetPath())
+
+	if relPath == "-" {
 		return
 	}
 
@@ -51,7 +79,7 @@ func (ef *FSItem) String() string {
 	return ef.ExternalObjectId.String()
 }
 
-func (ef *FSItem) GetExternalObjectId() ExternalObjectId {
+func (ef *FSItem) GetExternalObjectId() *ids.ExternalObjectId {
 	return &ef.ExternalObjectId
 }
 

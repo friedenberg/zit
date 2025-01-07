@@ -117,7 +117,7 @@ func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	if !sk.ExternalObjectId.IsEmpty() {
 		oid := &sk.ExternalObjectId
 		// TODO quote as necessary
-		field.Value = (&ids.ObjectIdStringerSansRepo{oid}).String()
+		field.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
 	}
 
 	return

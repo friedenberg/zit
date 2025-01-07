@@ -244,7 +244,8 @@ func (e *FD) FileNameSansExtRelTo(d string) (string, error) {
 func (e *FD) FilePathRelTo(d string) (string, error) {
 	rel, err := filepath.Rel(d, e.path)
 	if err != nil {
-		return "", err
+		return e.path, nil
+		// return "", err
 	}
 
 	return rel, nil

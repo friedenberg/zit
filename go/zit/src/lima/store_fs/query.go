@@ -20,12 +20,12 @@ func (s *Store) QueryCheckedOut(
 	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(func() (err error) {
-		aco := s.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
+		funcIterFSItems := s.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			s.makeFuncIterFilterAndApply(qg, f),
 		)
 
 		for o := range s.probablyCheckedOut.All() {
-			if err = aco(o); err != nil {
+			if err = funcIterFSItems(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -36,11 +36,11 @@ func (s *Store) QueryCheckedOut(
 
 	if !qg.ExcludeUntracked {
 		wg.Do(func() (err error) {
-			aco := s.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
+			funcIterFSItems := s.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 				s.makeFuncIterFilterAndApply(qg, f),
 			)
 
-			if err = s.queryUntracked(qg, aco); err != nil {
+			if err = s.queryUntracked(qg, funcIterFSItems); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -227,7 +227,14 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 	co.SetState(checked_out_state.Recognized)
 
 	for _, item := range item.Matching {
-		co.GetSkuExternal().ExternalObjectId.ResetWith(&item.ExternalObjectId)
+		if err = item.WriteToSku(
+			co.GetSkuExternal(),
+			s.dirLayout.Layout,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		co.GetSkuExternal().ObjectId.SetGenre(genres.Blob)
 
 		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {

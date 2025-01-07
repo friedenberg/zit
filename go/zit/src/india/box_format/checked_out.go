@@ -115,7 +115,7 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 	if err = f.addFieldsObjectIdsWithFSItem(
 		external,
 		box,
-		item,
+		true,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -135,32 +135,32 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 	return
 }
 
-func (f *BoxCheckedOut) makeFieldExternalObjectIdsIfNecessary(
-	sk *sku.Transacted,
-	item *sku.FSItem,
-) (field string_format_writer.Field, err error) {
-	field = string_format_writer.Field{
-		ColorType: string_format_writer.ColorTypeId,
-	}
+// func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
+// 	sk *sku.Transacted,
+// 	item *sku.FSItem,
+// ) (field string_format_writer.Field, err error) {
+// 	field = string_format_writer.Field{
+// 		ColorType: string_format_writer.ColorTypeId,
+// 	}
 
-	switch {
-	case (item == nil || item.Len() == 0) && !sk.ExternalObjectId.IsEmpty():
-		oid := &sk.ExternalObjectId
-		// TODO quote as necessary
-		field.Value = (&ids.ObjectIdStringerSansRepo{oid}).String()
+// 	switch {
+// 	case (item == nil || item.Len() == 0) && !sk.ExternalObjectId.IsEmpty():
+// 		oid := &sk.ExternalObjectId
+// 		// TODO quote as necessary
+// 		field.Value = (&ids.ObjectIdStringerSansRepo{oid}).String()
 
-	case item != nil:
-		switch item.GetCheckoutMode() {
-		case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
-			// TODO quote as necessary
-			if !item.Object.IsStdin() {
-				field.Value = f.relativePath.Rel(item.Object.String())
-			}
-		}
-	}
+// 	case item != nil:
+// 		switch item.GetCheckoutMode() {
+// 		case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
+// 			// TODO quote as necessary
+// 			if !item.Object.IsStdin() {
+// 				field.Value = f.relativePath.Rel(item.Object.String())
+// 			}
+// 		}
+// 	}
 
-	return
-}
+// 	return
+// }
 
 func (f *BoxCheckedOut) makeFieldObjectId(
 	sk *sku.Transacted,
@@ -187,31 +187,30 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 	return
 }
 
-func (f *BoxCheckedOut) addFieldsObjectIdsWithFSItem(
+func (f *BoxTransacted) addFieldsObjectIdsWithFSItem(
 	sk *sku.Transacted,
 	box *string_format_writer.Box,
-	item *sku.FSItem,
+	preferExternal bool,
 ) (err error) {
 	var external string_format_writer.Field
 
 	if external, err = f.makeFieldExternalObjectIdsIfNecessary(
 		sk,
-		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var internal string_format_writer.Field
-	var externalEmpty bool
+	var internalEmpty bool
 
-	if internal, externalEmpty, err = f.makeFieldObjectId(sk); err != nil {
+	if internal, internalEmpty, err = f.makeFieldObjectId(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	switch {
-	case externalEmpty && external.Value != "":
+	case (internalEmpty || preferExternal) && external.Value != "":
 		box.Contents = append(box.Contents, external)
 
 	case internal.Value != "":
@@ -421,19 +420,27 @@ func (f *BoxTransacted) addFieldsUntracked(
 	item *sku.FSItem,
 	op options_print.V0,
 ) (err error) {
-	fdToPrint := &item.Blob
+	// fdToPrint := &item.Blob
 
-	if co.GetSkuExternal().GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
-		fdToPrint = &item.Object
+	// if co.GetSkuExternal().GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
+	// 	fdToPrint = &item.Object
+	// }
+
+	// box.Contents = append(
+	// 	box.Contents,
+	// 	string_format_writer.Field{
+	// 		ColorType: string_format_writer.ColorTypeId,
+	// 		Value:     f.relativePath.Rel(fdToPrint.GetPath()),
+	// 	},
+	// )
+	if err = f.addFieldsObjectIdsWithFSItem(
+		co.GetSkuExternal(),
+		box,
+		true,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	box.Contents = append(
-		box.Contents,
-		string_format_writer.Field{
-			ColorType: string_format_writer.ColorTypeId,
-			Value:     f.relativePath.Rel(fdToPrint.GetPath()),
-		},
-	)
 
 	if err = f.addFieldsMetadata(
 		op,

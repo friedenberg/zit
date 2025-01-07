@@ -85,9 +85,9 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	external := co.GetSkuExternal()
 
-	var i *sku.FSItem
+	var item *sku.FSItem
 
-	if i, err = s.ReadFSItemFromExternal(external); err != nil {
+	if item, err = s.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -95,7 +95,7 @@ func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	s.deleteLock.Lock()
 	defer s.deleteLock.Unlock()
 
-	if err = i.MutableSetLike.Each(s.deleted.Add); err != nil {
+	if err = item.MutableSetLike.Each(s.deleted.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,7 +212,14 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			ks = append(ks, kfp.GetExternalObjectId())
+			var eoid ids.ExternalObjectId
+
+			if err = kfp.WriteToExternalObjectId(&eoid, s.dirLayout.Layout); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			ks = append(ks, &eoid)
 
 			return
 		},
@@ -240,7 +247,14 @@ func (s *Store) GetObjectIdsForDir(
 	}
 
 	for _, r := range results {
-		k = append(k, r.GetExternalObjectId())
+		var eoid ids.ExternalObjectId
+
+		if err = r.WriteToExternalObjectId(&eoid, s.dirLayout.Layout); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		k = append(k, &eoid)
 	}
 
 	return
@@ -280,7 +294,17 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 		k = make([]sku.ExternalObjectId, 0, len(results))
 
 		for _, r := range results {
-			k = append(k, r.GetExternalObjectId())
+			var eoid ids.ExternalObjectId
+
+			if err = r.WriteToExternalObjectId(
+				&eoid,
+				s.dirLayout.Layout,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			k = append(k, &eoid)
 		}
 	}
 
@@ -351,13 +375,19 @@ func (s *Store) ReadFSItemFromExternal(
 		}
 	}
 
-	if sk.ExternalObjectId.IsEmpty() {
-		if err = item.ExternalObjectId.SetObjectIdLike(&sk.ObjectId); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = item.ExternalObjectId.SetObjectIdLike(&sk.ExternalObjectId); err != nil {
+	if err = item.ExternalObjectId.SetObjectIdLike(
+		&sk.ObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// external.ObjectId.ResetWith(conflicted.GetSkuExternal().GetObjectId())
+	// TODO populate FD
+	if !sk.ExternalObjectId.IsEmpty() {
+		if err = item.ExternalObjectId.SetObjectIdLike(
+			&item.ExternalObjectId,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -400,11 +430,36 @@ func (s *Store) WriteFSItemToExternal(
 	default:
 		k := &item.ExternalObjectId
 
-		external.ExternalObjectId.ResetWith(k)
+		if err = external.ObjectId.SetObjectIdLike(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = external.ExternalObjectId.SetObjectIdLike(
+			&item.ExternalObjectId,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if external.ExternalObjectId.String() != k.String() {
-			err = errors.Errorf("expected %q but got %q", k, &external.ExternalObjectId)
+			err = errors.Errorf(
+				"expected %q but got %q. %s",
+				k,
+				&external.ExternalObjectId,
+				item.Debug(),
+			)
+
+			return
 		}
+	}
+
+	if err = item.WriteToSku(
+		external,
+		s.dirLayout.Layout,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	fdees := quiter.SortedValues(item.MutableSetLike)

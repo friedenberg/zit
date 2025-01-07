@@ -137,7 +137,8 @@ func (d *dirItems) walkDir(
 }
 
 func (d *dirItems) addPathAndDirEntry(
-	cache map[string]*sku.FSItem, p string,
+	cache map[string]*sku.FSItem,
+	p string,
 	de fs.DirEntry,
 ) (key string, fds *sku.FSItem, err error) {
 	if de.IsDir() {
@@ -167,14 +168,20 @@ func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 		return
 	}
 
-	ext := filepath.Ext(rel)
-	key = strings.TrimSuffix(rel, ext)
+	var ok bool
+
+	key, _, ok = strings.Cut(rel, ".")
+
+	if !ok {
+		key = rel
+	}
 
 	return
 }
 
 func (d *dirItems) addFD(
-	cache map[string]*sku.FSItem, f *fd.FD,
+	cache map[string]*sku.FSItem,
+	f *fd.FD,
 ) (key string, fds *sku.FSItem, err error) {
 	if f.IsDir() {
 		return
@@ -555,21 +562,9 @@ func (d *dirItems) addOneObject(
 	objectIdString string,
 	item *sku.FSItem,
 ) (err error) {
-	g := item.ExternalObjectId.GetGenre()
-
-	if g == genres.Zettel {
-		err = item.ExternalObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
-	} else {
-		err = item.ExternalObjectId.SetWithGenre(objectIdString, g)
-	}
-
-	if err != nil {
-		item.ExternalObjectId.SetGenre(item.ExternalObjectId.GetGenre())
-
-		if err = item.ExternalObjectId.Set(objectIdString); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = item.ExternalObjectId.Set(objectIdString); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = d.probablyCheckedOut.Add(item); err != nil {

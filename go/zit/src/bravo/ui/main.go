@@ -16,6 +16,7 @@ func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
 }
 
+// TODO add compile-time determined verbosity for testing / debugging
 func SetVerbose(on bool) {
 	printerLog.on = on
 	printerDebug.on = on

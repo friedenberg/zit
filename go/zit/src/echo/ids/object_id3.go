@@ -35,6 +35,7 @@ func (oid *objectId2) ReadFromSeq(
 		// !type
 	case seq.MatchAll(box.TokenMatcherOp(box.OpType), box.TokenTypeIdentifier):
 		oid.g = genres.Type
+		oid.middle = box.OpType
 		oid.right.Write(seq.At(1).Contents)
 		return
 

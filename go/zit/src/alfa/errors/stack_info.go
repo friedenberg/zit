@@ -81,6 +81,20 @@ func getPackageAndFunctionName(v string) (p string, f string) {
 	return
 }
 
+func (si StackInfo) FileNameLine() string {
+	filename := si.Filename
+
+	if si.RelFilename != "" {
+		filename = si.RelFilename
+	}
+
+	return fmt.Sprintf(
+		"%s:%d",
+		filename,
+		si.Line,
+	)
+}
+
 func (si StackInfo) String() string {
 	testPrefix := ""
 

@@ -391,19 +391,14 @@ function checkin_dot_organize_include_untracked_fs_blob() { # @test
 	run_zit checkin -organize . </dev/null
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
-		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		[two/dos @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		[three/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		[one/quatro @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		[two/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		[three/dos @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
-		[four/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 }
 

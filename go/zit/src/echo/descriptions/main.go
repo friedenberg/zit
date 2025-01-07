@@ -6,8 +6,8 @@ import (
 	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 // TODO-P1 move to catgut.String
@@ -49,7 +49,7 @@ func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
 }
 
 func (b *Description) readFromRuneScannerAfterNewline(
-	rs *query_spec.TokenScanner,
+	rs *box.Scanner,
 	sb *strings.Builder,
 ) (err error) {
 	if !rs.ConsumeSpacesOrErrorOnFalse() {
@@ -91,7 +91,7 @@ func (b *Description) readFromRuneScannerAfterNewline(
 }
 
 func (b *Description) readFromRuneScannerOrdinary(
-	rs *query_spec.TokenScanner,
+	rs *box.Scanner,
 	sb *strings.Builder,
 ) (err error) {
 	for {
@@ -129,7 +129,7 @@ func (b *Description) readFromRuneScannerOrdinary(
 	return
 }
 
-func (b *Description) ReadFromTokenScanner(rs *query_spec.TokenScanner) (err error) {
+func (b *Description) ReadFromBoxScanner(rs *box.Scanner) (err error) {
 	var sb strings.Builder
 
 	if err = b.readFromRuneScannerOrdinary(rs, &sb); err != nil {

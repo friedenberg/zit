@@ -144,13 +144,6 @@ func (s *Store) MakeMergedTransacted(
 		return
 	}
 
-	// ui.Debug().Print(
-	// "merged", mergedItem.Debug(),
-	// "local", localItem.Debug(),
-	// "base", baseItem.Debug(),
-	// "remote", remoteItem.Debug(),
-	// )
-
 	localItem.ResetWith(mergedItem)
 
 	merged = GetExternalPool().Get()
@@ -181,9 +174,9 @@ func (s *Store) MakeMergedTransacted(
 
 func (s *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
-	sz *sku.Transacted,
-) (cz *sku.CheckedOut, i *sku.FSItem, err error) {
-	if sz == nil {
+	sk *sku.Transacted,
+) (co *sku.CheckedOut, i *sku.FSItem, err error) {
+	if sk == nil {
 		i = &sku.FSItem{}
 		i.Reset()
 		return
@@ -196,29 +189,30 @@ func (s *Store) checkoutOneForMerge(
 			StoreSpecificOptions: CheckoutOptions{
 				AllowConflicted: true,
 				Path:            PathOptionTempLocal,
+				// TODO handle binary blobs
 				ForceInlineBlob: true,
 			},
 		},
 	}
 
-	cz = GetCheckedOutPool().Get()
-	sku.Resetter.ResetWith(cz.GetSku(), sz)
+	co = GetCheckedOutPool().Get()
+	sku.Resetter.ResetWith(co.GetSku(), sk)
 
-	if i, err = s.ReadFSItemFromExternal(cz.GetSkuExternal()); err != nil {
+	if i, err = s.ReadFSItemFromExternal(co.GetSku()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.checkoutOneForReal(
 		options,
-		cz,
+		co,
 		i,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(i, cz.GetSkuExternal()); err != nil {
+	if err = s.WriteFSItemToExternal(i, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -314,9 +308,9 @@ func (s *Store) RunMergeTool(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	var leftItem, middleItem, rightItem *sku.FSItem
+	var localItem, baseItem, remoteItem *sku.FSItem
 
-	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
+	if localItem, baseItem, remoteItem, err = s.checkoutConflictedForMerge(
 		conflicted,
 		mode,
 	); err != nil {
@@ -346,9 +340,9 @@ func (s *Store) RunMergeTool(
 
 	tool = append(
 		tool,
-		leftItem.Object.GetPath(),
-		middleItem.Object.GetPath(),
-		rightItem.Object.GetPath(),
+		localItem.Object.GetPath(),
+		baseItem.Object.GetPath(),
+		remoteItem.Object.GetPath(),
 		replacement.Object.GetPath(),
 	)
 
@@ -366,12 +360,12 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	e := GetExternalPool().Get()
-	defer GetExternalPool().Put(e)
+	external := GetExternalPool().Get()
+	defer GetExternalPool().Put(external)
 
-	e.ObjectId.ResetWith(&co.GetSkuExternal().ObjectId)
+	external.ObjectId.ResetWith(&co.GetSkuExternal().ObjectId)
 
-	if err = s.WriteFSItemToExternal(leftItem, e); err != nil {
+	if err = s.WriteFSItemToExternal(localItem, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -387,7 +381,7 @@ func (s *Store) RunMergeTool(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if err = s.ReadOneExternalObjectReader(f, e); err != nil {
+	if err = s.ReadOneExternalObjectReader(f, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -401,7 +395,7 @@ func (s *Store) RunMergeTool(
 
 	co = GetCheckedOutPool().Get()
 
-	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), e)
+	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), external)
 
 	return
 }

@@ -300,20 +300,21 @@ func (ar *reader) readOneObj(
 	// }
 
 	if z.GetSkuExternal().ObjectId.IsEmpty() {
+		z.sku.SetState(checked_out_state.Untracked)
+
 		// set empty zettel id to ensure middle is '/'
 		if err = z.GetSkuExternal().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
+		z.sku.SetState(checked_out_state.CheckedOut)
+
 		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.GetSkuExternal().ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
-
-	// TODO determine a better state for this
-	z.sku.SetState(checked_out_state.CheckedOut)
 
 	sku.TransactedResetter.ResetWith(z.GetSku(), z.GetSkuExternal())
 	ar.currentAssignment.AddObject(&z)

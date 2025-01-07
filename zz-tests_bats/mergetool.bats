@@ -76,6 +76,8 @@ function mergetool_conflict_one_local { # @test
 	#TODO-project-2022-zit-collapse_skus
 	mergetool_conflict_base
 
+  export BATS_TEST_BODY=true
+
 	# TODO add `-delete` option to `merge-tool`
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \"\$0\" >\"\$3\"'" .
 	assert_success

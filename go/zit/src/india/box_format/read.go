@@ -4,12 +4,11 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -18,14 +17,14 @@ func (f *BoxTransacted) ReadStringFormat(
 	rs io.RuneScanner,
 	el *sku.Transacted,
 ) (n int64, err error) {
-	var ts query_spec.TokenScanner
+	var ts box.Scanner
 	ts.Reset(rs)
 
 	if err = f.readStringFormatBox(&ts, el); err != nil {
 		if errors.Is(err, errNotABox) {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
+			err = errors.WrapExcept(err, io.EOF)
 			return
 		}
 	}
@@ -43,7 +42,7 @@ func (f *BoxTransacted) ReadStringFormat(
 		return
 	}
 
-	if err = o.Metadata.Description.ReadFromTokenScanner(&ts); err != nil {
+	if err = o.Metadata.Description.ReadFromBoxScanner(&ts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,10 +54,10 @@ func (f *BoxTransacted) ReadStringFormat(
 
 var errNotABox = errors.New("not a box")
 
-func (f *BoxTransacted) openBox(ts *query_spec.TokenScanner) (err error) {
-	if !ts.ScanSkipSpace() {
-		if ts.Error() != nil {
-			err = errors.Wrap(ts.Error())
+func (f *BoxTransacted) openBox(scanner *box.Scanner) (err error) {
+	if !scanner.ScanSkipSpace() {
+		if scanner.Error() != nil {
+			err = errors.Wrap(scanner.Error())
 		} else {
 			err = io.EOF
 		}
@@ -66,17 +65,17 @@ func (f *BoxTransacted) openBox(ts *query_spec.TokenScanner) (err error) {
 		return
 	}
 
-	t, tokenType := ts.GetTokenAndType()
+	seq := scanner.GetSeq()
 
-	if tokenType != token_types.TypeOperator || t.Bytes()[0] != '[' {
+	if !seq.MatchAll(box.TokenMatcherOp(box.OpGroupOpen)) {
 		err = errNotABox
-		ts.Unscan()
+		scanner.Unscan()
 		return
 	}
 
-	if !ts.ConsumeSpacesOrErrorOnFalse() {
-		if ts.Error() != nil {
-			err = errors.Wrap(ts.Error())
+	if !scanner.ConsumeSpacesOrErrorOnFalse() {
+		if scanner.Error() != nil {
+			err = errors.Wrap(scanner.Error())
 		} else {
 			err = io.ErrUnexpectedEOF
 		}
@@ -88,20 +87,20 @@ func (f *BoxTransacted) openBox(ts *query_spec.TokenScanner) (err error) {
 }
 
 func (f *BoxTransacted) readStringFormatBox(
-	ts *query_spec.TokenScanner,
+	scanner *box.Scanner,
 	el sku.ExternalLike,
 ) (err error) {
 	o := el.GetSku()
 
-	if err = f.openBox(ts); err != nil {
-		err = errors.Wrap(err)
+	if err = f.openBox(scanner); err != nil {
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
 	{
-		if !ts.ScanDotAllowedInIdentifiers() {
-			if ts.Error() != nil {
-				err = errors.Wrap(ts.Error())
+		if !scanner.ScanDotAllowedInIdentifiers() {
+			if scanner.Error() != nil {
+				err = errors.Wrap(scanner.Error())
 			} else {
 				err = io.ErrUnexpectedEOF
 			}
@@ -109,21 +108,54 @@ func (f *BoxTransacted) readStringFormatBox(
 			return
 		}
 
-		t, _, parts := ts.GetTokenAndTypeAndParts()
+		seq := scanner.GetSeq()
 
-		if t.Bytes()[0] == '/' {
-			if err = o.ExternalObjectId.Set(t.String()); err != nil {
-				err = errors.Wrap(err)
+		if err = o.ObjectId.ReadFromSeq(seq); err != nil {
+			err = nil
+			o.ObjectId.Reset()
+
+			if seq.MatchAll(box.TokenTypeLiteral) {
+				if err = o.ExternalObjectId.Set(seq.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else if ok, left, _, _ := seq.PartitionFavoringLeft(
+				box.TokenMatcherOp(box.OpPathSeparator),
+			); ok && left.Len() == 0 {
+				if err = o.ExternalObjectId.Set(seq.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else if ok, left, right := seq.MatchEnd(
+				box.TokenMatcherOp(box.OpSigilExternal),
+				box.TokenTypeIdentifier,
+			); ok {
+				var g genres.Genre
+
+				// left: one/uno, right: .zettel
+				if err = g.Set(right.At(1).String()); err != nil {
+					err = nil
+				} else {
+					if err = o.ObjectId.SetWithGenre(left.String(), g); err != nil {
+						o.ObjectId.Reset()
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				if err = o.ExternalObjectId.Set(seq.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			} else {
+				err = errors.Errorf("unsupported seq: %q", seq)
 				return
 			}
-		} else if err = o.ObjectId.ReadFromTokenAndParts(t, parts); err != nil {
-			err = errors.Wrap(err)
-			o.ObjectId.Reset()
-			return
 		}
 
 		if o.ObjectId.GetGenre() == genres.InventoryList {
-			if err = o.Metadata.Tai.Set(t.String()); err != nil {
+			if err = o.Metadata.Tai.Set(o.ObjectId.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -133,76 +165,78 @@ func (f *BoxTransacted) readStringFormatBox(
 	var k ids.ObjectId
 
 LOOP_AFTER_OID:
-	for ts.ScanDotAllowedInIdentifiers() {
-		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
+	for scanner.ScanDotAllowedInIdentifiers() {
+		seq := scanner.GetSeq()
 
-		if tokenType == token_types.TypeOperator {
-			r := rune(t.Bytes()[0])
+		switch {
+		// ] ' '
+		case seq.MatchAll(box.TokenTypeOperator):
+			r := rune(seq.At(0).Contents[0])
 
 			switch {
 			case r == ']':
 				break LOOP_AFTER_OID
 
 			case unicorn.IsSpace(r):
-				continue LOOP_AFTER_OID
+				continue
 			}
-		}
 
-		switch tokenType {
-		case token_types.TypeField:
-			if len(tokenParts.Left) == 0 {
-			} else {
-				field := string_format_writer.Field{
-					Key:   string(tokenParts.Left),
-					Value: string(tokenParts.Right),
-				}
-
-				field.ColorType = string_format_writer.ColorTypeUserData
-				o.Metadata.Fields = append(o.Metadata.Fields, field)
+			// "value"
+		case seq.MatchAll(box.TokenTypeLiteral):
+			if err = o.Metadata.Description.Set(
+				seq.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			continue
 
-		case token_types.TypeLiteral:
-			if len(tokenParts.Left) == 0 {
-			} else if len(tokenParts.Right) == 0 {
-				if err = o.Metadata.Description.Set(string(tokenParts.Left)); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				field := string_format_writer.Field{
-					Value: t.String(),
-				}
-
-				field.ColorType = string_format_writer.ColorTypeUserData
-				o.Metadata.Fields = append(o.Metadata.Fields, field)
+			// @abcd
+		case seq.MatchAll(box.TokenMatcherOp('@'), box.TokenTypeIdentifier):
+			if err = o.Metadata.Blob.Set(
+				string(seq.At(1).Contents),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			continue
 
-		case token_types.TypeIdentifier:
-			switch t.Bytes()[0] {
-			case '/':
-				if err = o.ExternalObjectId.Set(t.String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				continue
-
-			case '@':
-				if err = o.Metadata.Blob.Set(t.String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				continue
+			// "value"
+		case seq.MatchAll(
+			box.TokenTypeLiteral,
+		):
+			if err = o.Metadata.Description.Set(seq.String()); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
+
+			continue
+
+			// key=value key="value"
+		case seq.MatchAll(
+			box.TokenTypeIdentifier,
+			box.TokenMatcherOp(box.OpExact),
+			box.TokenMatcherOr(
+				box.TokenTypeIdentifier,
+				box.TokenTypeLiteral,
+			),
+		):
+
+			field := string_format_writer.Field{
+				Key:   string(seq.At(0).Contents),
+				Value: string(seq.At(2).Contents),
+			}
+
+			field.ColorType = string_format_writer.ColorTypeUserData
+			o.Metadata.Fields = append(o.Metadata.Fields, field)
+			continue
 		}
 
-		if err = k.TodoSetBytes(t); err != nil {
-			err = errors.Wrapf(err, "Type: %s", tokenType)
+		if err = k.ReadFromSeq(seq); err != nil {
+			err = nil
+			scanner.Unscan()
 			return
 		}
 
@@ -235,26 +269,17 @@ LOOP_AFTER_OID:
 				return
 			}
 
-		case genres.Blob:
-			field := string_format_writer.Field{
-				Key:   string(tokenParts.Left),
-				Value: string(tokenParts.Right),
-			}
-
-			field.ColorType = string_format_writer.ColorTypeUserData
-			o.Metadata.Fields = append(o.Metadata.Fields, field)
-
 		default:
 			err = genres.MakeErrUnsupportedGenre(k.GetGenre())
-			err = errors.Wrapf(err, "Token: %q", t)
+			err = errors.Wrapf(err, "Seq: %q", seq)
 			return
 		}
 
 		k.Reset()
 	}
 
-	if ts.Error() != nil {
-		err = errors.Wrap(ts.Error())
+	if scanner.Error() != nil {
+		err = errors.Wrap(scanner.Error())
 		return
 	}
 

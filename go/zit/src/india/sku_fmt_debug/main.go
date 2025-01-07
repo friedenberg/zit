@@ -9,6 +9,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func String(o *sku.Transacted) (str string) {
+	return StringMetadataTai(o)
+}
+
 func StringTaiGenreObjectIdShaBlob(o *sku.Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
@@ -44,6 +48,9 @@ func StringMetadataSansTai(o *sku.Transacted) (str string) {
 
 	sb.WriteString(" ")
 	sb.WriteString(o.GetObjectId().String())
+
+	sb.WriteString(" ")
+	sb.WriteString(o.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(o.GetBlobSha().String())

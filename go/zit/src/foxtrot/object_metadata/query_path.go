@@ -3,6 +3,9 @@ package object_metadata
 import (
 	"fmt"
 	"strings"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type qpItem struct {
@@ -10,6 +13,7 @@ type qpItem struct {
 	Any any
 }
 
+// TODO remove this entirely in favor of ad hoc debugging of queries
 type QueryPath []qpItem
 
 func (qp *QueryPath) String() string {
@@ -30,17 +34,13 @@ func (qp *QueryPath) Len() int {
 	return len(*qp)
 }
 
-func (qp *QueryPath) Push(q any) (err error) {
-	*qp = append(*qp, qpItem{Any: q})
-	return
-}
-
 func (qp *QueryPath) PushOnReturn(q any, ok *bool) {
-	// if !*ok {
-	// 	return
-	// }
+	if !ui.IsVerbose() {
+		return
+	}
 
-	qp.Push(qpItem{Ok: *ok, Any: q})
+	si, _ := errors.MakeStackInfo(1)
+	ui.Log().Print("QueryPath", *ok, si.FileNameLine())
 }
 
 func (qp *QueryPath) Pop() any {

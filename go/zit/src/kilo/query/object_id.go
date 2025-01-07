@@ -59,7 +59,7 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 
 		if ok {
 			ps := skMe.Cache.TagPaths.All[idx]
-			sk.Metadata.Cache.QueryPath.Push(ps.Parents)
+			sk.Metadata.Cache.QueryPath.PushOnReturn(ps.Parents, &ok)
 			return
 		}
 

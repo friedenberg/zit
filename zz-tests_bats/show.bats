@@ -320,6 +320,20 @@ function show_simple_all { # @test
 	EOM
 }
 
+function show_simple_type_one { # @test
+	run_zit show !md:t
+	assert_output_unsorted - <<-EOM
+		[!md @$(get_type_blob_sha) !toml-type-v1]
+	EOM
+}
+
+function show_simple_type_one_history { # @test
+	run_zit show !md+t
+	assert_output_unsorted - <<-EOM
+		[!md @$(get_type_blob_sha) !toml-type-v1]
+	EOM
+}
+
 function show_simple_typ_schwanzen { # @test
 	run_zit show :t
 	assert_output_unsorted - <<-EOM

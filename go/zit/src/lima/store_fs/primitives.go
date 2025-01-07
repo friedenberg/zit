@@ -24,6 +24,14 @@ func (s *Store) HydrateExternalFromItem(
 		external.ObjectId.ResetWith(&internal.ObjectId)
 	}
 
+	if err = item.WriteToSku(
+		external,
+		s.dirLayout.Layout,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var m checkout_mode.Mode
 
 	if m, err = item.GetCheckoutModeOrError(); err != nil {

@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -213,7 +212,6 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 
 func (e *Exp) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	sk := tg.GetSku()
-	ui.Log().Printf("%s in %s", sk, e)
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(e, &ok)
 
 	if len(e.Children) == 0 {

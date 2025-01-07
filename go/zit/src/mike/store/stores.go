@@ -231,7 +231,6 @@ func (s *Store) RunMergeTool(
 			err = errors.Wrap(err)
 			return
 		}
-
 	}
 
 	return
