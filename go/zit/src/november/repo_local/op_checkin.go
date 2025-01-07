@@ -25,6 +25,13 @@ func (repo *Repo) Checkin(
 	)
 
 	for _, co := range sortedResults {
+		if err = repo.GetStore().GetStoreFS().RefreshCheckedOut(
+			co,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		external := co.GetSkuExternal()
 
 		if co.GetState() == checked_out_state.Untracked &&
