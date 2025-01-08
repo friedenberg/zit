@@ -65,7 +65,7 @@ func (s *probe_index) saveOneLoc(
 	loc object_probe_index.Loc,
 ) (err error) {
 	if err = s.saveOneLocString(
-		o.GetObjectId().GetObjectIdString(),
+		o.GetObjectId().String(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -73,7 +73,7 @@ func (s *probe_index) saveOneLoc(
 	}
 
 	if err = s.saveOneLocString(
-		o.GetObjectId().GetObjectIdString()+o.GetTai().GetObjectIdString(),
+		o.GetObjectId().String()+o.GetTai().String(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)

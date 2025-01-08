@@ -28,7 +28,7 @@ function complete_show_all { # @test
 		.*Bestandsaufnahme
 		.*Bestandsaufnahme
 		.*Bestandsaufnahme
-		md.*Typ
+		!md.*Typ
 		one/dos.*Zettel: !md wow ok again
 		one/uno.*Zettel: !md wow the first
 		tag.*Etikett

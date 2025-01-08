@@ -3,7 +3,6 @@ package interfaces
 type ObjectId interface {
 	GenreGetter
 	Stringer
-	GetObjectIdString() string
 	Parts() [3]string
 }
 

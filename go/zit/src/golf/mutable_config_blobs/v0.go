@@ -20,6 +20,10 @@ type V0 struct {
 	Filters         map[string]string                     `toml:"filters"`
 }
 
+func (a V0) GetBlob() Blob {
+	return a
+}
+
 func (a *V0) Reset() {
 	a.FileExtensions.Reset()
 	a.Defaults.Typ = ids.Type{}

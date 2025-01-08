@@ -96,9 +96,7 @@ func (m Metadata) HasMetadataContent() bool {
 		return true
 	}
 
-	tString := m.Type.String()
-
-	if tString != "" {
+	if !m.Type.IsEmpty() {
 		return true
 	}
 
@@ -142,7 +140,7 @@ func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 		w.WriteFormat("- %s", e)
 	}
 
-	tString := m.Type.String()
+	tString := m.Type.StringSansOp()
 
 	if tString != "" {
 		w.WriteFormat("! %s", tString)

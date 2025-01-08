@@ -8,21 +8,21 @@ import (
 )
 
 const (
-	TagTypeTomlV0 = "toml-tag-v0"
-	TagTypeTomlV1 = "toml-tag-v1"
-	TagTypeLuaV1  = "lua-tag-v1"
-	TagTypeLuaV2  = "lua-tag-v2"
+	TagTypeTomlV0 = "!toml-tag-v0"
+	TagTypeTomlV1 = "!toml-tag-v1"
+	TagTypeLuaV1  = "!lua-tag-v1"
+	TagTypeLuaV2  = "!lua-tag-v2"
 
-	TypeTypeTomlV0 = "toml-type-v0"
-	TypeTypeTomlV1 = "toml-type-v1"
+	TypeTypeTomlV0 = "!toml-type-v0"
+	TypeTypeTomlV1 = "!toml-type-v1"
 
-	ConfigTypeTomlV0 = "toml-config-v0"
-	ConfigTypeTomlV1 = "toml-config-v1"
+	ConfigTypeTomlV0 = "!toml-config-v0"
+	ConfigTypeTomlV1 = "!toml-config-v1"
 
-	InventoryListTypeV0 = "inventory_list-v0"
-	InventoryListTypeV1 = "inventory_list-v1"
+	InventoryListTypeV0 = "!inventory_list-v0"
+	InventoryListTypeV1 = "!inventory_list-v1"
 
-	ZettelIdListTypeV0 = "zettel_id_list-v0"
+	ZettelIdListTypeV0 = "!zettel_id_list-v0"
 )
 
 var (

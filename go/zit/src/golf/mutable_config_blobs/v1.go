@@ -15,6 +15,10 @@ type V1 struct {
 	Tools          options_tools.Options `toml:"tools"`
 }
 
+func (a V1) GetBlob() Blob {
+	return a
+}
+
 func (a *V1) Reset() {
 	a.FileExtensions.Reset()
 	a.Defaults.Type = ids.Type{}

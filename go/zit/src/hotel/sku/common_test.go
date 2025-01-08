@@ -493,7 +493,5 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 the body`
 
-	if expected != actual {
-		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
-	}
+	t.AssertEqual(expected, actual)
 }

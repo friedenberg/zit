@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -130,7 +131,7 @@ func (s *Store) setBlobIfNecessary(
 	fe := s.config.GetTypeExtension(info.tipe.String())
 
 	if fe == "" {
-		fe = info.tipe.String()
+		fe = info.tipe.StringSansOp()
 	}
 
 	if err = i.Blob.SetPath(
@@ -254,6 +255,16 @@ func (s *Store) SetFilenameForTransacted(
 		info.objectName = info.basename
 	}
 
+	if strings.Contains(info.basename, "!") {
+		err = errors.Errorf("contains illegal characters: %q", info.basename)
+		return
+	}
+
+	if strings.Contains(info.objectName, "!") {
+		err = errors.Errorf("contains illegal characters: %q", info.objectName)
+		return
+	}
+
 	return
 }
 
@@ -262,7 +273,7 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 		dir,
 		fmt.Sprintf(
 			"%s.%s",
-			&tl.ObjectId,
+			tl.GetObjectId().StringSansOp(),
 			s.FileExtensionForGenre(tl),
 		),
 	)

@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
@@ -50,7 +51,7 @@ func MakeConfigStore(
 }
 
 func (a ConfigStore) ParseTypedBlob(
-	tipe interfaces.ObjectId,
+	tipe ids.Type,
 	blobSha interfaces.Sha,
 ) (common mutable_config_blobs.Blob, n int64, err error) {
 	switch tipe.String() {

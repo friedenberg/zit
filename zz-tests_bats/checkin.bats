@@ -352,7 +352,7 @@ function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 	export EDITOR="true"
 	run_zit checkin -organize .
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
 		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

@@ -35,7 +35,7 @@ function reindex_simple { # @test
 	run_zit show -format tags-path :e,z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		md [Paths: [], All: []]
+		!md [Paths: [], All: []]
 		one/dos [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[TypeDirect:[tag-3]] tag-4:[TypeDirect:[tag-4]]]]
 		one/uno [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[TypeDirect:[tag-3]] tag-4:[TypeDirect:[tag-4]]]]
 		tag [Paths: [TypeSelf:[tag]], All: [tag:[TypeSelf:[tag]]]]

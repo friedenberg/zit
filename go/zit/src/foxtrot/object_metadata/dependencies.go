@@ -125,7 +125,7 @@ func (f Dependencies) writeTyp(
 		return
 	}
 
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type))
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type.StringSansOp()))
 }
 
 func (f Dependencies) writeShaTyp(
@@ -133,7 +133,14 @@ func (f Dependencies) writeShaTyp(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadata()
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Blob, m.Type))
+	return ohio.WriteLine(
+		w1,
+		fmt.Sprintf(
+			"! %s.%s",
+			&m.Blob,
+			m.Type.StringSansOp(),
+		),
+	)
 }
 
 func (f Dependencies) writePathType(

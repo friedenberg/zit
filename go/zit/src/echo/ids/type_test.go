@@ -12,7 +12,7 @@ func TestBlobExt(t *testing.T) {
 		t.Fatalf("%s", err)
 	}
 
-	actual := e.String()
+	actual := e.StringSansOp()
 	expected := "md"
 
 	if expected != actual {
@@ -28,7 +28,7 @@ func TestBlobExt1(t *testing.T) {
 		t.Fatalf("%s", err)
 	}
 
-	actual := e.String()
+	actual := e.StringSansOp()
 	expected := "md"
 
 	if expected != actual {

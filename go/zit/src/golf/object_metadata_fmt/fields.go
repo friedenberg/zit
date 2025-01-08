@@ -93,7 +93,7 @@ func MetadataFieldType(
 	m *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     "!" + m.Type.String(),
+		Value:     m.Type.String(),
 		ColorType: string_format_writer.ColorTypeType,
 	}
 }

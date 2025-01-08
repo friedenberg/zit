@@ -19,6 +19,7 @@ const (
 type (
 	Blob interface {
 		interfaces.MutableStoredConfig
+		GetBlob() Blob
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensionGetter
 		GetPrintOptions() options_print.V0

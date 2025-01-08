@@ -40,8 +40,8 @@ function format_organize_right_align { # @test
 
 		  ###        -1
 
-		- [-zz-archive]
 		- [!md]
+		- [-zz-archive]
 
 		  ###        -2
 	EOM

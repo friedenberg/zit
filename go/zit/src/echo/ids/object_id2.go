@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -286,6 +287,45 @@ func (k2 *objectId2) GetObjectIdString() string {
 	return k2.String()
 }
 
+func (k2 *objectId2) StringSansOp() string {
+	var sb strings.Builder
+
+	if k2.repoId.Len() > 0 {
+		sb.WriteRune('/')
+		k2.repoId.WriteTo(&sb)
+		sb.WriteRune('/')
+	}
+
+	switch k2.g {
+	case genres.Zettel:
+		sb.Write(k2.left.Bytes())
+
+		if k2.middle != '\x00' {
+			sb.WriteByte(k2.middle)
+		}
+
+		sb.Write(k2.right.Bytes())
+
+	case genres.Type:
+		sb.Write(k2.right.Bytes())
+
+	default:
+		if k2.left.Len() > 0 {
+			sb.Write(k2.left.Bytes())
+		}
+
+		if k2.middle != '\x00' {
+			sb.WriteByte(k2.middle)
+		}
+
+		if k2.right.Len() > 0 {
+			sb.Write(k2.right.Bytes())
+		}
+	}
+
+	return sb.String()
+}
+
 func (k2 *objectId2) String() string {
 	var sb strings.Builder
 
@@ -306,6 +346,7 @@ func (k2 *objectId2) String() string {
 		sb.Write(k2.right.Bytes())
 
 	case genres.Type:
+		sb.WriteByte(box.OpType)
 		sb.Write(k2.right.Bytes())
 
 	default:

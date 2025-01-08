@@ -106,7 +106,7 @@ func (kc *Compiled) recompileTypes(
 			fe := commonBlob.GetFileExtension()
 
 			if fe == "" {
-				fe = ct.GetObjectId().String()
+				fe = ct.GetObjectId().StringSansOp()
 			}
 
 			// TODO-P2 enforce uniqueness

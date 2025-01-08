@@ -30,8 +30,8 @@ function deinit_force() { # @test
 	run_zit_init
 	assert_success
 	assert_output - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 }
 

@@ -374,7 +374,7 @@ func (s *Index) ReadOneObjectId(
 	oid interfaces.ObjectId,
 	sk *sku.Transacted,
 ) (err error) {
-	sh := sha.FromStringContent(oid.GetObjectIdString())
+	sh := sha.FromStringContent(oid.String())
 	defer sha.GetPool().Put(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
@@ -388,7 +388,7 @@ func (s *Index) ReadOneObjectId(
 func (s *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
-	sh := sha.FromStringContent(id.GetObjectIdString())
+	sh := sha.FromStringContent(id.String())
 	defer sha.GetPool().Put(sh)
 
 	if skus, err = s.ReadManySha(sh); err != nil {

@@ -41,7 +41,7 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 			s.wBuf.WriteString(g.String())
 
 			if g == genres.Zettel {
-				s.wBuf.WriteString(": !")
+				s.wBuf.WriteString(": ")
 				s.wBuf.WriteString(z.GetType().String())
 				s.wBuf.WriteString(" ")
 				s.wBuf.WriteString(z.GetMetadata().Description.String())

@@ -1,6 +1,8 @@
 package ids
 
 import (
+	"strings"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -61,6 +63,11 @@ func (eoid *ExternalObjectId) Set(value string) (err error) {
 		return
 	}
 
+	if strings.Contains(value, "!") {
+		err = errors.Errorf("contains illegal characters: %q", value)
+		return
+	}
+
 	eoid.value = value
 
 	return
@@ -95,7 +102,18 @@ func (dst *ExternalObjectId) SetObjectIdLike(src ObjectIdLike) (err error) {
 		return
 	}
 
-	if err = dst.SetWithGenre(src.String(), genres.Must(src.GetGenre())); err != nil {
+	var value string
+
+	if oid, ok := src.(*ObjectId); ok {
+		value = oid.StringSansOp()
+	} else {
+		value = src.String()
+	}
+
+	if err = dst.SetWithGenre(
+		value,
+		genres.Must(src.GetGenre()),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
