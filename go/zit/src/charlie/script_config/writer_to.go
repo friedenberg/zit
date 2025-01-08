@@ -1,6 +1,7 @@
 package script_config
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -55,7 +56,7 @@ func MakeWriterTo(
 	}
 
 	ui.TodoP2("determine how stderr and env should be handled")
-	wt.cmd.Stderr = os.Stderr
+	// wt.cmd.Stderr = os.Stderr
 	wt.cmd.Env = envCollapsed
 
 	return
@@ -78,9 +79,16 @@ func MakeWriterToWithStdin(
 }
 
 func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
-	var r io.ReadCloser
+	var pipeOut io.ReadCloser
 
-	if r, err = wt.cmd.StdoutPipe(); err != nil {
+	if pipeOut, err = wt.cmd.StdoutPipe(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var pipeErr io.ReadCloser
+
+	if pipeErr, err = wt.cmd.StderrPipe(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -90,13 +98,30 @@ func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	if n, err = io.Copy(w, r); err != nil {
+	var bufErr bytes.Buffer
+	chErrDone := make(chan struct{})
+
+	go func() {
+		io.Copy(&bufErr, pipeErr)
+		close(chErrDone)
+	}()
+
+	if n, err = io.Copy(w, pipeOut); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	<-chErrDone
+
 	if err = wt.cmd.Wait(); err != nil {
+		var errExit *exec.ExitError
+
+		if errors.As(err, &errExit) {
+			errExit.Stderr = bufErr.Bytes()
+		}
+
 		err = errors.Wrapf(err, "Command: '%s'", wt.cmd.String())
+
 		return
 	}
 

@@ -44,7 +44,6 @@ func (c Revert) DefaultGenres() ids.Genre {
 		genres.Zettel,
 		genres.Tag,
 		genres.Type,
-		// gattung.Bestandsaufnahme,
 		genres.Repo,
 	)
 }

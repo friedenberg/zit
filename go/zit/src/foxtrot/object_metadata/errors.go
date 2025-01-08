@@ -2,10 +2,38 @@ package object_metadata
 
 import (
 	"fmt"
+	"os/exec"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
+
+func MakeErrBlobFormatterFailed(
+	err *exec.ExitError,
+) ErrBlobFormatterFailed {
+	return ErrBlobFormatterFailed{ExitError: err}
+}
+
+type ErrBlobFormatterFailed struct {
+	*exec.ExitError
+}
+
+func (e ErrBlobFormatterFailed) Error() string {
+	return fmt.Sprintf(
+		"blob formatter failed (exit status: %d): %q",
+		e.ExitCode(),
+		e.Stderr,
+	)
+}
+
+func (e ErrBlobFormatterFailed) Is(target error) bool {
+	_, ok := target.(ErrBlobFormatterFailed)
+	return ok
+}
+
+func (e ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
+	return false
+}
 
 func MakeErrHasInlineBlobAndFilePath(
 	blobFD *fd.FD,

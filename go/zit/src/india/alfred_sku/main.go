@@ -61,8 +61,8 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 
 	default:
 		item = w.Get()
-		item.Title = fmt.Sprintf("not implemented for gattung: %q", g)
-		item.Subtitle = fmt.Sprintf("%s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(z))
+		item.Title = fmt.Sprintf("not implemented for genre: %q", g)
+		item.Subtitle = sku_fmt_debug.StringTaiGenreObjectIdShaBlob(z)
 	}
 
 	w.alfredWriter.WriteItem(item)

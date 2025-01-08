@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os/exec"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -190,7 +191,14 @@ func (f Dependencies) writeBlob(
 		}
 
 		if n, err = wt.WriteTo(w1); err != nil {
+			var errExit *exec.ExitError
+
+			if errors.As(err, &errExit) {
+				err = MakeErrBlobFormatterFailed(errExit)
+			}
+
 			err = errors.Wrap(err)
+
 			return
 		}
 	} else {

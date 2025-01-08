@@ -38,7 +38,7 @@ type errUnsupportedFormatter struct {
 
 func (e errUnsupportedFormatter) Error() string {
 	return fmt.Sprintf(
-		"unsupported formatter value %q for gattung %s",
+		"unsupported formatter value %q for genre %s",
 		e.format,
 		e.genres,
 	)
@@ -53,6 +53,6 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 	return e.format
 }
 
-func (e errUnsupportedFormatter) GetGattung() interfaces.Genre {
+func (e errUnsupportedFormatter) GetGenre() interfaces.Genre {
 	return e.genres
 }

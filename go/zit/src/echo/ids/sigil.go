@@ -54,7 +54,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 	return
 }
 
-func (a Sigil) GetGattung() interfaces.Genre {
+func (a Sigil) GetGenre() interfaces.Genre {
 	return genres.None
 }
 

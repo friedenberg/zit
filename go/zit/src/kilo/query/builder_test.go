@@ -13,7 +13,7 @@ func TestQuery(t1 *testing.T) {
 	type testCase struct {
 		stackInfo                                test_logz.StackInfo
 		description, expected, expectedOptimized string
-		defaultGattung                           ids.Genre
+		defaultGenre                             ids.Genre
 		inputs                                   []string
 	}
 
@@ -103,7 +103,7 @@ func TestQuery(t1 *testing.T) {
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
-			defaultGattung:    ids.MakeGenre(genres.Zettel),
+			defaultGenre:      ids.MakeGenre(genres.Zettel),
 			inputs:            []string{"one/uno"},
 		},
 		{
@@ -149,42 +149,42 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: ":Akte :Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
 			expected:          ":Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: ":Akte :Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
 			expected:          ":Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{":"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: "2109504781.792086:Bestandsaufnahme",
 			expected:          "2109504781.792086:Bestandsaufnahme",
 			inputs:            []string{"[2109504781.792086]:b"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: "^etikett-two.Zettel",
 			expected:          "^etikett-two.Zettel",
 			inputs:            []string{"^etikett-two.z"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: "!md.Akte !md.Typ !md.Etikett !md.Zettel !md.Konfig !md.Bestandsaufnahme !md.Kasten",
 			expected:          "!md.Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{"!md."},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			defaultGenre:      ids.MakeGenre(genres.TrueGenre()...),
 			expectedOptimized: "-etikett-two.Zettel",
 			expected:          "-etikett-two.Zettel",
 			inputs:            []string{"-etikett-two.z"},
@@ -201,7 +201,7 @@ func TestQuery(t1 *testing.T) {
 				}
 
 				sut := (&Builder{}).WithDefaultGenres(
-					tc.defaultGattung,
+					tc.defaultGenre,
 				)
 
 				m, err := sut.BuildQueryGroup(tc.inputs...)

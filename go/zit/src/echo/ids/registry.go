@@ -41,7 +41,7 @@ func register[T IdLike, TPtr interface {
 	if id1, ok = registryGenres[g]; ok {
 		panic(
 			errors.Errorf(
-				"gattung %s has two registrations: %s (old), %s (new)",
+				"genre %s has two registrations: %s (old), %s (new)",
 				g,
 				id1,
 				id,

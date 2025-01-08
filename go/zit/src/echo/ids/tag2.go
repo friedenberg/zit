@@ -35,7 +35,7 @@ func (e tag2) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e tag2) GetGattung() interfaces.Genre {
+func (e tag2) GetGenre() interfaces.Genre {
 	return genres.Tag
 }
 

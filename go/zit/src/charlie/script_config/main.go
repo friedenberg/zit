@@ -107,7 +107,7 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 		c = exec.Command("bash", all...)
 
 	case len(s.Shell) > 0:
-		all := append(s.Shell)
+		all := s.Shell
 		all = append(all, args...)
 
 		if len(all) > 1 {

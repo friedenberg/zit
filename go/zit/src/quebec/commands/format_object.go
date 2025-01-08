@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -113,7 +114,15 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 		object,
 		c.CheckoutMode,
 	); err != nil {
-		u.CancelWithError(err)
+		var errBlobFormatterFailed *object_metadata.ErrBlobFormatterFailed
+
+		if errors.As(err, &errBlobFormatterFailed) {
+			u.CancelWithError(errBlobFormatterFailed)
+			// err = nil
+			// ui.Err().Print(errExit)
+		} else {
+			u.CancelWithError(err)
+		}
 	}
 }
 

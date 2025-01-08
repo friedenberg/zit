@@ -38,7 +38,7 @@ func (s ObjectStore) objectReader(
 	}
 
 	if rc, err = NewFileReader(o); err != nil {
-		err = errors.Wrapf(err, "Gattung: %s", g.GetGenre())
+		err = errors.Wrapf(err, "Genre: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		return
 	}

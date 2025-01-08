@@ -96,7 +96,7 @@ func (qg *Group) GetExactlyOneObjectId(
 ) (k *ids.ObjectId, s ids.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
-			"expected exactly 1 gattung query but got %d",
+			"expected exactly 1 genre query but got %d",
 			len(qg.OptimizedQueries),
 		)
 
@@ -106,7 +106,7 @@ func (qg *Group) GetExactlyOneObjectId(
 	q, ok := qg.OptimizedQueries[g]
 
 	if !ok {
-		err = errors.Errorf("expected to have gattung %q", g)
+		err = errors.Errorf("expected to have genre %q", g)
 		return
 	}
 

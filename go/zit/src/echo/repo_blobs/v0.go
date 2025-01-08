@@ -10,7 +10,11 @@ type V0 struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (_ V0) GetGattung() interfaces.Genre {
+func (b V0) GetGenreGetter() interfaces.GenreGetter {
+	return b
+}
+
+func (V0) GetGenre() interfaces.Genre {
 	return genres.Type
 }
 
