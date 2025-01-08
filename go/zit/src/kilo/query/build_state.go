@@ -445,7 +445,7 @@ func (b *buildState) makeTagOrLuaTag(
 	defer sku.GetTransactedPool().Put(sk)
 
 	if err = b.builder.object_probe_index.ReadOneObjectId(
-		k.String(),
+		k,
 		sk,
 	); err != nil {
 		if collections.IsErrNotFound(err) {

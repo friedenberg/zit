@@ -14,7 +14,7 @@ import (
 type (
 	FuncRealize     = func(sku.ExternalLike, *sku.Transacted, sku.CommitOptions) error
 	FuncCommit      = func(sku.ExternalLike, sku.CommitOptions) error
-	FuncReadOneInto = func(string, *sku.Transacted) error
+	FuncReadOneInto = func(ids.IdLike, *sku.Transacted) error
 
 	StoreFuncs struct {
 		FuncRealize

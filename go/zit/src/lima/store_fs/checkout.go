@@ -172,7 +172,7 @@ func (s *Store) shouldCheckOut(
 	defer sku.GetTransactedPool().Put(mutter)
 
 	if err := s.externalStoreSupplies.FuncReadOneInto(
-		cz.GetSku().GetObjectId().String(),
+		cz.GetSku().GetObjectId(),
 		mutter,
 	); err == nil {
 		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.GetSkuExternal().Metadata) {

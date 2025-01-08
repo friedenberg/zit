@@ -191,7 +191,7 @@ func (c Clean) shouldClean(
 		defer sku.GetTransactedPool().Put(mutter)
 
 		err := u.GetStore().GetStreamIndex().ReadOneObjectId(
-			co.GetSku().GetObjectId().String(),
+			co.GetSku().GetObjectId(),
 			mutter,
 		)
 

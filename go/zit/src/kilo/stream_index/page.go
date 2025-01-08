@@ -89,7 +89,7 @@ func (pt *Page) add(
 	z1 *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	pt.oids[z1.ObjectId.String()] = struct{}{}
+	pt.oids[z1.ObjectId.GetObjectIdString()] = struct{}{}
 	z := sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.ResetWith(z, z1)

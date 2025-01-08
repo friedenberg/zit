@@ -251,7 +251,7 @@ func (s *Store) fetchParentIfNecessary(
 ) (mutter *sku.Transacted, err error) {
 	mutter = sku.GetTransactedPool().Get()
 	if err = s.GetStreamIndex().ReadOneObjectId(
-		sk.GetObjectId().String(),
+		sk.GetObjectId(),
 		mutter,
 	); err != nil {
 		if collections.IsErrNotFound(err) || errors.IsNotExist(err) {

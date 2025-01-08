@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
@@ -72,8 +73,15 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 		hasInternal := true
 
+		var oid ids.ObjectId
+
+		if err = oid.SetObjectIdLike(item.GetExternalObjectId()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = s.externalStoreSupplies.FuncReadOneInto(
-			item.ExternalObjectId.String(),
+			&oid,
 			co.GetSku(),
 		); err != nil {
 			if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {

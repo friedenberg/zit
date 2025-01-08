@@ -200,6 +200,13 @@ function checkin_simple_typ { # @test
 		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 	EOM
 
+	run_zit show -format blob !md:t
+	assert_success
+	assert_output - <<-EOM
+		binary = true
+		vim-syntax-type = "test"
+	EOM
+
 	run_zit last -format box-archive
 	assert_success
 	assert_output - <<-EOM

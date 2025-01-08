@@ -77,6 +77,7 @@ func (t Type) IsToml() bool {
 }
 
 func (i Type) GetObjectIdString() string {
+	return i.String()
 	if i.IsEmpty() {
 		return ""
 	} else {

@@ -667,7 +667,7 @@ func (u *Repo) MakeFormatFunc(
 			defer sku.GetTransactedPool().Put(sk)
 
 			if err = u.GetStore().GetStreamIndex().ReadOneObjectId(
-				o.ObjectId.String(),
+				o.GetObjectId(),
 				sk,
 			); err != nil {
 				err = errors.Wrap(err)

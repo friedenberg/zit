@@ -14,7 +14,7 @@ type (
 	FuncCommit      = func(*Transacted, CommitOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
-		k1 interfaces.ObjectId,
+		k1 ids.IdLike,
 		out *Transacted,
 	) (err error)
 

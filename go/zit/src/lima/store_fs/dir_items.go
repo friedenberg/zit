@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -394,8 +395,15 @@ func (d *dirItems) processFDSet(
 		recognized := sku.GetTransactedPool().Get()
 		defer sku.GetTransactedPool().Put(recognized)
 
+		var oid ids.ObjectId
+
+		if err = oid.Set(objectIdString); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = d.externalStoreSupplies.FuncReadOneInto(
-			objectIdString,
+			&oid,
 			recognized,
 		); err != nil {
 			if collections.IsErrNotFound(err) {

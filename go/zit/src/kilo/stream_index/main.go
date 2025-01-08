@@ -371,10 +371,10 @@ func (s *Index) ObjectExists(
 }
 
 func (s *Index) ReadOneObjectId(
-	id string,
+	oid ids.IdLike,
 	sk *sku.Transacted,
 ) (err error) {
-	sh := sha.FromStringContent(id)
+	sh := sha.FromStringContent(oid.GetObjectIdString())
 	defer sha.GetPool().Put(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
