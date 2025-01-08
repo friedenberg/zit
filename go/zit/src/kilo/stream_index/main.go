@@ -315,7 +315,7 @@ func (s *Index) ReadManySha(
 }
 
 func (s *Index) ObjectExists(
-	id ids.IdLike,
+	id *ids.ObjectId,
 ) (err error) {
 	var n uint8
 

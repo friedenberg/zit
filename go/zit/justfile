@@ -1,8 +1,6 @@
 
-build-and-test: build test
-  
 commit: \
-    build-and-test \
+    build test \
     (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
 
 #    ____ _

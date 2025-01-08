@@ -353,7 +353,10 @@ func (s *Store) addType(
 		return
 	}
 
-	if err = s.GetStreamIndex().ObjectExists(t); err == nil {
+	var oid ids.ObjectId
+	oid.ResetWithIdLike(t)
+
+	if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
 		return
 	}
 
@@ -417,12 +420,16 @@ func (s *Store) addTagAndExpanded(
 	s.tagLock.Lock()
 	defer s.tagLock.Unlock()
 
+	var oid ids.ObjectId
+
 	for _, e1 := range etikettenExpanded {
 		if e1.IsVirtual() {
 			continue
 		}
 
-		if err = s.GetStreamIndex().ObjectExists(e1); err == nil {
+		oid.ResetWithIdLike(e1)
+
+		if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
 			continue
 		}
 

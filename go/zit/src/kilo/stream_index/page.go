@@ -230,10 +230,10 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 		return
 	}
 
-	addedSchwanz := pt.addedLatest.Copy()
+	addedLatest := pt.addedLatest.Copy()
 
 	if err = heap.MergeStream(
-		&addedSchwanz,
+		&addedLatest,
 		func() (tz *sku.Transacted, err error) {
 			err = collections.MakeErrStopIteration()
 			return
