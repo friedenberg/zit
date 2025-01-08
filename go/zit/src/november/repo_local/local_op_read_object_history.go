@@ -12,7 +12,7 @@ func (env *Repo) ReadObjectHistory(
 	streamIndex := env.GetStore().GetStreamIndex()
 
 	if skus, err = streamIndex.ReadManyObjectId(
-		oid.String(),
+		oid,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

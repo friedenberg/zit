@@ -2,6 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -10,7 +11,7 @@ import (
 )
 
 func (s *Store) ReadTransactedFromObjectId(
-	k1 ids.IdLike,
+	k1 interfaces.ObjectId,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
@@ -28,7 +29,7 @@ func (s *Store) ReadTransactedFromObjectId(
 }
 
 func (s *Store) ReadOneObjectId(
-	k ids.IdLike,
+	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()
 
@@ -43,7 +44,7 @@ func (s *Store) ReadOneObjectId(
 // TODO add support for cwd and sigil
 // TODO simplify
 func (s *Store) ReadOneInto(
-	k1 ids.IdLike,
+	k1 interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
 	var sk *sku.Transacted

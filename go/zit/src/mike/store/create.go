@@ -71,7 +71,7 @@ func (s *Store) CreateOrUpdate(
 }
 
 func (s *Store) CreateOrUpdateBlobSha(
-	k ids.IdLike,
+	k interfaces.ObjectId,
 	sh interfaces.Sha,
 ) (t *sku.Transacted, err error) {
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {

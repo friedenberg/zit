@@ -23,7 +23,7 @@ func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.immutable_config_private
 }
 
-func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
 		return
 	}
@@ -35,7 +35,7 @@ func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) getRepo(k ids.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
 		return
 	}
@@ -50,7 +50,7 @@ func (kc *compiled) getRepo(k ids.IdLike) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc *compiled) getApproximatedType(
-	k ids.IdLike,
+	k interfaces.ObjectId,
 ) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
 		return
@@ -96,7 +96,7 @@ func (kc *compiled) getTagOrRepoIdOrType(
 }
 
 func (kc *compiled) getTag(
-	k ids.IdLike,
+	k interfaces.ObjectId,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != genres.Tag {
 		return

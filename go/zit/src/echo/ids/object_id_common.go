@@ -26,7 +26,7 @@ type IdParts struct {
 
 var ErrFDNotId = errors.New("not a id file")
 
-func MustObjectId(kp IdLike) (k *ObjectId) {
+func MustObjectId(kp interfaces.ObjectId) (k *ObjectId) {
 	k = &ObjectId{}
 	err := k.SetWithIdLike(kp)
 	errors.PanicIfError(err)

@@ -13,7 +13,7 @@ type Index interface {
 	interfaces.Flusher
 	CreateZettelId() (*ids.ZettelId, error)
 	interfaces.ResetterWithError
-	AddZettelId(ids.IdLike) error
+	AddZettelId(interfaces.ObjectId) error
 	PeekZettelIds(int) ([]*ids.ZettelId, error)
 }
 

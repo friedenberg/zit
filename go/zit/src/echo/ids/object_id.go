@@ -377,8 +377,7 @@ func (k2 *objectId) SetFromPath(
 }
 
 func (h *objectId) SetWithIdLike(
-	k IdLike,
-) (err error) {
+	k interfaces.ObjectId) (err error) {
 	switch kt := k.(type) {
 	case *objectId:
 		if err = kt.left.CopyTo(&h.left); err != nil {
@@ -448,7 +447,7 @@ func (h *objectId) SetRaw(v string) (err error) {
 }
 
 func (h *objectId) Set(v string) (err error) {
-	var k IdLike
+	var k interfaces.ObjectId
 
 	switch h.g {
 	case genres.None:
@@ -508,7 +507,7 @@ func (a *objectId) ResetWith(b *objectId) {
 	a.middle = b.middle
 }
 
-func (a *objectId) ResetWithIdLike(b IdLike) (err error) {
+func (a *objectId) ResetWithIdLike(b interfaces.ObjectId) (err error) {
 	return a.SetWithIdLike(b)
 }
 

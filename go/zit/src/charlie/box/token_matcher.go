@@ -19,7 +19,7 @@ func (tokenMatcher TokenMatcherOp) Match(token Token) bool {
 }
 
 func TokenMatcherOr(tm ...TokenMatcher) tokenMatcherOr {
-  return tokenMatcherOr(tm)
+	return tokenMatcherOr(tm)
 }
 
 type tokenMatcherOr []TokenMatcher

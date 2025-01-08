@@ -10,7 +10,7 @@ import (
 )
 
 type idExpandable[T any] interface {
-	IdLike
+	interfaces.ObjectId
 	interfaces.GenreGetter
 	interfaces.Stringer
 }
@@ -18,7 +18,7 @@ type idExpandable[T any] interface {
 type idExpandablePtr[T idExpandable[T]] interface {
 	interfaces.Ptr[T]
 	idExpandable[T]
-	IdLike
+	interfaces.ObjectId
 	interfaces.SetterPtr[T]
 }
 
@@ -31,7 +31,7 @@ func expandOne[T idExpandable[T], TPtr idExpandablePtr[T]](
 	ex.Expand(f, k.String())
 }
 
-func ExpandOneInto[T IdLike](
+func ExpandOneInto[T interfaces.ObjectId](
 	k T,
 	mf func(string) (T, error),
 	ex expansion.Expander,
@@ -57,7 +57,7 @@ func ExpandOneInto[T IdLike](
 	)
 }
 
-func ExpandOneSlice[T IdLike](
+func ExpandOneSlice[T interfaces.ObjectId](
 	k T,
 	mf func(string) (T, error),
 	exes ...expansion.Expander,

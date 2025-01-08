@@ -20,7 +20,7 @@ type (
 	}
 
 	ObjectProbeIndex interface {
-		ReadOneObjectId(ids.IdLike, *Transacted) error
+		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
 	}
 
 	TransactedGetter interface {
@@ -53,7 +53,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromObjectId(
-			k1 ids.IdLike,
+			k1 interfaces.ObjectId,
 		) (sk1 *Transacted, err error)
 	}
 

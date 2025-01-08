@@ -475,8 +475,7 @@ func (k2 *objectId2) SetFromPath(
 }
 
 func (h *objectId2) SetWithIdLike(
-	k IdLike,
-) (err error) {
+	k interfaces.ObjectId) (err error) {
 	h.Reset()
 
 	switch kt := k.(type) {
@@ -602,7 +601,7 @@ func (oid *objectId2) Set(v string) (err error) {
 		}
 	}
 
-	var k IdLike
+	var k interfaces.ObjectId
 
 	switch oid.g {
 	case genres.None:
@@ -694,7 +693,7 @@ func (oid *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		}
 	}
 
-	var k IdLike
+	var k interfaces.ObjectId
 
 	switch oid.g {
 	case genres.Zettel:
@@ -789,7 +788,7 @@ func (a *objectId2) SetObjectIdLike(b ObjectIdLike) (err error) {
 	return
 }
 
-func (a *objectId2) ResetWithIdLike(b IdLike) (err error) {
+func (a *objectId2) ResetWithIdLike(b interfaces.ObjectId) (err error) {
 	return a.SetWithIdLike(b)
 }
 

@@ -123,7 +123,7 @@ func (a *Transacted) GetObjectId() *ids.ObjectId {
 	return &a.ObjectId
 }
 
-func (a *Transacted) SetObjectIdLike(kl ids.IdLike) (err error) {
+func (a *Transacted) SetObjectIdLike(kl interfaces.ObjectId) (err error) {
 	if err = a.ObjectId.SetWithIdLike(kl); err != nil {
 		err = errors.Wrap(err)
 		return

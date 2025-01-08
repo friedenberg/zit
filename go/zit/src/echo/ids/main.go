@@ -12,19 +12,10 @@ type Abbreviatable interface {
 	interfaces.Stringer
 }
 
-type IdWithParts interface {
-	GetObjectIdString() string
-	interfaces.Stringer
-	Parts() [3]string
-}
+type IdWithParts = interfaces.ObjectId
 
 type (
-	IdLike interface {
-		IdWithParts
-		interfaces.GenreGetter
-		// interfaces.Resetter
-		// interfaces.Setter
-	}
+	IdLike = IdWithParts
 
 	ObjectIdLike interface {
 		interfaces.GenreGetter
@@ -46,7 +37,7 @@ type (
 
 type Index struct{}
 
-func Make(v string) (k IdLike, err error) {
+func Make(v string) (k interfaces.ObjectId, err error) {
 	if v == "" {
 		k = &ObjectId{}
 		return
@@ -111,7 +102,7 @@ func Make(v string) (k IdLike, err error) {
 	return
 }
 
-func Equals(a, b IdLike) (ok bool) {
+func Equals(a, b interfaces.ObjectId) (ok bool) {
 	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
 		return
 	}
@@ -133,8 +124,7 @@ func FormattedString(k IdWithParts) string {
 }
 
 func AlignedParts(
-	id IdLike,
-	lenLeft, lenRight int,
+	id interfaces.ObjectId, lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
 	left := parts[0]
@@ -154,7 +144,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id IdLike, lenLeft, lenRight int) string {
+func Aligned(id interfaces.ObjectId, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }

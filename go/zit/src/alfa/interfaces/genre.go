@@ -3,6 +3,8 @@ package interfaces
 type ObjectId interface {
 	GenreGetter
 	Stringer
+	GetObjectIdString() string
+	Parts() [3]string
 }
 
 type ObjectIdWithRepoId interface {
@@ -22,7 +24,8 @@ type RepoIdGetter interface {
 }
 
 type Genre interface {
-	ObjectId
+	GenreGetter
+	Stringer
 	EqualsGenre(GenreGetter) bool
 	GetGenreBitInt() byte
 	GetGenreString() string
