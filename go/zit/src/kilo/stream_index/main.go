@@ -249,14 +249,41 @@ func (i *Index) flushEverything(
 	return
 }
 
+func PageIndexForObject(
+	width uint8,
+	object *sku.Transacted,
+) (n uint8, err error) {
+	if n, err = PageIndexForObjectId(width, object.GetObjectId()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
+	if n, err = sha.PageIndexForString(
+		width,
+		oid.String(),
+		// oid.GetObjectIdString(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (i *Index) Add(
 	z *sku.Transacted,
-	v string,
 	options sku.CommitOptions,
 ) (err error) {
 	var n uint8
 
-	if n, err = sha.PageIndexForString(DigitWidth, v); err != nil {
+	if n, err = PageIndexForObject(
+		DigitWidth,
+		z,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

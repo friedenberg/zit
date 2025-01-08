@@ -206,7 +206,6 @@ func (s *Store) tryRealizeAndOrStore(
 	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
 		if err = s.GetStreamIndex().Add(
 			child,
-			child.GetObjectId().String(),
 			o,
 		); err != nil {
 			err = errors.Wrap(err)
