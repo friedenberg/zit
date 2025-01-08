@@ -46,7 +46,14 @@ func PageIndexForString(width uint8, s string) (n uint8, err error) {
 	}
 
 	sh := FromHash(hash)
-	return PageIndexForSha(width, sh)
+	defer GetPool().Put(sh)
+
+	if n, err = PageIndexForSha(width, sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func PageIndexForSha(width uint8, s interfaces.Sha) (n uint8, err error) {
