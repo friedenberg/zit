@@ -13,9 +13,14 @@ type CommitOptions struct {
 	DontAddMissingType bool
 }
 
+type StreamIndexOptions struct {
+	ForceLatest      bool
+	AddToStreamIndex bool
+}
+
 type StoreOptions struct {
+	StreamIndexOptions StreamIndexOptions
 	AddToInventoryList bool
-	AddToStreamIndex   bool
 	ApplyProto         bool
 	MergeCheckedOut    bool
 	RunHooks           bool
@@ -40,7 +45,10 @@ func GetStoreOptionsRealizeSansProto() StoreOptions {
 
 func GetStoreOptionsReindex() StoreOptions {
 	return StoreOptions{
-		AddToStreamIndex: true,
+		StreamIndexOptions: StreamIndexOptions{
+			ForceLatest:      true,
+			AddToStreamIndex: true,
+		},
 	}
 }
 

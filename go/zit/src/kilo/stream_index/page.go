@@ -94,7 +94,7 @@ func (pt *Page) add(
 
 	sku.TransactedResetter.ResetWith(z, z1)
 
-	if pt.sunrise.Less(z.GetTai()) {
+	if pt.sunrise.Less(z.GetTai()) || options.StreamIndexOptions.ForceLatest {
 		pt.addedLatest.Add(z)
 	} else {
 		pt.added.Add(z)
