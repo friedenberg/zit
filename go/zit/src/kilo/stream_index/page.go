@@ -64,7 +64,7 @@ func (s *Page) readOneRange(
 	b := make([]byte, ra.ContentLength)
 
 	if _, err = f.ReadAt(b, ra.Offset); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Range: %q, Page: %q", ra, s.PageId)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (s *Page) readOneRange(
 	}
 
 	if _, err = dec.readFormatExactly(f, &skWR); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Range: %q, Page: %q", ra, s.PageId.Path())
 		return
 	}
 

@@ -409,7 +409,7 @@ func (d *dirItems) processFDSet(
 			if collections.IsErrNotFound(err) {
 				err = nil
 			} else {
-				err = errors.Wrap(err)
+				err = errors.Wrapf(err, "ObjectId: %q", objectIdString)
 				return
 			}
 		} else {
