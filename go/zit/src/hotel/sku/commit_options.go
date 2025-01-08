@@ -15,6 +15,7 @@ type CommitOptions struct {
 
 type StoreOptions struct {
 	AddToInventoryList bool
+	AddToStreamIndex   bool
 	ApplyProto         bool
 	MergeCheckedOut    bool
 	RunHooks           bool
@@ -39,7 +40,7 @@ func GetStoreOptionsRealizeSansProto() StoreOptions {
 
 func GetStoreOptionsReindex() StoreOptions {
 	return StoreOptions{
-		AddToInventoryList: true,
+		AddToStreamIndex: true,
 	}
 }
 
@@ -70,23 +71,3 @@ func GetStoreOptionsCreate() StoreOptions {
 		Validate:           true,
 	}
 }
-
-// type Mode byte
-
-// const (
-// 	ModeEmpty              = Mode(iota)
-// 	ModeAddToInventoryList = Mode(1 << iota) // proper commit
-// 	ModeUpdateTai                            // update the tai
-// 	ModeLatest                               // only features updates that have no retroactive effects
-// 	ModeMergeCheckedOut
-// 	ModeApplyProto
-// 	ModeHooks
-
-// 	ModeRealizeWithProto = ModeUpdateTai | ModeApplyProto | ModeHooks
-// 	ModeRealizeSansProto = ModeUpdateTai | ModeHooks
-
-// 	ModeReindex = ModeLatest
-// 	ModeImport  = ModeReindex | ModeAddToInventoryList
-// 	ModeCommit  = ModeImport | ModeHooks
-// 	ModeCreate  = ModeCommit | ModeApplyProto
-// )

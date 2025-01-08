@@ -309,6 +309,11 @@ func (t Tai) Less(t1 Tai) bool {
 	return t.Before(t1)
 }
 
+func MakeTaiRFC3339Value(t Tai) *TaiRFC3339Value {
+	t1 := TaiRFC3339Value(t)
+	return &t1
+}
+
 type TaiRFC3339Value Tai
 
 func (t *TaiRFC3339Value) Set(v string) (err error) {
@@ -327,5 +332,7 @@ func (t *TaiRFC3339Value) Set(v string) (err error) {
 }
 
 func (t *TaiRFC3339Value) String() string {
-	return t.Format(thyme.RFC3339)
+	// TODO figure out why the pointer needs to be converted to Tai to execute
+	// correctly
+	return Tai(*t).Format(thyme.RFC3339)
 }

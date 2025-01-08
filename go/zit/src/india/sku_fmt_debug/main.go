@@ -38,7 +38,15 @@ func StringObjectIdBlobMetadataSansTai(o *sku.Transacted) (str string) {
 }
 
 func StringMetadataTai(o *sku.Transacted) (str string) {
-	return fmt.Sprintf("%s %s", o.GetTai(), StringMetadataSansTai(o))
+	t := o.GetTai()
+	t1 := ids.MakeTaiRFC3339Value(t)
+
+	return fmt.Sprintf(
+		"%s (%s) %s",
+		t,
+		t1,
+		StringMetadataSansTai(o),
+	)
 }
 
 func StringMetadataSansTai(o *sku.Transacted) (str string) {

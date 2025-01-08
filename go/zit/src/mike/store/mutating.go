@@ -83,7 +83,7 @@ func (s *Store) tryRealizeAndOrStore(
 	ui.Log().Printf("%s -> %s", o, child)
 
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() &&
-		o.AddToInventoryList {
+		(o.AddToInventoryList || o.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
 		})
@@ -138,7 +138,9 @@ func (s *Store) tryRealizeAndOrStore(
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
+	if o.AddToInventoryList || o.AddToStreamIndex {
 		if err = s.addObjectToAbbrStore(child); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -201,7 +203,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 	}
 
-	if o.AddToInventoryList {
+	if o.AddToInventoryList || o.AddToStreamIndex {
 		if err = s.GetStreamIndex().Add(
 			child,
 			child.GetObjectId().String(),
