@@ -65,8 +65,7 @@ func (s *probe_index) saveOneLoc(
 	loc object_probe_index.Loc,
 ) (err error) {
 	if err = s.saveOneLocString(
-		o,
-		o.GetObjectId().String(),
+		o.GetObjectId().GetObjectIdString(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -74,8 +73,7 @@ func (s *probe_index) saveOneLoc(
 	}
 
 	if err = s.saveOneLocString(
-		o,
-		o.GetObjectId().String()+o.GetTai().String(),
+		o.GetObjectId().GetObjectIdString()+o.GetTai().GetObjectIdString(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -86,7 +84,6 @@ func (s *probe_index) saveOneLoc(
 }
 
 func (s *probe_index) saveOneLocString(
-	o *sku.Transacted,
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
