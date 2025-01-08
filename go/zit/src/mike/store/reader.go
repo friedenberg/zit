@@ -82,7 +82,7 @@ func (s *Store) ReadOneInto(
 	case genres.Blob:
 		var oid ids.ObjectId
 
-		if err = oid.SetWithGenre(k1.String(), genres.Zettel); err != nil {
+		if err = oid.SetWithIdLike(k1); err != nil {
 			err = collections.MakeErrNotFound(k1)
 			return
 		}

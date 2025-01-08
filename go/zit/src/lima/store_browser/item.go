@@ -34,6 +34,7 @@ func (i *Item) GetKey() string {
 	return i.Id.String()
 }
 
+// TODO replace with external id
 func (i *Item) GetObjectId() *ids.ObjectId {
 	var oid ids.ObjectId
 	errors.PanicIfError(oid.SetLeft(i.GetKey()))

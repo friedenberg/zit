@@ -12,15 +12,10 @@ type Abbreviatable interface {
 	interfaces.Stringer
 }
 
-type IdWithParts = interfaces.ObjectId
-
 type (
-	IdLike = IdWithParts
-
 	ObjectIdLike interface {
 		interfaces.GenreGetter
 		interfaces.Stringer
-		// GetObjectId() *ObjectId
 		IsEmpty() bool
 		SetObjectIdLike(ObjectIdLike) error
 	}
@@ -114,7 +109,7 @@ func Equals(a, b interfaces.ObjectId) (ok bool) {
 	return true
 }
 
-func FormattedString(k IdWithParts) string {
+func FormattedString(k interfaces.ObjectId) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -163,7 +158,7 @@ func LeftSubtract[
 	return
 }
 
-func Contains(a, b IdWithParts) bool {
+func Contains(a, b interfaces.ObjectId) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -178,7 +173,7 @@ func Contains(a, b IdWithParts) bool {
 	return true
 }
 
-func ContainsExactly(a, b IdWithParts) bool {
+func ContainsExactly(a, b interfaces.ObjectId) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()

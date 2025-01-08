@@ -8,11 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
@@ -287,43 +284,6 @@ func (oid *objectId2) StringSansRepo() string {
 
 func (k2 *objectId2) GetObjectIdString() string {
 	return k2.String()
-	// var sb strings.Builder
-
-	// if k2.repoId.Len() > 0 {
-	// 	sb.WriteRune('/')
-	// 	k2.repoId.WriteTo(&sb)
-	// 	sb.WriteRune('/')
-	// }
-
-	// switch k2.g {
-	// case genres.Zettel:
-	// 	sb.Write(k2.left.Bytes())
-
-	// 	if k2.middle != '\x00' {
-	// 		sb.WriteByte(k2.middle)
-	// 	}
-
-	// 	sb.Write(k2.right.Bytes())
-
-	// case genres.Type:
-	// 	sb.WriteByte(box.OpType)
-	// 	sb.Write(k2.right.Bytes())
-
-	// default:
-	// 	if k2.left.Len() > 0 {
-	// 		sb.Write(k2.left.Bytes())
-	// 	}
-
-	// 	if k2.middle != '\x00' {
-	// 		sb.WriteByte(k2.middle)
-	// 	}
-
-	// 	if k2.right.Len() > 0 {
-	// 		sb.Write(k2.right.Bytes())
-	// 	}
-	// }
-
-	// return sb.String()
 }
 
 func (k2 *objectId2) String() string {
@@ -429,53 +389,9 @@ func (k2 *objectId2) Abbreviate(
 	return
 }
 
-func (k2 *objectId2) SetFromPath(
-	path string,
-	fe file_extensions.V0,
-) (err error) {
-	els := files.PathElements(path)
-	ext := els[0]
-
-	switch ext {
-	case fe.Tag:
-		if err = k2.SetWithGenre(els[1], genres.Tag); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Type:
-		if err = k2.SetWithGenre(els[1], genres.Type); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Repo:
-		if err = k2.SetWithGenre(els[1], genres.Repo); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Zettel:
-		if len(els) < 3 {
-			err = errors.Errorf("not a valid zettel: %q, %q", els, path)
-			return
-		}
-
-		if err = k2.SetWithGenre(els[2]+"/"+els[1], genres.Zettel); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = ErrFDNotId
-		return
-	}
-
-	return
-}
-
 func (h *objectId2) SetWithIdLike(
-	k interfaces.ObjectId) (err error) {
+	k interfaces.ObjectId,
+) (err error) {
 	h.Reset()
 
 	switch kt := k.(type) {
@@ -519,48 +435,6 @@ func (h *objectId2) SetWithGenre(
 	h.g = genres.Make(g.GetGenre())
 
 	if err = h.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (h *objectId2) TodoSetBytes(v *catgut.String) (err error) {
-	return h.Set(v.String())
-}
-
-func (h *objectId2) TodoSetBytesForgiving(v *catgut.String) (err error) {
-	if err = h.Set(v.String()); err != nil {
-		h.g = genres.None
-
-		if err = v.CopyTo(&h.left); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	return
-}
-
-func (h *objectId2) SetBlob(v string) (err error) {
-	h.g = genres.Blob
-
-	if err = h.left.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (h *objectId2) SetRaw(v string) (err error) {
-	ui.DebugBatsTestBody().Print(v)
-	h.g = genres.None
-
-	if err = h.left.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
