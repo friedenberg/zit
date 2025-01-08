@@ -247,7 +247,7 @@ LOOP:
 			); ok {
 				switch {
 
-          // left: one/uno, partition: ., right: zettel
+				// left: one/uno, partition: ., right: zettel
 				case right.MatchAll(box.TokenTypeIdentifier):
 					if err = q.AddString(string(right.At(0).Contents)); err != nil {
 						err = nil
@@ -260,7 +260,7 @@ LOOP:
 						seq = left
 					}
 
-          // left: !md, partition: ., right: ''
+					// left: !md, partition: ., right: ''
 				case right.Len() == 0:
 					if err = b.addSigilFromOp(q, partition.Contents[0]); err != nil {
 						err = nil

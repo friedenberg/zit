@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -287,43 +286,44 @@ func (oid *objectId2) StringSansRepo() string {
 }
 
 func (k2 *objectId2) GetObjectIdString() string {
-	var sb strings.Builder
+	return k2.String()
+	// var sb strings.Builder
 
-	if k2.repoId.Len() > 0 {
-		sb.WriteRune('/')
-		k2.repoId.WriteTo(&sb)
-		sb.WriteRune('/')
-	}
+	// if k2.repoId.Len() > 0 {
+	// 	sb.WriteRune('/')
+	// 	k2.repoId.WriteTo(&sb)
+	// 	sb.WriteRune('/')
+	// }
 
-	switch k2.g {
-	case genres.Zettel:
-		sb.Write(k2.left.Bytes())
+	// switch k2.g {
+	// case genres.Zettel:
+	// 	sb.Write(k2.left.Bytes())
 
-		if k2.middle != '\x00' {
-			sb.WriteByte(k2.middle)
-		}
+	// 	if k2.middle != '\x00' {
+	// 		sb.WriteByte(k2.middle)
+	// 	}
 
-		sb.Write(k2.right.Bytes())
+	// 	sb.Write(k2.right.Bytes())
 
-	case genres.Type:
-		sb.WriteByte(box.OpType)
-		sb.Write(k2.right.Bytes())
+	// case genres.Type:
+	// 	sb.WriteByte(box.OpType)
+	// 	sb.Write(k2.right.Bytes())
 
-	default:
-		if k2.left.Len() > 0 {
-			sb.Write(k2.left.Bytes())
-		}
+	// default:
+	// 	if k2.left.Len() > 0 {
+	// 		sb.Write(k2.left.Bytes())
+	// 	}
 
-		if k2.middle != '\x00' {
-			sb.WriteByte(k2.middle)
-		}
+	// 	if k2.middle != '\x00' {
+	// 		sb.WriteByte(k2.middle)
+	// 	}
 
-		if k2.right.Len() > 0 {
-			sb.Write(k2.right.Bytes())
-		}
-	}
+	// 	if k2.right.Len() > 0 {
+	// 		sb.Write(k2.right.Bytes())
+	// 	}
+	// }
 
-	return sb.String()
+	// return sb.String()
 }
 
 func (k2 *objectId2) String() string {
