@@ -354,7 +354,11 @@ func (s *Store) addType(
 	}
 
 	var oid ids.ObjectId
-	oid.ResetWithIdLike(t)
+
+	if err = oid.ResetWithIdLike(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
 		return
@@ -427,7 +431,10 @@ func (s *Store) addTagAndExpanded(
 			continue
 		}
 
-		oid.ResetWithIdLike(e1)
+		if err = oid.ResetWithIdLike(e1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
 			continue
