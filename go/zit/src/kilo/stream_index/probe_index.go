@@ -2,7 +2,6 @@ package stream_index
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
@@ -93,8 +92,6 @@ func (s *probe_index) saveOneLocString(
 ) (err error) {
 	sh := sha.FromStringContent(str)
 	defer sha.GetPool().Put(sh)
-
-	ui.Log().Print(str, sh, o, loc)
 
 	if err = s.Index.AddSha(sh, loc); err != nil {
 		err = errors.Wrap(err)
