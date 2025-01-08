@@ -88,6 +88,10 @@ func (t Tai) Parts() [3]string {
 	return [3]string{strconv.FormatInt(t.Sec, 10), ".", a}
 }
 
+func (i Tai) GetObjectIdString() string {
+	return i.String()
+}
+
 func (t Tai) String() (v string) {
 	a := strings.TrimRight(fmt.Sprintf("%018d", t.Asec), "0")
 

@@ -54,6 +54,10 @@ func (a *Config) ResetWith(_ Config) {
 	return
 }
 
+func (i Config) GetObjectIdString() string {
+	return i.String()
+}
+
 func (i Config) String() string {
 	return "konfig"
 }

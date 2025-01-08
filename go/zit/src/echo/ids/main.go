@@ -13,6 +13,7 @@ type Abbreviatable interface {
 }
 
 type IdWithParts interface {
+	GetObjectIdString() string
 	interfaces.Stringer
 	Parts() [3]string
 }

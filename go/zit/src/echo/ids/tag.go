@@ -105,6 +105,10 @@ func (a tag) Equals(b tag) bool {
 	return a == b
 }
 
+func (i Tag) GetObjectIdString() string {
+	return i.String()
+}
+
 func (e tag) String() string {
 	var sb strings.Builder
 

@@ -131,6 +131,10 @@ func (h ZettelId) GetTail() string {
 	return h.right
 }
 
+func (i ZettelId) GetObjectIdString() string {
+	return i.String()
+}
+
 func (h ZettelId) String() string {
 	v := fmt.Sprintf("%s/%s", h.left, h.right)
 	return v

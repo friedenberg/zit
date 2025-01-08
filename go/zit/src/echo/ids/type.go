@@ -76,6 +76,14 @@ func (t Type) IsToml() bool {
 	return strings.HasPrefix(t.value, "toml")
 }
 
+func (i Type) GetObjectIdString() string {
+	if i.IsEmpty() {
+		return ""
+	} else {
+		return "!" + i.String()
+	}
+}
+
 func (e Type) String() string {
 	return e.value
 }

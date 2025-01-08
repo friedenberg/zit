@@ -80,6 +80,10 @@ func (o RepoId) GetGenre() interfaces.Genre {
 	return genres.Repo
 }
 
+func (i RepoId) GetObjectIdString() string {
+	return i.String()
+}
+
 func (k RepoId) String() string {
 	return k.value
 }

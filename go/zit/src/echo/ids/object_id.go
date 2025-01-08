@@ -260,6 +260,10 @@ func (k2 *objectId) LenHeadAndTail() (int, int) {
 	return k2.left.Len(), k2.right.Len()
 }
 
+func (k2 *objectId) GetObjectIdString() string {
+	return k2.StringFromPtr()
+}
+
 func (k2 *objectId) String() string {
 	return k2.StringFromPtr()
 }
