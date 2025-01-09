@@ -172,7 +172,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if s.sunrise.Less(child.GetTai()) {
+	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
 		if err = s.GetConfig().AddTransacted(
 			child,
 			parent,
@@ -335,7 +335,10 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
+		sku.CommitOptions{
+			StoreOptions:       sku.GetStoreOptionsUpdate(),
+			DontAddMissingTags: true,
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -407,30 +410,20 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 	return
 }
 
-func (s *Store) addTagAndExpanded(
-	e ids.Tag,
+func (s *Store) addTags(
+	tags []ids.Tag,
 ) (err error) {
-	if e.IsVirtual() {
-		return
-	}
-
-	etikettenExpanded := ids.ExpandOneSlice(
-		e,
-		ids.MakeTag,
-		expansion.ExpanderRight,
-	)
-
 	s.tagLock.Lock()
 	defer s.tagLock.Unlock()
 
 	var oid ids.ObjectId
 
-	for _, e1 := range etikettenExpanded {
-		if e1.IsVirtual() {
+	for _, tag := range tags {
+		if tag.IsVirtual() {
 			continue
 		}
 
-		if err = oid.ResetWithIdLike(e1); err != nil {
+		if err = oid.ResetWithIdLike(tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -443,7 +436,7 @@ func (s *Store) addTagAndExpanded(
 
 		var k ids.ObjectId
 
-		if err = k.SetWithIdLike(e1); err != nil {
+		if err = k.SetWithIdLike(tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -470,11 +463,41 @@ func (s *Store) addMissingTypeAndTags(
 		}
 	}
 
+	if !co.DontAddMissingTags && m.GetGenre() == genres.Tag {
+		var tag ids.Tag
+
+		if err = tag.TodoSetFromObjectId(m.GetObjectId()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		tagsExpanded := ids.ExpandOneSlice(
+			tag,
+			ids.MakeTag,
+			expansion.ExpanderRight,
+		)
+
+		if len(tagsExpanded) > 0 {
+			tagsExpanded = tagsExpanded[:len(tagsExpanded)-1]
+		}
+
+		if err = s.addTags(tagsExpanded); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if !co.DontAddMissingTags {
 		es := quiter.SortedValues(m.Metadata.GetTags())
 
 		for _, e := range es {
-			if err = s.addTagAndExpanded(e); err != nil {
+			tagsExpanded := ids.ExpandOneSlice(
+				e,
+				ids.MakeTag,
+				expansion.ExpanderRight,
+			)
+
+			if err = s.addTags(tagsExpanded); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

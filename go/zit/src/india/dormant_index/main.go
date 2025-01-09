@@ -19,8 +19,8 @@ import (
 )
 
 type Index struct {
-	changes   []string
-	etiketten tag_paths.TagsWithParentsAndTypes
+	changes []string
+	tags    tag_paths.TagsWithParentsAndTypes
 }
 
 func (sch *Index) GetChanges() (out []string) {
@@ -37,7 +37,7 @@ func (sch *Index) HasChanges() bool {
 func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
-	if err = sch.etiketten.Add(e, nil); err != nil {
+	if err = sch.tags.Add(e, nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -48,7 +48,7 @@ func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
 func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
-	if err = sch.etiketten.Remove(e); err != nil {
+	if err = sch.tags.Remove(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,9 +57,9 @@ func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 }
 
 func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
-	for _, e := range sch.etiketten {
+	for _, e := range sch.tags {
 		if e.Len() == 0 {
-			panic("empty schlummernd etikett")
+			panic("empty dormant tag")
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
@@ -67,7 +67,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 
 		if ok {
 			ui.Log().Printf(
-				"Schlummernd true for %s: %s in %s",
+				"dormant true for %s: %s in %s",
 				sk,
 				e,
 				all[i],
@@ -78,7 +78,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 	}
 
 	ui.Log().Printf(
-		"Schlummernd false for %s",
+		"dormant false for %s",
 		sk,
 	)
 
@@ -118,16 +118,16 @@ func (sch *Index) Flush(
 	dryRun bool,
 ) (err error) {
 	if len(sch.changes) == 0 {
-		ui.Log().Print("no Schlummernd changes")
+		ui.Log().Print("no dormant changes")
 		return
 	}
 
 	if dryRun {
-		ui.Log().Print("no Schlummernd flush, dry run")
+		ui.Log().Print("no dormant flush, dry run")
 		return
 	}
 
-	if err = printerHeader("writing schlummernd"); err != nil {
+	if err = printerHeader("writing dormant"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -151,7 +151,7 @@ func (sch *Index) Flush(
 		return
 	}
 
-	if err = printerHeader("wrote schlummernd"); err != nil {
+	if err = printerHeader("wrote dormant"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -160,7 +160,7 @@ func (sch *Index) Flush(
 }
 
 func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
-	s.etiketten.Reset()
+	s.tags.Reset()
 	var count uint16
 
 	var n1 int64
@@ -177,7 +177,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		return
 	}
 
-	s.etiketten = slices.Grow(s.etiketten, int(count))
+	s.tags = slices.Grow(s.tags, int(count))
 
 	for i := uint16(0); i < count; i++ {
 		var l uint16
@@ -198,7 +198,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.etiketten = append(s.etiketten, tag_paths.TagWithParentsAndTypes{
+		s.tags = append(s.tags, tag_paths.TagWithParentsAndTypes{
 			Tag: cs,
 		})
 	}
@@ -207,7 +207,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 }
 
 func (s Index) WriteTo(w io.Writer) (n int64, err error) {
-	count := uint16(s.etiketten.Len())
+	count := uint16(s.tags.Len())
 
 	var n1 int
 	var n2 int64
@@ -219,7 +219,7 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	for _, e := range s.etiketten {
+	for _, e := range s.tags {
 		l := uint16(e.Len())
 
 		n1, err = ohio.WriteUint16(w, l)

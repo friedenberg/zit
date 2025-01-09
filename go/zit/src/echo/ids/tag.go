@@ -40,8 +40,6 @@ type tag struct {
 	value         string
 }
 
-type IndexedTag = IndexedLike
-
 func MustTagPtr(v string) (e *Tag) {
 	e = &Tag{}
 	e.init()

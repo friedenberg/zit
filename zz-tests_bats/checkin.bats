@@ -139,30 +139,32 @@ function checkin_simple_all { # @test
 	run_zit checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	run_zit show -format log :?z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
+		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
-		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
-		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
@@ -170,13 +172,14 @@ function checkin_simple_all_dry_run { # @test
 	run_zit checkin -dry-run .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	run_zit show -format log :z,e,t
@@ -233,6 +236,7 @@ function checkin_simple_etikett { # @test
 	# run_zit checkin zz-archive.e
 	assert_success
 	assert_output - <<-EOM
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
@@ -240,6 +244,7 @@ function checkin_simple_etikett { # @test
 	assert_success
 	assert_output - <<-EOM
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	run_zit show -format blob zz-archive?e
@@ -319,14 +324,15 @@ function checkin_dot_untracked_fs_blob() { # @test
 	run_zit checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
@@ -353,14 +359,15 @@ function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 	run_zit checkin -organize .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
-		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
@@ -410,11 +417,12 @@ function checkin_dot_organize_include_untracked_fs_blob() { # @test
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
+		[one/dos @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 

@@ -25,8 +25,6 @@ type tag2 struct {
 	value         *catgut.String
 }
 
-type IndexedTag2 = IndexedLike
-
 func (e *tag2) init() {
 	e.value = catgut.GetPool().Get()
 }

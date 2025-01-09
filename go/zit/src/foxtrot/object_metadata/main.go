@@ -24,7 +24,6 @@ type MetadataWriterTo interface {
 type Field = string_format_writer.Field
 
 type Metadata struct {
-	// StoreVersion values.Int
 	Description descriptions.Description
 	Tags        ids.TagMutableSet // public for gob, but should be private
 	Type        ids.Type

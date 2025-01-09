@@ -3,7 +3,6 @@ package config
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -33,7 +32,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 
 	var tag ids.Tag
 
-	// TODO better solution for "realizing" etiketten against Konfig.
+	// TODO better solution for "realizing" tags against Config.
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
 	mp.Cache.TagPaths.Reset()
@@ -148,43 +147,34 @@ func (k *Compiled) addImplicitTags(
 	mp := &sk.Metadata
 	ie := ids.MakeTagMutableSet()
 
-	addImpEts := func(e *ids.Tag) (err error) {
+	addImplicitTags := func(e *ids.Tag) (err error) {
 		p1 := tag_paths.MakePathWithType()
 		p1.Type = tag_paths.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
-		impl := k.getImplicitTags(e)
+		implicitTags := k.getImplicitTags(e)
 
-		if impl.Len() == 0 {
+		if implicitTags.Len() == 0 {
 			sk.Metadata.Cache.TagPaths.AddPathWithType(p1)
 			return
 		}
 
-		if err = impl.EachPtr(
-			quiter.MakeChain(
-				ie.AddPtr,
-				func(e1 *ids.Tag) (err error) {
-					p2 := p1.Clone()
-					p2.Add(catgut.MakeFromString(e1.String()))
-					sk.Metadata.Cache.TagPaths.AddPathWithType(p2)
-					return
-				},
-			),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		for e1 := range implicitTags.All() {
+			p2 := p1.Clone()
+			p2.Add(catgut.MakeFromString(e1.String()))
+			sk.Metadata.Cache.TagPaths.AddPathWithType(p2)
 		}
 
 		return
 	}
 
-	mp.GetTags().EachPtr(addImpEts)
+	mp.GetTags().EachPtr(addImplicitTags)
 
 	typKonfig := k.getApproximatedType(mp.GetType()).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetTags().EachPtr(ie.AddPtr)
-		typKonfig.GetTags().EachPtr(addImpEts)
+		typKonfig.GetTags().EachPtr(addImplicitTags)
 	}
 
 	mp.Cache.SetImplicitTags(ie)

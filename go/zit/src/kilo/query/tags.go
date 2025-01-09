@@ -60,7 +60,7 @@ func (sch *Tags) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 	for _, e := range sch.tags {
 		if e.Len() == 0 {
-			panic("empty schlummernd etikett")
+			panic("empty dormant tag")
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
@@ -68,7 +68,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 
 		if ok {
 			ui.Log().Printf(
-				"Schlummernd true for %s: %s in %s",
+				"dormant true for %s: %s in %s",
 				sk,
 				e,
 				all[i],
@@ -79,7 +79,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 	}
 
 	ui.Log().Printf(
-		"Schlummernd false for %s",
+		"dormant false for %s",
 		sk,
 	)
 
@@ -152,7 +152,7 @@ func (sch *Tags) Flush(
 		return
 	}
 
-	if err = printerHeader("wrote schlummernd"); err != nil {
+	if err = printerHeader("wrote dormant"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

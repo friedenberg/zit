@@ -24,7 +24,7 @@ func (u *Repo) Unlock() (err error) {
 
 	if u.storesInitialized {
 		ui.Log().Printf("konfig has changes: %t", u.GetConfig().HasChanges())
-		ui.Log().Printf("schlummernd has changes: %t", u.GetDormantIndex().HasChanges())
+		ui.Log().Printf("dormant has changes: %t", u.GetDormantIndex().HasChanges())
 
 		var changes []string
 		changes = append(changes, u.GetConfig().GetChanges()...)
@@ -55,7 +55,7 @@ func (u *Repo) Unlock() (err error) {
 			return
 		}
 
-		ui.Log().Print("will flush schlummernd")
+		ui.Log().Print("will flush dormant")
 		if err = u.dormantIndex.Flush(
 			u.GetRepoLayout(),
 			u.PrinterHeader(),

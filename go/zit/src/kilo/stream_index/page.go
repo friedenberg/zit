@@ -26,7 +26,6 @@ type Page struct {
 	PageId
 	sunrise ids.Tai
 	*probe_index
-	// All, Schwanzen  Page
 	added, addedLatest *sku.TransactedHeap
 	hasChanges         bool
 	directoryLayout    repo_layout.Layout

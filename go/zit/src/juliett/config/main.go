@@ -61,6 +61,8 @@ func (a *Compiled) Reset() error {
 
 	sku.TransactedResetter.Reset(&a.Sku)
 
+	a.SetNeedsRecompile("reset")
+
 	return nil
 }
 

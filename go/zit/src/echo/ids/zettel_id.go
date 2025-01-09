@@ -61,7 +61,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 	switch {
 	case head == "":
 		err = errors.Errorf(
-			"kopf was empty: {Kopf: %q, Schwanz: %q}",
+			"head was empty: {head: %q, tail: %q}",
 			head,
 			tail,
 		)
@@ -69,7 +69,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 
 	case tail == "":
 		err = errors.Errorf(
-			"schwanz was empty: {Kopf: %q, Schwanz: %q}",
+			"tail was empty: {head: %q, tail: %q}",
 			head,
 			tail,
 		)

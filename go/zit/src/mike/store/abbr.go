@@ -64,8 +64,8 @@ func newIndexAbbr(
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
-				Kopfen:    tridex.Make(),
-				Schwanzen: tridex.Make(),
+				Heads:    tridex.Make(),
+				Tails: tridex.Make(),
 			},
 		},
 	}
@@ -186,8 +186,8 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 			return
 		}
 
-		i.indexAbbrEncodableTridexes.ZettelId.Kopfen.Add(h.GetHead())
-		i.indexAbbrEncodableTridexes.ZettelId.Schwanzen.Add(h.GetTail())
+		i.indexAbbrEncodableTridexes.ZettelId.Heads.Add(h.GetHead())
+		i.indexAbbrEncodableTridexes.ZettelId.Tails.Add(h.GetTail())
 
 	case genres.Type, genres.Tag, genres.Config, genres.InventoryList:
 		return

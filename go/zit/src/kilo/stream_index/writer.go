@@ -55,7 +55,7 @@ func (pw *writer) Flush() (err error) {
 
 	ui.Log().Print("changesAreHistorical", pw.changesAreHistorical)
 	ui.Log().Print("added", pw.added.Len())
-	ui.Log().Print("addedSchwanz", pw.addedLatest.Len())
+	ui.Log().Print("addedtail", pw.addedLatest.Len())
 
 	if pw.added.Len() == 0 && !pw.changesAreHistorical {
 		if pw.File, err = files.OpenReadWrite(path); err != nil {
@@ -140,7 +140,7 @@ func (pw *writer) updateSigilWithLatest(st skuWithRangeAndSigil) (err error) {
 }
 
 func (pw *writer) flushJustLatest() (err error) {
-	ui.Log().Printf("flushing just schwanz: %s", pw.Path())
+	ui.Log().Printf("flushing just tail: %s", pw.Path())
 
 	if err = pw.copyJustHistoryFrom(
 		&pw.Reader,

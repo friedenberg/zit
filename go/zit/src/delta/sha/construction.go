@@ -46,25 +46,25 @@ func MakeSha(v string) (s *Sha, err error) {
 }
 
 func MakeShaFromPath(p string) (s *Sha, err error) {
-	schwanz := filepath.Base(p)
-	kopf := filepath.Base(filepath.Dir(p))
+	tail := filepath.Base(p)
+	head := filepath.Base(filepath.Dir(p))
 
 	switch {
-	case schwanz == string(filepath.Separator) || kopf == string(filepath.Separator):
+	case tail == string(filepath.Separator) || head == string(filepath.Separator):
 		fallthrough
 
-	case schwanz == "." || kopf == ".":
+	case tail == "." || head == ".":
 		err = errors.Errorf(
-			"path cannot be turned into a kopf/schwanz pair: '%s/%s'",
-			kopf,
-			schwanz,
+			"path cannot be turned into a head/tail pair: '%s/%s'",
+			head,
+			tail,
 		)
 
 		return
 	}
 
-	if s, err = MakeSha(fmt.Sprintf("%s%s", kopf, schwanz)); err != nil {
-		err = errors.Wrapf(err, "kopf: %q, schwanz: %q", kopf, schwanz)
+	if s, err = MakeSha(fmt.Sprintf("%s%s", head, tail)); err != nil {
+		err = errors.Wrapf(err, "head: %q, tail: %q", head, tail)
 		return
 	}
 

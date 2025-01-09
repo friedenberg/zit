@@ -13,11 +13,6 @@ type TypedId interface {
 	interfaces.Setter
 }
 
-// func Path(i IdMitKorper, pc ...string) string {
-// 	pc = append(pc, i.Kopf(), i.Schwanz())
-// 	return path.Join(pc...)
-// }
-
 func Path(i interfaces.StringerWithHeadAndTail, pc ...string) string {
 	pc = append(pc, i.GetHead(), i.GetTail())
 	return path.Join(pc...)

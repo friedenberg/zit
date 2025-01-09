@@ -44,14 +44,14 @@ func (ih indexNoAbbr[V, VPtr]) Abbreviate(h V) (v string, err error) {
 }
 
 type indexZettelId struct {
-	readFunc  func() error
-	Kopfen    interfaces.MutableTridex
-	Schwanzen interfaces.MutableTridex
+	readFunc func() error
+	Heads    interfaces.MutableTridex
+	Tails    interfaces.MutableTridex
 }
 
 func (ih *indexZettelId) Add(h *ids.ZettelId) (err error) {
-	ih.Kopfen.Add(h.GetHead())
-	ih.Schwanzen.Add(h.GetTail())
+	ih.Heads.Add(h.GetHead())
+	ih.Tails.Add(h.GetTail())
 	return
 }
 
@@ -61,12 +61,12 @@ func (ih *indexZettelId) Exists(parts [3]string) (err error) {
 		return
 	}
 
-	if !ih.Kopfen.ContainsExpansion(parts[0]) {
+	if !ih.Heads.ContainsExpansion(parts[0]) {
 		err = collections.MakeErrNotFoundString(parts[0])
 		return
 	}
 
-	if !ih.Schwanzen.ContainsExpansion(parts[2]) {
+	if !ih.Tails.ContainsExpansion(parts[2]) {
 		err = collections.MakeErrNotFoundString(parts[2])
 		return
 	}
@@ -116,10 +116,10 @@ func (ih *indexZettelId) Expand(
 		return
 	}
 
-	kopf := ih.Kopfen.Expand(hAbbr.GetHead())
-	schwanz := ih.Schwanzen.Expand(hAbbr.GetTail())
+	head := ih.Heads.Expand(hAbbr.GetHead())
+	tail := ih.Tails.Expand(hAbbr.GetTail())
 
-	if h, err = ids.MakeZettelIdFromHeadAndTail(kopf, schwanz); err != nil {
+	if h, err = ids.MakeZettelIdFromHeadAndTail(head, tail); err != nil {
 		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
 		return
 	}
@@ -155,8 +155,8 @@ func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) 
 		return
 	}
 
-	head := ih.Kopfen.Abbreviate(h.GetHead())
-	tail := ih.Schwanzen.Abbreviate(h.GetTail())
+	head := ih.Heads.Abbreviate(h.GetHead())
+	tail := ih.Tails.Abbreviate(h.GetTail())
 
 	if head == "" {
 		v = h.String()
