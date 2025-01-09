@@ -129,41 +129,58 @@ func (k *Compiled) GetTypeExtension(v string) string {
 }
 
 func (k *Compiled) AddTransacted(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
+	child *sku.Transacted,
+	parent *sku.Transacted,
 	ak *blob_store.VersionedStores,
 ) (err error) {
 	didChange := false
 
-	g := kinder.ObjectId.GetGenre()
+	g := child.ObjectId.GetGenre()
 
 	switch g {
 	case genres.Type:
-		if didChange, err = k.addType(kinder); err != nil {
+		if didChange, err = k.addType(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if didChange {
-			k.SetNeedsRecompile(fmt.Sprintf("modified type: %s", kinder))
+			k.SetNeedsRecompile(fmt.Sprintf("modified type: %s", child))
 		}
 
 		return
 
 	case genres.Tag:
-		if didChange, err = k.addTag(kinder, mutter); err != nil {
+		if didChange, err = k.addTag(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
+		var tag ids.Tag
+
+		if err = tag.TodoSetFromObjectId(child.GetObjectId()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if child.Metadata.GetTags().Len() > 0 {
+			k.SetNeedsRecompile(
+				fmt.Sprintf(
+					"tag with tags added: %q -> %q",
+					tag,
+					quiter.SortedValues(child.Metadata.GetTags()),
+				),
+			)
+		}
+
 	case genres.Repo:
-		if didChange, err = k.addRepo(kinder); err != nil {
+		if didChange, err = k.addRepo(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Config:
-		if didChange, err = k.setTransacted(kinder, ak); err != nil {
+		if didChange, err = k.setTransacted(child, ak); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -177,15 +194,15 @@ func (k *Compiled) AddTransacted(
 		return
 	}
 
-	if mutter == nil {
+	if parent == nil {
 		return
 	}
 
-	if quiter.SetEquals(kinder.Metadata.Tags, mutter.Metadata.Tags) {
+	if quiter.SetEquals(child.Metadata.Tags, parent.Metadata.Tags) {
 		return
 	}
 
-	k.SetNeedsRecompile(fmt.Sprintf("modified: %s", kinder))
+	k.SetNeedsRecompile(fmt.Sprintf("modified: %s", child))
 
 	return
 }

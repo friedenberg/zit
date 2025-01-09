@@ -1,8 +1,6 @@
 package store
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
@@ -513,16 +511,6 @@ func (s *Store) addMissingTypeAndTags(
 			if err = s.addTags(tagsExpanded); err != nil {
 				err = errors.Wrap(err)
 				return
-			}
-
-			if len(es) > 0 {
-				s.config.SetNeedsRecompile(
-					fmt.Sprintf(
-						"tag with tags added: %q -> %q",
-						tag,
-						es,
-					),
-				)
 			}
 		}
 
