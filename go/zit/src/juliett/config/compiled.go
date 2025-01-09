@@ -1,14 +1,27 @@
 package config
 
 import (
+	"fmt"
 	"sync"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
+)
+
+type (
+	immutable_config_private = immutable_config.Config
+	mutable_config_private   = mutable_config_blobs.Blob
+	cli                      = config_mutable_cli.Config
+	ApproximatedType         = blob_store.ApproximatedType
 )
 
 type compiled struct {
@@ -35,14 +48,99 @@ type compiled struct {
 	Repos sku.TransactedMutableSet
 }
 
-func (kc *compiled) IsInlineType(k ids.Type) (isInline bool) {
-	todo.Change("fix this horrible hack")
-	if k.IsEmpty() {
-		return true
+func (k *compiled) setTransacted(
+	kt1 *sku.Transacted,
+	blobStore *blob_store.VersionedStores,
+) (didChange bool, err error) {
+	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
+		return
 	}
 
-	isInline = kc.InlineTypes.ContainsKey(k.String()) ||
-		builtin_types.IsBuiltin(k)
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	didChange = true
+
+	sku.Resetter.ResetWith(&k.Sku, kt1)
+
+	k.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &k.Sku))
+
+	if err = k.loadMutableConfigBlob(
+		blobStore,
+		k.Sku.GetType(),
+		k.Sku.GetBlobSha(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k *compiled) loadMutableConfigBlob(
+	blobStore *blob_store.VersionedStores,
+	mutableConfigType ids.Type,
+	blobSha interfaces.Sha,
+) (err error) {
+	// k.lock.Lock()
+	// defer k.lock.Unlock()
+
+	kag := blobStore.GetConfig()
+
+	if k.mutable_config_private, _, err = kag.ParseTypedBlob(
+		mutableConfigType,
+		blobSha,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k *compiled) addRepo(
+	c *sku.Transacted,
+) (didChange bool, err error) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	b := sku.GetTransactedPool().Get()
+
+	sku.Resetter.ResetWith(b, c)
+
+	if didChange, err = quiter.AddOrReplaceIfGreater(
+		k.Repos,
+		b,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k *compiled) addType(
+	b1 *sku.Transacted,
+) (didChange bool, err error) {
+	if err = genres.Type.AssertGenre(b1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	b := sku.GetTransactedPool().Get()
+
+	sku.Resetter.ResetWith(b, b1)
+
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	if didChange, err = quiter.AddOrReplaceIfGreater(
+		k.Types,
+		b,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
