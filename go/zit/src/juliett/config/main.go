@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -24,11 +23,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
-var typeExpander expansion.Expander
-
 func init() {
-	typeExpander = expansion.MakeExpanderRight(`-`)
-
 	gob.Register(
 		collections_value.MakeMutableValueSet[values.String](
 			nil,
@@ -81,30 +76,6 @@ func (a *Compiled) GetMutableConfig() mutable_config_blobs.Blob {
 }
 
 type cli = config_mutable_cli.Config
-
-type compiled struct {
-	lock sync.Locker
-
-	changes []string
-
-	Sku sku.Transacted
-
-	mutable_config_private
-
-	DefaultTags  ids.TagSet
-	Tags         interfaces.MutableSetLike[*tag]
-	ImplicitTags implicitTagMap
-
-	// Typen
-	ExtensionsToTypes map[string]string
-	TypesToExtensions map[string]string
-	DefaultType       sku.Transacted // deprecated
-	Types             sku.TransactedMutableSet
-	InlineTypes       interfaces.SetLike[values.String]
-
-	// Kasten
-	Repos sku.TransactedMutableSet
-}
 
 func (c *Compiled) Initialize(
 	dirLayout repo_layout.Layout,

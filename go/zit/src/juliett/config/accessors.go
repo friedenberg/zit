@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -120,7 +121,7 @@ func (c *compiled) getSortedTypesExpanded(
 
 	sa := quiter.MakeFuncSetString(expandedMaybe)
 
-	typeExpander.Expand(sa, v)
+	expansion.ExpanderRight.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
@@ -161,7 +162,7 @@ func (c *compiled) getSortedTagsExpanded(
 	sa := quiter.MakeFuncSetString(
 		expandedMaybe,
 	)
-	typeExpander.Expand(sa, v)
+	expansion.ExpanderRight.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
