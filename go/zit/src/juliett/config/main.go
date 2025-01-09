@@ -45,7 +45,7 @@ type Compiled struct {
 	dormant *dormant_index.Index
 }
 
-func (a *Compiled) Reset() error {
+func (a *compiled) Reset() error {
 	a.mutable_config_private = mutable_config_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
@@ -60,8 +60,6 @@ func (a *Compiled) Reset() error {
 	a.Types = sku.MakeTransactedMutableSet()
 
 	sku.TransactedResetter.Reset(&a.Sku)
-
-	a.SetNeedsRecompile("reset")
 
 	return nil
 }
