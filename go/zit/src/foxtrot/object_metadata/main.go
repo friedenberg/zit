@@ -1,7 +1,6 @@
 package object_metadata
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"strings"
@@ -9,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flags"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -58,7 +57,7 @@ func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 	)
 
 	// TODO add support for tag_paths
-	fes := flag2.Make(
+	fes := flag.Make(
 		flag_policy.FlagPolicyAppend,
 		func() string {
 			return m.Cache.TagPaths.String()

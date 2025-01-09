@@ -1,9 +1,13 @@
-package flags
+package flag
 
 import (
+	"flag"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 )
+
+type FlagSet = flag.FlagSet
 
 func Make(
 	fp flag_policy.FlagPolicy,
