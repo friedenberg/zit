@@ -353,7 +353,9 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	defer GetCheckedOutPool().Put(replacement)
 
-	if !oldFDs.Object.IsEmpty() && !s.config.IsDryRun() {
+	if !oldFDs.Object.IsEmpty() &&
+		!newFDs.Object.IsEmpty() &&
+		!s.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Object.GetPath(),
 			oldFDs.Object.GetPath(),
@@ -363,12 +365,20 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		}
 	}
 
-	if !oldFDs.Blob.IsEmpty() && !s.config.IsDryRun() {
+	if !oldFDs.Blob.IsEmpty() &&
+		!newFDs.Blob.IsEmpty() &&
+		!s.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Blob.GetPath(),
 			oldFDs.Blob.GetPath(),
 		); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(
+				err,
+				"New: %q, Old: %q",
+				newFDs.Blob.GetPath(),
+				oldFDs.Blob.GetPath(),
+			)
+
 			return
 		}
 	}
