@@ -30,7 +30,7 @@ const (
 	CompressionTypeZlib  = CompressionType("zlib")
 	CompressionTypeZstd  = CompressionType("zstd")
 
-	CompressionTypeDefault = CompressionTypeGzip
+	CompressionTypeDefault = CompressionTypeZstd
 )
 
 type CompressionType string

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
-var CurrentStoreVersion = StoreVersion(values.Int(7))
+var CurrentStoreVersion = StoreVersion(values.Int(8))
 
 func MakeStoreVersion(sv interfaces.StoreVersion) StoreVersion {
 	return StoreVersion(values.Int(sv.GetInt()))

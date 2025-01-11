@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"os"
 
@@ -19,8 +20,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type config struct {
-	tipe ids.Type
+type Config struct {
+	ids.Type
 	immutable_config.Config
 	storeVersion      immutable_config.StoreVersion
 	compressionType   immutable_config.CompressionType
@@ -49,8 +50,8 @@ func (s *Layout) loadImmutableConfig() (err error) {
 	}
 
 	thr := triple_hyphen_io.Reader{
-		Metadata: metadataReader{config: &s.config},
-		Blob:     &s.config,
+		Metadata: metadata{Config: &s.Config},
+		Blob:     &s.Config,
 	}
 
 	if _, err = thr.ReadFrom(r); err != nil {
@@ -61,11 +62,11 @@ func (s *Layout) loadImmutableConfig() (err error) {
 	return
 }
 
-type metadataReader struct {
-	*config
+type metadata struct {
+	*Config
 }
 
-func (m metadataReader) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (m metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	if n, err = format.ReadLines(
@@ -73,7 +74,7 @@ func (m metadataReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": m.tipe.Set,
+					"!": m.Type.Set,
 				},
 			),
 		),
@@ -85,8 +86,21 @@ func (m metadataReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (s *config) ReadFrom(r io.Reader) (n int64, err error) {
-	switch s.tipe.String() {
+func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
+	var n1 int
+	n1, err = fmt.Fprintf(w, "! %s\n", m.Type.StringSansOp())
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Config) ReadFrom(r io.Reader) (n int64, err error) {
+	switch s.Type.String() {
 	case builtin_types.ImmutableConfigV1:
 		s.Config = &immutable_config.TomlV1{}
 		td := toml.NewDecoder(r)
@@ -115,13 +129,47 @@ func (s *config) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 	default:
-		err = errors.Errorf("unsupported config type: %q", s.tipe)
+		err = errors.Errorf("unsupported config type: %q", s.Type)
 		return
 	}
 
 	s.storeVersion = immutable_config.MakeStoreVersion(s.GetStoreVersion())
 	s.compressionType = s.GetCompressionType()
 	s.lockInternalFiles = s.GetLockInternalFiles()
+
+	return
+}
+
+func (s *Config) WriteTo(w io.Writer) (n int64, err error) {
+	switch s.Type.String() {
+	case builtin_types.ImmutableConfigV1:
+		te := toml.NewEncoder(w)
+
+		if err = te.Encode(s.Config); err != nil {
+			if err == io.EOF {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	case "":
+		dec := gob.NewEncoder(w)
+
+		if err = dec.Encode(s.Config); err != nil {
+			if err == io.EOF {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	default:
+		err = errors.Errorf("unsupported config type: %q", s.Type)
+		return
+	}
 
 	return
 }

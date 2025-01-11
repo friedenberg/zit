@@ -59,9 +59,11 @@ func init() {
 	register(InventoryListTypeV0, genres.InventoryList, false)
 	register(InventoryListTypeV1, genres.InventoryList, true)
 
-	register(ZettelIdListTypeV0, genres.None, false)
-
 	register(RepoTypeLocalRelay, genres.Repo, false)
+
+	register(ImmutableConfigV1, genres.None, false)
+
+	register(ZettelIdListTypeV0, genres.None, false)
 }
 
 func register(tipeString string, g genres.Genre, isDefault bool) {

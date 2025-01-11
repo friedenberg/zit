@@ -24,7 +24,7 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = mr.Blob.ReadFrom(r)
+	n1, err = mr.Blob.ReadFrom(bufio.NewReader(r))
 	n += n1
 
 	if err != nil {

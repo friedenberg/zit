@@ -1,0 +1,9 @@
+---
+! toml-config-immutable-v1
+---
+
+store-version = 8
+repo-type = 0
+recipients = []
+compression-type = 'zstd'
+lock-internal-files = false

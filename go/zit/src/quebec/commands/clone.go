@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -25,7 +24,6 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
 				BigBang: repo_layout.BigBang{
-					Config:             immutable_config.Default(),
 					ExcludeDefaultType: true,
 				},
 			}

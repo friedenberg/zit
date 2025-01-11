@@ -14,28 +14,38 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
 type BigBang struct {
+	ids.Type
+	Config immutable_config.Latest
+
 	AgeIdentity          age.Identity
 	Yin                  string
 	Yang                 string
-	Config               immutable_config.Latest
 	ExcludeDefaultType   bool
 	ExcludeDefaultConfig bool
 	OverrideXDGWithCwd   bool
 }
 
-func (e *BigBang) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&e.AgeIdentity, "age", "")
-	f.BoolVar(&e.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
-	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
-	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
+func (bb *BigBang) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&bb.AgeIdentity, "age", "")
+	f.BoolVar(&bb.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
+	f.StringVar(&bb.Yin, "yin", "", "File containing list of zettel id left parts")
+	f.StringVar(&bb.Yang, "yang", "", "File containing list of zettel id right parts")
 
-	e.Config.SetFlagSet(f)
+	bb.Type = builtin_types.GetOrPanic(builtin_types.ImmutableConfigV1).Type
+	bb.Config = immutable_config.Default()
+	bb.Config.SetFlagSet(f)
 }
 
-func (s Layout) Genesis(bb BigBang) {
+func (s *Layout) Genesis(bb BigBang) {
+	s.Config.Type = bb.Type
+	s.Config.Config = bb.Config
+
 	if err := s.MakeDir(
 		s.DirObjectId(),
 		s.DirCache(),
@@ -84,7 +94,31 @@ func (s Layout) Genesis(bb BigBang) {
 			s.CancelWithError(err)
 		}
 
-		writeFile(s.FileConfigPermanent(), bb.Config)
+		{
+			var f *os.File
+
+			{
+				var err error
+
+				if f, err = files.CreateExclusiveWriteOnly(
+					s.FileConfigPermanent(),
+				); err != nil {
+					s.CancelWithError(err)
+				}
+
+				defer s.MustClose(f)
+			}
+
+			thw := triple_hyphen_io.Writer{
+				Metadata: metadata{Config: &s.Config},
+				Blob:     &s.Config,
+			}
+
+			if _, err := thw.WriteTo(f); err != nil {
+				s.CancelWithError(err)
+			}
+		}
+
 		writeFile(s.FileConfigMutable(), "")
 		writeFile(s.FileCacheDormant(), "")
 	}

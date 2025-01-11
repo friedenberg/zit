@@ -21,7 +21,7 @@ type Getter interface {
 type Layout struct {
 	*env.Env
 
-	config
+	Config
 
 	basePath              string
 	readOnlyBlobStorePath string
@@ -157,7 +157,7 @@ func Make(
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
 		age:            s.age,
-		config:         s.config,
+		Config:         s.Config,
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetDirLayout().TempLocal,
 	}
@@ -175,12 +175,12 @@ func (a Layout) SansObjectAge() (b Layout) {
 func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
 	b.compressionType = immutable_config.CompressionTypeNone
-	b.ObjectStore.config.compressionType = b.config.GetCompressionType()
+	b.ObjectStore.Config.compressionType = b.Config.GetCompressionType()
 	return
 }
 
 func (s Layout) GetConfig() immutable_config.Config {
-	return s.config.Config
+	return s.Config.Config
 }
 
 func (s Layout) GetLockSmith() interfaces.LockSmith {

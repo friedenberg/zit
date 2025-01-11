@@ -10,7 +10,7 @@ import (
 )
 
 type ObjectStore struct {
-	config
+	Config
 	basePath string
 	age      *age.Age
 	interfaces.DirectoryPaths

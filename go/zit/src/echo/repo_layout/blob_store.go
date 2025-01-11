@@ -18,7 +18,7 @@ import (
 )
 
 type blobStore struct {
-	config
+	Config
 	basePath string
 	tempPath string
 	age      *age.Age
@@ -28,7 +28,7 @@ type blobStore struct {
 func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {
 	bs = blobStore{
 		age:         s.age,
-		config:      s.config,
+		Config:      s.Config,
 		TemporaryFS: s.TempLocal,
 	}
 
@@ -48,7 +48,7 @@ func MakeBlobStore(
 	return blobStore{
 		basePath: basePath,
 		age:      age,
-		config: config{
+		Config: Config{
 			compressionType: compressionType,
 		},
 	}
@@ -132,7 +132,7 @@ func (s blobStore) blobReaderFrom(
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
-		CompressionType: s.config.compressionType,
+		CompressionType: s.Config.compressionType,
 	}
 
 	if r, err = NewFileReader(o); err != nil {
