@@ -1,7 +1,6 @@
 package repo_layout
 
 import (
-	"encoding/gob"
 	"os"
 	"path/filepath"
 
@@ -182,40 +181,6 @@ func (a Layout) SansObjectCompression() (b Layout) {
 
 func (s Layout) GetConfig() immutable_config.Config {
 	return s.config.Config
-}
-
-func (s *Layout) loadImmutableConfig() (err error) {
-	var config immutable_config.Latest
-	s.config.Config = &config
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(s.FileConfigPermanent()); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	dec := gob.NewDecoder(f)
-
-	// TODO use text object format
-
-	if err = dec.Decode(&config); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	s.config.storeVersion = immutable_config.MakeStoreVersion(config.GetStoreVersion())
-	s.config.compressionType = config.GetCompressionType()
-	s.config.lockInternalFiles = config.GetLockInternalFiles()
-
-	return
 }
 
 func (s Layout) GetLockSmith() interfaces.LockSmith {

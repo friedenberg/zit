@@ -123,19 +123,7 @@ LINE_READ_LOOP:
 }
 
 func (mr *Reader) ReadBlobFrom(r io.Reader) (n int64, err error) {
-	br := bufio.NewReader(r)
-	blob := ohio.MakePipedReaderFrom(mr.Blob)
-
-	var n1 int64
-	n1, err = br.WriteTo(blob)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrapf(err, "blob write failed")
-		return
-	}
-
-	if _, err = blob.Close(); err != nil {
+	if n, err = mr.Blob.ReadFrom(r); err != nil {
 		err = errors.Wrapf(err, "blob read failed")
 		return
 	}
