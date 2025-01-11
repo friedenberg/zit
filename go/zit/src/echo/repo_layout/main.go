@@ -22,13 +22,12 @@ type Getter interface {
 type Layout struct {
 	*env.Env
 
-	sv immutable_config.StoreVersion
+	config
 
 	basePath              string
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
 	age                   *age.Age
-	immutable_config      immutable_config.Config
 
 	interfaces.DirectoryPaths
 
@@ -59,7 +58,7 @@ func Make(
 	s.basePath = o.BasePath
 	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
 
-	if err = s.sv.ReadFromFile(
+	if err = s.storeVersion.ReadFromFile(
 		s.DataFileStoreVersion(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -135,7 +134,7 @@ func Make(
 		}
 	}
 
-	if err = s.loadKonfigAngeboren(); err != nil {
+	if err = s.loadImmutableConfig(); err != nil {
 		errors.Wrap(err)
 		return
 	}
@@ -157,11 +156,11 @@ func Make(
 	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
-		basePath:         s.basePath,
-		age:              s.age,
-		immutable_config: s.immutable_config,
-		DirectoryPaths:   s.DirectoryPaths,
-		TemporaryFS:      s.GetDirLayout().TempLocal,
+		basePath:       s.basePath,
+		age:            s.age,
+		config:         s.config,
+		DirectoryPaths: s.DirectoryPaths,
+		TemporaryFS:    s.GetDirLayout().TempLocal,
 	}
 
 	return
@@ -176,16 +175,19 @@ func (a Layout) SansObjectAge() (b Layout) {
 
 func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
-	b.immutable_config.CompressionType = immutable_config.CompressionTypeNone
-	b.ObjectStore.immutable_config.CompressionType = b.immutable_config.CompressionType
+	b.compressionType = immutable_config.CompressionTypeNone
+	b.ObjectStore.config.compressionType = b.config.GetCompressionType()
 	return
 }
 
 func (s Layout) GetConfig() immutable_config.Config {
-	return s.immutable_config
+	return s.config.Config
 }
 
-func (s *Layout) loadKonfigAngeboren() (err error) {
+func (s *Layout) loadImmutableConfig() (err error) {
+	var config immutable_config.Latest
+	s.config.Config = &config
+
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(s.FileConfigPermanent()); err != nil {
@@ -202,10 +204,16 @@ func (s *Layout) loadKonfigAngeboren() (err error) {
 
 	dec := gob.NewDecoder(f)
 
-	if err = dec.Decode(&s.immutable_config); err != nil {
+	// TODO use text object format
+
+	if err = dec.Decode(&config); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	s.config.storeVersion = immutable_config.MakeStoreVersion(config.GetStoreVersion())
+	s.config.compressionType = config.GetCompressionType()
+	s.config.lockInternalFiles = config.GetLockInternalFiles()
 
 	return
 }
@@ -256,5 +264,5 @@ func (h Layout) DataFileStoreVersion() string {
 }
 
 func (h Layout) GetStoreVersion() immutable_config.StoreVersion {
-	return h.sv
+	return h.storeVersion
 }

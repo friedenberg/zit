@@ -6,7 +6,7 @@ func (s Layout) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
-		CompressionType: s.immutable_config.CompressionType,
+		CompressionType: s.config.compressionType,
 	}
 
 	return NewFileReader(o)
@@ -20,7 +20,7 @@ func (s Layout) WriteCloserCache(
 			Age:             s.age,
 			FinalPath:       p,
 			LockFile:        false,
-			CompressionType: s.immutable_config.CompressionType,
+			CompressionType: s.config.compressionType,
 			TemporaryFS:     s.TempLocal,
 		},
 	)

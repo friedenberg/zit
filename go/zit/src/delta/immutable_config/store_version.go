@@ -13,6 +13,10 @@ import (
 
 var CurrentStoreVersion = StoreVersion(values.Int(7))
 
+func MakeStoreVersion(sv interfaces.StoreVersion) StoreVersion {
+	return StoreVersion(values.Int(sv.GetInt()))
+}
+
 type StoreVersion values.Int
 
 func (a StoreVersion) Less(b interfaces.StoreVersion) bool {

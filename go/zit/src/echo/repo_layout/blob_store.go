@@ -18,18 +18,18 @@ import (
 )
 
 type blobStore struct {
-	basePath         string
-	tempPath         string
-	age              *age.Age
-	immutable_config immutable_config.Config
+	config
+	basePath string
+	tempPath string
+	age      *age.Age
 	dir_layout.TemporaryFS
 }
 
 func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {
 	bs = blobStore{
-		age:              s.age,
-		immutable_config: s.immutable_config,
-		TemporaryFS:      s.TempLocal,
+		age:         s.age,
+		config:      s.config,
+		TemporaryFS: s.TempLocal,
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
@@ -48,8 +48,8 @@ func MakeBlobStore(
 	return blobStore{
 		basePath: basePath,
 		age:      age,
-		immutable_config: immutable_config.Config{
-			CompressionType: compressionType,
+		config: config{
+			compressionType: compressionType,
 		},
 	}
 }
@@ -105,8 +105,8 @@ func (s blobStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
 		Age:                      s.age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 s.immutable_config.LockInternalFiles,
-		CompressionType:          s.immutable_config.CompressionType,
+		LockFile:                 s.lockInternalFiles,
+		CompressionType:          s.compressionType,
 		TemporaryFS:              s.TemporaryFS,
 	}
 
@@ -132,7 +132,7 @@ func (s blobStore) blobReaderFrom(
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
-		CompressionType: s.immutable_config.CompressionType,
+		CompressionType: s.config.compressionType,
 	}
 
 	if r, err = NewFileReader(o); err != nil {

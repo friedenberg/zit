@@ -168,7 +168,7 @@ func (repo *Repo) initialize(options Options) (err error) {
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(repo.GetConfig().GetStoreVersion())
+	objectFormat := object_inventory_format.FormatForVersion(repo.layout.GetStoreVersion())
 	boxFormatArchive := repo.MakeBoxArchive(true)
 
 	repo.blobStore = blob_store.Make(

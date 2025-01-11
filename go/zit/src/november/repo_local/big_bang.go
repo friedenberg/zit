@@ -29,10 +29,10 @@ import (
 
 // Include repo type
 type BigBang struct {
-	AgeIdentity age.Identity
-	Yin         string
-	Yang        string
-	immutable_config.Config
+	AgeIdentity          age.Identity
+	Yin                  string
+	Yang                 string
+	Config               immutable_config.Latest
 	ExcludeDefaultType   bool
 	ExcludeDefaultConfig bool
 	OverrideXDGWithCwd   bool
