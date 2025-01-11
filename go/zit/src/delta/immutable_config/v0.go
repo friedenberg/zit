@@ -4,17 +4,14 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 )
 
 // TODO Split into repo and blob store configs
-// TODO make toml-compatible
 type V0 struct {
-	StoreVersion      StoreVersion    `toml:"store-version"`
-	RepoType          repo_type.Type  `toml:"repo-type"`
-	Recipients        []string        `toml:"recipients"`
-	CompressionType   CompressionType `toml:"compression-type"`
-	LockInternalFiles bool            `toml:"lock-internal-files"`
+	StoreVersion      StoreVersion
+	Recipients        []string
+	CompressionType   CompressionType
+	LockInternalFiles bool
 }
 
 func (k *V0) SetFlagSet(f *flag.FlagSet) {

@@ -1,7 +1,6 @@
 package ids
 
 import (
-	"io"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -144,9 +143,5 @@ func (t *Type) UnmarshalBinary(text []byte) (err error) {
 		return
 	}
 
-	return
-}
-
-func (t *Type) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
