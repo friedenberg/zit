@@ -57,7 +57,7 @@ func init() {
 				"a script to run for each file to transform it the standard zettel format",
 			)
 
-			c.AddToFlagSet(f)
+			c.Metadata.SetFlagSet(f)
 			c.Checkout.SetFlagSet(f)
 
 			return c

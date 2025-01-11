@@ -37,7 +37,7 @@ func init() {
 			c.RemoteBlobStore.SetFlagSet(f)
 			f.BoolVar(&c.PrintCopies, "print-copies", true, "output when blobs are copied")
 
-			c.Proto.AddToFlagSet(f)
+			c.Proto.SetFlagSet(f)
 
 			return c
 		},

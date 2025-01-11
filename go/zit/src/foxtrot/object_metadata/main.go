@@ -48,7 +48,7 @@ func (m *Metadata) Mutter() *sha.Sha {
 	return &m.ParentMetadataObjectIdParent
 }
 
-func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
+func (m *Metadata) SetFlagSet(f *flag.FlagSet) {
 	f.Var(
 		&m.Description,
 		"description",

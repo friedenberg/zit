@@ -40,7 +40,7 @@ func init() {
 			"checkout each Blob and run a utility",
 		)
 
-		c.Proto.AddToFlagSet(f)
+		c.Proto.SetFlagSet(f)
 		c.Checkout.SetFlagSet(f)
 
 		return c

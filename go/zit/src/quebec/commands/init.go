@@ -24,7 +24,7 @@ func init() {
 				},
 			}
 
-			c.BigBang.AddToFlagSet(f)
+			c.BigBang.SetFlagSet(f)
 
 			return c
 		},

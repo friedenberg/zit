@@ -25,7 +25,7 @@ func init() {
 				Flags: organize_text.MakeFlags(),
 			}
 
-			c.Flags.AddToFlagSet(f)
+			c.Flags.SetFlagSet(f)
 
 			return c
 		},

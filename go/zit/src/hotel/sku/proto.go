@@ -26,8 +26,8 @@ type Proto struct {
 	object_metadata.Metadata
 }
 
-func (pz *Proto) AddToFlagSet(f *flag.FlagSet) {
-	pz.Metadata.AddToFlagSet(f)
+func (pz *Proto) SetFlagSet(f *flag.FlagSet) {
+	pz.Metadata.SetFlagSet(f)
 }
 
 func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {

@@ -29,7 +29,7 @@ func init() {
 
 			f.BoolVar(&c.Organize, "organize", false, "")
 
-			c.CheckoutOptions.AddToFlagSet(f)
+			c.CheckoutOptions.SetFlagSet(f)
 
 			return c
 		},

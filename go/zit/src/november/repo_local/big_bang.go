@@ -37,13 +37,13 @@ type BigBang struct {
 	OverrideXDGWithCwd   bool
 }
 
-func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
+func (e *BigBang) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&e.AgeIdentity, "age", "")
 	f.BoolVar(&e.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
 	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
 	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
 
-	e.Config.AddToFlagSet(f)
+	e.Config.SetFlagSet(f)
 }
 
 func (bb BigBang) Start(

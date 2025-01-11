@@ -83,7 +83,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 	}
 }
 
-func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
+func (o *Flags) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
 
 	f.Var(

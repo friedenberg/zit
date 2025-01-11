@@ -18,7 +18,7 @@ type OptionsWithoutMode struct {
 	StoreSpecificOptions any
 }
 
-func (c *Options) AddToFlagSet(f *flag.FlagSet) {
+func (c *Options) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 	f.BoolVar(
 		&c.Force,

@@ -32,7 +32,7 @@ func (k Config) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 
-func (k *Config) AddToFlagSet(f *flag.FlagSet) {
+func (k *Config) SetFlagSet(f *flag.FlagSet) {
 	k.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(

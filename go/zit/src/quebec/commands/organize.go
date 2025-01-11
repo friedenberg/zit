@@ -44,7 +44,7 @@ func init() {
 
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
-			c.AddToFlagSet(f)
+			c.SetFlagSet(f)
 
 			return c
 		},

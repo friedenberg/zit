@@ -46,7 +46,7 @@ func (cmd *Clone) GetFlagSet() *flag.FlagSet {
 
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.FlagSet = f
-	cmd.BigBang.AddToFlagSet(f)
+	cmd.BigBang.SetFlagSet(f)
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 }
