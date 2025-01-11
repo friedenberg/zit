@@ -24,7 +24,7 @@ const (
 
 	RepoTypeLocalRelay = "!toml-repo-relay-local-v0"
 
-	ImmutableConfigV1 = "!toml-config-immutable-v0"
+	ImmutableConfigV1 = "!toml-config-immutable-v1"
 
 	ZettelIdListTypeV0 = "!zettel_id_list-v0"
 )

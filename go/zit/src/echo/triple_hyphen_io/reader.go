@@ -10,12 +10,10 @@ import (
 )
 
 type Reader struct {
-	state           readerState
 	RequireMetadata bool // TODO-P4 add delimiter
 	Metadata, Blob  io.ReaderFrom
 }
 
-// TODO-P4 add constructors and remove public fields
 func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
 	n1, err = mr.readMetadataFrom(&r)
@@ -38,6 +36,7 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
+	var state readerState
 	br := bufio.NewReader(*r)
 
 	if mr.RequireMetadata && mr.Metadata == nil {
@@ -73,7 +72,7 @@ LINE_READ_LOOP:
 
 		line = strings.TrimSuffix(rawLine, "\n")
 
-		switch mr.state {
+		switch state {
 		case readerStateEmpty:
 			switch {
 			case mr.RequireMetadata && line != Boundary:
@@ -89,7 +88,7 @@ LINE_READ_LOOP:
 				break LINE_READ_LOOP
 			}
 
-			mr.state += 1
+			state += 1
 
 			object_metadata = ohio.MakePipedReaderFrom(mr.Metadata)
 
@@ -100,7 +99,7 @@ LINE_READ_LOOP:
 					return
 				}
 
-				mr.state += 1
+				state += 1
 				break
 			}
 
@@ -114,7 +113,7 @@ LINE_READ_LOOP:
 			break LINE_READ_LOOP
 
 		default:
-			err = errors.Errorf("impossible state %d", mr.state)
+			err = errors.Errorf("impossible state %d", state)
 			return
 		}
 	}
