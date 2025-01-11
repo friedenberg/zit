@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 )
 
 func Test1(t1 *testing.T) {

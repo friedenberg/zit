@@ -6,8 +6,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 func makePrinter(

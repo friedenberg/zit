@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 )
 
 type Dependencies struct {

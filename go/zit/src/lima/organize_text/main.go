@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 )
 
 type Text struct {

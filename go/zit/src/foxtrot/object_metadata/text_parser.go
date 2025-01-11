@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 )
 
 type textParser struct {
