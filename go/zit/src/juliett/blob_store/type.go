@@ -45,7 +45,7 @@ func MakeTypeStore(
 	}
 }
 
-func (a TypeStore) GetCommonStore() CommonStore[type_blobs.Blob] {
+func (a TypeStore) GetCommonStore() interfaces.CommonStore[type_blobs.Blob] {
 	return a
 }
 

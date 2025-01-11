@@ -1,6 +1,7 @@
 package store
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
@@ -73,6 +74,6 @@ func (s *Store) GetStreamIndex() *stream_index.Index {
 	return s.streamIndex
 }
 
-func (s *Store) GetConfigBlobFormat() blob_store.Format2[mutable_config_blobs.Blob] {
+func (s *Store) GetConfigBlobFormat() interfaces.Format[mutable_config_blobs.Blob] {
 	return s.configBlobFormat
 }

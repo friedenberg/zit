@@ -37,7 +37,7 @@ type Store struct {
 	inventoryList          *sku.List
 	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
-	configBlobFormat       blob_store.Format2[mutable_config_blobs.Blob]
+	configBlobFormat       interfaces.Format[mutable_config_blobs.Blob]
 	luaVMPoolBuilder       *lua.VMPoolBuilder
 	tagLock                sync.Mutex
 

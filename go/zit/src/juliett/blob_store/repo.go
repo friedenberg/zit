@@ -48,7 +48,7 @@ func MakeRepoStore(
 	}
 }
 
-func (a RepoStore) GetCommonStore() CommonStore[repo_blobs.Blob] {
+func (a RepoStore) GetCommonStore() interfaces.CommonStore[repo_blobs.Blob] {
 	return a
 }
 

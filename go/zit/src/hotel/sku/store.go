@@ -49,4 +49,14 @@ type (
 	ExternalLikeResetter3Getter interface {
 		GetExternalLikeResetter3() interfaces.Resetter3[ExternalLike]
 	}
+
+	BlobStore[T any] interface {
+		GetTransactedWithBlob(
+			sk TransactedGetter,
+		) (common TransactedWithBlob[T], n int64, err error)
+
+		PutTransactedWithBlob(
+			TransactedWithBlob[T],
+		) error
+	}
 )

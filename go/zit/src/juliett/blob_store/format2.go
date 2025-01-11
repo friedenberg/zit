@@ -10,23 +10,23 @@ import (
 type format2[
 	O interfaces.Blob[O],
 ] struct {
-	Parser2[O]
-	ParseSaver2[O]
-	SavedBlobFormatter
-	ParsedBlobFormatter2[O]
+	interfaces.Parser[O]
+	interfaces.ParseSaver[O]
+	interfaces.SavedBlobFormatter
+	interfaces.ParsedBlobFormatter[O]
 }
 
 func MakeBlobFormat2[
 	O interfaces.Blob[O],
 ](
-	parser Parser2[O],
-	formatter ParsedBlobFormatter2[O],
+	parser interfaces.Parser[O],
+	formatter interfaces.ParsedBlobFormatter[O],
 	arf interfaces.BlobReaderFactory,
-) Format2[O] {
+) interfaces.Format[O] {
 	return format2[O]{
-		Parser2:              parser,
-		ParsedBlobFormatter2: formatter,
-		SavedBlobFormatter:   MakeSavedBlobFormatter(arf),
+		Parser:              parser,
+		ParsedBlobFormatter: formatter,
+		SavedBlobFormatter:  MakeSavedBlobFormatter(arf),
 	}
 }
 
@@ -34,10 +34,10 @@ func (af format2[O]) FormatParsedBlob(
 	w io.Writer,
 	e O,
 ) (n int64, err error) {
-	if af.ParsedBlobFormatter2 == nil {
+	if af.ParsedBlobFormatter == nil {
 		err = errors.Errorf("no ParsedBlobFormatter")
 	} else {
-		n, err = af.ParsedBlobFormatter2.FormatParsedBlob(w, e)
+		n, err = af.ParsedBlobFormatter.FormatParsedBlob(w, e)
 	}
 
 	return

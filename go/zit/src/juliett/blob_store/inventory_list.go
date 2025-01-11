@@ -43,7 +43,7 @@ func MakeInventoryStore(
 	return s
 }
 
-func (a InventoryStore) GetCommonStore() CommonStore2[*sku.List] {
+func (a InventoryStore) GetCommonStore() sku.BlobStore[*sku.List] {
 	return a
 }
 

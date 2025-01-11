@@ -27,6 +27,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 )
 
+// Include repo type
 type BigBang struct {
 	AgeIdentity age.Identity
 	Yin         string

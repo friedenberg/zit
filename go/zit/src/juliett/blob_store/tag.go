@@ -75,7 +75,7 @@ func MakeTagStore(
 	}
 }
 
-func (a TagStore) GetCommonStore() CommonStore2[tag_blobs.Blob] {
+func (a TagStore) GetCommonStore() sku.BlobStore[tag_blobs.Blob] {
 	return a
 }
 

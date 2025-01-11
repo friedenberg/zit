@@ -90,7 +90,7 @@ func (a ConfigStore) FormatTypedBlob(
 	tipe := sk.GetType()
 	blobSha := sk.GetBlobSha()
 
-	var store SavedBlobFormatter
+	var store interfaces.SavedBlobFormatter
 	switch tipe.String() {
 	case "", builtin_types.ConfigTypeTomlV0:
 		store = a.toml_v0

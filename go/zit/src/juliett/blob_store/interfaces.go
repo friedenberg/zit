@@ -8,10 +8,6 @@ import (
 )
 
 type (
-	SavedBlobFormatter interface {
-		FormatSavedBlob(io.Writer, interfaces.Sha) (int64, error)
-	}
-
 	ParsedBlobFormatter[T any, TPtr interfaces.Ptr[T]] interface {
 		FormatParsedBlob(io.Writer, TPtr) (int64, error)
 	}
@@ -25,7 +21,7 @@ type (
 	}
 
 	Format[T any, TPtr interfaces.Ptr[T]] interface {
-		SavedBlobFormatter
+		interfaces.SavedBlobFormatter
 		ParsedBlobFormatter[T, TPtr]
 		Parser[T, TPtr]
 	}

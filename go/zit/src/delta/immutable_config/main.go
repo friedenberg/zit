@@ -5,18 +5,21 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/repo_type"
 )
 
 func init() {
 	gob.RegisterName("KonfigLike", Config{})
 }
 
-// Split into repo and blob store configs
+// TODO Split into repo and blob store configs
+// TODO make toml-compatible
 type Config struct {
-	StoreVersion      StoreVersion
-	Recipients        []string
-	CompressionType   CompressionType
-	LockInternalFiles bool
+	StoreVersion      StoreVersion    `toml:"store-version"`
+	RepoType          repo_type.Type  `toml:"repo-type"`
+	Recipients        []string        `toml:"recipients"`
+	CompressionType   CompressionType `toml:"compression-type"`
+	LockInternalFiles bool            `toml:"lock-internal-files"`
 }
 
 func Default() Config {

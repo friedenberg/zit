@@ -13,7 +13,7 @@ type format[
 ] struct {
 	Parser[O, OPtr]
 	ParseSaver[O, OPtr]
-	SavedBlobFormatter
+	interfaces.SavedBlobFormatter
 	ParsedBlobFormatter[O, OPtr]
 }
 
