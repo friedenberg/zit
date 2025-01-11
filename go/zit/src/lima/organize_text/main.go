@@ -36,44 +36,48 @@ func (t *Text) Refine() (err error) {
 	return
 }
 
-func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
-	if !t.Options.wasMade {
-		panic("options not initialized")
-	}
+type metadataReader struct {
+	*Text
+	reader
+}
 
-	r1 := &reader{
-		options: t.Options,
-	}
-
-	mr := triple_hyphen_io.Reader{
-		Metadata: &t.Metadata,
-		Blob:     r1,
-	}
-
-	var n1 int64
-	n1, err = mr.ReadMetadataFrom(&r)
-	n += n1
-
-	if err != nil {
+func (mr *metadataReader) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = mr.Metadata.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ocs := t.OptionComments
+	ocs := mr.OptionComments
 
 	for _, oc := range ocs {
 		if ocwa, ok := oc.(OptionCommentWithApply); ok {
-			if err = ocwa.ApplyToReader(t.Options, r1); err != nil {
+			if err = ocwa.ApplyToReader(mr.Options, &mr.reader); err != nil {
 				err = errors.Wrapf(err, "OptionComment: %s", oc)
 				return
 			}
 		}
 	}
+	return
+}
 
-	n1, err = mr.ReadBlobFrom(r)
-	n += n1
+func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
+	if !t.Options.wasMade {
+		panic("options not initialized")
+	}
 
-	if err != nil {
+	r1 := metadataReader{
+		Text: t,
+		reader: reader{
+			options: t.Options,
+		},
+	}
+
+	mr := triple_hyphen_io.Reader{
+		Metadata: &r1,
+		Blob:     &r1.reader,
+	}
+
+	if n, err = mr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

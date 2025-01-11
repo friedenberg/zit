@@ -18,26 +18,26 @@ type Reader struct {
 // TODO-P4 add constructors and remove public fields
 func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.ReadMetadataFrom(&r)
+	n1, err = mr.readMetadataFrom(&r)
 	n += n1
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "metadata read failed")
 		return
 	}
 
-	n1, err = mr.ReadBlobFrom(r)
+	n1, err = mr.Blob.ReadFrom(r)
 	n += n1
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "blob read failed")
 		return
 	}
 
 	return
 }
 
-func (mr *Reader) ReadMetadataFrom(r *io.Reader) (n int64, err error) {
+func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
 	br := bufio.NewReader(*r)
 
 	if mr.RequireMetadata && mr.Metadata == nil {
@@ -117,15 +117,6 @@ LINE_READ_LOOP:
 			err = errors.Errorf("impossible state %d", mr.state)
 			return
 		}
-	}
-
-	return
-}
-
-func (mr *Reader) ReadBlobFrom(r io.Reader) (n int64, err error) {
-	if n, err = mr.Blob.ReadFrom(r); err != nil {
-		err = errors.Wrapf(err, "blob read failed")
-		return
 	}
 
 	return
