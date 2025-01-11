@@ -22,6 +22,8 @@ const (
 	InventoryListTypeV0 = "!inventory_list-v0"
 	InventoryListTypeV1 = "!inventory_list-v1"
 
+	RepoTypeLocalRelay = "!toml-repo-relay-local-v0"
+
 	ZettelIdListTypeV0 = "!zettel_id_list-v0"
 )
 
@@ -56,6 +58,8 @@ func init() {
 	register(InventoryListTypeV1, genres.InventoryList, true)
 
 	register(ZettelIdListTypeV0, genres.None, false)
+
+	register(RepoTypeLocalRelay, genres.Repo, false)
 }
 
 func register(tipeString string, g genres.Genre, isDefault bool) {

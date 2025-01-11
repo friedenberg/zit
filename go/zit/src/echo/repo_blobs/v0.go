@@ -1,21 +1,18 @@
 package repo_blobs
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 type V0 struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (b V0) GetGenreGetter() interfaces.GenreGetter {
+func (b V0) GetRepoBlob() Blob {
 	return b
 }
 
-func (V0) GetGenre() interfaces.Genre {
-	return genres.Type
+func (b V0) GetRepoType() {
 }
 
 func (a *V0) Reset() {

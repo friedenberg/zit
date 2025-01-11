@@ -11,14 +11,12 @@ func init() {
 	gob.RegisterName("KonfigLike", Config{})
 }
 
+// Split into repo and blob store configs
 type Config struct {
-	StoreVersion                        StoreVersion
-	Recipients                          []string
-	UseBestandsaufnahme                 bool // deprecated
-	UseKonfigErworbenFile               bool // deprecated
-	UseBestandsaufnahmeForVerzeichnisse bool // deprecated
-	CompressionType                     CompressionType
-	LockInternalFiles                   bool
+	StoreVersion      StoreVersion
+	Recipients        []string
+	CompressionType   CompressionType
+	LockInternalFiles bool
 }
 
 func Default() Config {
