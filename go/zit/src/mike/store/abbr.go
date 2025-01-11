@@ -64,7 +64,7 @@ func newIndexAbbr(
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
-				Heads:    tridex.Make(),
+				Heads: tridex.Make(),
 				Tails: tridex.Make(),
 			},
 		},
