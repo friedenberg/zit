@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 func Test1(t1 *testing.T) {
@@ -26,7 +27,7 @@ body
 	mr := &bytes.Buffer{}
 	ar := &bytes.Buffer{}
 
-	r := Reader{
+	r := triple_hyphen_io.Reader{
 		Metadata: mr,
 		Blob:     ar,
 	}
@@ -73,7 +74,7 @@ metadatei
 	mr := &bytes.Buffer{}
 	ar := &bytes.Buffer{}
 
-	r := Reader{
+	r := triple_hyphen_io.Reader{
 		Metadata: mr,
 		Blob:     ar,
 	}

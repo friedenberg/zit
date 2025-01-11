@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 type Dependencies struct {
@@ -59,7 +60,7 @@ func (f Dependencies) writeBoundary(
 	w1 io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
-	return ohio.WriteLine(w1, Boundary)
+	return ohio.WriteLine(w1, triple_hyphen_io.Boundary)
 }
 
 func (f Dependencies) writeNewLine(

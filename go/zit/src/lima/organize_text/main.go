@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 type Text struct {
@@ -45,7 +45,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		options: t.Options,
 	}
 
-	mr := object_metadata.Reader{
+	mr := triple_hyphen_io.Reader{
 		Metadata: &t.Metadata,
 		Blob:     r1,
 	}
@@ -117,7 +117,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	mw := object_metadata.Writer{
+	mw := triple_hyphen_io.Writer{
 		Blob: lw,
 	}
 

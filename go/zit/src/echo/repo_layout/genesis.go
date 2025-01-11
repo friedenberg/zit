@@ -88,13 +88,9 @@ func (s Layout) Genesis(bb BigBang) {
 		writeFile(s.FileConfigMutable(), "")
 		writeFile(s.FileCacheDormant(), "")
 	}
-
-	return
 }
 
 func (s Layout) readAndTransferLines(in, out string) (err error) {
-	ui.TodoP4("move to user operations")
-
 	if in == "" {
 		return
 	}

@@ -6,8 +6,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 func makePrinter(
@@ -19,7 +19,7 @@ func makePrinter(
 		format:            of,
 		options:           op,
 		out:               out,
-		offset:            int64(len(object_metadata.Boundary) + 1),
+		offset:            int64(len(triple_hyphen_io.Boundary) + 1),
 		firstBoundaryOnce: &sync.Once{},
 	}
 }
@@ -33,7 +33,7 @@ type printer struct {
 }
 
 func (f *printer) printBoundary() (n int64, err error) {
-	if n, err = ohio.WriteLine(f.out, object_metadata.Boundary); err != nil {
+	if n, err = ohio.WriteLine(f.out, triple_hyphen_io.Boundary); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,7 +46,7 @@ func (f *printer) printBoundary() (n int64, err error) {
 func (f *printer) printFirstBoundary() (n int64, err error) {
 	f.firstBoundaryOnce.Do(
 		func() {
-			if n, err = ohio.WriteLine(f.out, object_metadata.Boundary); err != nil {
+			if n, err = ohio.WriteLine(f.out, triple_hyphen_io.Boundary); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -1,4 +1,11 @@
-package object_metadata
+package triple_hyphen_io
+
+import "io"
+
+type MetadataWriterTo interface {
+	io.WriterTo
+	HasMetadataContent() bool
+}
 
 type readerState int
 

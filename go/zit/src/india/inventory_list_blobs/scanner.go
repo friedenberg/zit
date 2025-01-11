@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 func makeScanner(
@@ -74,7 +75,7 @@ func (scanner *scanner) Scan() (ok bool) {
 	scanner.lastSku = nil
 
 	if !scanner.afterFirst {
-		_, scanner.err = object_metadata.ReadBoundary(scanner.ringBuffer)
+		_, scanner.err = triple_hyphen_io.ReadBoundary(scanner.ringBuffer)
 
 		if errors.IsEOF(scanner.err) {
 			return
@@ -86,7 +87,7 @@ func (scanner *scanner) Scan() (ok bool) {
 		scanner.afterFirst = true
 	}
 
-	scanner.Offset += int64(len(object_metadata.Boundary) + 1)
+	scanner.Offset += int64(len(triple_hyphen_io.Boundary) + 1)
 	scanner.ContentLength = 0
 
 	scanner.lastSku = sku.GetTransactedPool().Get()
@@ -109,7 +110,7 @@ func (scanner *scanner) Scan() (ok bool) {
 
 	oldErr := scanner.err
 
-	_, scanner.err = object_metadata.ReadBoundary(scanner.ringBuffer)
+	_, scanner.err = triple_hyphen_io.ReadBoundary(scanner.ringBuffer)
 
 	if errors.IsNotNilAndNotEOF(scanner.err) {
 		scanner.err = errors.Wrap(errors.MakeMulti(scanner.err, oldErr))

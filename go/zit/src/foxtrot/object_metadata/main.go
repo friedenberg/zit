@@ -2,7 +2,6 @@ package object_metadata
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -15,11 +14,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
-
-type MetadataWriterTo interface {
-	io.WriterTo
-	HasMetadataContent() bool
-}
 
 type Field = string_format_writer.Field
 

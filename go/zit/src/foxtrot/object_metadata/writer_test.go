@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 func TestWriter1(t1 *testing.T) {
@@ -21,7 +22,7 @@ blob
 
 	out := &strings.Builder{}
 
-	sut := Writer{
+	sut := triple_hyphen_io.Writer{
 		Metadata: strings.NewReader("metadatei\n"),
 		Blob:     strings.NewReader("blob\n"),
 	}
@@ -45,7 +46,7 @@ metadatei
 
 	out := &strings.Builder{}
 
-	sut := Writer{
+	sut := triple_hyphen_io.Writer{
 		Metadata: strings.NewReader("metadatei\n"),
 	}
 
@@ -66,7 +67,7 @@ func TestWriter3(t1 *testing.T) {
 
 	out := &strings.Builder{}
 
-	sut := Writer{
+	sut := triple_hyphen_io.Writer{
 		Blob: strings.NewReader("blob\n"),
 	}
 

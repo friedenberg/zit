@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/triple_hyphen_io"
 )
 
 type TagSetGetter interface {
@@ -87,7 +88,7 @@ func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
 	return
 }
 
-func (m Metadata) GetMetadataWriterTo() object_metadata.MetadataWriterTo {
+func (m Metadata) GetMetadataWriterTo() triple_hyphen_io.MetadataWriterTo {
 	return m
 }
 
