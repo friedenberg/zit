@@ -25,7 +25,7 @@ type (
 		Parser[T]
 	}
 
-	CommonStore[T any] interface {
+	TypedBlobStore[T any] interface {
 		ParseTypedBlob(
 			tipe ObjectId,
 			blobSha Sha,
