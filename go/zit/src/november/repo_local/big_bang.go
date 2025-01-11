@@ -1,24 +1,20 @@
 package repo_local
 
 import (
-	"bufio"
 	"encoding/gob"
-	"flag"
 	"io"
 	"os"
 	"path"
-	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -27,27 +23,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 )
 
-// Include repo type
-type BigBang struct {
-	AgeIdentity          age.Identity
-	Yin                  string
-	Yang                 string
-	Config               immutable_config.Latest
-	ExcludeDefaultType   bool
-	ExcludeDefaultConfig bool
-	OverrideXDGWithCwd   bool
-}
-
-func (e *BigBang) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&e.AgeIdentity, "age", "")
-	f.BoolVar(&e.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
-	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
-	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
-
-	e.Config.SetFlagSet(f)
-}
-
-func (bb BigBang) Start(
+func Genesis(
+	bb repo_layout.BigBang,
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	options env.Options,
@@ -68,37 +45,7 @@ func (bb BigBang) Start(
 	u = Make(env, OptionsEmpty)
 
 	repoLayout := u.GetRepoLayout()
-	repoLayout.Initialize()
-
-	{
-		if err = readAndTransferLines(
-			bb.Yin,
-			filepath.Join(repoLayout.DirObjectId(), "Yin"),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = readAndTransferLines(
-			bb.Yang,
-			filepath.Join(repoLayout.DirObjectId(), "Yang"),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = repoLayout.Age().AddIdentityOrGenerateIfNecessary(
-			bb.AgeIdentity,
-			repoLayout.FileAge(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		writeFile(repoLayout.FileConfigPermanent(), bb.Config)
-		writeFile(repoLayout.FileConfigMutable(), "")
-		writeFile(repoLayout.FileCacheDormant(), "")
-	}
+	repoLayout.Genesis(bb)
 
 	if err = u.dormantIndex.Flush(
 		u.GetRepoLayout(),
@@ -112,8 +59,7 @@ func (bb BigBang) Start(
 	u.Must(u.Reset)
 	u.Must(repoLayout.ResetCache)
 
-	ui.TodoP2("determine if this should be an Einleitung option")
-	if err = bb.initDefaultTypeAndConfig(u); err != nil {
+	if err = u.initDefaultTypeAndConfig(bb); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,23 +71,25 @@ func (bb BigBang) Start(
 	return
 }
 
-func (bb BigBang) initDefaultTypeAndConfig(u *Repo) (err error) {
-	if err = u.Lock(); err != nil {
+func (repo *Repo) initDefaultTypeAndConfig(bb repo_layout.BigBang) (err error) {
+	if err = repo.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
+	defer errors.Deferred(&err, repo.Unlock)
 
 	var defaultTypeObjectId ids.Type
 
-	if defaultTypeObjectId, err = bb.initDefaultTypeIfNecessaryAfterLock(u); err != nil {
+	if defaultTypeObjectId, err = repo.initDefaultTypeIfNecessaryAfterLock(
+		bb,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = bb.initDefaultConfigIfNecessaryAfterLock(
-		u,
+	if err = repo.initDefaultConfigIfNecessaryAfterLock(
+		bb,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -151,8 +99,8 @@ func (bb BigBang) initDefaultTypeAndConfig(u *Repo) (err error) {
 	return
 }
 
-func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
-	u *Repo,
+func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
+	bb repo_layout.BigBang,
 ) (defaultTypeObjectId ids.Type, err error) {
 	if bb.ExcludeDefaultType {
 		return
@@ -170,7 +118,7 @@ func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
 
 	var sh interfaces.Sha
 
-	if sh, _, err = u.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
+	if sh, _, err = repo.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
 		&defaultTypeBlob,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +136,7 @@ func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
 	o.Metadata.Blob.ResetWithShaLike(sh)
 	o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
-	if err = u.GetStore().CreateOrUpdate(
+	if err = repo.GetStore().CreateOrUpdate(
 		o,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
@@ -199,8 +147,8 @@ func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
 	return
 }
 
-func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
-	u *Repo,
+func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
+	bb repo_layout.BigBang,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bb.ExcludeDefaultConfig {
@@ -211,7 +159,7 @@ func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
 	var tipe ids.Type
 
 	if sh, tipe, err = writeDefaultMutableConfig(
-		u,
+		repo,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -232,7 +180,7 @@ func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
 
 	newConfig.Metadata.Type.ResetWith(tipe)
 
-	if err = u.GetStore().CreateOrUpdate(
+	if err = repo.GetStore().CreateOrUpdate(
 		newConfig,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
@@ -299,53 +247,4 @@ func writeFile(p string, contents any) {
 		enc := gob.NewEncoder(f)
 		err = enc.Encode(contents)
 	}
-}
-
-func readAndTransferLines(in, out string) (err error) {
-	ui.TodoP4("move to user operations")
-
-	if in == "" {
-		return
-	}
-
-	var fi, fo *os.File
-
-	if fi, err = files.Open(in); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, fi.Close)
-
-	if fo, err = files.CreateExclusiveWriteOnly(out); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, fo.Close)
-
-	r := bufio.NewReader(fi)
-	w := bufio.NewWriter(fo)
-
-	defer errors.Deferred(&err, w.Flush)
-
-	for {
-		var l string
-		l, err = r.ReadString('\n')
-
-		if errors.Is(err, io.EOF) {
-			err = nil
-			break
-		}
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		// TODO-P2 sterilize line
-		w.WriteString(l)
-	}
-
-	return
 }

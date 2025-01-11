@@ -4,13 +4,14 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Init struct {
 	*flag.FlagSet
-	repo_local.BigBang
+	repo_layout.BigBang
 }
 
 func init() {
@@ -19,7 +20,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Init{
 				FlagSet: f,
-				BigBang: repo_local.BigBang{
+				BigBang: repo_layout.BigBang{
 					Config: immutable_config.Default(),
 				},
 			}
@@ -43,7 +44,8 @@ func (c Init) Run(
 	{
 		var err error
 
-		if repo, err = c.BigBang.Start(
+		if repo, err = repo_local.Genesis(
+			c.BigBang,
 			dependencies.Context,
 			dependencies.Config,
 			env.Options{},
