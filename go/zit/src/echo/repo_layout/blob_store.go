@@ -138,7 +138,7 @@ func (s blobStore) blobReaderFrom(
 				Path:      p,
 			}
 		} else {
-			err = errors.Wrapf(err, "Path: %q, Compression: %q, Age: %q", p, s.GetCompressionType(), s.GetAgeEncryption())
+			err = errors.Wrapf(err, "Path: %q, Compression: %q", p, s.GetCompressionType())
 		}
 
 		return

@@ -38,7 +38,6 @@ func (s ObjectStore) objectReader(
 		err = errors.Wrapf(err, "Genre: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		err = errors.Wrapf(err, "Path: %s", o.Path)
-		err = errors.Wrapf(err, "Age: %s", o.GetAgeEncryption())
 		return
 	}
 
