@@ -21,7 +21,7 @@ function can_initialize_without_age { # @test
 }
 
 function can_initialize_with_age { # @test
-	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age generate
+	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity generate
 	assert_success
 	assert_output - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]

@@ -120,7 +120,7 @@ function run_zit_init_disable_age {
   run_zit init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
-    -age none \
+    -age-identity none \
     -lock-internal-files=false \
     "$@"
 

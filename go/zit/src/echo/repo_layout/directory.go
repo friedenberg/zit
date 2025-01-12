@@ -74,10 +74,6 @@ func (s directoryV0) DirObjectGenre(
 	return
 }
 
-func (s directoryV0) FileAge() string {
-	return s.DirZit("AgeIdentity")
-}
-
 func (s directoryV0) DirCache(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }

@@ -33,7 +33,7 @@ function info_age_none { # @test
 function info_age_some { # @test
 	age-keygen --output age-key >/dev/null 2>&1
 	key="$(tail -n1 age-key)"
-	run_zit_init -override-xdg-with-cwd -age age-key
+	run_zit_init -override-xdg-with-cwd -age-identity age-key
 	run_zit repo-info age-encryption
 	assert_output "$key"
 }

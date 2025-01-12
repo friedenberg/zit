@@ -4,9 +4,9 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type InitRelay struct {
@@ -38,10 +38,36 @@ func (c InitRelay) GetFlagSet() *flag.FlagSet {
 func (c InitRelay) Run(
 	dependencies Dependencies,
 ) {
-	repo_local.Genesis(
-		c.BigBang,
+	layout := dir_layout.MakeDefault(
+		dependencies.Context,
+		dependencies.Debug,
+	)
+
+	env := env.Make(
 		dependencies.Context,
 		dependencies.Config,
+		layout,
 		env.Options{},
 	)
+
+	var repoLayout repo_layout.Layout
+
+	layoutOptions := repo_layout.Options{
+		BasePath:             dependencies.Config.BasePath,
+		PermitNoZitDirectory: true,
+	}
+
+	{
+		var err error
+
+		if repoLayout, err = repo_layout.Make(
+			env,
+			layoutOptions,
+		); err != nil {
+			env.CancelWithError(err)
+		}
+
+	}
+
+	repoLayout.Genesis(c.BigBang)
 }

@@ -11,7 +11,6 @@ type DirectoryPaths interface {
 	DirObjectId() string
 	DirObjects(p ...string) string
 	DirZit(p ...string) string
-	FileAge() string
 	FileCacheDormant() string
 	FileCacheObjectId() string
 	FileConfigMutable() string

@@ -13,8 +13,11 @@ teardown() {
 
 function init_relay { # @test
 	run_zit init-relay \
-		-age none \
+		-age-identity none \
 		-lock-internal-files=false
+	assert_success
+	assert_output - <<-EOM
+	EOM
 
 	function output_immutable_config() {
 		cat - <<-EOM

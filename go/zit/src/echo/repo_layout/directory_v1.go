@@ -54,10 +54,6 @@ func (s directoryV1) DirZit(p ...string) string {
 	return s.Dir(p...)
 }
 
-func (s directoryV1) FileAge() string {
-	return s.DirZit("age_identity")
-}
-
 func (s directoryV1) DirCache(p ...string) string {
 	return s.DirZit(append([]string{"cache"}, p...)...)
 }

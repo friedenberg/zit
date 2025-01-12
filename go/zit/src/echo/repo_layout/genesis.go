@@ -3,7 +3,6 @@ package repo_layout
 import (
 	"bufio"
 	"encoding/gob"
-	"flag"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,36 +11,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
-
-type BigBang struct {
-	ids.Type
-	Config *immutable_config.Latest
-
-	AgeIdentity          age.Identity
-	Yin                  string
-	Yang                 string
-	ExcludeDefaultType   bool
-	ExcludeDefaultConfig bool
-	OverrideXDGWithCwd   bool
-}
-
-func (bb *BigBang) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&bb.AgeIdentity, "age", "")
-	f.BoolVar(&bb.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
-	f.StringVar(&bb.Yin, "yin", "", "File containing list of zettel id left parts")
-	f.StringVar(&bb.Yang, "yang", "", "File containing list of zettel id right parts")
-
-	bb.Type = builtin_types.GetOrPanic(builtin_types.ImmutableConfigV1).Type
-	bb.Config = immutable_config.Default()
-	bb.Config.SetFlagSet(f)
-}
 
 func (s *Layout) Genesis(bb BigBang) {
 	s.config.Type = bb.Type
@@ -74,13 +46,13 @@ func (s *Layout) Genesis(bb BigBang) {
 	}
 
 	{
-		if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
-			bb.AgeIdentity,
-		); err != nil {
-			if !errors.IsExist(err) {
-				s.CancelWithError(err)
-			}
-		}
+		// if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
+		// 	bb.AgeIdentity,
+		// ); err != nil {
+		// 	if !errors.IsExist(err) {
+		// 		s.CancelWithError(err)
+		// 	}
+		// }
 
 		{
 			var f *os.File

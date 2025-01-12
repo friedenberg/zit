@@ -114,7 +114,7 @@ function init_and_with_another_age { # @test
 	pushd inner || exit 1
 
 	set_xdg "$(pwd)"
-	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age "$age_id"
+	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id"
 	assert_success
 
 	run_zit repo-info age-encryption
