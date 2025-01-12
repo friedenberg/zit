@@ -39,7 +39,7 @@ func (bb *BigBang) SetFlagSet(f *flag.FlagSet) {
 
 	bb.Type = builtin_types.GetOrPanic(builtin_types.ImmutableConfigV1).Type
 	bb.Config = immutable_config.Default()
-	bb.Config.SetFlagSet(f)
+	bb.Config.BlobStore.SetFlagSet(f)
 }
 
 func (s *Layout) Genesis(bb BigBang) {

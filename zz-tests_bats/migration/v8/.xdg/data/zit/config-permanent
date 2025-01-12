@@ -3,7 +3,9 @@
 ---
 
 store-version = 8
-repo-type = 0
+repo-type = 1
+
+[blob-store]
 recipients = []
 compression-type = 'zstd'
 lock-internal-files = false

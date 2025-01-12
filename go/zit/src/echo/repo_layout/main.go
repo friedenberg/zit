@@ -175,7 +175,7 @@ func (a Layout) SansObjectAge() (b Layout) {
 func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
 	b.compressionType = immutable_config.CompressionTypeNone
-	b.ObjectStore.Config.compressionType = b.Config.GetCompressionType()
+	b.ObjectStore.Config.compressionType = b.Config.GetBlobStoreImmutableConfig().GetCompressionType()
 	return
 }
 

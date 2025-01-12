@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 )
 
 // TODO Split into repo and blob store configs
@@ -39,8 +40,16 @@ func (k V0) GetImmutableConfig() Config {
 	return k
 }
 
+func (k V0) GetBlobStoreImmutableConfig() BlobStoreConfig {
+	return k
+}
+
 func (k V0) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
+}
+
+func (k V0) GetAge() age.Age {
+	return age.Age{}
 }
 
 func (k V0) GetCompressionType() CompressionType {

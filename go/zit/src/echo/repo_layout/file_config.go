@@ -134,8 +134,8 @@ func (s *Config) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	s.storeVersion = immutable_config.MakeStoreVersion(s.GetStoreVersion())
-	s.compressionType = s.GetCompressionType()
-	s.lockInternalFiles = s.GetLockInternalFiles()
+	s.compressionType = s.GetBlobStoreImmutableConfig().GetCompressionType()
+	s.lockInternalFiles = s.GetBlobStoreImmutableConfig().GetLockInternalFiles()
 
 	return
 }
