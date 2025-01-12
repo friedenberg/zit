@@ -23,7 +23,7 @@ func init() {
 		"clone",
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
-        FlagSet: f,
+				FlagSet: f,
 				Genesis: command_components.Genesis{
 					BigBang: repo_layout.BigBang{
 						ExcludeDefaultType: true,
@@ -72,7 +72,7 @@ func (cmd Clone) Run(
 		env.Options{},
 	)
 
-	remote := cmd.MakeRemote(local.Env, cmd.GetFlagSet().Args()[0])
+	remote := cmd.MakeRemote(local.GetEnv(), cmd.GetFlagSet().Args()[0])
 
 	qg := cmd.MakeQueryGroup(cmd, local, cmd.Args()[1:]...)
 
@@ -81,6 +81,6 @@ func (cmd Clone) Run(
 		qg,
 		cmd.RemoteTransferOptions.WithPrintCopies(true),
 	); err != nil {
-		local.CancelWithError(err)
+		dependencies.CancelWithError(err)
 	}
 }

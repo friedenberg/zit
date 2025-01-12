@@ -117,6 +117,10 @@ func Make(
 	return
 }
 
+func (u *Repo) GetRepo() repo.Repo {
+	return u
+}
+
 func (u *Repo) GetRelayRepo() repo.Relay {
 	return u
 }
