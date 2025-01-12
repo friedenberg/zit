@@ -43,8 +43,8 @@ func (s *Layout) loadImmutableConfig() (err error) {
 	}
 
 	thr := triple_hyphen_io.Reader{
-		Metadata: metadata{Config: &s.Config},
-		Blob:     &s.Config,
+		Metadata: metadata{config: &s.config},
+		Blob:     &s.config,
 	}
 
 	if _, err = thr.ReadFrom(r); err != nil {
@@ -52,21 +52,21 @@ func (s *Layout) loadImmutableConfig() (err error) {
 		return
 	}
 
-	s.Config.Blob = dir_layout.MakeConfigFromImmutableBlobConfig(
-		s.Config.Config.GetBlobStoreImmutableConfig(),
+	s.config.BlobStoreImmutableConfig = dir_layout.MakeConfigFromImmutableBlobConfig(
+		s.config.ImmutableConfig.GetBlobStoreImmutableConfig(),
 	)
 
 	return
 }
 
-type Config struct {
+type config struct {
 	ids.Type
-	Config immutable_config.Config
-	Blob   dir_layout.Config
+	ImmutableConfig          immutable_config.Config
+	BlobStoreImmutableConfig dir_layout.Config
 }
 
 type metadata struct {
-	*Config
+	*config
 }
 
 func (m metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -102,13 +102,13 @@ func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (c *Config) ReadFrom(r io.Reader) (n int64, err error) {
+func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 	switch c.Type.String() {
 	case builtin_types.ImmutableConfigV1:
-		c.Config = &immutable_config.TomlV1{}
+		c.ImmutableConfig = &immutable_config.TomlV1{}
 		td := toml.NewDecoder(r)
 
-		if err = td.Decode(c.Config); err != nil {
+		if err = td.Decode(c.ImmutableConfig); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {
@@ -118,11 +118,11 @@ func (c *Config) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 	case "":
-		c.Config = &immutable_config.V0{}
+		c.ImmutableConfig = &immutable_config.V0{}
 
 		dec := gob.NewDecoder(r)
 
-		if err = dec.Decode(c.Config); err != nil {
+		if err = dec.Decode(c.ImmutableConfig); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {
@@ -136,19 +136,19 @@ func (c *Config) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	c.Blob = dir_layout.MakeConfigFromImmutableBlobConfig(
-		c.Config.GetBlobStoreImmutableConfig(),
+	c.BlobStoreImmutableConfig = dir_layout.MakeConfigFromImmutableBlobConfig(
+		c.ImmutableConfig.GetBlobStoreImmutableConfig(),
 	)
 
 	return
 }
 
-func (s *Config) WriteTo(w io.Writer) (n int64, err error) {
+func (s *config) WriteTo(w io.Writer) (n int64, err error) {
 	switch s.Type.String() {
 	case builtin_types.ImmutableConfigV1:
 		te := toml.NewEncoder(w)
 
-		if err = te.Encode(s.Config); err != nil {
+		if err = te.Encode(s.ImmutableConfig); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {
@@ -160,7 +160,7 @@ func (s *Config) WriteTo(w io.Writer) (n int64, err error) {
 	case "":
 		dec := gob.NewEncoder(w)
 
-		if err = dec.Encode(s.Config); err != nil {
+		if err = dec.Encode(s.ImmutableConfig); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {

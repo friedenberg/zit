@@ -11,6 +11,7 @@ type Latest = TomlV1
 type Config interface {
 	GetImmutableConfig() Config
 	GetStoreVersion() interfaces.StoreVersion
+	GetRepoType() repo_type.Type
 	GetBlobStoreImmutableConfig() BlobStoreConfig
 }
 

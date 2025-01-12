@@ -1,0 +1,44 @@
+#! /usr/bin/env bats
+
+setup() {
+	load "$(dirname "$BATS_TEST_FILE")/common.bash"
+
+	# for shellcheck SC2154
+	export output
+}
+
+teardown() {
+	chflags_and_rm
+}
+
+function init_relay { # @test
+	run_zit init-relay \
+		-age none \
+		-lock-internal-files=false
+
+	function output_immutable_config() {
+		cat - <<-EOM
+			---
+			! toml-config-immutable-v1
+			---
+
+			store-version = 8
+			repo-type = 'relay'
+
+			[blob-store]
+			compression-type = 'zstd'
+			lock-internal-files = false
+		EOM
+	}
+
+	run cat .xdg/data/zit/config-permanent
+	assert_success
+	output_immutable_config | assert_output -
+
+	run_zit cat-blob "$(get_konfig_sha)"
+	assert_success
+	assert_output
+
+	run_zit show
+	assert_failure
+}

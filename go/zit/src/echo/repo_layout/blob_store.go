@@ -25,7 +25,7 @@ func MakeBlobStoreFromHome(
 	s Layout,
 ) (bs blobStore, err error) {
 	bs = blobStore{
-		Config: s.Config.Blob,
+		Config: s.config.BlobStoreImmutableConfig,
 		tempFS: s.TempLocal,
 	}
 

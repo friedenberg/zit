@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 )
 
@@ -46,6 +47,10 @@ func (k V0) GetBlobStoreImmutableConfig() BlobStoreConfig {
 
 func (k V0) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
+}
+
+func (k V0) GetRepoType() repo_type.Type {
+	return repo_type.TypeReadWrite
 }
 
 func (k V0) GetAgeEncryption() *age.Age {

@@ -3,7 +3,7 @@
 ---
 
 store-version = 8
-repo-type = 1
+repo-type = 'read-write'
 
 [blob-store]
 compression-type = 'zstd'

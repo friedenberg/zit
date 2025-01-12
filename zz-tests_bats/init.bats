@@ -21,7 +21,7 @@ function init_compression { # @test
 			---
 
 			store-version = 8
-			repo-type = 1
+			repo-type = 'read-write'
 
 			[blob-store]
 			compression-type = 'zstd'
@@ -119,7 +119,7 @@ function init_and_with_another_age { # @test
 
 	run_zit repo-info age-encryption
 	assert_success
-  assert_output "$age_id"
+	assert_output "$age_id"
 }
 
 function init_with_non_xdg { # @test

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type CatBlob struct {
@@ -23,7 +23,7 @@ type CatBlob struct {
 func init() {
 	registerCommand(
 		"cat-blob",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithBlobStore {
 			c := &CatBlob{}
 
 			f.Var(&c.Utility, "utility", "")
@@ -40,12 +40,12 @@ type shaWithReadCloser struct {
 }
 
 func (c CatBlob) makeBlobWriter(
-	u *repo_local.Repo,
+	blobStore command_components.BlobStoreWithEnv,
 ) interfaces.FuncIter[shaWithReadCloser] {
 	if c.Utility.IsEmpty() {
 		return quiter.MakeSyncSerializer(
 			func(rc shaWithReadCloser) (err error) {
-				if err = c.copy(u, rc); err != nil {
+				if err = c.copy(blobStore, rc); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -74,7 +74,7 @@ func (c CatBlob) makeBlobWriter(
 				}
 
 				if err = c.copy(
-					u,
+					blobStore,
 					shaWithReadCloser{
 						Sha:        rc.Sha,
 						ReadCloser: out,
@@ -95,27 +95,27 @@ func (c CatBlob) makeBlobWriter(
 	}
 }
 
-func (c CatBlob) RunWithRepo(
-	repo *repo_local.Repo,
+func (c CatBlob) RunWithBlobStore(
+	blobStore command_components.BlobStoreWithEnv,
 	args ...string,
 ) {
-	blobWriter := c.makeBlobWriter(repo)
+	blobWriter := c.makeBlobWriter(blobStore)
 
 	for _, v := range args {
 		var sh sha.Sha
 
 		if err := sh.Set(v); err != nil {
-			repo.CancelWithError(err)
+			blobStore.CancelWithError(err)
 		}
 
-		if err := c.blob(repo, &sh, blobWriter); err != nil {
+		if err := c.blob(blobStore, &sh, blobWriter); err != nil {
 			ui.Err().Print(err)
 		}
 	}
 }
 
 func (c CatBlob) copy(
-	u *repo_local.Repo,
+	blobStore command_components.BlobStoreWithEnv,
 	rc shaWithReadCloser,
 ) (err error) {
 	defer errors.DeferredCloser(&err, rc.ReadCloser)
@@ -124,7 +124,7 @@ func (c CatBlob) copy(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			rc.Sha.GetShaLike().GetShaString(),
-			u.GetUI(),
+			blobStore.GetUI(),
 			rc.ReadCloser,
 			true,
 		); err != nil {
@@ -132,7 +132,7 @@ func (c CatBlob) copy(
 			return
 		}
 	} else {
-		if _, err = io.Copy(u.GetUIFile(), rc.ReadCloser); err != nil {
+		if _, err = io.Copy(blobStore.GetUIFile(), rc.ReadCloser); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -142,13 +142,13 @@ func (c CatBlob) copy(
 }
 
 func (c CatBlob) blob(
-	u *repo_local.Repo,
+	blobStore command_components.BlobStoreWithEnv,
 	sh *sha.Sha,
 	blobWriter interfaces.FuncIter[shaWithReadCloser],
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = u.GetRepoLayout().BlobReader(sh); err != nil {
+	if r, err = blobStore.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

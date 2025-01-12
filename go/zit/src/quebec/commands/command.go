@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type Dependencies struct {
@@ -28,6 +29,10 @@ type CommandWithEnv interface {
 
 type CommandWithRepo interface {
 	RunWithRepo(*repo_local.Repo, ...string)
+}
+
+type CommandWithBlobStore interface {
+	RunWithBlobStore(command_components.BlobStoreWithEnv, ...string)
 }
 
 type CommandWithQuery interface {
@@ -66,6 +71,12 @@ func registerCommand(
 
 	case func(*flag.FlagSet) CommandWithRepo:
 		commands[n] = commandWithRepo{
+			Command: mft(f),
+			FlagSet: f,
+		}
+
+	case func(*flag.FlagSet) CommandWithBlobStore:
+		commands[n] = commandWithBlobStore{
 			Command: mft(f),
 			FlagSet: f,
 		}

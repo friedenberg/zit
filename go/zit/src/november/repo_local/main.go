@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -179,6 +180,15 @@ func (repo *Repo) initialize(options Options) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if repo.GetConfig().GetRepoType() != repo_type.TypeReadWrite {
+		err = repo_type.ErrUnsupportedRepoType{
+			Expected: repo_type.TypeReadWrite,
+			Actual:   repo.GetConfig().GetRepoType(),
+		}
+
+		return
 	}
 
 	// for _, rb := range u.GetConfig().Recipients {

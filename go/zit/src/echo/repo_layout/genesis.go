@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -39,12 +40,12 @@ func (bb *BigBang) SetFlagSet(f *flag.FlagSet) {
 
 	bb.Type = builtin_types.GetOrPanic(builtin_types.ImmutableConfigV1).Type
 	bb.Config = immutable_config.Default()
-	bb.Config.BlobStore.SetFlagSet(f)
+	bb.Config.SetFlagSet(f)
 }
 
 func (s *Layout) Genesis(bb BigBang) {
-	s.Config.Type = bb.Type
-	s.Config.Config = bb.Config
+	s.config.Type = bb.Type
+	s.config.ImmutableConfig = bb.Config
 
 	if err := s.MakeDir(
 		s.DirObjectId(),
@@ -87,7 +88,7 @@ func (s *Layout) Genesis(bb BigBang) {
 			s.CancelWithError(err)
 		}
 
-		if err := s.Config.Config.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
+		if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
 			bb.AgeIdentity,
 		); err != nil {
 			if !errors.IsExist(err) {
@@ -111,8 +112,8 @@ func (s *Layout) Genesis(bb BigBang) {
 			}
 
 			thw := triple_hyphen_io.Writer{
-				Metadata: metadata{Config: &s.Config},
-				Blob:     &s.Config,
+				Metadata: metadata{config: &s.config},
+				Blob:     &s.config,
 			}
 
 			if _, err := thw.WriteTo(f); err != nil {
@@ -120,8 +121,10 @@ func (s *Layout) Genesis(bb BigBang) {
 			}
 		}
 
-		writeFile(s.FileConfigMutable(), "")
-		writeFile(s.FileCacheDormant(), "")
+		if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeReadWrite {
+			writeFile(s.FileConfigMutable(), "")
+			writeFile(s.FileCacheDormant(), "")
+		}
 	}
 }
 

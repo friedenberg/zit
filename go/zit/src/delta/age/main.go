@@ -14,7 +14,7 @@ type (
 )
 
 type Age struct {
-	Recipients []Recipient `toml:"recipients,omitempty"`
+	// Recipients []Recipient `toml:"recipients,omitempty"`
 	Identities []*Identity `toml:"identities,omitempty"`
 }
 

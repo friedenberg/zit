@@ -123,6 +123,7 @@ function run_zit_init_disable_age {
     -age none \
     -lock-internal-files=false \
     "$@"
+
   assert_success
   assert_output - <<-EOM
 [!md @$(get_type_blob_sha) !toml-type-v1]
