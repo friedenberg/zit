@@ -8,31 +8,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type WriteBlob struct {
-	Check           bool
-	AgeIdentity     age.Identity
-	CompressionType immutable_config.CompressionType
-	UtilityBefore   script_value.Utility
-	UtilityAfter    script_value.Utility
+	Check         bool
+	UtilityBefore script_value.Utility
+	UtilityAfter  script_value.Utility
 }
 
 func init() {
 	registerCommand(
 		"write-blob",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithBlobStore {
 			c := &WriteBlob{}
 
 			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")
-			f.Var(&c.AgeIdentity, "age-identity", "")
-			c.CompressionType.SetFlagSet(f)
 
 			f.Var(&c.UtilityBefore, "utility-before", "")
 			f.Var(&c.UtilityAfter, "utility-after", "")
@@ -48,16 +42,13 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c WriteBlob) RunWithBlobStore(
+	blobStore command_components.BlobStoreWithEnv,
+	args ...string,
+) {
 	var failCount atomic.Uint32
 
 	sawStdin := false
-
-	var ag age.Age
-
-	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		u.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
-	}
 
 	for _, p := range args {
 		switch {
@@ -71,21 +62,21 @@ func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		a := answer{Path: p}
 
-		a.Sha, a.error = c.doOne(&ag, u.GetRepoLayout(), p)
+		a.Sha, a.error = c.doOne(blobStore, p)
 
 		if a.error != nil {
-			ui.Err().Printf("%s: (error: %q)", a.Path, a.error)
+			blobStore.GetErr().Printf("%s: (error: %q)", a.Path, a.error)
 			failCount.Add(1)
 			continue
 		}
 
-		hasBlob := u.GetRepoLayout().HasBlob(a.Sha)
+		hasBlob := blobStore.HasBlob(a.Sha)
 
 		if hasBlob {
 			if c.Check {
-				u.GetUI().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
+				blobStore.GetUI().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
 			} else {
-				u.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
+				blobStore.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
 			}
 		} else {
 			ui.Err().Printf("%s %s (untracked)", a.GetShaLike(), a.Path)
@@ -99,24 +90,18 @@ func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	fc := failCount.Load()
 
 	if fc > 0 {
-		u.CancelWithBadRequestf("untracked objects: %d", fc)
+		blobStore.CancelWithBadRequestf("untracked objects: %d", fc)
 		return
 	}
 }
 
 func (c WriteBlob) doOne(
-	ag *age.Age,
-	arf interfaces.BlobWriterFactory,
+	blobStore command_components.BlobStoreWithEnv,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var rc io.ReadCloser
 
 	o := dir_layout.FileReadOptions{
-		Config: dir_layout.MakeConfig(
-			ag,
-			c.CompressionType,
-			false,
-		),
 		Path: p,
 	}
 
@@ -132,7 +117,7 @@ func (c WriteBlob) doOne(
 	if c.Check {
 		wc = sha.MakeWriter(nil)
 	} else {
-		if wc, err = arf.BlobWriter(); err != nil {
+		if wc, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
