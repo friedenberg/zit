@@ -5,17 +5,16 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 )
 
 type directoryV1 struct {
-	sv immutable_config.StoreVersion
+	sv interfaces.StoreVersion
 	xdg.XDG
 }
 
 func (c *directoryV1) init(
-	sv immutable_config.StoreVersion,
+	sv interfaces.StoreVersion,
 	xdg xdg.XDG,
 ) (err error) {
 	c.sv = sv

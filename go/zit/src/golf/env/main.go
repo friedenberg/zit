@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -68,6 +69,16 @@ func Make(
 		if e.debug, err = debug.MakeContext(context, kCli.Debug); err != nil {
 			context.CancelWithError(err)
 		}
+	}
+
+	if kCli.Verbose && !kCli.Quiet {
+		ui.SetVerbose(true)
+	} else {
+		ui.SetOutput(io.Discard)
+	}
+
+	if kCli.Todo {
+		ui.SetTodoOn()
 	}
 
 	return e

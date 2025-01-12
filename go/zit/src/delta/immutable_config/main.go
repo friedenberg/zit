@@ -16,7 +16,7 @@ type Config interface {
 
 type BlobStoreConfig interface {
 	GetBlobStoreImmutableConfig() BlobStoreConfig
-	GetAge() age.Age
+	GetAge() *age.Age
 	GetCompressionType() CompressionType
 	GetLockInternalFiles() bool
 }
@@ -26,7 +26,6 @@ func Default() TomlV1 {
 		StoreVersion: CurrentStoreVersion,
 		RepoType:     repo_type.TypeReadWrite,
 		BlobStore: BlobStoreTomlV1{
-			Recipients:        make([]string, 0),
 			CompressionType:   CompressionTypeDefault,
 			LockInternalFiles: true,
 		},

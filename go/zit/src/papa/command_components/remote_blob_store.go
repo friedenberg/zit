@@ -3,38 +3,31 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type RemoteBlobStore struct {
-	Blobs           string
-	AgeIdentity     age.Identity
-	CompressionType immutable_config.CompressionType
+	Blobs  string
+	Config immutable_config.BlobStoreTomlV1
 }
 
 func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {
-	cmd.CompressionType = immutable_config.CompressionTypeDefault
+	cmd.Config.CompressionType = immutable_config.CompressionTypeDefault
+	cmd.Config.CompressionType.SetFlagSet(f)
 	f.StringVar(&cmd.Blobs, "blobs", "", "")
-	f.Var(&cmd.AgeIdentity, "age-identity", "")
-	cmd.CompressionType.SetFlagSet(f)
 }
 
-func (cmd *RemoteBlobStore) MakeRemoteBlobStore() (blobStore interfaces.BlobStore, err error) {
-	var ag age.Age
-
-	if err = ag.AddIdentity(cmd.AgeIdentity); err != nil {
-		err = errors.Wrapf(err, "age-identity: %q", &cmd.AgeIdentity)
-		return
-	}
-
+func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
+	e *env.Env,
+) (blobStore interfaces.BlobStore, err error) {
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,
-		&ag,
-		cmd.CompressionType,
+		dir_layout.MakeConfigFromImmutableBlobConfig(cmd.Config),
+		e.GetDirLayout().TempLocal,
 	)
 
 	return

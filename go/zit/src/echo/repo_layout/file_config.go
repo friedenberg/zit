@@ -14,19 +14,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
-
-type Config struct {
-	ids.Type
-	immutable_config.Config
-	storeVersion      immutable_config.StoreVersion
-	compressionType   immutable_config.CompressionType
-	lockInternalFiles bool
-}
 
 func (s *Layout) loadImmutableConfig() (err error) {
 	var r io.Reader
@@ -59,7 +52,17 @@ func (s *Layout) loadImmutableConfig() (err error) {
 		return
 	}
 
+	s.Config.Blob = dir_layout.MakeConfigFromImmutableBlobConfig(
+		s.Config.Config.GetBlobStoreImmutableConfig(),
+	)
+
 	return
+}
+
+type Config struct {
+	ids.Type
+	Config immutable_config.Config
+	Blob   dir_layout.Config
 }
 
 type metadata struct {
@@ -99,13 +102,13 @@ func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (s *Config) ReadFrom(r io.Reader) (n int64, err error) {
-	switch s.Type.String() {
+func (c *Config) ReadFrom(r io.Reader) (n int64, err error) {
+	switch c.Type.String() {
 	case builtin_types.ImmutableConfigV1:
-		s.Config = &immutable_config.TomlV1{}
+		c.Config = &immutable_config.TomlV1{}
 		td := toml.NewDecoder(r)
 
-		if err = td.Decode(s.Config); err != nil {
+		if err = td.Decode(c.Config); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {
@@ -115,11 +118,11 @@ func (s *Config) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 	case "":
-		s.Config = &immutable_config.V0{}
+		c.Config = &immutable_config.V0{}
 
 		dec := gob.NewDecoder(r)
 
-		if err = dec.Decode(s.Config); err != nil {
+		if err = dec.Decode(c.Config); err != nil {
 			if err == io.EOF {
 				err = nil
 			} else {
@@ -129,13 +132,13 @@ func (s *Config) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 	default:
-		err = errors.Errorf("unsupported config type: %q", s.Type)
+		err = errors.Errorf("unsupported config type: %q", c.Type)
 		return
 	}
 
-	s.storeVersion = immutable_config.MakeStoreVersion(s.GetStoreVersion())
-	s.compressionType = s.GetBlobStoreImmutableConfig().GetCompressionType()
-	s.lockInternalFiles = s.GetBlobStoreImmutableConfig().GetLockInternalFiles()
+	c.Blob = dir_layout.MakeConfigFromImmutableBlobConfig(
+		c.Config.GetBlobStoreImmutableConfig(),
+	)
 
 	return
 }

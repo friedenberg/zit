@@ -1,7 +1,6 @@
 package repo_local
 
 import (
-	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -136,23 +135,13 @@ func (repo *Repo) initialize(options Options) (err error) {
 
 	ui.TodoP4("find a better place for this")
 	{
-		if repo.GetCLIConfig().Verbose && !repo.GetCLIConfig().Quiet {
-			ui.SetVerbose(true)
-		} else {
-			ui.SetOutput(io.Discard)
-		}
-
-		if repo.GetCLIConfig().Todo {
-			ui.SetTodoOn()
-		}
-
-		standortOptions := repo_layout.Options{
+		layoutOptions := repo_layout.Options{
 			BasePath: repo.GetCLIConfig().BasePath,
 		}
 
 		if repo.layout, err = repo_layout.Make(
 			repo.Env,
-			standortOptions,
+			layoutOptions,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

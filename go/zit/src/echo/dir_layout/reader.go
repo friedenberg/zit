@@ -24,12 +24,12 @@ type reader struct {
 func NewReader(o ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
-	if r.rAge, err = o.Age.Decrypt(o.Reader); err != nil {
+	if r.rAge, err = o.GetAge().Decrypt(o.Reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if r.rExpand, err = o.CompressionType.NewReader(r.rAge); err != nil {
+	if r.rExpand, err = o.GetCompressionType().NewReader(r.rAge); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

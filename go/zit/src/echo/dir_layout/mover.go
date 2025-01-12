@@ -20,7 +20,7 @@ type Mover struct {
 
 func NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
-		lockFile:                  o.LockFile,
+		lockFile:                  o.GetLockInternalFiles(),
 		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,
 	}
 
@@ -36,9 +36,12 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 	}
 
 	wo := WriteOptions{
-		Age:             o.Age,
-		CompressionType: o.CompressionType,
-		Writer:          m.file,
+		Config: MakeConfig(
+			o.GetAge(),
+			o.GetCompressionType(),
+			o.GetLockInternalFiles(),
+		),
+		Writer: m.file,
 	}
 
 	if m.Writer, err = NewWriter(wo); err != nil {

@@ -20,6 +20,12 @@ function info_store_version { # @test
 	assert_output
 }
 
+# bats test_tags=user_story:compression
+function info_compression_type { # @test
+	run_zit info compression-type
+	assert_output 'zstd'
+}
+
 # bats test_tags=user_story:xdg
 function info_xdg { # @test
 	run_zit_init_disable_age

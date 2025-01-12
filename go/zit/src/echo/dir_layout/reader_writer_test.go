@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
 
 func makeAge(t *testing.T) *age.Age {
@@ -32,7 +33,11 @@ func Test1(t *testing.T) {
 	var w *writer
 
 	o := WriteOptions{
-		Age:    age,
+		Config: MakeConfig(
+			age,
+			immutable_config.CompressionTypeDefault,
+			false,
+		),
 		Writer: out,
 	}
 
@@ -52,7 +57,11 @@ func Test1(t *testing.T) {
 	var r *reader
 
 	ro := ReadOptions{
-		Age:    age,
+		Config: MakeConfig(
+			age,
+			immutable_config.CompressionTypeDefault,
+			false,
+		),
 		Reader: in,
 	}
 

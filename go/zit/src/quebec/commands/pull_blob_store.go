@@ -54,7 +54,9 @@ func (c *PullBlobStore) RunWithQuery(
 	{
 		var err error
 
-		if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(); err != nil {
+		if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(
+			repo.Env,
+		); err != nil {
 			repo.CancelWithError(err)
 		}
 	}

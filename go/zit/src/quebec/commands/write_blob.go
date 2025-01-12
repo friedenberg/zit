@@ -112,9 +112,12 @@ func (c WriteBlob) doOne(
 	var rc io.ReadCloser
 
 	o := dir_layout.FileReadOptions{
-		Age:             ag,
-		Path:            p,
-		CompressionType: c.CompressionType,
+		Config: dir_layout.MakeConfig(
+			ag,
+			c.CompressionType,
+			false,
+		),
+		Path: p,
 	}
 
 	if rc, err = dir_layout.NewFileReader(o); err != nil {

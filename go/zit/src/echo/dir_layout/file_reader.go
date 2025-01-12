@@ -20,9 +20,12 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 	}
 
 	fro := ReadOptions{
-		Age:             o.Age,
+		Config: MakeConfig(
+			o.GetAge(),
+			o.GetCompressionType(),
+			o.GetLockInternalFiles(),
+		),
 		Reader:          ar.file,
-		CompressionType: o.CompressionType,
 	}
 
 	if ar.Reader, err = NewReader(fro); err != nil {

@@ -8,7 +8,7 @@ import (
 
 // TODO Split into repo and blob store configs
 type BlobStoreTomlV1 struct {
-	Recipients        []string        `toml:"recipients"`
+	AgeIdentity       age.Age         `toml:"age-identity"`
 	CompressionType   CompressionType `toml:"compression-type"`
 	LockInternalFiles bool            `toml:"lock-internal-files"`
 }
@@ -23,23 +23,15 @@ func (k *BlobStoreTomlV1) SetFlagSet(f *flag.FlagSet) {
 		"",
 	)
 
-	f.Func(
-		"recipient",
-		"age recipients",
-		func(value string) (err error) {
-			// TODO-P2 validate age recipient
-			k.Recipients = append(k.Recipients, value)
-			return
-		},
-	)
+	f.Var(&k.AgeIdentity, "age-identity", "add an age identity")
 }
 
 func (k BlobStoreTomlV1) GetBlobStoreImmutableConfig() BlobStoreConfig {
 	return k
 }
 
-func (k BlobStoreTomlV1) GetAge() age.Age {
-	return age.Age{}
+func (k BlobStoreTomlV1) GetAge() *age.Age {
+	return &age.Age{}
 }
 
 func (k BlobStoreTomlV1) GetCompressionType() CompressionType {

@@ -18,6 +18,27 @@ type Age struct {
 	identities []age.Identity
 }
 
+func (a *Age) String() string {
+	return "TODO"
+}
+
+// TODO add support for recipients in addition to identities
+func (a *Age) Set(v string) (err error) {
+	var identity Identity
+
+	if err = identity.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = a.AddIdentity(identity); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a *Age) AddIdentity(
 	identity Identity,
 ) (err error) {

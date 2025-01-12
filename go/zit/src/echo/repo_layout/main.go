@@ -57,25 +57,7 @@ func Make(
 	s.basePath = o.BasePath
 	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
 
-	if err = s.storeVersion.ReadFromFile(
-		s.DataFileStoreVersion(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var dp directoryPaths
-
-	switch s.GetStoreVersion().GetInt() {
-	case 6:
-		xdg := s.GetXDG()
-		xdg.Data = s.basePath
-		s.SetXDG(xdg)
-		dp = &directoryV0{}
-
-	default:
-		dp = &directoryV1{}
-	}
+	dp := &directoryV1{}
 
 	if err = dp.init(s.GetStoreVersion(), s.GetXDG()); err != nil {
 		err = errors.Wrap(err)
@@ -143,21 +125,11 @@ func Make(
 		return
 	}
 
-	if s.readOnlyBlobStorePath != "" {
-		// ui.Err().Printf("using remote store: %q", s.readOnlyBlobStorePath)
-		s.remote = MakeBlobStore(
-			s.readOnlyBlobStorePath,
-			s.age,
-			immutable_config.CompressionTypeZstd,
-		)
-	}
-
 	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
-		age:            s.age,
-		Config:         s.Config,
+		Config:         s.Config.Blob,
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetDirLayout().TempLocal,
 	}
@@ -167,15 +139,25 @@ func Make(
 
 func (a Layout) SansObjectAge() (b Layout) {
 	b = a
-	b.age = nil
-	b.ObjectStore.age = nil
+
+	b.ObjectStore.Config = dir_layout.MakeConfig(
+		nil,
+		a.ObjectStore.Config.GetCompressionType(),
+		a.ObjectStore.Config.GetLockInternalFiles(),
+	)
+
 	return
 }
 
 func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
-	b.compressionType = immutable_config.CompressionTypeNone
-	b.ObjectStore.Config.compressionType = b.Config.GetBlobStoreImmutableConfig().GetCompressionType()
+
+	b.ObjectStore.Config = dir_layout.MakeConfig(
+		a.ObjectStore.Config.GetAge(),
+		immutable_config.CompressionTypeNone,
+		a.ObjectStore.Config.GetLockInternalFiles(),
+	)
+
 	return
 }
 
@@ -228,6 +210,10 @@ func (h Layout) DataFileStoreVersion() string {
 	return filepath.Join(h.GetXDG().Data, "version")
 }
 
-func (h Layout) GetStoreVersion() immutable_config.StoreVersion {
-	return h.storeVersion
+func (h Layout) GetStoreVersion() interfaces.StoreVersion {
+	if h.Config.Config == nil {
+		return immutable_config.CurrentStoreVersion
+	} else {
+		return h.Config.Config.GetStoreVersion()
+	}
 }

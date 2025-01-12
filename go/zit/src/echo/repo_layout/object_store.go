@@ -4,15 +4,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type ObjectStore struct {
-	Config
+	dir_layout.Config
+
 	basePath string
-	age      *age.Age
 	interfaces.DirectoryPaths
 	dir_layout.TemporaryFS
 }
@@ -31,9 +30,8 @@ func (s ObjectStore) objectReader(
 	}
 
 	o := dir_layout.FileReadOptions{
-		Age:             s.age,
-		Path:            id.Path(sh.GetShaLike(), p),
-		CompressionType: s.compressionType,
+		Config: s.Config,
+		Path:   id.Path(sh.GetShaLike(), p),
 	}
 
 	if rc, err = dir_layout.NewFileReader(o); err != nil {
@@ -58,11 +56,9 @@ func (s ObjectStore) objectWriter(
 	}
 
 	o := dir_layout.MoveOptions{
-		Age:                      s.age,
+		Config:                   s.Config,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 s.lockInternalFiles,
-		CompressionType:          s.compressionType,
 		TemporaryFS:              s.TemporaryFS,
 	}
 

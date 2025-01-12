@@ -11,6 +11,37 @@ teardown() {
 	chflags_and_rm
 }
 
+function init_compression { # @test
+	run_zit_init_disable_age
+
+	function output_immutable_config() {
+		cat - <<-EOM
+			---
+			! toml-config-immutable-v1
+			---
+
+			store-version = 8
+			repo-type = 1
+
+			[blob-store]
+			compression-type = 'zstd'
+			lock-internal-files = false
+
+			[blob-store.age-identity]
+		EOM
+	}
+
+	run cat .xdg/data/zit/config-permanent
+	assert_success
+	output_immutable_config | assert_output -
+
+	run_zit cat-blob "$(get_konfig_sha)"
+	assert_success
+
+	run zstd --decompress .xdg/data/zit/objects/blobs/35/* --stdout
+	assert_success
+}
+
 function init_and_reindex { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1

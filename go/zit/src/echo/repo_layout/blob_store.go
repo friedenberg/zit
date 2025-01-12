@@ -9,26 +9,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type blobStore struct {
-	config   Config
+	dir_layout.Config
 	basePath string
-	tempPath string
-	age      *age.Age
 	tempFS   dir_layout.TemporaryFS
 }
 
-func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {
+func MakeBlobStoreFromHome(
+	s Layout,
+) (bs blobStore, err error) {
 	bs = blobStore{
-		age:    s.age,
-		config: s.Config,
+		Config: s.Config.Blob,
 		tempFS: s.TempLocal,
 	}
 
@@ -42,15 +39,14 @@ func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {
 
 func MakeBlobStore(
 	basePath string,
-	age *age.Age,
-	compressionType immutable_config.CompressionType,
+	config dir_layout.Config,
+	tempFS dir_layout.TemporaryFS,
 ) blobStore {
+	ui.DebugBatsTestBody().Printf("%#v", config)
 	return blobStore{
+		Config:   config,
 		basePath: basePath,
-		age:      age,
-		config: Config{
-			compressionType: compressionType,
-		},
+		tempFS:   tempFS,
 	}
 }
 
@@ -102,11 +98,9 @@ func (s blobStore) BlobReader(
 
 func (s blobStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
 	mo := dir_layout.MoveOptions{
-		Age:                      s.age,
+		Config:                   s.Config,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 s.config.lockInternalFiles,
-		CompressionType:          s.config.compressionType,
 		TemporaryFS:              s.tempFS,
 	}
 
@@ -130,9 +124,8 @@ func (s blobStore) blobReaderFrom(
 	p = id.Path(sh.GetShaLike(), p)
 
 	o := dir_layout.FileReadOptions{
-		Age:             s.age,
-		Path:            p,
-		CompressionType: s.config.compressionType,
+		Config: s.Config,
+		Path:   p,
 	}
 
 	if r, err = dir_layout.NewFileReader(o); err != nil {

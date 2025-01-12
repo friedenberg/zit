@@ -37,6 +37,9 @@ func (c Info) RunWithEnv(e *env.Env, args ...string) {
 		case "store-version":
 			e.GetUI().Print(c.Config.GetStoreVersion())
 
+		case "compression-type":
+			e.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
+
 		case "xdg":
 			ecksDeeGee := e.GetDirLayout().GetXDG()
 

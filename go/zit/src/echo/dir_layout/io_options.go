@@ -2,38 +2,27 @@ package dir_layout
 
 import (
 	"io"
-
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
 
 type ReadOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
+	Config
 	io.Reader
 }
 
 type FileReadOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-	Path            string
+	Config
+	Path string
 }
 
 type WriteOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
+	Config
 	io.Writer
 }
 
 type MoveOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
+	Config
 	TemporaryFS
 	ErrorOnAttemptedOverwrite bool
-	LockFile                  bool
 	FinalPath                 string
 	GenerateFinalPathFromSha  bool
 }

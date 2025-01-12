@@ -333,10 +333,10 @@ function import_inventory_lists { # @test
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
 
+	export BATS_TEST_BODY=true
 	run_zit import \
 		-inventory-list "$list" \
-		-blobs "$blobs" \
-		-compression-type zstd
+		-blobs "$blobs"
 
 	assert_success
 

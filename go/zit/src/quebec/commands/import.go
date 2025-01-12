@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -50,12 +49,6 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 		return
 	}
 
-	var ag age.Age
-
-	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		local.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
-	}
-
 	bf := local.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
 
 	var rc io.ReadCloser
@@ -63,9 +56,12 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 	// setup inventory list reader
 	{
 		o := dir_layout.FileReadOptions{
-			Age:             &ag,
-			Path:            c.InventoryList,
-			CompressionType: c.CompressionType,
+			Config: dir_layout.MakeConfig(
+				c.Config.GetAge(),
+				c.Config.GetCompressionType(),
+				false,
+			),
+			Path: c.InventoryList,
 		}
 
 		var err error
@@ -96,7 +92,9 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 		{
 			var err error
 
-			if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(); err != nil {
+			if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(
+				local.Env,
+			); err != nil {
 				local.CancelWithError(err)
 			}
 		}

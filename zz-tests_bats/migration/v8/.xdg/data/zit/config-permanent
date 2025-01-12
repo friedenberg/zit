@@ -6,6 +6,7 @@ store-version = 8
 repo-type = 1
 
 [blob-store]
-recipients = []
 compression-type = 'zstd'
 lock-internal-files = false
+
+[blob-store.age-identity]

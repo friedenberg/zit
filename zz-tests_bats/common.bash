@@ -96,7 +96,11 @@ function run_zit_stderr_unified {
 }
 
 function run_zit_init {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang) -lock-internal-files=false "$@"
+  run_zit init \
+    -yin <(cat_yin) \
+    -yang <(cat_yang) \
+    -lock-internal-files=false \
+    "$@"
   assert_success
 }
 
@@ -109,7 +113,12 @@ function get_type_blob_sha() {
 }
 
 function run_zit_init_disable_age {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none -lock-internal-files=false "$@"
+  run_zit init \
+    -yin <(cat_yin) \
+    -yang <(cat_yang) \
+    -age none \
+    -lock-internal-files=false \
+    "$@"
   assert_success
   assert_output - <<-EOM
 [!md @$(get_type_blob_sha) !toml-type-v1]
