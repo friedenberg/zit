@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -50,7 +50,7 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkout) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
+func (c Checkout) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
 	opCheckout := user_ops.Checkout{
 		Repo:     u,
 		Organize: c.Organize,

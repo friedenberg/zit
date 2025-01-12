@@ -12,11 +12,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Checkout struct {
-	*repo_local.Repo
+	*read_write_repo_local.Repo
 	Organize bool
 	checkout_options.Options
 	Open    bool

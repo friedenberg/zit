@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c Exec) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if len(args) == 0 {
 		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
 	}
@@ -60,7 +60,7 @@ func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 }
 
 func (c Exec) runBash(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	tz *sku.Transacted,
 	args ...string,
 ) (err error) {

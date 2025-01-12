@@ -7,8 +7,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-type Repo interface {
-	GetRepo() Repo
+type Relay interface {
+	GetRelayRepo() Relay
+
+	MakeInventoryList(
+		qg *query.Group,
+	) (list *sku.List, err error)
+
+	PullQueryGroupFromRemote(
+		remote ReadWrite,
+		qg *query.Group,
+		options RemoteTransferOptions,
+	) (err error)
+
+	GetBlobStore() interfaces.BlobStore
+}
+
+type ReadWrite interface {
+	Relay
+	GetReadWriteRepo() ReadWrite
 
 	MakeQueryGroup(
 		metaBuilder any,
@@ -22,7 +39,7 @@ type Repo interface {
 	) (list *sku.List, err error)
 
 	PullQueryGroupFromRemote(
-		remote Repo,
+		remote ReadWrite,
 		qg *query.Group,
 		options RemoteTransferOptions,
 	) (err error)

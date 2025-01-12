@@ -6,13 +6,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"github.com/google/shlex"
 )
 
 // TODO move to store_fs
 type EachBlob struct {
-	*repo_local.Repo
+	*read_write_repo_local.Repo
 	Utility string
 }
 

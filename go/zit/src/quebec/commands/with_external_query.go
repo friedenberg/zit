@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -19,7 +19,7 @@ type CompletionGenresGetter interface {
 }
 
 func (c commandWithQuery) CompleteWithRepo(
-	local *repo_local.Repo,
+	local *read_write_repo_local.Repo,
 	args ...string,
 ) {
 	if _, ok := c.CommandWithQuery.(CompletionGenresGetter); !ok {
@@ -44,7 +44,7 @@ func (c commandWithQuery) CompleteWithRepo(
 }
 
 func (c commandWithQuery) RunWithRepo(
-	local *repo_local.Repo,
+	local *read_write_repo_local.Repo,
 	args ...string,
 ) {
 	qg := c.MakeQueryGroup(

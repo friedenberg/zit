@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
+func (c Import) RunWithRepo(local *read_write_repo_local.Repo, args ...string) {
 	if c.InventoryList == "" {
 		local.CancelWithBadRequestf("empty inventory list")
 		return

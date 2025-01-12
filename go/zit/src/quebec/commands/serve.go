@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Serve struct {
@@ -29,7 +29,7 @@ func (c Serve) GetEnvOptions() env.Options {
 	}
 }
 
-func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c Serve) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	u.SetCancelOnSIGHUP()
 
 	// TODO switch network to be RemoteServeType

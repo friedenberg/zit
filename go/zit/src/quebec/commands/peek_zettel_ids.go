@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type PeekZettelIds struct{}
@@ -22,7 +22,7 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
+func (c PeekZettelIds) RunWithRepo(repo *read_write_repo_local.Repo, args ...string) {
 	n := 0
 
 	if len(args) > 0 {

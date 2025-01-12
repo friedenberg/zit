@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Test struct{}
@@ -20,7 +20,7 @@ func init() {
 }
 
 func (c Test) RunWithRepo(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	args ...string,
 ) {
 }

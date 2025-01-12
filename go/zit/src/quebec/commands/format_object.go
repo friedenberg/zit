@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type FormatObject struct {
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c *FormatObject) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)
@@ -127,7 +127,7 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 }
 
 func (c *FormatObject) FormatFromStdin(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"

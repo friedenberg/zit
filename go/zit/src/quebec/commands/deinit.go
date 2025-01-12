@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Deinit struct {
@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c Deinit) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c Deinit) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
@@ -48,7 +48,7 @@ func (c Deinit) RunWithRepo(u *repo_local.Repo, args ...string) {
 	}
 }
 
-func (c Deinit) getPermission(u *repo_local.Repo) (success bool) {
+func (c Deinit) getPermission(u *read_write_repo_local.Repo) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",

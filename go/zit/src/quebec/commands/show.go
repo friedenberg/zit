@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Show struct {
@@ -50,7 +50,7 @@ func (c Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Show) RunWithQuery(repo *repo_local.Repo, qg *query.Group) {
+func (c Show) RunWithQuery(repo *read_write_repo_local.Repo, qg *query.Group) {
 	var f interfaces.FuncIter[*sku.Transacted]
 
 	if c.Format == "" && qg.IsExactlyOneObjectId() {

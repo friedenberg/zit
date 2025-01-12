@@ -19,15 +19,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type HTTP struct {
 	http.Client
-	*repo_local.Repo
+	*read_write_repo_local.Repo
 }
 
-func (repo *HTTP) GetRepo() repo.Repo {
+func (repo *HTTP) GetReadWriteRepo() repo.ReadWrite {
 	return repo
 }
 
@@ -86,7 +86,7 @@ func (repo *HTTP) MakeInventoryList(
 }
 
 func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
-	remote repo.Repo,
+	remote repo.ReadWrite,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
@@ -176,7 +176,7 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 }
 
 func (remote *HTTP) WriteBlobToRemote(
-	local repo.Repo,
+	local repo.ReadWrite,
 	expected *sha.Sha,
 ) (err error) {
 	var actual sha.Sha

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -43,7 +43,7 @@ func (c *PullBlobStore) DefaultGenres() ids.Genre {
 }
 
 func (c *PullBlobStore) RunWithQuery(
-	repo *repo_local.Repo,
+	repo *read_write_repo_local.Repo,
 	qg *query.Group,
 ) {
 	importerOptions := store.ImporterOptions{

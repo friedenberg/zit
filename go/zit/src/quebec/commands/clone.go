@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -62,7 +62,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 func (c Clone) Run(
 	dependencies Dependencies,
 ) {
-	local := repo_local.Genesis(
+	local := read_write_repo_local.Genesis(
 		c.BigBang,
 		dependencies.Context,
 		dependencies.Config,

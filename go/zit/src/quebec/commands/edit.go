@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -57,7 +57,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
+func (c Edit) RunWithQuery(u *read_write_repo_local.Repo, eqwk *query.Group) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,
 	}

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -46,7 +46,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c Last) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -116,7 +116,7 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 }
 
 func (c Last) runWithInventoryList(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()

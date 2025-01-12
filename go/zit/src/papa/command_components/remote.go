@@ -6,13 +6,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
 type Remote struct {
 	RemoteType repo.RemoteType
-	remote     repo.Repo
+	remote     repo.ReadWrite
 }
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
@@ -22,12 +22,12 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 func (c Remote) MakeRemote(
 	env *env.Env,
 	remoteArg string,
-) (remote repo.Repo) {
+) (remote repo.ReadWrite) {
 	var err error
 
 	switch c.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
+		if remote, err = read_write_repo_local.MakeFromConfigAndXDGDotenvPath(
 			env.Context,
 			env.GetCLIConfig(),
 			remoteArg,

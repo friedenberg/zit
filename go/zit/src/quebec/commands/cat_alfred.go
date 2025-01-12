@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred_sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type CatAlfred struct {
@@ -49,7 +49,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
+func (c CatAlfred) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.GetUIFile())
 	defer u.MustFlush(wo)

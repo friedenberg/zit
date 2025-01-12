@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type FindMissing struct{}
@@ -21,7 +21,7 @@ func init() {
 }
 
 func (c FindMissing) RunWithRepo(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	args ...string,
 ) {
 	var lookupStored map[sha.Bytes][]string

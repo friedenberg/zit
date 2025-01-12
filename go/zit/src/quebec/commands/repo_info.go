@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type RepoInfo struct{}
@@ -22,7 +22,7 @@ func init() {
 }
 
 // TODO disambiguate this from repo / env
-func (cmd RepoInfo) RunWithRepo(repo *repo_local.Repo, args ...string) {
+func (cmd RepoInfo) RunWithRepo(repo *read_write_repo_local.Repo, args ...string) {
 	c := repo.GetConfig()
 
 	if len(args) == 0 {

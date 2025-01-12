@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 func MakeRemoteHTTPFromXDGDotenvPath(
@@ -15,9 +15,9 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 	xdgDotenvPath string,
 	options env.Options,
 ) (remoteHTTP *HTTP, err error) {
-	var remote *repo_local.Repo
+	var remote *read_write_repo_local.Repo
 
-	if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
+	if remote, err = read_write_repo_local.MakeFromConfigAndXDGDotenvPath(
 		context,
 		config,
 		xdgDotenvPath,
@@ -55,9 +55,9 @@ func MakeRemoteStdioLocal(
 	env *env.Env,
 	dir string,
 ) (remoteHTTP *HTTP, err error) {
-	remote := repo_local.Make(
+	remote := read_write_repo_local.Make(
 		env,
-		repo_local.OptionsEmpty,
+		read_write_repo_local.OptionsEmpty,
 	)
 
 	remoteHTTP = &HTTP{
@@ -82,9 +82,9 @@ func MakeRemoteStdioSSH(
 	env *env.Env,
 	arg string,
 ) (remoteHTTP *HTTP, err error) {
-	remote := repo_local.Make(
+	remote := read_write_repo_local.Make(
 		env,
-		repo_local.OptionsEmpty,
+		read_write_repo_local.OptionsEmpty,
 	)
 
 	remoteHTTP = &HTTP{

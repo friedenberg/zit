@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type Mergetool struct{}
@@ -35,7 +35,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Mergetool) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
+func (c Mergetool) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
 	conflicted := sku.MakeSkuTypeSetMutable()
 
 	if err := u.GetStore().QuerySkuType(
@@ -71,7 +71,7 @@ func (c Mergetool) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	u.Must(u.Unlock)
 }
 
-func (c Mergetool) doOne(u *repo_local.Repo, co *sku.CheckedOut) {
+func (c Mergetool) doOne(u *read_write_repo_local.Repo, co *sku.CheckedOut) {
 	tm := sku.Conflicted{
 		CheckedOut: co.Clone(),
 	}

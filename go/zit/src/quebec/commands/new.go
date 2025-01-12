@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -66,7 +66,7 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(
-	u *repo_local.Repo,
+	u *read_write_repo_local.Repo,
 	args ...string,
 ) (err error) {
 	if u.GetConfig().DryRun && len(args) == 0 {
@@ -79,7 +79,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c *New) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
 		u.CancelWithError(err)
 	}

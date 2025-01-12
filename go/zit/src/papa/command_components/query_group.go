@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type QueryGroup struct {
@@ -20,7 +20,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 
 func (c QueryGroup) MakeQueryGroup(
 	command any,
-	local *repo_local.Repo,
+	local *read_write_repo_local.Repo,
 	args ...string,
 ) (qg *query.Group) {
 	var err error

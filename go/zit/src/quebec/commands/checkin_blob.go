@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 )
 
 type CheckinBlob struct {
@@ -41,7 +41,7 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c CheckinBlob) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	if len(args)%2 != 0 {
 		u.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",

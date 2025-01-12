@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
+func (c *FormatOrganize) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {
