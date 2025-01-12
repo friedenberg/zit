@@ -1,6 +1,7 @@
 package age
 
 import (
+	"fmt"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -8,18 +9,17 @@ import (
 )
 
 type (
-	Recipient       = age.Recipient
 	X25519Identity  = age.X25519Identity
 	X25519Recipient = age.X25519Recipient
 )
 
 type Age struct {
-	recipients []Recipient
-	identities []age.Identity
+	// Recipients []Recipient `toml:"recipients"`
+	Identities []*Identity `toml:"identities"`
 }
 
 func (a *Age) String() string {
-	return "TODO"
+	return fmt.Sprintf("%s", a.Identities)
 }
 
 // TODO add support for recipients in addition to identities
@@ -46,22 +46,16 @@ func (a *Age) AddIdentity(
 		return
 	}
 
-	a.recipients = append(a.recipients, identity)
-	a.identities = append(a.identities, identity)
+	// a.Recipients = append(a.Recipients, identity)
+	a.Identities = append(a.Identities, &identity)
 
 	return
 }
 
 func (a *Age) AddIdentityOrGenerateIfNecessary(
 	identity Identity,
-	path string,
 ) (err error) {
-	if err = identity.GenerateIfNecessary(path); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = identity.WriteToPathIfNecessary(path); err != nil {
+	if err = identity.GenerateIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,9 +68,9 @@ func (a *Age) AddIdentityOrGenerateIfNecessary(
 	return
 }
 
-func MakeFromIdentity(identity Identity, path string) (a *Age, err error) {
+func MakeFromIdentity(identity Identity) (a *Age, err error) {
 	a = &Age{}
-	err = a.AddIdentityOrGenerateIfNecessary(identity, path)
+	err = a.AddIdentityOrGenerateIfNecessary(identity)
 	return
 }
 
@@ -88,7 +82,7 @@ func MakeFromIdentityPathOrString(path_or_identity string) (a *Age, err error) {
 		return
 	}
 
-	return MakeFromIdentity(i, "")
+	return MakeFromIdentity(i)
 }
 
 func MakeFromIdentityFile(basePath string) (a *Age, err error) {
@@ -99,7 +93,7 @@ func MakeFromIdentityFile(basePath string) (a *Age, err error) {
 		return
 	}
 
-	return MakeFromIdentity(i, "")
+	return MakeFromIdentity(i)
 }
 
 func MakeFromIdentityString(contents string) (a *Age, err error) {
@@ -110,7 +104,7 @@ func MakeFromIdentityString(contents string) (a *Age, err error) {
 		return
 	}
 
-	return MakeFromIdentity(i, "")
+	return MakeFromIdentity(i)
 }
 
 // func (a *Age) AddBech32PivYubikeyEC256(bech string) (err error) {
@@ -134,32 +128,30 @@ func MakeFromIdentityString(contents string) (a *Age, err error) {
 // 	return
 // }
 
-func (a *Age) Recipients() []Recipient {
-	if a == nil {
-		return nil
+func (a *Age) GetRecipients() []age.Recipient {
+	r := make([]age.Recipient, len(a.Identities))
+
+	for i := range r {
+		r[i] = a.Identities[i]
 	}
 
-	return a.recipients
-}
-
-func (a *Age) Identities() []age.Identity {
-	if a == nil {
-		return nil
-	}
-
-	return a.identities
+	return r
 }
 
 func (a *Age) Decrypt(src io.Reader) (out io.Reader, err error) {
-	i := a.Identities()
+	is := make([]age.Identity, len(a.Identities))
 
-	switch len(i) {
+	for i := range is {
+		is[i] = a.Identities[i]
+	}
+
+	switch len(is) {
 	case 0:
 		out = src
 		return
 
 	default:
-		if out, err = age.Decrypt(src, a.Identities()...); err != nil {
+		if out, err = age.Decrypt(src, is...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -169,7 +161,7 @@ func (a *Age) Decrypt(src io.Reader) (out io.Reader, err error) {
 }
 
 func (a *Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
-	r := a.Recipients()
+	r := a.GetRecipients()
 
 	switch len(r) {
 	case 0:
@@ -187,18 +179,5 @@ func (a *Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
 }
 
 func (a *Age) Close() error {
-	if a == nil {
-		return nil
-	}
-
-	for _, i := range a.identities {
-		if c, ok := i.(io.Closer); ok {
-			err := c.Close()
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }

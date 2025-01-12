@@ -37,6 +37,8 @@ func (s ObjectStore) objectReader(
 	if rc, err = dir_layout.NewFileReader(o); err != nil {
 		err = errors.Wrapf(err, "Genre: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
+		err = errors.Wrapf(err, "Path: %s", o.Path)
+		err = errors.Wrapf(err, "Age: %s", o.GetAgeEncryption())
 		return
 	}
 

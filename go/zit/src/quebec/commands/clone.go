@@ -62,20 +62,12 @@ func (c Clone) DefaultGenres() ids.Genre {
 func (c Clone) Run(
 	dependencies Dependencies,
 ) {
-	var local *repo_local.Repo
-
-	{
-		var err error
-
-		if local, err = repo_local.Genesis(
-			c.BigBang,
-			dependencies.Context,
-			dependencies.Config,
-			env.Options{},
-		); err != nil {
-			local.CancelWithError(err)
-		}
-	}
+	local := repo_local.Genesis(
+		c.BigBang,
+		dependencies.Context,
+		dependencies.Config,
+		env.Options{},
+	)
 
 	remote := c.MakeRemote(local.Env, c.GetFlagSet().Args()[0])
 

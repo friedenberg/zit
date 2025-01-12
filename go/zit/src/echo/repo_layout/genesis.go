@@ -21,7 +21,7 @@ import (
 
 type BigBang struct {
 	ids.Type
-	Config immutable_config.Latest
+	Config *immutable_config.Latest
 
 	AgeIdentity          age.Identity
 	Yin                  string
@@ -87,11 +87,12 @@ func (s *Layout) Genesis(bb BigBang) {
 			s.CancelWithError(err)
 		}
 
-		if err := s.Age().AddIdentityOrGenerateIfNecessary(
+		if err := s.Config.Config.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
 			bb.AgeIdentity,
-			s.FileAge(),
 		); err != nil {
-			s.CancelWithError(err)
+			if !errors.IsExist(err) {
+				s.CancelWithError(err)
+			}
 		}
 
 		{

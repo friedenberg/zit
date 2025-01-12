@@ -16,13 +16,13 @@ type Config interface {
 
 type BlobStoreConfig interface {
 	GetBlobStoreImmutableConfig() BlobStoreConfig
-	GetAge() *age.Age
+	GetAgeEncryption() *age.Age
 	GetCompressionType() CompressionType
 	GetLockInternalFiles() bool
 }
 
-func Default() TomlV1 {
-	return TomlV1{
+func Default() *TomlV1 {
+	return &TomlV1{
 		StoreVersion: CurrentStoreVersion,
 		RepoType:     repo_type.TypeReadWrite,
 		BlobStore: BlobStoreTomlV1{

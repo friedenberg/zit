@@ -26,7 +26,7 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 ) (blobStore interfaces.BlobStore, err error) {
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,
-		dir_layout.MakeConfigFromImmutableBlobConfig(cmd.Config),
+		dir_layout.MakeConfigFromImmutableBlobConfig(&cmd.Config),
 		e.GetDirLayout().TempLocal,
 	)
 

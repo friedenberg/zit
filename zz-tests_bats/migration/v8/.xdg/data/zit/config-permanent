@@ -8,5 +8,3 @@ repo-type = 1
 [blob-store]
 compression-type = 'zstd'
 lock-internal-files = false
-
-[blob-store.age-identity]

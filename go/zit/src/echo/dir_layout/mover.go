@@ -37,7 +37,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 
 	wo := WriteOptions{
 		Config: MakeConfig(
-			o.GetAge(),
+			o.GetAgeEncryption(),
 			o.GetCompressionType(),
 			o.GetLockInternalFiles(),
 		),

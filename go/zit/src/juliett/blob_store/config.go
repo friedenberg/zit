@@ -18,30 +18,30 @@ type ConfigStore struct {
 }
 
 func MakeConfigStore(
-	dirLayout repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 ) ConfigStore {
 	return ConfigStore{
 		toml_v0: MakeBlobStore(
-			dirLayout,
+			repoLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
-					dirLayout,
+					repoLayout,
 				),
 				ParsedBlobTomlFormatter[mutable_config_blobs.V0, *mutable_config_blobs.V0]{},
-				dirLayout,
+				repoLayout,
 			),
 			func(a *mutable_config_blobs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
-			dirLayout,
+			repoLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V1](
-					dirLayout,
+					repoLayout,
 				),
 				ParsedBlobTomlFormatter[mutable_config_blobs.V1, *mutable_config_blobs.V1]{},
-				dirLayout,
+				repoLayout,
 			),
 			func(a *mutable_config_blobs.V1) {
 				a.Reset()

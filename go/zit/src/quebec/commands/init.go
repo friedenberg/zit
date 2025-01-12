@@ -36,18 +36,10 @@ func (c Init) GetFlagSet() *flag.FlagSet {
 func (c Init) Run(
 	dependencies Dependencies,
 ) {
-	var repo *repo_local.Repo
-
-	{
-		var err error
-
-		if repo, err = repo_local.Genesis(
-			c.BigBang,
-			dependencies.Context,
-			dependencies.Config,
-			env.Options{},
-		); err != nil {
-			repo.CancelWithError(err)
-		}
-	}
+	repo_local.Genesis(
+		c.BigBang,
+		dependencies.Context,
+		dependencies.Config,
+		env.Options{},
+	)
 }

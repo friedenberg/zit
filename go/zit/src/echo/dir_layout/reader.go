@@ -24,7 +24,7 @@ type reader struct {
 func NewReader(o ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
-	if r.rAge, err = o.GetAge().Decrypt(o.Reader); err != nil {
+	if r.rAge, err = o.GetAgeEncryption().Decrypt(o.Reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

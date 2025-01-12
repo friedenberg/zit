@@ -20,12 +20,12 @@ func MakeBlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ](
-	st repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 	format Format[A, APtr],
 	resetFunc func(APtr),
 ) (s *BlobStore[A, APtr]) {
 	s = &BlobStore[A, APtr]{
-		dirLayout: st,
+		dirLayout: repoLayout,
 		Format:    format,
 		resetFunc: resetFunc,
 	}

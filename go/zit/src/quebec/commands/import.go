@@ -57,7 +57,7 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 	{
 		o := dir_layout.FileReadOptions{
 			Config: dir_layout.MakeConfig(
-				c.Config.GetAge(),
+				c.Config.GetAgeEncryption(),
 				c.Config.GetCompressionType(),
 				false,
 			),

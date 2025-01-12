@@ -48,7 +48,7 @@ func (k V0) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 
-func (k V0) GetAge() *age.Age {
+func (k V0) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 

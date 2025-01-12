@@ -40,6 +40,9 @@ func (c Info) RunWithEnv(e *env.Env, args ...string) {
 		case "compression-type":
 			e.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
 
+		case "age-encryption":
+			e.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
+
 		case "xdg":
 			ecksDeeGee := e.GetDirLayout().GetXDG()
 

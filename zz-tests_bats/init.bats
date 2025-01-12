@@ -26,8 +26,6 @@ function init_compression { # @test
 			[blob-store]
 			compression-type = 'zstd'
 			lock-internal-files = false
-
-			[blob-store.age-identity]
 		EOM
 	}
 
@@ -110,7 +108,7 @@ function init_and_deinit { # @test
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_zit_init
-	age_id="$(realpath .xdg/data/zit/age_identity)"
+	age_id="$(zit repo-info age-encryption)"
 
 	mkdir inner
 	pushd inner || exit 1
@@ -119,8 +117,9 @@ function init_and_with_another_age { # @test
 	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age "$age_id"
 	assert_success
 
-	run diff .xdg/data/zit/age_identity "$age_id"
+	run_zit repo-info age-encryption
 	assert_success
+  assert_output "$age_id"
 }
 
 function init_with_non_xdg { # @test
@@ -173,7 +172,7 @@ function init_and_init { # @test
 
 	run_zit init -lock-internal-files=false -override-xdg-with-cwd
 	assert_failure
-	assert_output --partial '.zit/local/share/age_identity: file exists'
+	assert_output --partial '.zit/local/share/config-permanent: file exists'
 
 	run zit show :
 	assert_success

@@ -28,7 +28,7 @@ func Genesis(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	options env.Options,
-) (repo *Repo, err error) {
+) (repo *Repo) {
 	dirLayout := dir_layout.MakeDefaultAndInitialize(
 		context,
 		config.Debug,
@@ -46,21 +46,19 @@ func Genesis(
 
 	repo.layout.Genesis(bb)
 
-	if err = repo.dormantIndex.Flush(
+	if err := repo.dormantIndex.Flush(
 		repo.GetRepoLayout(),
 		repo.PrinterHeader(),
 		repo.config.DryRun,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
+		context.CancelWithError(err)
 	}
 
 	repo.Must(repo.Reset)
 	repo.Must(repo.layout.ResetCache)
 
-	if err = repo.initDefaultTypeAndConfig(bb); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := repo.initDefaultTypeAndConfig(bb); err != nil {
+		context.CancelWithError(err)
 	}
 
 	repo.Must(repo.Lock)

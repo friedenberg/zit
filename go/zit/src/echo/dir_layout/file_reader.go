@@ -21,7 +21,7 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 
 	fro := ReadOptions{
 		Config: MakeConfig(
-			o.GetAge(),
+			o.GetAgeEncryption(),
 			o.GetCompressionType(),
 			o.GetLockInternalFiles(),
 		),

@@ -14,20 +14,24 @@ type Config struct {
 func MakeConfigFromImmutableBlobConfig(
 	config immutable_config.BlobStoreConfig,
 ) Config {
-	return Config{
-		age:               config.GetAge(),
-		compressionType:   config.GetCompressionType(),
-		lockInternalFiles: config.GetLockInternalFiles(),
-	}
+	return MakeConfig(
+		config.GetAgeEncryption(),
+		config.GetCompressionType(),
+		config.GetLockInternalFiles(),
+	)
 }
 
 func MakeConfig(
-	age *age.Age,
+	ag *age.Age,
 	compressionType immutable_config.CompressionType,
 	lockInternalFiles bool,
 ) Config {
+	if ag == nil {
+		ag = &age.Age{}
+	}
+
 	return Config{
-		age:               age,
+		age:               ag,
 		compressionType:   compressionType,
 		lockInternalFiles: lockInternalFiles,
 	}
@@ -37,8 +41,8 @@ func (c Config) GetBlobStoreImmutableConfig() immutable_config.BlobStoreConfig {
 	return c
 }
 
-func (c Config) GetAge() *age.Age {
-	return &age.Age{}
+func (c Config) GetAgeEncryption() *age.Age {
+	return c.age
 }
 
 func (c Config) GetCompressionType() immutable_config.CompressionType {

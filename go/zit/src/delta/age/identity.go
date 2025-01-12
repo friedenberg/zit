@@ -1,8 +1,10 @@
 package age
 
 import (
+	"bufio"
 	"io"
 	"os"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -10,17 +12,28 @@ import (
 	"filippo.io/age"
 )
 
+// necessary because the age.Identity interface does not include Stringer, but
+// all of the actual identities do implement Stringer
 type identity interface {
 	age.Identity
 	interfaces.Stringer
 }
 
 type Identity struct {
-	identity
+	identity identity
 	age.Recipient
 
 	path     string
 	disabled bool
+}
+
+func (i Identity) Unwrap(stanzas []*age.Stanza) (fileKey []byte, err error) {
+	if fileKey, err = i.identity.Unwrap(stanzas); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (i *Identity) IsDisabled() bool {
@@ -32,7 +45,25 @@ func (i *Identity) IsEmpty() bool {
 }
 
 func (i *Identity) String() string {
-	return i.path
+	if i.identity == nil {
+		return ""
+	} else {
+		return i.identity.String()
+	}
+}
+
+func (i *Identity) MarshalText() (b []byte, err error) {
+	b = []byte(i.String())
+	return
+}
+
+func (i *Identity) UnmarshalText(b []byte) (err error) {
+	if err = i.SetFromX25519Identity(string(b)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (i *Identity) SetFromX25519Identity(identity string) (err error) {
@@ -55,17 +86,38 @@ func (i *Identity) SetX25519Identity(x *age.X25519Identity) {
 }
 
 func (i *Identity) SetFromPath(path string) (err error) {
-	i.path = path
+	var f *os.File
 
-	var contents string
-
-	if contents, err = files.ReadAllString(path); err != nil {
+	if f, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = i.SetFromX25519Identity(contents); err != nil {
-		err = errors.Wrap(err)
+	defer errors.DeferredCloser(&err, f)
+
+	br := bufio.NewReader(f)
+	isEOF := false
+	var key string
+
+	for !isEOF {
+		var line string
+		line, err = br.ReadString('\n')
+
+		if err == io.EOF {
+			isEOF = true
+			err = nil
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if len(line) > 0 {
+			key = strings.TrimSpace(line)
+		}
+	}
+
+	if err = i.SetFromX25519Identity(key); err != nil {
+		err = errors.Wrapf(err, "Key: %q", key)
 		return
 	}
 
@@ -86,9 +138,15 @@ func (i *Identity) Set(path_or_identity string) (err error) {
 			return
 		}
 
+	case path_or_identity == "generate":
+		if err = i.GenerateIfNecessary(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		if err = i.SetFromX25519Identity(path_or_identity); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Identity: %q", path_or_identity)
 			return
 		}
 	}
@@ -96,7 +154,7 @@ func (i *Identity) Set(path_or_identity string) (err error) {
 	return
 }
 
-func (i *Identity) GenerateIfNecessary(basePath string) (err error) {
+func (i *Identity) GenerateIfNecessary() (err error) {
 	if i.IsDisabled() || !i.IsEmpty() {
 		return
 	}
@@ -109,30 +167,6 @@ func (i *Identity) GenerateIfNecessary(basePath string) (err error) {
 	}
 
 	i.SetX25519Identity(x)
-
-	return
-}
-
-func (i *Identity) WriteToPathIfNecessary(basePath string) (err error) {
-	if i.IsDisabled() || i.IsEmpty() || basePath == "" {
-		return
-	}
-
-	var f *os.File
-
-	if f, err = files.CreateExclusiveWriteOnly(basePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if _, err = io.WriteString(f, i.identity.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	i.path = basePath
 
 	return
 }

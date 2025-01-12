@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -26,7 +25,6 @@ type Layout struct {
 	basePath              string
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
-	age                   *age.Age
 
 	interfaces.DirectoryPaths
 
@@ -41,7 +39,6 @@ func Make(
 	o Options,
 ) (s Layout, err error) {
 	s.Env = env
-	s.age = &age.Age{}
 
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(dir_layout.EnvDir)
@@ -97,24 +94,6 @@ func Make(
 		}
 	}
 
-	{
-		fa := s.FileAge()
-
-		if files.Exists(fa) {
-			var i age.Identity
-
-			if err = i.SetFromPath(fa); err != nil {
-				errors.Wrap(err)
-				return
-			}
-
-			if err = s.age.AddIdentity(i); err != nil {
-				errors.Wrap(err)
-				return
-			}
-		}
-	}
-
 	if err = s.loadImmutableConfig(); err != nil {
 		errors.Wrap(err)
 		return
@@ -129,7 +108,7 @@ func Make(
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
-		Config:         s.Config.Blob,
+		Config:         dir_layout.MakeConfigFromImmutableBlobConfig(s.Config.Config.GetBlobStoreImmutableConfig()),
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetDirLayout().TempLocal,
 	}
@@ -153,7 +132,7 @@ func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
 
 	b.ObjectStore.Config = dir_layout.MakeConfig(
-		a.ObjectStore.Config.GetAge(),
+		a.ObjectStore.Config.GetAgeEncryption(),
 		immutable_config.CompressionTypeNone,
 		a.ObjectStore.Config.GetLockInternalFiles(),
 	)
@@ -167,10 +146,6 @@ func (s Layout) GetConfig() immutable_config.Config {
 
 func (s Layout) GetLockSmith() interfaces.LockSmith {
 	return s.lockSmith
-}
-
-func (s *Layout) Age() *age.Age {
-	return s.age
 }
 
 func stringSliceJoin(s string, vs []string) []string {

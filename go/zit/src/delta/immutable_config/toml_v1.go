@@ -12,14 +12,14 @@ type TomlV1 struct {
 	BlobStore    BlobStoreTomlV1 `toml:"blob-store"`
 }
 
-func (k TomlV1) GetImmutableConfig() Config {
+func (k *TomlV1) GetImmutableConfig() Config {
 	return k
 }
 
-func (k TomlV1) GetBlobStoreImmutableConfig() BlobStoreConfig {
-	return k.BlobStore
+func (k *TomlV1) GetBlobStoreImmutableConfig() BlobStoreConfig {
+	return &k.BlobStore
 }
 
-func (k TomlV1) GetStoreVersion() interfaces.StoreVersion {
+func (k *TomlV1) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
