@@ -14,8 +14,8 @@ type (
 )
 
 type Age struct {
-	// Recipients []Recipient `toml:"recipients"`
-	Identities []*Identity `toml:"identities"`
+	Recipients []Recipient `toml:"recipients,omitempty"`
+	Identities []*Identity `toml:"identities,omitempty"`
 }
 
 func (a *Age) String() string {
