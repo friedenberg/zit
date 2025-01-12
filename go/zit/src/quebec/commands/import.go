@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -62,7 +62,7 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 
 	// setup inventory list reader
 	{
-		o := repo_layout.FileReadOptions{
+		o := dir_layout.FileReadOptions{
 			Age:             &ag,
 			Path:            c.InventoryList,
 			CompressionType: c.CompressionType,
@@ -70,7 +70,7 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 
 		var err error
 
-		if rc, err = repo_layout.NewFileReader(o); err != nil {
+		if rc, err = dir_layout.NewFileReader(o); err != nil {
 			local.CancelWithError(err)
 		}
 

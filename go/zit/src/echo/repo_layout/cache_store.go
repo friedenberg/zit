@@ -1,22 +1,25 @@
 package repo_layout
 
-import "code.linenisgreat.com/zit/go/zit/src/delta/sha"
+import (
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+)
 
 func (s Layout) ReadCloserCache(p string) (sha.ReadCloser, error) {
-	o := FileReadOptions{
+	o := dir_layout.FileReadOptions{
 		Age:             s.age,
 		Path:            p,
 		CompressionType: s.Config.compressionType,
 	}
 
-	return NewFileReader(o)
+	return dir_layout.NewFileReader(o)
 }
 
 func (s Layout) WriteCloserCache(
 	p string,
 ) (w sha.WriteCloser, err error) {
-	return NewMover(
-		MoveOptions{
+	return dir_layout.NewMover(
+		dir_layout.MoveOptions{
 			Age:             s.age,
 			FinalPath:       p,
 			LockFile:        false,

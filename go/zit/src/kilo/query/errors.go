@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type ErrBlobMissing struct {
 	ObjectId
-	repo_layout.ErrBlobMissing
+	dir_layout.ErrBlobMissing
 }
 
 // TODO add recovery text

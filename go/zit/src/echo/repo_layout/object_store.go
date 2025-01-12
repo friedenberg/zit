@@ -30,13 +30,13 @@ func (s ObjectStore) objectReader(
 		return
 	}
 
-	o := FileReadOptions{
+	o := dir_layout.FileReadOptions{
 		Age:             s.age,
 		Path:            id.Path(sh.GetShaLike(), p),
 		CompressionType: s.compressionType,
 	}
 
-	if rc, err = NewFileReader(o); err != nil {
+	if rc, err = dir_layout.NewFileReader(o); err != nil {
 		err = errors.Wrapf(err, "Genre: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		return
@@ -57,7 +57,7 @@ func (s ObjectStore) objectWriter(
 		return
 	}
 
-	o := MoveOptions{
+	o := dir_layout.MoveOptions{
 		Age:                      s.age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
@@ -66,7 +66,7 @@ func (s ObjectStore) objectWriter(
 		TemporaryFS:              s.TemporaryFS,
 	}
 
-	if wc, err = NewMover(o); err != nil {
+	if wc, err = dir_layout.NewMover(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

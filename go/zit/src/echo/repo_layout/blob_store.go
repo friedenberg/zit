@@ -18,18 +18,18 @@ import (
 )
 
 type blobStore struct {
-	Config
+	config   Config
 	basePath string
 	tempPath string
 	age      *age.Age
-	dir_layout.TemporaryFS
+	tempFS   dir_layout.TemporaryFS
 }
 
 func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {
 	bs = blobStore{
-		age:         s.age,
-		Config:      s.Config,
-		TemporaryFS: s.TempLocal,
+		age:    s.age,
+		config: s.Config,
+		tempFS: s.TempLocal,
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
@@ -48,7 +48,7 @@ func MakeBlobStore(
 	return blobStore{
 		basePath: basePath,
 		age:      age,
-		Config: Config{
+		config: Config{
 			compressionType: compressionType,
 		},
 	}
@@ -90,7 +90,7 @@ func (s blobStore) BlobReader(
 	}
 
 	if r, err = s.blobReaderFrom(sh, s.basePath); err != nil {
-		if !IsErrBlobMissing(err) {
+		if !dir_layout.IsErrBlobMissing(err) {
 			err = errors.Wrap(err)
 		}
 
@@ -101,16 +101,16 @@ func (s blobStore) BlobReader(
 }
 
 func (s blobStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
-	mo := MoveOptions{
+	mo := dir_layout.MoveOptions{
 		Age:                      s.age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 s.lockInternalFiles,
-		CompressionType:          s.compressionType,
-		TemporaryFS:              s.TemporaryFS,
+		LockFile:                 s.config.lockInternalFiles,
+		CompressionType:          s.config.compressionType,
+		TemporaryFS:              s.tempFS,
 	}
 
-	if w, err = NewMover(mo); err != nil {
+	if w, err = dir_layout.NewMover(mo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -129,18 +129,18 @@ func (s blobStore) blobReaderFrom(
 
 	p = id.Path(sh.GetShaLike(), p)
 
-	o := FileReadOptions{
+	o := dir_layout.FileReadOptions{
 		Age:             s.age,
 		Path:            p,
-		CompressionType: s.Config.compressionType,
+		CompressionType: s.config.compressionType,
 	}
 
-	if r, err = NewFileReader(o); err != nil {
+	if r, err = dir_layout.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
 			shCopy.ResetWithShaLike(sh.GetShaLike())
 
-			err = ErrBlobMissing{
+			err = dir_layout.ErrBlobMissing{
 				ShaGetter: shCopy,
 				Path:      p,
 			}
@@ -226,7 +226,7 @@ func CopyBlobIfNecessary(
 	blobSha := blobShaGetter.GetShaLike()
 
 	if dst.HasBlob(blobSha) || blobSha.IsNull() {
-		err = MakeErrAlreadyExists(
+		err = dir_layout.MakeErrAlreadyExists(
 			blobSha,
 			"",
 		)

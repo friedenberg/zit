@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -188,7 +188,7 @@ func (remote *HTTP) WriteBlobToRemote(
 	if rc, err = local.GetBlobStore().BlobReader(
 		expected,
 	); err != nil {
-		if repo_layout.IsErrBlobMissing(err) {
+		if dir_layout.IsErrBlobMissing(err) {
 			// TODO make an option to collect this error at the present it, and an
 			// option to fetch it from another remote store
 			ui.Err().Printf("Blob missing locally: %q", expected)

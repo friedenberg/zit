@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -63,7 +63,7 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 	var wc io.WriteCloser
 
-	o := repo_layout.WriteOptions{
+	o := dir_layout.WriteOptions{
 		Age:             &ag,
 		CompressionType: c.CompressionType,
 		Writer:          u.GetUIFile(),
@@ -72,7 +72,7 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	{
 		var err error
 
-		if wc, err = repo_layout.NewWriter(o); err != nil {
+		if wc, err = dir_layout.NewWriter(o); err != nil {
 			u.CancelWithError(err)
 		}
 	}

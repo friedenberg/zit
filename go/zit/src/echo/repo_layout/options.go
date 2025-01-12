@@ -1,12 +1,7 @@
 package repo_layout
 
 import (
-	"io"
 	"os"
-
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type Options struct {
@@ -17,35 +12,4 @@ type Options struct {
 
 func (o Options) GetReadOnlyBlobStorePath() string {
 	return os.Getenv("ZIT_READ_ONLY_BLOB_STORE_PATH")
-}
-
-type ReadOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
-	io.Reader
-}
-
-type FileReadOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-	Path            string
-}
-
-type WriteOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
-	io.Writer
-}
-
-type MoveOptions struct {
-	*age.Age
-	CompressionType immutable_config.CompressionType
-
-	dir_layout.TemporaryFS
-	ErrorOnAttemptedOverwrite bool
-	LockFile                  bool
-	FinalPath                 string
-	GenerateFinalPathFromSha  bool
 }

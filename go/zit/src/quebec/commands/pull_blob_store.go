@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -65,7 +65,7 @@ func (c *PullBlobStore) RunWithQuery(
 		qg,
 		func(sk *sku.Transacted) (err error) {
 			if err = importer.ImportBlobIfNecessary(sk); err != nil {
-				if repo_layout.IsErrBlobMissing(err) {
+				if dir_layout.IsErrBlobMissing(err) {
 					err = nil
 					repo.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobSha())
 				} else {

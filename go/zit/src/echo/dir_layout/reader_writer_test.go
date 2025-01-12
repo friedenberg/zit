@@ -1,4 +1,4 @@
-package repo_layout
+package dir_layout
 
 import (
 	"io"
