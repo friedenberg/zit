@@ -23,8 +23,8 @@ func init() {
 				BigBang: repo_layout.BigBang{},
 			}
 
-			c.BigBang.SetFlagSet(f)
-			c.BigBang.Config.RepoType = repo_type.TypeRelay
+			c.SetFlagSet(f)
+			c.Config.RepoType = repo_type.TypeRelay
 
 			return c
 		},

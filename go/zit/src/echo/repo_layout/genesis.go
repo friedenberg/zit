@@ -74,20 +74,6 @@ func (s *Layout) Genesis(bb BigBang) {
 	}
 
 	{
-		if err := s.readAndTransferLines(
-			bb.Yin,
-			filepath.Join(s.DirObjectId(), "Yin"),
-		); err != nil {
-			s.CancelWithError(err)
-		}
-
-		if err := s.readAndTransferLines(
-			bb.Yang,
-			filepath.Join(s.DirObjectId(), "Yang"),
-		); err != nil {
-			s.CancelWithError(err)
-		}
-
 		if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
 			bb.AgeIdentity,
 		); err != nil {
@@ -120,11 +106,25 @@ func (s *Layout) Genesis(bb BigBang) {
 				s.CancelWithError(err)
 			}
 		}
+	}
 
-		if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeReadWrite {
-			writeFile(s.FileConfigMutable(), "")
-			writeFile(s.FileCacheDormant(), "")
+	if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeReadWrite {
+		if err := s.readAndTransferLines(
+			bb.Yin,
+			filepath.Join(s.DirObjectId(), "Yin"),
+		); err != nil {
+			s.CancelWithError(err)
 		}
+
+		if err := s.readAndTransferLines(
+			bb.Yang,
+			filepath.Join(s.DirObjectId(), "Yang"),
+		); err != nil {
+			s.CancelWithError(err)
+		}
+
+		writeFile(s.FileConfigMutable(), "")
+		writeFile(s.FileCacheDormant(), "")
 	}
 }
 
