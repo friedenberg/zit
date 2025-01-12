@@ -9,17 +9,6 @@ import (
 
 type Relay interface {
 	GetRelayRepo() Relay
-
-	MakeInventoryList(
-		qg *query.Group,
-	) (list *sku.List, err error)
-
-	PullQueryGroupFromRemote(
-		remote ReadWrite,
-		qg *query.Group,
-		options RemoteTransferOptions,
-	) (err error)
-
 	GetBlobStore() interfaces.BlobStore
 }
 

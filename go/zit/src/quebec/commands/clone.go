@@ -3,17 +3,17 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type Clone struct {
 	*flag.FlagSet
-	repo_layout.BigBang
+	command_components.Genesis
 	command_components.RemoteTransfer
 	command_components.QueryGroup
 }
@@ -23,12 +23,17 @@ func init() {
 		"clone",
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
-				BigBang: repo_layout.BigBang{
-					ExcludeDefaultType: true,
+        FlagSet: f,
+				Genesis: command_components.Genesis{
+					BigBang: repo_layout.BigBang{
+						ExcludeDefaultType: true,
+					},
 				},
 			}
 
 			c.SetFlagSet(f)
+			c.Config.RepoType = repo_type.TypeReadWrite
+			f.Var(&c.Config.RepoType, "repo-type", "")
 
 			return c
 		},
@@ -44,8 +49,7 @@ func (cmd *Clone) GetFlagSet() *flag.FlagSet {
 }
 
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
-	cmd.FlagSet = f
-	cmd.BigBang.SetFlagSet(f)
+	cmd.Genesis.SetFlagSet(f)
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 }
@@ -59,24 +63,23 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Clone) Run(
+func (cmd Clone) Run(
 	dependencies Dependencies,
 ) {
-	local := read_write_repo_local.Genesis(
-		c.BigBang,
+	local := cmd.OnTheFirstDay(
 		dependencies.Context,
 		dependencies.Config,
 		env.Options{},
 	)
 
-	remote := c.MakeRemote(local.Env, c.GetFlagSet().Args()[0])
+	remote := cmd.MakeRemote(local.Env, cmd.GetFlagSet().Args()[0])
 
-	qg := c.MakeQueryGroup(c, local, c.Args()[1:]...)
+	qg := cmd.MakeQueryGroup(cmd, local, cmd.Args()[1:]...)
 
 	if err := local.PullQueryGroupFromRemote(
 		remote,
 		qg,
-		c.RemoteTransferOptions.WithPrintCopies(true),
+		cmd.RemoteTransferOptions.WithPrintCopies(true),
 	); err != nil {
 		local.CancelWithError(err)
 	}

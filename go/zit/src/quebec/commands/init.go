@@ -3,41 +3,41 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type Init struct {
 	*flag.FlagSet
-	repo_layout.BigBang
+	command_components.Genesis
 }
 
 func init() {
 	registerCommand(
 		"init",
 		func(f *flag.FlagSet) Command {
-			c := &Init{
-				FlagSet: f,
-				BigBang: repo_layout.BigBang{},
-			}
+			c := &Init{}
 
-			c.BigBang.SetFlagSet(f)
+			c.SetFlagSet(f)
 
 			return c
 		},
 	)
 }
 
-func (c Init) GetFlagSet() *flag.FlagSet {
+func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
+	cmd.FlagSet = f
+	cmd.Genesis.SetFlagSet(f)
+}
+
+func (c *Init) GetFlagSet() *flag.FlagSet {
 	return c.FlagSet
 }
 
-func (c Init) Run(
+func (cmd *Init) Run(
 	dependencies Dependencies,
 ) {
-	read_write_repo_local.Genesis(
-		c.BigBang,
+	cmd.OnTheFirstDay(
 		dependencies.Context,
 		dependencies.Config,
 		env.Options{},
