@@ -16,9 +16,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
+	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 )
 
 func init() {
