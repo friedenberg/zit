@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type CheckinJson struct{}
@@ -33,7 +33,7 @@ type TomlBookmark struct {
 }
 
 func (c CheckinJson) RunWithRepo(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	args ...string,
 ) {
 	dec := json.NewDecoder(u.GetInFile())

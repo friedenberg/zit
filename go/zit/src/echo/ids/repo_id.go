@@ -41,11 +41,12 @@ func MakeRepoId(v string) (e *RepoId, err error) {
 }
 
 type RepoId struct {
-	value string
+	domain string
+	id     string
 }
 
 func (k RepoId) IsEmpty() bool {
-	return k.value == ""
+	return k.id == ""
 }
 
 func (k RepoId) GetRepoId() interfaces.RepoId {
@@ -61,11 +62,11 @@ func (k RepoId) GetRepoIdString() string {
 }
 
 func (e *RepoId) Reset() {
-	e.value = ""
+	e.id = ""
 }
 
 func (e *RepoId) ResetWith(e1 RepoId) {
-	e.value = e1.value
+	e.id = e1.id
 }
 
 func (a RepoId) EqualsAny(b any) bool {
@@ -73,7 +74,7 @@ func (a RepoId) EqualsAny(b any) bool {
 }
 
 func (a RepoId) Equals(b RepoId) bool {
-	return a.value == b.value
+	return a.id == b.id
 }
 
 func (o RepoId) GetGenre() interfaces.Genre {
@@ -85,11 +86,11 @@ func (i RepoId) GetObjectIdString() string {
 }
 
 func (k RepoId) String() string {
-	return k.value
+	return k.id
 }
 
 func (k RepoId) Parts() [3]string {
-	return [3]string{"", "/", k.value}
+	return [3]string{"", "/", k.id}
 }
 
 func (k RepoId) GetQueryPrefix() string {
@@ -114,7 +115,7 @@ func (e *RepoId) Set(v string) (err error) {
 		return
 	}
 
-	e.value = v
+	e.id = v
 
 	return
 }

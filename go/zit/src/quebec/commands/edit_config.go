@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c EditConfig) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
+func (c EditConfig) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -57,7 +57,7 @@ func (c EditConfig) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
 }
 
 func (c EditConfig) editInVim(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 ) (sk *sku.Transacted, err error) {
 	var f *os.File
 
@@ -98,7 +98,7 @@ func (c EditConfig) editInVim(
 }
 
 func (c EditConfig) makeTempConfigFile(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	p string,
 ) (err error) {
 	var k *sku.Transacted
@@ -131,7 +131,7 @@ func (c EditConfig) makeTempConfigFile(
 }
 
 func (c EditConfig) readTempConfigFile(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	p string,
 ) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()

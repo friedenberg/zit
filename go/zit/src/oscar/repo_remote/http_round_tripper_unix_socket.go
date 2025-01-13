@@ -5,17 +5,17 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type HTTPRoundTripperUnixSocket struct {
-	read_write_repo_local.UnixSocket
+	repo_local_working_copy.UnixSocket
 	net.Conn
 	HTTPRoundTripperBufio
 }
 
 func (roundTripper *HTTPRoundTripperUnixSocket) Initialize(
-	remote *read_write_repo_local.Repo,
+	remote *repo_local_working_copy.Repo,
 ) (err error) {
 	if roundTripper.UnixSocket, err = remote.InitializeUnixSocket(
 		net.ListenConfig{},

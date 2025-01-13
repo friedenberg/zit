@@ -18,12 +18,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 // TODO move to store_fs
 type Diff struct {
-	*read_write_repo_local.Repo
+	*repo_local_working_copy.Repo
 
 	object_metadata.TextFormatterFamily
 }

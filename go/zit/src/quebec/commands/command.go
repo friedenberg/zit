@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -28,7 +28,7 @@ type CommandWithEnv interface {
 }
 
 type CommandWithRepo interface {
-	RunWithRepo(*read_write_repo_local.Repo, ...string)
+	RunWithRepo(*repo_local_working_copy.Repo, ...string)
 }
 
 type CommandWithBlobStore interface {
@@ -36,7 +36,7 @@ type CommandWithBlobStore interface {
 }
 
 type CommandWithQuery interface {
-	RunWithQuery(store *read_write_repo_local.Repo, ids *query.Group)
+	RunWithQuery(store *repo_local_working_copy.Repo, ids *query.Group)
 }
 
 type CommandWithQueryAndBuilderOptions interface {
@@ -45,7 +45,7 @@ type CommandWithQueryAndBuilderOptions interface {
 }
 
 type CommandCompletionWithRepo interface {
-	CompleteWithRepo(u *read_write_repo_local.Repo, args ...string)
+	CompleteWithRepo(u *repo_local_working_copy.Repo, args ...string)
 }
 
 var commands = map[string]Command{}

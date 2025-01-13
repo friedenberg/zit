@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type Genesis struct {
@@ -25,7 +25,7 @@ func (c Genesis) OnTheFirstDay(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-) repo.ReadWrite {
+) repo.WorkingCopy {
 	switch c.BigBang.Config.RepoType {
 
 	case repo_type.TypeReadWrite:
@@ -48,8 +48,8 @@ func (c Genesis) readWrite(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-) repo.ReadWrite {
-	local := read_write_repo_local.Genesis(
+) repo.WorkingCopy {
+	local := repo_local_working_copy.Genesis(
 		c.BigBang,
 		context,
 		config,
@@ -63,7 +63,7 @@ func (c Genesis) relay(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-) repo.Relay {
+) repo.Archive {
 	layout := dir_layout.MakeDefault(
 		context,
 		config.Debug,

@@ -23,14 +23,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 )
 
+// TODO add lock to make threadsafe
 type Store struct {
-	dirLayout repo_layout.Layout
-	ls        interfaces.LockSmith
-	sv        interfaces.StoreVersion
-	of        interfaces.ObjectIOFactory
-	af        interfaces.BlobIOFactory
-	clock     ids.Clock
-	blobStore blob_store.InventoryList
+	repoLayout repo_layout.Layout
+	ls         interfaces.LockSmith
+	sv         interfaces.StoreVersion
+	of         interfaces.ObjectIOFactory
+	af         interfaces.BlobIOFactory
+	clock      ids.Clock
+	blobStore  blob_store.InventoryList
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -53,7 +54,7 @@ func (s *Store) Initialize(
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		dirLayout:     dirLayout,
+		repoLayout:    dirLayout,
 		ls:            ls,
 		sv:            sv,
 		of:            of,
@@ -132,7 +133,7 @@ func (s *Store) Create(
 	if skus.Len() > 0 {
 		var wc interfaces.ShaWriteCloser
 
-		if wc, err = s.dirLayout.BlobWriter(); err != nil {
+		if wc, err = s.repoLayout.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -176,6 +177,8 @@ func (s *Store) Create(
 
 func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
 	var wc interfaces.ShaWriteCloser
+
+	// TODO also write to inventory_list_log
 
 	if wc, err = s.of.ObjectWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -345,7 +348,7 @@ func (s *Store) ReadAllInventoryLists(
 ) (err error) {
 	var p string
 
-	if p, err = s.dirLayout.DirObjectGenre(
+	if p, err = s.repoLayout.DirObjectGenre(
 		genres.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)

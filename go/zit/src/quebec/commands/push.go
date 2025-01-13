@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type Push struct{}
@@ -26,8 +26,8 @@ func (c Push) DefaultGenres() ids.Genre {
 }
 
 func (c Push) RunWithRemoteAndQuery(
-	local *read_write_repo_local.Repo,
-	remote repo.ReadWrite,
+	local *repo_local_working_copy.Repo,
+	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) {

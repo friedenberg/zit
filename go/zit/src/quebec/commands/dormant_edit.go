@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c DormantEdit) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
+func (c DormantEdit) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
@@ -66,7 +66,7 @@ func (c DormantEdit) RunWithRepo(u *read_write_repo_local.Repo, args ...string) 
 
 // TODO refactor into common
 func (c DormantEdit) editInVim(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -95,7 +95,7 @@ func (c DormantEdit) editInVim(
 
 // TODO refactor into common
 func (c DormantEdit) makeTempKonfigFile(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -127,7 +127,7 @@ func (c DormantEdit) makeTempKonfigFile(
 
 // TODO refactor into common
 func (c DormantEdit) readTempKonfigFile(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File

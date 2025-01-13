@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type Checkin struct {
@@ -26,7 +26,7 @@ type Checkin struct {
 }
 
 func (op Checkin) Run(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	qg *query.Group,
 ) (err error) {
 	var l sync.Mutex
@@ -73,7 +73,7 @@ func (op Checkin) Run(
 }
 
 func (op Checkin) runOrganize(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	qg *query.Group,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
@@ -135,7 +135,7 @@ func (op Checkin) runOrganize(
 }
 
 func (c Checkin) openBlobIfNecessary(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	objects sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {

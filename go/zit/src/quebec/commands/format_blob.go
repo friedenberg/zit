@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type FormatBlob struct {
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c *FormatBlob) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
+func (c *FormatBlob) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)
@@ -119,7 +119,7 @@ func (c *FormatBlob) RunWithRepo(u *read_write_repo_local.Repo, args ...string) 
 }
 
 func (c *FormatBlob) FormatFromStdin(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"

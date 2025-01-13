@@ -30,17 +30,15 @@ type InventoryListStore interface {
 	// ) (err error)
 }
 
-// TODO rename to Archive?
 // TODO explore permissions for who can read / write from the archive
-type Relay interface {
+type Archive interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
 	// GetInventoryListStore() InventoryListStore
 }
 
-// TODO rename to WorkingCopy?
-type ReadWrite interface {
-	Relay
+type WorkingCopy interface {
+	Archive
 
 	// MakeQueryGroup(
 	// 	builderOptions query.BuilderOptions,
@@ -64,7 +62,7 @@ type ReadWrite interface {
 	// 	) (err error)
 
 	PullQueryGroupFromRemote(
-		remote ReadWrite,
+		remote WorkingCopy,
 		qg *query.Group,
 		options RemoteTransferOptions,
 	) (err error)

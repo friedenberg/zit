@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -38,7 +38,7 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
+func (c Diff) RunWithQuery(u *repo_local_working_copy.Repo, qg *query.Group) {
 	o := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyDescription: true,
 	}

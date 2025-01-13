@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -27,9 +27,9 @@ func (cmd commandWithRepo) Run(
 		envOptions = og.GetEnvOptions()
 	}
 
-	repoOptions := read_write_repo_local.OptionsEmpty
+	repoOptions := repo_local_working_copy.OptionsEmpty
 
-	if og, ok := cmd.Command.(read_write_repo_local.OptionsGetter); ok {
+	if og, ok := cmd.Command.(repo_local_working_copy.OptionsGetter); ok {
 		repoOptions = og.GetLocalRepoOptions()
 	}
 

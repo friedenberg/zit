@@ -9,14 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type CommandWithRemoteAndQuery interface {
 	RunWithRemoteAndQuery(
-		local *read_write_repo_local.Repo,
-		remote repo.ReadWrite,
+		local *repo_local_working_copy.Repo,
+		remote repo.WorkingCopy,
 		qg *query.Group,
 		options repo.RemoteTransferOptions,
 	)
@@ -38,7 +38,7 @@ func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c commandWithRemoteAndQuery) CompleteWithRepo(
-	u *read_write_repo_local.Repo,
+	u *repo_local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -77,7 +77,7 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 }
 
 func (c commandWithRemoteAndQuery) RunWithRepo(
-	local *read_write_repo_local.Repo,
+	local *repo_local_working_copy.Repo,
 	args ...string,
 ) {
 	if len(args) < 1 {

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type Export struct {
@@ -44,7 +44,7 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
+func (c Export) RunWithQuery(u *repo_local_working_copy.Repo, qg *query.Group) {
 	var list *sku.List
 
 	{

@@ -20,7 +20,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 
 func (c QueryGroup) MakeQueryGroup(
 	options query.BuilderOptions,
-	repo repo.ReadWrite,
+	repo repo.WorkingCopy,
 	args ...string,
 ) (qg *query.Group) {
 	var err error

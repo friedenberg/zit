@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type Status struct{}
@@ -36,7 +36,7 @@ func (c Status) ModifyBuilder(
 		WithDefaultSigil(ids.SigilExternal)
 }
 
-func (c Status) RunWithQuery(u *read_write_repo_local.Repo, qg *query.Group) {
+func (c Status) RunWithQuery(u *repo_local_working_copy.Repo, qg *query.Group) {
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	if err := u.GetStore().QuerySkuType(

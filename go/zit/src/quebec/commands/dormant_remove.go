@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
 
 type DormantRemove struct{}
@@ -20,7 +20,7 @@ func init() {
 	)
 }
 
-func (c DormantRemove) RunWithRepo(u *read_write_repo_local.Repo, args ...string) {
+func (c DormantRemove) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 	u.Must(u.Lock)
 
 	for _, v := range args {
