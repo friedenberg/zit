@@ -17,8 +17,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 func init() {

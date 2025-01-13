@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 func (s *Store) tryNewHook(

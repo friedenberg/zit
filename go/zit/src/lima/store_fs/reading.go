@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 func (s *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
