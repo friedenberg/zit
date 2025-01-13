@@ -33,7 +33,6 @@ func init() {
 
 			c.SetFlagSet(f)
 			c.Config.RepoType = repo_type.TypeReadWrite
-			f.Var(&c.Config.RepoType, "repo-type", "")
 
 			return c
 		},
@@ -66,17 +65,17 @@ func (c Clone) DefaultGenres() ids.Genre {
 func (cmd Clone) Run(
 	dependencies Dependencies,
 ) {
-	local := cmd.OnTheFirstDay(
+	repo := cmd.OnTheFirstDay(
 		dependencies.Context,
 		dependencies.Config,
 		env.Options{},
 	)
 
-	remote := cmd.MakeRemote(local.GetEnv(), cmd.GetFlagSet().Args()[0])
+	remote := cmd.MakeRemote(repo.GetEnv(), cmd.GetFlagSet().Args()[0])
 
-	qg := cmd.MakeQueryGroup(cmd, local, cmd.Args()[1:]...)
+	qg := cmd.MakeQueryGroup(cmd, repo, cmd.Args()[1:]...)
 
-	if err := local.PullQueryGroupFromRemote(
+	if err := repo.PullQueryGroupFromRemote(
 		remote,
 		qg,
 		cmd.RemoteTransferOptions.WithPrintCopies(true),

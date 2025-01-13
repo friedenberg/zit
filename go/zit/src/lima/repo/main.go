@@ -9,19 +9,16 @@ import (
 )
 
 type Repo interface {
-	GetRepo() Repo
 	GetEnv() *env.Env
 }
 
 type Relay interface {
 	Repo
-	GetRelayRepo() Relay
 	GetBlobStore() interfaces.BlobStore
 }
 
 type ReadWrite interface {
 	Relay
-	GetReadWriteRepo() ReadWrite
 
 	MakeQueryGroup(
 		metaBuilder any,

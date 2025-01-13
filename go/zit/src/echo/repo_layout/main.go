@@ -116,6 +116,10 @@ func Make(
 	return
 }
 
+func (a Layout) GetEnv() *env.Env {
+	return a.Env
+}
+
 func (a Layout) SansObjectAge() (b Layout) {
 	b = a
 

@@ -17,7 +17,7 @@ type TomlV1 struct {
 func (k *TomlV1) SetFlagSet(f *flag.FlagSet) {
 	k.BlobStore.SetFlagSet(f)
 	k.RepoType = repo_type.TypeReadWrite
-	// f.Var(&k.RepoType, "repo-type", "")
+	f.Var(&k.RepoType, "repo-type", "")
 }
 
 func (k *TomlV1) GetImmutableConfig() Config {
