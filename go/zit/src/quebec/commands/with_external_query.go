@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
