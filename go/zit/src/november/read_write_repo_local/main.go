@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
@@ -25,6 +24,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/mike/config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 

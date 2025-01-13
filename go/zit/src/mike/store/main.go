@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -21,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/mike/config"
 )
 
 type Store struct {
