@@ -2,7 +2,7 @@ package store_browser
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 )
 
 func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {

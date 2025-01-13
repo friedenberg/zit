@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 )
 
 func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {

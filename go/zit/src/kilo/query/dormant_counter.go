@@ -3,7 +3,7 @@ package query
 import (
 	"sync/atomic"
 
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 )
 
 type DormantCounter interface {

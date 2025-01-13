@@ -15,8 +15,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
 

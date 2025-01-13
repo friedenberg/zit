@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
