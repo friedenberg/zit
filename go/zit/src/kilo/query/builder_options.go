@@ -43,17 +43,3 @@ func MakeBuilderOptions(o any) BuilderOptions {
 
 	return options
 }
-
-func (options BuilderOptions) Apply(b *Builder) {
-	if options.DefaultGenresGetter != nil {
-		b = b.WithDefaultGenres(options.DefaultGenres())
-	}
-
-	if options.DefaultSigilGetter != nil {
-		b.WithDefaultSigil(options.DefaultSigil())
-	}
-
-	if options.QueryBuilderModifier != nil {
-		options.ModifyBuilder(b)
-	}
-}

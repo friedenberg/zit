@@ -75,6 +75,22 @@ func (b *Builder) makeState() *buildState {
 	return state
 }
 
+func (b *Builder) WithOptions(options BuilderOptions) *Builder {
+	if options.DefaultGenresGetter != nil {
+		b = b.WithDefaultGenres(options.DefaultGenres())
+	}
+
+	if options.DefaultSigilGetter != nil {
+		b.WithDefaultSigil(options.DefaultSigil())
+	}
+
+	if options.QueryBuilderModifier != nil {
+		options.ModifyBuilder(b)
+	}
+
+	return b
+}
+
 func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
 	b.permittedSigil.Add(s)
 	return b

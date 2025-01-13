@@ -49,16 +49,13 @@ func (u *Repo) MakeQueryBuilderExcludingHidden(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	b := u.makeQueryBuilder().
+	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
-		WithHidden(u.GetMatcherDormant())
-
-	options.Apply(b)
-
-	return b
+		WithHidden(u.GetMatcherDormant()).
+		WithOptions(options)
 }
 
 func (u *Repo) MakeQueryBuilder(
@@ -69,15 +66,12 @@ func (u *Repo) MakeQueryBuilder(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	b := u.makeQueryBuilder().
+	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
-		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
-
-	options.Apply(b)
-
-	return b
+		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
+		WithOptions(options)
 }
 
 func (u *Repo) GetDefaultExternalStore() *external_store.Store {
