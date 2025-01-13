@@ -22,7 +22,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
 type Store struct {
@@ -115,7 +114,7 @@ func (s *Store) GetBlobStore() interfaces.BlobStore {
 	return &s.repoLayout
 }
 
-func (s *Store) GetInventoryListStore() repo.InventoryListStore {
+func (s *Store) GetInventoryListStore() sku.InventoryListStore {
 	return s
 }
 

@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -39,7 +38,7 @@ func (u *Repo) GetBlobStore() interfaces.BlobStore {
 	return u.GetRepoLayout()
 }
 
-func (u *Repo) GetInventoryListStore() repo.InventoryListStore {
+func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
 	return u.GetStore().GetInventoryListStore()
 }
 

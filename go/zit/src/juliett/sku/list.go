@@ -7,6 +7,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 )
 
+type InventoryListStore interface {
+	WriteInventoryList(t InventoryList) (err error)
+	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
+
+	// ReadAllSkus(
+	// 	f func(besty, sk *sku.Transacted) error,
+	// ) (err error)
+
+	// ReadAllInventoryListsSince(
+	// since ids.Tai,
+	// 	f interfaces.FuncIter[*sku.Transacted],
+	// ) (err error)
+
+	// ReadAllInventoryLists(
+	// 	f interfaces.FuncIter[*sku.Transacted],
+	// ) (err error)
+}
+
 type ListFormat interface {
 	GetListFormat() ListFormat
 	WriteInventoryListBlob(Collection, io.Writer) (int64, error)

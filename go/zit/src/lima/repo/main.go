@@ -12,29 +12,11 @@ type Repo interface {
 	GetEnv() *env.Env
 }
 
-type InventoryListStore interface {
-	WriteInventoryList(t sku.InventoryList) (err error)
-	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
-
-	// ReadAllSkus(
-	// 	f func(besty, sk *sku.Transacted) error,
-	// ) (err error)
-
-	// ReadAllInventoryListsSince(
-	// since ids.Tai,
-	// 	f interfaces.FuncIter[*sku.Transacted],
-	// ) (err error)
-
-	// ReadAllInventoryLists(
-	// 	f interfaces.FuncIter[*sku.Transacted],
-	// ) (err error)
-}
-
 // TODO explore permissions for who can read / write from the archive
 type Archive interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
-	GetInventoryListStore() InventoryListStore
+	GetInventoryListStore() sku.InventoryListStore
 }
 
 type WorkingCopy interface {
