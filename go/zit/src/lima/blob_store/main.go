@@ -17,17 +17,17 @@ type VersionedStores struct {
 }
 
 func Make(
-	dirLayout repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
 ) *VersionedStores {
 	return &VersionedStores{
-		InventoryList: MakeInventoryStore(dirLayout, objectFormat, boxFormat),
-		Tag:           MakeTagStore(dirLayout, luaVMPoolBuilder),
-		Repo:          MakeRepoStore(dirLayout),
-		Config:        MakeConfigStore(dirLayout),
-		Type:          MakeTypeStore(dirLayout),
+		InventoryList: MakeInventoryStore(repoLayout, objectFormat, boxFormat),
+		Tag:           MakeTagStore(repoLayout, luaVMPoolBuilder),
+		Repo:          MakeRepoStore(repoLayout),
+		Config:        MakeConfigStore(repoLayout),
+		Type:          MakeTypeStore(repoLayout),
 	}
 }
 

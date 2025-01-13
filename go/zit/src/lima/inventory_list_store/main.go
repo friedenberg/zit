@@ -15,16 +15,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
-// TODO add lock to make threadsafe
 type Store struct {
+	lock sync.Mutex
+
 	repoLayout repo_layout.Layout
 	ls         interfaces.LockSmith
 	sv         interfaces.StoreVersion
@@ -41,32 +44,27 @@ type Store struct {
 }
 
 func (s *Store) Initialize(
-	dirLayout repo_layout.Layout,
-	ls interfaces.LockSmith,
-	sv interfaces.StoreVersion,
-	of interfaces.ObjectIOFactory,
-	af interfaces.BlobIOFactory,
+	repoLayout repo_layout.Layout,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
-	box *box_format.BoxTransacted,
 	blobStore blob_store.InventoryList,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		repoLayout:    dirLayout,
-		ls:            ls,
-		sv:            sv,
-		of:            of,
-		af:            af,
+		repoLayout:    repoLayout,
+		ls:            repoLayout.GetLockSmith(),
+		sv:            repoLayout.GetStoreVersion(),
+		of:            repoLayout.ObjectReaderWriterFactory(genres.InventoryList),
+		af:            repoLayout,
 		clock:         clock,
 		object_format: pmf,
+		box:           box_format.MakeBoxTransactedArchive(repoLayout.Env, true),
 		options:       op,
-		box:           box,
 		blobStore:     blobStore,
 	}
 
-	v := sv.GetInt()
+	v := s.sv.GetInt()
 
 	switch {
 	case v <= 6:
@@ -101,6 +99,26 @@ func (s *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
 	}
 }
 
+func (s *Store) GetTai() ids.Tai {
+	if s.clock == nil {
+		return ids.NowTai()
+	} else {
+		return s.clock.GetTai()
+	}
+}
+
+func (s *Store) GetEnv() *env.Env {
+	return s.repoLayout.Env
+}
+
+func (s *Store) GetBlobStore() interfaces.BlobStore {
+	return &s.repoLayout
+}
+
+func (s *Store) GetInventoryListStore() repo.InventoryListStore {
+	return s
+}
+
 func (s *Store) Create(
 	skus *sku.List,
 	description descriptions.Description,
@@ -121,7 +139,11 @@ func (s *Store) Create(
 
 	t.Metadata.Type = s.blobType
 	t.Metadata.Description = description
-	tai := s.clock.GetTai()
+
+	if s.clock == nil {
+	}
+
+	tai := s.GetTai()
 
 	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
@@ -175,7 +197,12 @@ func (s *Store) Create(
 	return
 }
 
+// TODO split into public and private parts, where public includes writing the
+// skus AND the list, while private writes just the list
 func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	var wc interfaces.ShaWriteCloser
 
 	// TODO also write to inventory_list_log

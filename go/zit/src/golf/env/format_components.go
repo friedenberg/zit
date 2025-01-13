@@ -1,27 +1,27 @@
-package repo_local_working_copy
+package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
-func (u *Repo) FormatOutputOptions() (o string_format_writer.OutputOptions) {
+func (u *Env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
 	o.ColorOptionsOut = u.FormatColorOptionsOut()
 	o.ColorOptionsErr = u.FormatColorOptionsErr()
 	return
 }
 
-func (u *Repo) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetOut().IsTty() || !u.config.PrintOptions.PrintColors
+func (u *Env) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
+	o.OffEntirely = !u.GetOut().IsTty() || !u.cliConfig.PrintOptions.PrintColors
 	return
 }
 
-func (u *Repo) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetErr().IsTty() || !u.config.PrintOptions.PrintColors
+func (u *Env) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
+	o.OffEntirely = !u.GetErr().IsTty() || !u.cliConfig.PrintOptions.PrintColors
 	return
 }
 
-func (u *Repo) StringFormatWriterFields(
+func (u *Env) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[string_format_writer.Box] {

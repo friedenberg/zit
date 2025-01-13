@@ -8,7 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
 )
@@ -97,5 +101,25 @@ func (c Genesis) relay(
 
 	repoLayout.Genesis(c.BigBang)
 
-	return repoLayout
+	objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
+	boxFormat := box_format.MakeBoxTransactedArchive(repoLayout.Env, true)
+
+	inventoryListBlobStore := blob_store.MakeInventoryStore(
+		repoLayout,
+		objectFormat,
+		boxFormat,
+	)
+
+	var inventoryListStore inventory_list_store.Store
+
+	if err := inventoryListStore.Initialize(
+		repoLayout,
+		objectFormat,
+		nil,
+		inventoryListBlobStore,
+	); err != nil {
+		env.CancelWithError(err)
+	}
+
+	return &inventoryListStore
 }

@@ -10,9 +10,34 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
+
+func MakeBoxTransactedArchive(env *env.Env, includeTai bool) *BoxTransacted {
+	po := options_print.V0{}.
+		WithPrintShas(true).
+		WithPrintTai(includeTai).
+		WithExcludeFields(true).
+		WithDescriptionInBox(true)
+
+	co := env.FormatColorOptionsOut()
+	co.OffEntirely = true
+
+	return MakeBoxTransacted(
+		co,
+		po,
+		env.StringFormatWriterFields(
+			string_format_writer.CliFormatTruncationNone,
+			co,
+		),
+		ids.Abbr{},
+		nil,
+		nil,
+		nil,
+	)
+}
 
 func MakeBoxTransacted(
 	co string_format_writer.ColorOptions,

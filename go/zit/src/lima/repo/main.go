@@ -34,7 +34,7 @@ type InventoryListStore interface {
 type Archive interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
-	// GetInventoryListStore() InventoryListStore
+	GetInventoryListStore() InventoryListStore
 }
 
 type WorkingCopy interface {

@@ -78,20 +78,20 @@ func (u *Repo) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	)
 }
 
-func (u *Repo) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
-	po := u.GetConfig().PrintOptions.
+func (repo *Repo) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
+	po := repo.GetConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTai(includeTai).
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 
-	co := u.FormatColorOptionsOut()
+	co := repo.FormatColorOptionsOut()
 	co.OffEntirely = true
 
 	return box_format.MakeBoxTransacted(
 		co,
 		po,
-		u.StringFormatWriterFields(
+		repo.StringFormatWriterFields(
 			string_format_writer.CliFormatTruncationNone,
 			co,
 		),

@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
@@ -92,13 +91,8 @@ func (c *Store) Initialize(
 
 	if err = c.inventoryListStore.Initialize(
 		c.GetDirectoryLayout(),
-		c.GetDirectoryLayout().GetLockSmith(),
-		c.config.GetStoreVersion(),
-		c.dirLayout.ObjectReaderWriterFactory(genres.InventoryList),
-		c.dirLayout,
 		pmf,
 		c,
-		box,
 		blobStore.GetInventoryList(),
 	); err != nil {
 		err = errors.Wrap(err)
