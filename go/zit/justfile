@@ -52,7 +52,7 @@ codemod-go-imports: codemod-go-fix_redundant_import_aliases
 
 # moves a go package from one src/<root>/<leaf> to another src/<root>/<leaf>
 codemod-go-move_package src dst: && codemod-go-imports build-go
-  #! /bin/bash -xe
+  #! /bin/bash -e
 
   prefix=code.linenisgreat.com/zit/go/zit
   original="{{src}}"
