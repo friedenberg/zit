@@ -18,7 +18,6 @@ func MakeBuilder(
 	object_probe_index sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
-	options BuilderOptions,
 ) (b *Builder) {
 	b = &Builder{
 		dirLayout:          s,
@@ -27,8 +26,6 @@ func MakeBuilder(
 		luaVMPoolBuilder:   luaVMPoolBuilder,
 		repoGetter:         repoGetter,
 	}
-
-	// TODO use options
 
 	return
 }

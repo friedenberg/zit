@@ -19,14 +19,14 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c QueryGroup) MakeQueryGroup(
-	command any,
+	options query.BuilderOptions,
 	repo repo.ReadWrite,
 	args ...string,
 ) (qg *query.Group) {
 	var err error
 
 	if qg, err = repo.MakeQueryGroup(
-		command,
+		options,
 		c.RepoId,
 		c.ExternalQueryOptions,
 		args...,

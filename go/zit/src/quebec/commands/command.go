@@ -39,6 +39,11 @@ type CommandWithQuery interface {
 	RunWithQuery(store *read_write_repo_local.Repo, ids *query.Group)
 }
 
+type CommandWithQueryAndBuilderOptions interface {
+	query.BuilderOptionGetter
+	CommandWithQuery
+}
+
 type CommandCompletionWithRepo interface {
 	CompleteWithRepo(u *read_write_repo_local.Repo, args ...string)
 }

@@ -17,18 +17,6 @@ func (u *Repo) MakeQueryGroup(
 ) (qg *query.Group, err error) {
 	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
-	if dgg, ok := metaBuilder.(query.DefaultGenresGetter); ok {
-		b = b.WithDefaultGenres(dgg.DefaultGenres())
-	}
-
-	if dsg, ok := metaBuilder.(query.DefaultSigilGetter); ok {
-		b.WithDefaultSigil(dsg.DefaultSigil())
-	}
-
-	if qbm, ok := metaBuilder.(query.QueryBuilderModifier); ok {
-		qbm.ModifyBuilder(b)
-	}
-
 	if qg, err = b.BuildQueryGroupWithRepoId(
 		repoId,
 		externalQueryOptions,
@@ -43,14 +31,13 @@ func (u *Repo) MakeQueryGroup(
 	return
 }
 
-func (u *Repo) makeQueryBuilder(options query.BuilderOptions) *query.Builder {
+func (u *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
 		u.GetRepoLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
 		u.MakeLuaVMPoolBuilder(),
 		u,
-		options,
 	)
 }
 
@@ -62,12 +49,16 @@ func (u *Repo) MakeQueryBuilderExcludingHidden(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder(options).
+	b := u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
 		WithHidden(u.GetMatcherDormant())
+
+	options.Apply(b)
+
+	return b
 }
 
 func (u *Repo) MakeQueryBuilder(
@@ -78,11 +69,15 @@ func (u *Repo) MakeQueryBuilder(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder(options).
+	b := u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
+
+	options.Apply(b)
+
+	return b
 }
 
 func (u *Repo) GetDefaultExternalStore() *external_store.Store {

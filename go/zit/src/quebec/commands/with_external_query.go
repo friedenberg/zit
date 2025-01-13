@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/read_write_repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -30,7 +31,7 @@ func (c commandWithQuery) CompleteWithRepo(
 	defer local.MustClose(w)
 
 	qg := c.MakeQueryGroup(
-		c.CommandWithQuery,
+		query.MakeBuilderOptions(c.CommandWithQuery),
 		local,
 		args...,
 	)
@@ -48,7 +49,7 @@ func (c commandWithQuery) RunWithRepo(
 	args ...string,
 ) {
 	qg := c.MakeQueryGroup(
-		c.CommandWithQuery,
+		query.MakeBuilderOptions(c.CommandWithQuery),
 		local,
 		args...,
 	)

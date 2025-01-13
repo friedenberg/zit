@@ -11,7 +11,7 @@ import (
 func (u *Repo) GetSkuFromObjectId(
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
-	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
+	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), query.BuilderOptions{})
 
 	var qg *query.Group
 

@@ -16,8 +16,44 @@ type DefaultGenresGetter interface {
 	DefaultGenres() ids.Genre
 }
 
-type CompletionGenresGetter interface {
-	CompletionGenres() ids.Genre
+type BuilderOptionGetter interface {
+	GetQueryBuilderOptions() BuilderOptions
 }
 
-type BuilderOptions interface{}
+type BuilderOptions struct {
+	QueryBuilderModifier
+	DefaultSigilGetter
+	DefaultGenresGetter
+}
+
+func MakeBuilderOptions(o any) BuilderOptions {
+	var options BuilderOptions
+
+	if dgg, ok := o.(DefaultGenresGetter); ok {
+		options.DefaultGenresGetter = dgg
+	}
+
+	if dsg, ok := o.(DefaultSigilGetter); ok {
+		options.DefaultSigilGetter = dsg
+	}
+
+	if qbm, ok := o.(QueryBuilderModifier); ok {
+		options.QueryBuilderModifier = qbm
+	}
+
+	return options
+}
+
+func (options BuilderOptions) Apply(b *Builder) {
+	if options.DefaultGenresGetter != nil {
+		b = b.WithDefaultGenres(options.DefaultGenres())
+	}
+
+	if options.DefaultSigilGetter != nil {
+		b.WithDefaultSigil(options.DefaultSigil())
+	}
+
+	if options.QueryBuilderModifier != nil {
+		options.ModifyBuilder(b)
+	}
+}

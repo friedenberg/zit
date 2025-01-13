@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -73,7 +74,11 @@ func (cmd Clone) Run(
 
 	remote := cmd.MakeRemote(repo.GetEnv(), cmd.GetFlagSet().Args()[0])
 
-	qg := cmd.MakeQueryGroup(cmd, repo, cmd.Args()[1:]...)
+	qg := cmd.MakeQueryGroup(
+		query.MakeBuilderOptions(cmd),
+		repo,
+		cmd.Args()[1:]...,
+	)
 
 	if err := repo.PullQueryGroupFromRemote(
 		remote,

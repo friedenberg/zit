@@ -51,7 +51,11 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
-	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres(), c)
+	b := u.MakeQueryBuilderExcludingHidden(
+		cgg.CompletionGenres(),
+		query.MakeBuilderOptions(c.CommandWithRemoteAndQuery),
+	)
+
 	var qg *query.Group
 
 	if qg, err = b.BuildQueryGroupWithRepoId(
@@ -83,7 +87,7 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 	}
 
 	qg := c.MakeQueryGroup(
-		c.CommandWithRemoteAndQuery,
+		query.MakeBuilderOptions(c.CommandWithRemoteAndQuery),
 		local,
 		args[1:]...,
 	)

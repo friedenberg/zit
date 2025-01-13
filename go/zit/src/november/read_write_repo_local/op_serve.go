@@ -379,7 +379,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 			var err error
 
 			if qg, err = local.MakeQueryGroup(
-				nil,
+				query.BuilderOptions{},
 				ids.RepoId{},
 				sku.ExternalQueryOptions{},
 				qgString.String(),

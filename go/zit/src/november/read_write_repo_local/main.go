@@ -213,7 +213,7 @@ func (repo *Repo) initialize(options Options) (err error) {
 		objectFormat,
 		repo.sunrise,
 		repo.MakeLuaVMPoolBuilder(),
-		repo.makeQueryBuilder(nil).
+		repo.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
 		boxFormatArchive,
