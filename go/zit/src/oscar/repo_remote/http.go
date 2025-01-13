@@ -35,9 +35,8 @@ func (repo *HTTP) GetBlobStore() interfaces.BlobStore {
 	return &HTTPBlobStore{repo: repo}
 }
 
-func (repo *HTTP) MakeQueryGroup(
+func (repo *HTTP) MakeExternalQueryGroupWithRepoId(
 	builderOptions query.BuilderOptions,
-	repoId ids.RepoId,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (qg *query.Group, err error) {

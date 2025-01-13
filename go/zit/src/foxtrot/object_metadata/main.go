@@ -18,6 +18,10 @@ import (
 type Field = string_format_writer.Field
 
 type Metadata struct {
+	// Domain
+	// RepoId
+	// InventoryListTai
+
 	Description descriptions.Description
 	Tags        ids.TagMutableSet // public for gob, but should be private
 	Type        ids.Type

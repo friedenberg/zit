@@ -59,7 +59,6 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	var qg *query.Group
 
 	if qg, err = b.BuildQueryGroupWithRepoId(
-		c.RepoId,
 		c.ExternalQueryOptions,
 	); err != nil {
 		err = errors.Wrap(err)

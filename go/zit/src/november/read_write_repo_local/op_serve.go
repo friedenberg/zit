@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -378,9 +377,8 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		{
 			var err error
 
-			if qg, err = local.MakeQueryGroup(
+			if qg, err = local.MakeExternalQueryGroupWithRepoId(
 				query.BuilderOptions{},
-				ids.RepoId{},
 				sku.ExternalQueryOptions{},
 				qgString.String(),
 			); err != nil {

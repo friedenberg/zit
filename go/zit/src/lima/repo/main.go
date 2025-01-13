@@ -23,9 +23,13 @@ type Relay interface {
 type ReadWrite interface {
 	Relay
 
-	MakeQueryGroup(
+	// MakeQueryGroup(
+	// 	builderOptions query.BuilderOptions,
+	// 	args ...string,
+	// ) (qg *query.Group, err error)
+
+	MakeExternalQueryGroupWithRepoId(
 		builderOptions query.BuilderOptions,
-		repoId ids.RepoId,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
 	) (qg *query.Group, err error)

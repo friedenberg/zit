@@ -239,7 +239,6 @@ func (b *Builder) WithOptionsFromOriginalQuery(
 }
 
 func (b *Builder) BuildQueryGroupWithRepoId(
-	k ids.RepoId,
 	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
@@ -247,13 +246,13 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 
 	ok := false
 	state.eqo = eqo
-	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(k)
+	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(eqo.RepoId)
 
-	state.qg.RepoId = k
+	state.qg.RepoId = eqo.RepoId
 	state.qg.ExternalQueryOptions = eqo
 
 	if !ok {
-		err = errors.Errorf("kasten not found: %q", k)
+		err = errors.Errorf("kasten not found: %q", eqo.RepoId)
 		return
 	}
 

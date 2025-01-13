@@ -9,16 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Repo) MakeQueryGroup(
+func (u *Repo) MakeExternalQueryGroupWithRepoId(
 	metaBuilder query.BuilderOptions,
-	repoId ids.RepoId,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (qg *query.Group, err error) {
 	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
 	if qg, err = b.BuildQueryGroupWithRepoId(
-		repoId,
 		externalQueryOptions,
 		args...,
 	); err != nil {
