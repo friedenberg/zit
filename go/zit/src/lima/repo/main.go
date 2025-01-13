@@ -17,6 +17,9 @@ type Repo interface {
 type Relay interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
+	// WriteInventoryList(*sku.List) error
+	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
+	// ReadAllInventoryLists() (*sku.List, error)
 }
 
 // TODO rename to WorkingCopy?

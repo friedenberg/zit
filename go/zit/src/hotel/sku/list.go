@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 )
 
 type ListFormat interface {
@@ -17,10 +18,18 @@ type ListFormat interface {
 	) error
 }
 
-type List = TransactedHeap
+type List = heap.Heap[Transacted, *Transacted]
 
 func MakeList() *List {
-	return MakeTransactedHeap()
+	h := heap.Make(
+		transactedEqualer{},
+		transactedLessor{},
+		transactedResetter{},
+	)
+
+	h.SetPool(GetTransactedPool())
+
+	return h
 }
 
 var ResetterList resetterList

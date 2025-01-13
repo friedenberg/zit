@@ -26,7 +26,7 @@ type Page struct {
 	PageId
 	sunrise ids.Tai
 	*probe_index
-	added, addedLatest *sku.TransactedHeap
+	added, addedLatest *sku.List
 	hasChanges         bool
 	directoryLayout    repo_layout.Layout
 	config             *config.Compiled
@@ -40,8 +40,8 @@ func (pt *Page) initialize(
 	pt.directoryLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
 	pt.sunrise = i.sunrise
 	pt.PageId = pid
-	pt.added = sku.MakeTransactedHeap()
-	pt.addedLatest = sku.MakeTransactedHeap()
+	pt.added = sku.MakeList()
+	pt.addedLatest = sku.MakeList()
 	pt.config = i.mutable_config
 	pt.probe_index = &i.probe_index
 	pt.oids = make(map[string]struct{})
