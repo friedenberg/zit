@@ -1,30 +1,68 @@
 package read_write_repo_local
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Repo) makeQueryBuilder() *query.Builder {
+func (u *Repo) MakeQueryGroup(
+	metaBuilder query.BuilderOptions,
+	repoId ids.RepoId,
+	externalQueryOptions sku.ExternalQueryOptions,
+	args ...string,
+) (qg *query.Group, err error) {
+	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
+
+	if dgg, ok := metaBuilder.(query.DefaultGenresGetter); ok {
+		b = b.WithDefaultGenres(dgg.DefaultGenres())
+	}
+
+	if dsg, ok := metaBuilder.(query.DefaultSigilGetter); ok {
+		b.WithDefaultSigil(dsg.DefaultSigil())
+	}
+
+	if qbm, ok := metaBuilder.(query.QueryBuilderModifier); ok {
+		qbm.ModifyBuilder(b)
+	}
+
+	if qg, err = b.BuildQueryGroupWithRepoId(
+		repoId,
+		externalQueryOptions,
+		args...,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	qg.ExternalQueryOptions = externalQueryOptions
+
+	return
+}
+
+func (u *Repo) makeQueryBuilder(options query.BuilderOptions) *query.Builder {
 	return query.MakeBuilder(
 		u.GetRepoLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
 		u.MakeLuaVMPoolBuilder(),
 		u,
+		options,
 	)
 }
 
 func (u *Repo) MakeQueryBuilderExcludingHidden(
 	dg ids.Genre,
+	options query.BuilderOptions,
 ) *query.Builder {
 	if dg.IsEmpty() {
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder().
+	return u.makeQueryBuilder(options).
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
@@ -34,12 +72,13 @@ func (u *Repo) MakeQueryBuilderExcludingHidden(
 
 func (u *Repo) MakeQueryBuilder(
 	dg ids.Genre,
+	options query.BuilderOptions,
 ) *query.Builder {
 	if dg.IsEmpty() {
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder().
+	return u.makeQueryBuilder(options).
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).

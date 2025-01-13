@@ -12,16 +12,19 @@ type Repo interface {
 	GetEnv() *env.Env
 }
 
+// TODO rename to Archive?
+// TODO explore permissions for who can read / write from the archive
 type Relay interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
 }
 
+// TODO rename to WorkingCopy?
 type ReadWrite interface {
 	Relay
 
 	MakeQueryGroup(
-		metaBuilder any,
+		builderOptions query.BuilderOptions,
 		repoId ids.RepoId,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
@@ -30,6 +33,12 @@ type ReadWrite interface {
 	MakeInventoryList(
 		qg *query.Group,
 	) (list *sku.List, err error)
+
+	// 	PullQueryGroupFromRemote2(
+	// 		remote ReadWrite,
+	// 		options RemoteTransferOptions,
+	// 		query ...string,
+	// 	) (err error)
 
 	PullQueryGroupFromRemote(
 		remote ReadWrite,

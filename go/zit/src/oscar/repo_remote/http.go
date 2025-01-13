@@ -36,7 +36,7 @@ func (repo *HTTP) GetBlobStore() interfaces.BlobStore {
 }
 
 func (repo *HTTP) MakeQueryGroup(
-	metaBuilder any,
+	builderOptions query.BuilderOptions,
 	repoId ids.RepoId,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
@@ -84,6 +84,30 @@ func (repo *HTTP) MakeInventoryList(
 
 	return
 }
+
+// func (remoteHTTP *HTTP) PullQueryGroupFromRemote2(
+// 	remote repo.ReadWrite,
+// 	options repo.RemoteTransferOptions,
+// 	queryStrings ...string,
+// ) (err error) {
+// 	var qg *query.Group
+
+// 	if qg, err = remoteHTTP.MakeQueryGroup(queryStrings...); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	if err = remoteHTTP.PullQueryGroupFromRemote(
+// 		remote,
+// 		qg,
+// 		options,
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	return
+// }
 
 func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	remote repo.ReadWrite,

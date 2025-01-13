@@ -43,6 +43,7 @@ func (op Checkout) RunWithKasten(
 ) (zsc sku.SkuTypeSetMutable, err error) {
 	b := op.Repo.MakeQueryBuilder(
 		ids.MakeGenre(genres.Zettel),
+    op,
 	).WithTransacted(
 		skus,
 		ids.SigilExternal,
@@ -189,6 +190,7 @@ func (op Checkout) runOrganize(
 
 	b := op.MakeQueryBuilder(
 		ids.MakeGenre(genres.TrueGenre()...),
+    op,
 	).WithTransacted(
 		changeResults.After.AsTransactedSet(),
 		ids.SigilExternal,
