@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type CheckinBlob struct {
@@ -22,7 +22,7 @@ type CheckinBlob struct {
 func init() {
 	registerCommand(
 		"checkin-blob",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &CheckinBlob{
 				NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
 					collections_ptr.SetterPolicyAppend,
@@ -41,7 +41,7 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c CheckinBlob) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if len(args)%2 != 0 {
 		u.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",

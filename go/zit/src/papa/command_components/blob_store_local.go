@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type BlobStoreLocal struct{}
@@ -26,7 +26,7 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-	repoOptions repo_local_working_copy.Options,
+	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {
 	layout := dir_layout.MakeDefault(
 		context,

@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Deinit struct {
@@ -17,7 +17,7 @@ type Deinit struct {
 func init() {
 	registerCommand(
 		"deinit",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Deinit{}
 
 			f.BoolVar(
@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c Deinit) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c Deinit) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
@@ -48,7 +48,7 @@ func (c Deinit) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 	}
 }
 
-func (c Deinit) getPermission(u *repo_local_working_copy.Repo) (success bool) {
+func (c Deinit) getPermission(u *local_working_copy.Repo) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",

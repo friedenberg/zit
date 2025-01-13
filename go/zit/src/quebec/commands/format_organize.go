@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -20,7 +20,7 @@ type FormatOrganize struct {
 func init() {
 	registerCommand(
 		"format-organize",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &FormatOrganize{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c *FormatOrganize) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {

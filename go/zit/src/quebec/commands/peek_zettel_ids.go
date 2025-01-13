@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type PeekZettelIds struct{}
@@ -14,7 +14,7 @@ type PeekZettelIds struct{}
 func init() {
 	registerCommand(
 		"peek-zettel-ids",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &PeekZettelIds{}
 
 			return c
@@ -22,7 +22,7 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) RunWithRepo(repo *repo_local_working_copy.Repo, args ...string) {
+func (c PeekZettelIds) RunWithLocalWorkingCopy(repo *local_working_copy.Repo, args ...string) {
 	n := 0
 
 	if len(args) > 0 {

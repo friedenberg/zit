@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type CatBlobShas struct{}
@@ -15,7 +15,7 @@ type CatBlobShas struct{}
 func init() {
 	registerCommand(
 		"cat-blob-shas",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &CatBlobShas{}
 
 			return c
@@ -29,7 +29,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) RunWithRepo(u *repo_local_working_copy.Repo, _ ...string) {
+func (c CatBlobShas) RunWithLocalWorkingCopy(u *local_working_copy.Repo, _ ...string) {
 	if err := u.GetRepoLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {

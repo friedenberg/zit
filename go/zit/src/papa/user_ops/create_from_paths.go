@@ -9,11 +9,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type CreateFromPaths struct {
-	*repo_local_working_copy.Repo
+	*local_working_copy.Repo
 	sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -26,7 +26,7 @@ type Import struct {
 func init() {
 	registerCommand(
 		"import",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Import{
 				StoreVersion: immutable_config.CurrentStoreVersion,
 			}
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c Import) RunWithRepo(local *repo_local_working_copy.Repo, args ...string) {
+func (c Import) RunWithLocalWorkingCopy(local *local_working_copy.Repo, args ...string) {
 	if c.InventoryList == "" {
 		local.CancelWithBadRequestf("empty inventory list")
 		return

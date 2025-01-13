@@ -64,6 +64,7 @@ function print_their_xdg() {
 
 function run_clone_default_with() {
 	run_zit clone \
+		-age-identity none \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
 		-lock-internal-files=false \
@@ -210,11 +211,14 @@ function clone_relay_history_default_allow_conflicts { # @test
 	us="us"
 	set_xdg "$us"
 	run_clone_default_with \
-		-repo-type relay \
+		-repo-type archive \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg them)
+	tree us/.xdg/data/zit/objects
 
 	assert_success
+	assert_output - <<-EOM
+	EOM
 
 	run_zit show +?z,t,e
 	assert_success

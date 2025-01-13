@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Test struct{}
@@ -11,7 +11,7 @@ type Test struct{}
 func init() {
 	registerCommand(
 		"test",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Test{}
 
 			return c
@@ -19,8 +19,8 @@ func init() {
 	)
 }
 
-func (c Test) RunWithRepo(
-	u *repo_local_working_copy.Repo,
+func (c Test) RunWithLocalWorkingCopy(
+	u *local_working_copy.Repo,
 	args ...string,
 ) {
 }

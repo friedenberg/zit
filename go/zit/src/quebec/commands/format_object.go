@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type FormatObject struct {
@@ -25,7 +25,7 @@ type FormatObject struct {
 func init() {
 	registerCommand(
 		"format-object",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &FormatObject{
 				CheckoutMode: checkout_mode.BlobOnly,
 			}
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c *FormatObject) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c *FormatObject) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)
@@ -127,7 +127,7 @@ func (c *FormatObject) RunWithRepo(u *repo_local_working_copy.Repo, args ...stri
 }
 
 func (c *FormatObject) FormatFromStdin(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"

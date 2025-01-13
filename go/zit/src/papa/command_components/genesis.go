@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Genesis struct {
@@ -30,15 +30,13 @@ func (c Genesis) OnTheFirstDay(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-) repo.WorkingCopy {
+) repo.Archive {
 	switch c.BigBang.Config.RepoType {
-
 	case repo_type.TypeWorkingCopy:
-		return c.readWrite(context, config, envOptions)
+		return c.makeWorkingCopy(context, config, envOptions)
 
 	case repo_type.TypeArchive:
-		fallthrough
-		// return c.relay(context, config, envOptions)
+		return c.makeArchive(context, config, envOptions)
 
 	default:
 		context.CancelWithError(
@@ -49,12 +47,12 @@ func (c Genesis) OnTheFirstDay(
 	return nil
 }
 
-func (c Genesis) readWrite(
+func (c Genesis) makeWorkingCopy(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
 ) repo.WorkingCopy {
-	local := repo_local_working_copy.Genesis(
+	local := local_working_copy.Genesis(
 		c.BigBang,
 		context,
 		config,
@@ -64,7 +62,7 @@ func (c Genesis) readWrite(
 	return local
 }
 
-func (c Genesis) relay(
+func (c Genesis) makeArchive(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,

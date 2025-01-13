@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type DormantRemove struct{}
@@ -12,7 +12,7 @@ type DormantRemove struct{}
 func init() {
 	registerCommand(
 		"dormant-remove",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &DormantRemove{}
 
 			return c
@@ -20,7 +20,7 @@ func init() {
 	)
 }
 
-func (c DormantRemove) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c DormantRemove) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	u.Must(u.Lock)
 
 	for _, v := range args {

@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Pull struct{}
@@ -27,7 +27,7 @@ func (c Pull) DefaultGenres() ids.Genre {
 }
 
 func (c Pull) RunWithRemoteAndQuery(
-	local *repo_local_working_copy.Repo,
+	local *local_working_copy.Repo,
 	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,

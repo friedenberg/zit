@@ -9,7 +9,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -27,8 +28,16 @@ type CommandWithEnv interface {
 	RunWithEnv(*env.Env, ...string)
 }
 
-type CommandWithRepo interface {
-	RunWithRepo(*repo_local_working_copy.Repo, ...string)
+type CommandWithArchive interface {
+	RunWithArchive(repo.Archive, ...string)
+}
+
+type CommandWithWorkingCopy interface {
+	RunWithWorkingCopy(repo.WorkingCopy, ...string)
+}
+
+type CommandWithLocalWorkingCopy interface {
+	RunWithLocalWorkingCopy(*local_working_copy.Repo, ...string)
 }
 
 type CommandWithBlobStore interface {
@@ -36,7 +45,7 @@ type CommandWithBlobStore interface {
 }
 
 type CommandWithQuery interface {
-	RunWithQuery(store *repo_local_working_copy.Repo, ids *query.Group)
+	RunWithQuery(store *local_working_copy.Repo, ids *query.Group)
 }
 
 type CommandWithQueryAndBuilderOptions interface {
@@ -45,7 +54,7 @@ type CommandWithQueryAndBuilderOptions interface {
 }
 
 type CommandCompletionWithRepo interface {
-	CompleteWithRepo(u *repo_local_working_copy.Repo, args ...string)
+	CompleteWithRepo(u *local_working_copy.Repo, args ...string)
 }
 
 var commands = map[string]Command{}
@@ -74,7 +83,7 @@ func registerCommand(
 			FlagSet: f,
 		}
 
-	case func(*flag.FlagSet) CommandWithRepo:
+	case func(*flag.FlagSet) CommandWithLocalWorkingCopy:
 		commands[n] = commandWithRepo{
 			Command: mft(f),
 			FlagSet: f,
@@ -97,7 +106,7 @@ func registerCommandWithQuery(
 ) {
 	registerCommand(
 		n,
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			cmd := &commandWithQuery{
 				CommandWithQuery: makeFunc(f),
 			}
@@ -115,7 +124,7 @@ func registerCommandWithRemoteAndQuery(
 ) {
 	registerCommand(
 		n,
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			cmd := &commandWithRemoteAndQuery{
 				CommandWithRemoteAndQuery: cwraq,
 			}

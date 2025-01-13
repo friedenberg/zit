@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type RepoInfo struct{}
@@ -13,7 +13,7 @@ type RepoInfo struct{}
 func init() {
 	registerCommand(
 		"repo-info",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &RepoInfo{}
 
 			return c
@@ -22,7 +22,7 @@ func init() {
 }
 
 // TODO disambiguate this from repo / env
-func (cmd RepoInfo) RunWithRepo(repo *repo_local_working_copy.Repo, args ...string) {
+func (cmd RepoInfo) RunWithLocalWorkingCopy(repo *local_working_copy.Repo, args ...string) {
 	c := repo.GetConfig()
 
 	if len(args) == 0 {

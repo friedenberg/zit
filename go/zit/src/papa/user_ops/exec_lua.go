@@ -4,11 +4,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type ExecLua struct {
-	*repo_local_working_copy.Repo
+	*local_working_copy.Repo
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {

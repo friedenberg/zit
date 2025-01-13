@@ -14,9 +14,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -110,8 +110,8 @@ func (s *Store) GetTai() ids.Tai {
 	}
 }
 
-func (s *Store) GetEnv() *env.Env {
-	return s.repoLayout.Env
+func (s *Store) GetRepoLayout() repo_layout.Layout {
+	return s.repoLayout
 }
 
 func (s *Store) GetBlobStore() interfaces.BlobStore {
@@ -187,12 +187,7 @@ func (s *Store) Create(
 		}
 	}
 
-	list := sku.InventoryList{
-		Transacted: t,
-		List:       skus,
-	}
-
-	if err = s.WriteInventoryList(list); err != nil {
+	if err = s.WriteInventoryListObject(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -202,7 +197,7 @@ func (s *Store) Create(
 
 // TODO split into public and private parts, where public includes writing the
 // skus AND the list, while private writes just the list
-func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
+func (s *Store) WriteInventoryListObject(t *sku.Transacted) (err error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -220,7 +215,7 @@ func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
 	t.Metadata.Type = s.blobType
 
 	if _, err = s.blobStore.WriteObjectToWriter(
-		t.Transacted,
+		t,
 		wc,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -236,6 +231,66 @@ func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
 	)
 
 	if err = t.CalculateObjectShas(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ImportInventoryList(
+	bs interfaces.BlobStore,
+	t *sku.Transacted,
+) (err error) {
+	ui.Debug().Print(sku.String(t))
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = bs.BlobReader(
+		t.GetBlobSha(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	list := sku.MakeList()
+
+	if err = inventory_list_blobs.ReadInventoryListBlob(
+		s.FormatForVersion(s.sv),
+		rc,
+		list,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ui.Debug().Print(list)
+
+	for sk := range list.All() {
+		ui.Debug().Print(sku.String(sk))
+		var n int64
+
+		if n, err = repo_layout.CopyBlobIfNecessary(
+			s.GetRepoLayout().GetEnv(),
+			s.GetRepoLayout(),
+			bs,
+			sk.GetBlobSha(),
+		); err != nil {
+			if errors.Is(err, &dir_layout.ErrAlreadyExists{}) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+		ui.Debug().Print(n)
+	}
+
+	if err = s.WriteInventoryListObject(
+		t,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -32,7 +32,7 @@ type New struct {
 func init() {
 	registerCommand(
 		"new",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &New{}
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
@@ -66,7 +66,7 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	if u.GetConfig().DryRun && len(args) == 0 {
@@ -79,7 +79,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c *New) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
 		u.CancelWithError(err)
 	}

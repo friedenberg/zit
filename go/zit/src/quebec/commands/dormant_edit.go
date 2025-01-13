@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -22,7 +22,7 @@ type DormantEdit struct{}
 func init() {
 	registerCommand(
 		"dormant-edit",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &DormantEdit{}
 
 			return c
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c DormantEdit) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c DormantEdit) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
@@ -66,7 +66,7 @@ func (c DormantEdit) RunWithRepo(u *repo_local_working_copy.Repo, args ...string
 
 // TODO refactor into common
 func (c DormantEdit) editInVim(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -95,7 +95,7 @@ func (c DormantEdit) editInVim(
 
 // TODO refactor into common
 func (c DormantEdit) makeTempKonfigFile(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -127,7 +127,7 @@ func (c DormantEdit) makeTempKonfigFile(
 
 // TODO refactor into common
 func (c DormantEdit) readTempKonfigFile(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File

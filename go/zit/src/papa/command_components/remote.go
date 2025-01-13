@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
@@ -27,7 +27,7 @@ func (c Remote) MakeRemote(
 
 	switch c.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		if remote, err = repo_local_working_copy.MakeFromConfigAndXDGDotenvPath(
+		if remote, err = local_working_copy.MakeFromConfigAndXDGDotenvPath(
 			env.Context,
 			env.GetCLIConfig(),
 			remoteArg,

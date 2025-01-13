@@ -19,12 +19,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type HTTP struct {
 	http.Client
-	*repo_local_working_copy.Repo
+	*local_working_copy.Repo
 }
 
 func (repo *HTTP) GetReadWriteRepo() repo.WorkingCopy {

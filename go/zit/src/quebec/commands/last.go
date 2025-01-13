@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -27,7 +27,7 @@ type Last struct {
 func init() {
 	registerCommand(
 		"last",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Last{}
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
@@ -46,7 +46,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c Last) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -116,7 +116,7 @@ func (c Last) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 }
 
 func (c Last) runWithInventoryList(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()

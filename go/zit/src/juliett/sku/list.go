@@ -8,21 +8,30 @@ import (
 )
 
 type InventoryListStore interface {
-	WriteInventoryList(t InventoryList) (err error)
+	FormatForVersion(sv interfaces.StoreVersion) ListFormat
+
+	WriteInventoryListObject(t *Transacted) (err error)
+	ImportInventoryList(bs interfaces.BlobStore, t *Transacted) (err error)
+	// WriteInventoryListStream(list *Transacted, ) (err error)
 	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
 
-	// ReadAllSkus(
-	// 	f func(besty, sk *sku.Transacted) error,
-	// ) (err error)
+	StreamInventoryList(
+		blobSha interfaces.Sha,
+		f interfaces.FuncIter[*Transacted],
+	) (err error)
+
+	ReadAllSkus(
+		f func(besty, sk *Transacted) error,
+	) (err error)
 
 	// ReadAllInventoryListsSince(
 	// since ids.Tai,
 	// 	f interfaces.FuncIter[*sku.Transacted],
 	// ) (err error)
 
-	// ReadAllInventoryLists(
-	// 	f interfaces.FuncIter[*sku.Transacted],
-	// ) (err error)
+	ReadAllInventoryLists(
+		f interfaces.FuncIter[*Transacted],
+	) (err error)
 }
 
 type ListFormat interface {

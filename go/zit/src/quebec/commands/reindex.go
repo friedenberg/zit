@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Reindex struct{}
@@ -11,7 +11,7 @@ type Reindex struct{}
 func init() {
 	registerCommand(
 		"reindex",
-		func(_ *flag.FlagSet) CommandWithRepo {
+		func(_ *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Reindex{}
 
 			return c
@@ -19,11 +19,11 @@ func init() {
 	)
 }
 
-func (c Reindex) GetLocalRepoOptions() repo_local_working_copy.Options {
-	return repo_local_working_copy.OptionsAllowConfigReadError
+func (c Reindex) GetLocalRepoOptions() local_working_copy.Options {
+	return local_working_copy.OptionsAllowConfigReadError
 }
 
-func (c Reindex) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c Reindex) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		u.CancelWithErrorf("reindex does not support arguments")
 	}

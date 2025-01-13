@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -61,7 +61,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkin) RunWithQuery(u *repo_local_working_copy.Repo, qg *query.Group) {
+func (c Checkin) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
 	op := user_ops.Checkin{
 		Delete:             c.Delete,
 		Organize:           c.Organize,

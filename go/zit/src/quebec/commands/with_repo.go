@@ -4,14 +4,14 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type commandWithRepo struct {
 	*flag.FlagSet
 	command_components.RepoLocal
-	Command CommandWithRepo
+	Command CommandWithLocalWorkingCopy
 }
 
 func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
@@ -27,9 +27,9 @@ func (cmd commandWithRepo) Run(
 		envOptions = og.GetEnvOptions()
 	}
 
-	repoOptions := repo_local_working_copy.OptionsEmpty
+	repoOptions := local_working_copy.OptionsEmpty
 
-	if og, ok := cmd.Command.(repo_local_working_copy.OptionsGetter); ok {
+	if og, ok := cmd.Command.(local_working_copy.OptionsGetter); ok {
 		repoOptions = og.GetLocalRepoOptions()
 	}
 
@@ -48,7 +48,7 @@ func (cmd commandWithRepo) Run(
 		t.CompleteWithRepo(repo, cmdArgs...)
 
 	default:
-		cmd.Command.RunWithRepo(repo, cmdArgs...)
+		cmd.Command.RunWithLocalWorkingCopy(repo, cmdArgs...)
 	}
 }
 

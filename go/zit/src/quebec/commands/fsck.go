@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Fsck struct {
@@ -31,7 +31,7 @@ func init() {
 }
 
 func (c Fsck) RunWithQuery(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	qg *query.Group,
 ) {
 	p := u.PrinterTransacted()

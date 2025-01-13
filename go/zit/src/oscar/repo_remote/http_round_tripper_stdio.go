@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type HTTPRoundTripperStdio struct {
@@ -20,7 +20,7 @@ type HTTPRoundTripperStdio struct {
 }
 
 func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
-	remote *repo_local_working_copy.Repo,
+	remote *local_working_copy.Repo,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
 		err = errors.Wrap(err)
@@ -47,7 +47,7 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
 }
 
 func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
-	remote *repo_local_working_copy.Repo,
+	remote *local_working_copy.Repo,
 	arg string,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("ssh"); err != nil {
@@ -77,7 +77,7 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
 }
 
 func (roundTripper *HTTPRoundTripperStdio) initialize(
-	remote *repo_local_working_copy.Repo,
+	remote *local_working_copy.Repo,
 ) (err error) {
 	// roundTripper.Stderr = os.Stderr
 	var stderrReadCloser io.ReadCloser

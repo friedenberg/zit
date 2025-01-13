@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -18,14 +18,14 @@ type Exec struct{}
 func init() {
 	registerCommand(
 		"exec",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Exec{}
 			return c
 		},
 	)
 }
 
-func (c Exec) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c Exec) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if len(args) == 0 {
 		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
 	}
@@ -60,7 +60,7 @@ func (c Exec) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
 }
 
 func (c Exec) runBash(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	tz *sku.Transacted,
 	args ...string,
 ) (err error) {

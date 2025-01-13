@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type FindMissing struct{}
@@ -12,7 +12,7 @@ type FindMissing struct{}
 func init() {
 	registerCommand(
 		"find-missing",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &FindMissing{}
 
 			return c
@@ -20,8 +20,8 @@ func init() {
 	)
 }
 
-func (c FindMissing) RunWithRepo(
-	u *repo_local_working_copy.Repo,
+func (c FindMissing) RunWithLocalWorkingCopy(
+	u *local_working_copy.Repo,
 	args ...string,
 ) {
 	var lookupStored map[sha.Bytes][]string

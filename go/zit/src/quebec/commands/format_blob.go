@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type FormatBlob struct {
@@ -24,7 +24,7 @@ type FormatBlob struct {
 func init() {
 	registerCommand(
 		"format-blob",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &FormatBlob{}
 
 			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c *FormatBlob) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c *FormatBlob) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)
@@ -119,7 +119,7 @@ func (c *FormatBlob) RunWithRepo(u *repo_local_working_copy.Repo, args ...string
 }
 
 func (c *FormatBlob) FormatFromStdin(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"

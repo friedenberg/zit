@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Serve struct {
@@ -15,7 +15,7 @@ type Serve struct {
 func init() {
 	registerCommand(
 		"serve",
-		func(f *flag.FlagSet) CommandWithRepo {
+		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
 			c := &Serve{}
 
 			return c
@@ -29,7 +29,7 @@ func (c Serve) GetEnvOptions() env.Options {
 	}
 }
 
-func (c Serve) RunWithRepo(u *repo_local_working_copy.Repo, args ...string) {
+func (c Serve) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
 	u.SetCancelOnSIGHUP()
 
 	// TODO switch network to be RemoteServeType

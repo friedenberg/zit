@@ -3,12 +3,15 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -66,25 +69,58 @@ func (c Clone) DefaultGenres() ids.Genre {
 func (cmd Clone) Run(
 	dependencies Dependencies,
 ) {
-	repo := cmd.OnTheFirstDay(
+	repoGeneric := cmd.OnTheFirstDay(
 		dependencies.Context,
 		dependencies.Config,
 		env.Options{},
 	)
 
-	remote := cmd.MakeRemote(repo.GetEnv(), cmd.GetFlagSet().Args()[0])
-
-	qg := cmd.MakeQueryGroup(
-		query.MakeBuilderOptions(cmd),
-		repo,
-		cmd.Args()[1:]...,
+	remote := cmd.MakeRemote(
+		repoGeneric.GetRepoLayout().GetEnv(),
+		cmd.GetFlagSet().Args()[0],
 	)
 
-	if err := repo.PullQueryGroupFromRemote(
-		remote,
-		qg,
-		cmd.RemoteTransferOptions.WithPrintCopies(true),
-	); err != nil {
-		dependencies.CancelWithError(err)
+	switch local := repoGeneric.(type) {
+	default:
+		dependencies.CancelWithBadRequestf(
+			"unsupported repo type: %q (%T)",
+			local.GetRepoLayout().GetConfig().GetRepoType(),
+			local,
+		)
+
+	case repo.WorkingCopy:
+		qg := cmd.MakeQueryGroup(
+			query.MakeBuilderOptions(cmd),
+			local,
+			cmd.Args()[1:]...,
+		)
+
+		if err := local.PullQueryGroupFromRemote(
+			remote,
+			qg,
+			cmd.RemoteTransferOptions.WithPrintCopies(true),
+		); err != nil {
+			dependencies.CancelWithError(err)
+		}
+
+	case repo.Archive:
+		remoteInventoryListStore := remote.GetInventoryListStore()
+		localInventoryListStore := local.GetInventoryListStore()
+
+		if err := remoteInventoryListStore.ReadAllInventoryLists(
+			func(sk *sku.Transacted) (err error) {
+				if err = localInventoryListStore.ImportInventoryList(
+					remote.GetBlobStore(),
+					sk,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			dependencies.CancelWithError(err)
+		}
 	}
 }

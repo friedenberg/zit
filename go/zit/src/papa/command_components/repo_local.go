@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type RepoLocal struct{}
@@ -19,8 +19,8 @@ func (c RepoLocal) MakeRepoLocal(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
-	repoOptions repo_local_working_copy.Options,
-) *repo_local_working_copy.Repo {
+	repoOptions local_working_copy.Options,
+) *local_working_copy.Repo {
 	layout := dir_layout.MakeDefault(
 		context,
 		config.Debug,
@@ -33,5 +33,5 @@ func (c RepoLocal) MakeRepoLocal(
 		envOptions,
 	)
 
-	return repo_local_working_copy.Make(env, repoOptions)
+	return local_working_copy.Make(env, repoOptions)
 }

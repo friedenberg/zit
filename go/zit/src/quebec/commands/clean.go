@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -74,7 +74,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Clean) RunWithQuery(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	qg *query.Group,
 ) {
 	if c.organize {
@@ -108,7 +108,7 @@ func (c Clean) RunWithQuery(
 	u.Must(u.Unlock)
 }
 
-func (c Clean) runOrganize(u *repo_local_working_copy.Repo, qg *query.Group) (err error) {
+func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Group) (err error) {
 	opOrganize := user_ops.Organize{
 		Repo: u,
 		Metadata: organize_text.Metadata{
@@ -168,7 +168,7 @@ func (c Clean) runOrganize(u *repo_local_working_copy.Repo, qg *query.Group) (er
 }
 
 func (c Clean) shouldClean(
-	u *repo_local_working_copy.Repo,
+	u *local_working_copy.Repo,
 	co sku.SkuType,
 	qg *query.Group,
 ) bool {

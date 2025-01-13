@@ -30,7 +30,7 @@ func (c QueryGroup) MakeQueryGroup(
 		c.ExternalQueryOptions,
 		args...,
 	); err != nil {
-		repo.GetEnv().CancelWithError(err)
+		repo.GetRepoLayout().GetEnv().CancelWithError(err)
 	}
 
 	return
