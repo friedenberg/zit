@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -15,7 +16,7 @@ import (
 func MakeTextFormatter(
 	dirLayout repo_layout.Layout,
 	options checkout_options.TextFormatterOptions,
-	k Config,
+	k ids.InlineTypeChecker,
 ) textFormatter {
 	return MakeTextFormatterWithBlobFormatter(dirLayout, options, k, nil)
 }
@@ -23,7 +24,7 @@ func MakeTextFormatter(
 func MakeTextFormatterWithBlobFormatter(
 	dirLayout repo_layout.Layout,
 	options checkout_options.TextFormatterOptions,
-	k Config,
+	k ids.InlineTypeChecker,
 	formatter script_config.RemoteScript,
 ) textFormatter {
 	return textFormatter{
@@ -40,7 +41,7 @@ func MakeTextFormatterWithBlobFormatter(
 }
 
 type textFormatter struct {
-	k       Config
+	k       ids.InlineTypeChecker
 	options checkout_options.TextFormatterOptions
 	object_metadata.TextFormatterFamily
 }

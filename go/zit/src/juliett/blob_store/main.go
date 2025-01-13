@@ -11,7 +11,7 @@ import (
 type VersionedStores struct {
 	InventoryList InventoryList
 	Repo          RepoStore
-	Config        ConfigStore
+	Config        Config
 	Type          Type
 	Tag           Tag
 }
@@ -39,7 +39,7 @@ func (a *VersionedStores) GetType() Type {
 	return a.Type
 }
 
-func (a *VersionedStores) GetConfig() ConfigStore {
+func (a *VersionedStores) GetConfig() Config {
 	return a.Config
 }
 

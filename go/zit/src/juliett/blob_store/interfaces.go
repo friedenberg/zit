@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
@@ -24,11 +23,6 @@ type (
 		interfaces.SavedBlobFormatter
 		ParsedBlobFormatter[T, TPtr]
 		Parser[T, TPtr]
-	}
-
-	Config interface {
-		interfaces.Config
-		ids.InlineTypeChecker
 	}
 )
 

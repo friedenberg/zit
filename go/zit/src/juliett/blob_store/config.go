@@ -12,15 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ConfigStore struct {
+type Config struct {
 	toml_v0 Store[mutable_config_blobs.V0, *mutable_config_blobs.V0]
 	toml_v1 Store[mutable_config_blobs.V1, *mutable_config_blobs.V1]
 }
 
 func MakeConfigStore(
 	repoLayout repo_layout.Layout,
-) ConfigStore {
-	return ConfigStore{
+) Config {
+	return Config{
 		toml_v0: MakeBlobStore(
 			repoLayout,
 			MakeBlobFormat(
@@ -50,7 +50,7 @@ func MakeConfigStore(
 	}
 }
 
-func (a ConfigStore) ParseTypedBlob(
+func (a Config) ParseTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Sha,
 ) (common mutable_config_blobs.Blob, n int64, err error) {
@@ -81,7 +81,7 @@ func (a ConfigStore) ParseTypedBlob(
 	return
 }
 
-func (a ConfigStore) FormatTypedBlob(
+func (a Config) FormatTypedBlob(
 	tg sku.TransactedGetter,
 	w io.Writer,
 ) (n int64, err error) {
@@ -107,7 +107,7 @@ func (a ConfigStore) FormatTypedBlob(
 	return
 }
 
-func (a ConfigStore) PutTypedBlob(
+func (a Config) PutTypedBlob(
 	tipe interfaces.ObjectId,
 	common mutable_config_blobs.Blob,
 ) (err error) {
