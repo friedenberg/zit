@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
-type TagStore struct {
+type Tag struct {
 	dirLayout        repo_layout.Layout
 	luaVMPoolBuilder *lua.VMPoolBuilder
 	toml_v0          Store[tag_blobs.V0, *tag_blobs.V0]
@@ -22,8 +22,8 @@ type TagStore struct {
 func MakeTagStore(
 	dirLayout repo_layout.Layout,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-) TagStore {
-	return TagStore{
+) Tag {
+	return Tag{
 		dirLayout:        dirLayout,
 		luaVMPoolBuilder: luaVMPoolBuilder,
 		toml_v0: MakeBlobStore(
@@ -75,11 +75,11 @@ func MakeTagStore(
 	}
 }
 
-func (a TagStore) GetCommonStore() sku.BlobStore[tag_blobs.Blob] {
+func (a Tag) GetCommonStore() sku.BlobStore[tag_blobs.Blob] {
 	return a
 }
 
-func (a TagStore) GetTransactedWithBlob(
+func (a Tag) GetTransactedWithBlob(
 	tg sku.TransactedGetter,
 ) (twb sku.TransactedWithBlob[tag_blobs.Blob], n int64, err error) {
 	sk := tg.GetSku()
@@ -177,7 +177,7 @@ func (a TagStore) GetTransactedWithBlob(
 	return
 }
 
-func (a TagStore) PutTransactedWithBlob(
+func (a Tag) PutTransactedWithBlob(
 	twb sku.TransactedWithBlob[tag_blobs.Blob],
 ) (err error) {
 	tipe := twb.GetType()

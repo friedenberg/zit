@@ -99,7 +99,7 @@ func (c *Store) Initialize(
 		pmf,
 		c,
 		box,
-		blobStore,
+		blobStore.GetInventoryList(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

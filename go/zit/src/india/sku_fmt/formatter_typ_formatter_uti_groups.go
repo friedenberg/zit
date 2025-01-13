@@ -12,16 +12,16 @@ import (
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	blob_store.TypeStore
+	blob_store.Type
 }
 
 func MakeFormatterTypFormatterUTIGroups(
 	sr sku.OneReader,
-	typeBlobStore blob_store.TypeStore,
+	typeBlobStore blob_store.Type,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
 		OneReader: sr,
-		TypeStore: typeBlobStore,
+		Type: typeBlobStore,
 	}
 }
 

@@ -33,7 +33,7 @@ type Store struct {
 	af        interfaces.BlobIOFactory
 	clock     ids.Clock
 	pool      interfaces.Pool[sku.List, *sku.List]
-	blobStore *blob_store.VersionedStores
+	blobStore blob_store.InventoryList
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -51,7 +51,7 @@ func (s *Store) Initialize(
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
 	box *box_format.BoxTransacted,
-	blobStore *blob_store.VersionedStores,
+	blobStore blob_store.InventoryList,
 ) (err error) {
 	p := pool.MakePool(nil, func(a *sku.List) { sku.ResetterList.Reset(a) })
 
@@ -116,7 +116,7 @@ func (s *Store) Create(
 
 	if !s.ls.IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: "create bestandsaufnahme",
+			Operation: "create inventory list",
 		}
 
 		return
@@ -146,7 +146,7 @@ func (s *Store) Create(
 		func() {
 			defer errors.DeferredCloser(&err, wc)
 
-			if _, err = s.blobStore.GetInventoryList().WriteBlobToWriter(
+			if _, err = s.blobStore.WriteBlobToWriter(
 				t.GetType(),
 				o,
 				wc,
@@ -159,7 +159,7 @@ func (s *Store) Create(
 		sh := wc.GetShaLike()
 		t.SetBlobSha(sh)
 
-		if _, _, err = s.blobStore.GetInventoryList().GetTransactedWithBlob(
+		if _, _, err = s.blobStore.GetTransactedWithBlob(
 			t,
 		); err != nil {
 			err = errors.Wrapf(err, "Blob Sha: %q", sh)
@@ -179,7 +179,7 @@ func (s *Store) Create(
 
 		t.Metadata.Type = s.blobType
 
-		if _, err = s.blobStore.GetInventoryList().WriteObjectToWriter(
+		if _, err = s.blobStore.WriteObjectToWriter(
 			t,
 			wc,
 		); err != nil {
@@ -262,7 +262,7 @@ func (s *Store) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if o, err = s.blobStore.GetInventoryList().ReadInventoryListObject(
+	if o, err = s.blobStore.ReadInventoryListObject(
 		s.blobType,
 		or,
 	); err != nil {
@@ -286,7 +286,7 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = s.blobStore.GetInventoryList().StreamInventoryListBlobSkusFromReader(
+	if err = s.blobStore.StreamInventoryListBlobSkusFromReader(
 		s.blobType,
 		rc,
 		f,
@@ -303,7 +303,7 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 
 	var maxSku sku.Transacted
 
-	if err = s.ReadAll(
+	if err = s.ReadAllInventoryLists(
 		func(b *sku.Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -334,7 +334,7 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) ReadAll(
+func (s *Store) ReadAllInventoryLists(
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var p string
@@ -376,7 +376,7 @@ func (s *Store) ReadAllSorted(
 ) (err error) {
 	var skus []*sku.Transacted
 
-	if err = s.ReadAll(
+	if err = s.ReadAllInventoryLists(
 		func(o *sku.Transacted) (err error) {
 			skus = append(skus, o)
 
@@ -402,7 +402,7 @@ func (s *Store) ReadAllSorted(
 func (s *Store) ReadAllSkus(
 	f func(besty, sk *sku.Transacted) error,
 ) (err error) {
-	if err = s.ReadAll(
+	if err = s.ReadAllInventoryLists(
 		func(t *sku.Transacted) (err error) {
 			if err = f(t, t); err != nil {
 				err = errors.Wrapf(

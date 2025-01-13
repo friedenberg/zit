@@ -7,15 +7,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 )
 
-type TypeStore struct {
+type Type struct {
 	toml_v0 Store[type_blobs.V0, *type_blobs.V0]
 	toml_v1 Store[type_blobs.TomlV1, *type_blobs.TomlV1]
 }
 
 func MakeTypeStore(
 	dirLayout repo_layout.Layout,
-) TypeStore {
-	return TypeStore{
+) Type {
+	return Type{
 		toml_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
@@ -45,11 +45,11 @@ func MakeTypeStore(
 	}
 }
 
-func (a TypeStore) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
+func (a Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
 	return a
 }
 
-func (a TypeStore) ParseTypedBlob(
+func (a Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
 	blobSha interfaces.Sha,
 ) (common type_blobs.Blob, n int64, err error) {
@@ -80,7 +80,7 @@ func (a TypeStore) ParseTypedBlob(
 	return
 }
 
-func (a TypeStore) PutTypedBlob(
+func (a Type) PutTypedBlob(
 	tipe interfaces.ObjectId,
 	common type_blobs.Blob,
 ) (err error) {

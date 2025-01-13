@@ -19,7 +19,14 @@ type Relay interface {
 	GetBlobStore() interfaces.BlobStore
 	// WriteInventoryList(*sku.List) error
 	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
-	// ReadAllInventoryLists() (*sku.List, error)
+
+	// ReadAllSkus(
+	// 	f func(besty, sk *sku.Transacted) error,
+	// ) (err error)
+
+	// ReadAllInventoryLists(
+	// 	f interfaces.FuncIter[*sku.Transacted],
+	// ) (err error)
 }
 
 // TODO rename to WorkingCopy?

@@ -9,11 +9,11 @@ import (
 )
 
 type VersionedStores struct {
-	InventoryList InventoryStore
+	InventoryList InventoryList
 	Repo          RepoStore
 	Config        ConfigStore
-	Type          TypeStore
-	Tag           TagStore
+	Type          Type
+	Tag           Tag
 }
 
 func Make(
@@ -35,7 +35,7 @@ func (a *VersionedStores) GetTypeV1() Store[type_blobs.TomlV1, *type_blobs.TomlV
 	return a.Type.toml_v1
 }
 
-func (a *VersionedStores) GetType() TypeStore {
+func (a *VersionedStores) GetType() Type {
 	return a.Type
 }
 
@@ -43,10 +43,10 @@ func (a *VersionedStores) GetConfig() ConfigStore {
 	return a.Config
 }
 
-func (a *VersionedStores) GetTag() TagStore {
+func (a *VersionedStores) GetTag() Tag {
 	return a.Tag
 }
 
-func (a *VersionedStores) GetInventoryList() InventoryStore {
+func (a *VersionedStores) GetInventoryList() InventoryList {
 	return a.InventoryList
 }

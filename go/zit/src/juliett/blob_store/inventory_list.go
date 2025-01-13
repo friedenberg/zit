@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 )
 
-type InventoryStore struct {
+type InventoryList struct {
 	dirLayout repo_layout.Layout
 	boxFormat *box_format.BoxTransacted
 	v0        inventory_list_blobs.V0
@@ -25,10 +25,10 @@ func MakeInventoryStore(
 	dirLayout repo_layout.Layout,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
-) InventoryStore {
+) InventoryList {
 	objectOptions := object_inventory_format.Options{Tai: true}
 
-	s := InventoryStore{
+	s := InventoryList{
 		dirLayout: dirLayout,
 		boxFormat: boxFormat,
 		v0: inventory_list_blobs.MakeV0(
@@ -43,11 +43,11 @@ func MakeInventoryStore(
 	return s
 }
 
-func (a InventoryStore) GetCommonStore() sku.BlobStore[*sku.List] {
+func (a InventoryList) GetCommonStore() sku.BlobStore[*sku.List] {
 	return a
 }
 
-func (a InventoryStore) GetTransactedWithBlob(
+func (a InventoryList) GetTransactedWithBlob(
 	tg sku.TransactedGetter,
 ) (twb sku.TransactedWithBlob[*sku.List], n int64, err error) {
 	twb.Transacted = tg.GetSku()
@@ -70,7 +70,7 @@ func (a InventoryStore) GetTransactedWithBlob(
 	return
 }
 
-func (a InventoryStore) GetTransactedWithBlobFromReader(
+func (a InventoryList) GetTransactedWithBlobFromReader(
 	twb *sku.TransactedWithBlob[*sku.List],
 	r io.Reader,
 ) (n int64, err error) {
@@ -102,7 +102,7 @@ func (a InventoryStore) GetTransactedWithBlobFromReader(
 	return
 }
 
-func (a InventoryStore) WriteObjectToWriter(
+func (a InventoryList) WriteObjectToWriter(
 	sk *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
@@ -131,7 +131,7 @@ func (a InventoryStore) WriteObjectToWriter(
 	return
 }
 
-func (a InventoryStore) WriteBlobToWriter(
+func (a InventoryList) WriteBlobToWriter(
 	tipe ids.Type,
 	b sku.Collection,
 	w io.Writer,
@@ -159,7 +159,7 @@ func (a InventoryStore) WriteBlobToWriter(
 	return
 }
 
-func (a InventoryStore) PutTransactedWithBlob(
+func (a InventoryList) PutTransactedWithBlob(
 	twb sku.TransactedWithBlob[*sku.List],
 ) (err error) {
 	tipe := twb.GetType()
@@ -174,7 +174,7 @@ func (a InventoryStore) PutTransactedWithBlob(
 	return
 }
 
-func (a InventoryStore) StreamInventoryListBlobSkus(
+func (a InventoryList) StreamInventoryListBlobSkus(
 	tg sku.TransactedGetter,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -203,7 +203,7 @@ func (a InventoryStore) StreamInventoryListBlobSkus(
 	return
 }
 
-func (a InventoryStore) StreamInventoryListBlobSkusFromReader(
+func (a InventoryList) StreamInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	rf io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -231,7 +231,7 @@ func (a InventoryStore) StreamInventoryListBlobSkusFromReader(
 	return
 }
 
-func (a InventoryStore) ReadInventoryListObject(
+func (a InventoryList) ReadInventoryListObject(
 	tipe ids.Type,
 	r io.Reader,
 ) (out *sku.Transacted, err error) {
