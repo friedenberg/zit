@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 type V1 struct {
@@ -120,7 +119,7 @@ func (s V1) StreamInventoryListBlobSkus(
 		}
 
 		if err = f(o); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku_fmt_debug.String(o))
+			err = errors.Wrapf(err, "Object: %s", sku.String(o))
 			return
 		}
 	}

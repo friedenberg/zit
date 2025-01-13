@@ -1,4 +1,4 @@
-package sku_fmt_debug
+package sku
 
 import (
 	"fmt"
@@ -6,14 +6,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func String(o *sku.Transacted) (str string) {
+func String(o *Transacted) (str string) {
 	return StringMetadataTai(o)
 }
 
-func StringTaiGenreObjectIdShaBlob(o *sku.Transacted) (str string) {
+func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
 		o.GetTai(),
@@ -26,7 +25,7 @@ func StringTaiGenreObjectIdShaBlob(o *sku.Transacted) (str string) {
 	return
 }
 
-func StringObjectIdBlobMetadataSansTai(o *sku.Transacted) (str string) {
+func StringObjectIdBlobMetadataSansTai(o *Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s",
 		o.GetObjectId(),
@@ -37,7 +36,7 @@ func StringObjectIdBlobMetadataSansTai(o *sku.Transacted) (str string) {
 	return
 }
 
-func StringMetadataTai(o *sku.Transacted) (str string) {
+func StringMetadataTai(o *Transacted) (str string) {
 	t := o.GetTai()
 	t1 := ids.MakeTaiRFC3339Value(t)
 
@@ -49,7 +48,7 @@ func StringMetadataTai(o *sku.Transacted) (str string) {
 	)
 }
 
-func StringMetadataSansTai(o *sku.Transacted) (str string) {
+func StringMetadataSansTai(o *Transacted) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(o.GetGenre().GetGenreString())

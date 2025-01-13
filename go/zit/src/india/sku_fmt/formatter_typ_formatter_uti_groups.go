@@ -21,7 +21,7 @@ func MakeFormatterTypFormatterUTIGroups(
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
 		OneReader: sr,
-		Type: typeBlobStore,
+		Type:      typeBlobStore,
 	}
 }
 

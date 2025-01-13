@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
@@ -21,7 +20,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
@@ -32,7 +30,6 @@ type Store struct {
 	of        interfaces.ObjectIOFactory
 	af        interfaces.BlobIOFactory
 	clock     ids.Clock
-	pool      interfaces.Pool[sku.List, *sku.List]
 	blobStore blob_store.InventoryList
 
 	object_format object_inventory_format.Format
@@ -53,8 +50,6 @@ func (s *Store) Initialize(
 	box *box_format.BoxTransacted,
 	blobStore blob_store.InventoryList,
 ) (err error) {
-	p := pool.MakePool(nil, func(a *sku.List) { sku.ResetterList.Reset(a) })
-
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
@@ -63,7 +58,6 @@ func (s *Store) Initialize(
 		sv:            sv,
 		of:            of,
 		af:            af,
-		pool:          p,
 		clock:         clock,
 		object_format: pmf,
 		options:       op,
@@ -107,10 +101,10 @@ func (s *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
 }
 
 func (s *Store) Create(
-	o *sku.List,
-	bez descriptions.Description,
+	skus *sku.List,
+	description descriptions.Description,
 ) (t *sku.Transacted, err error) {
-	if o.Len() == 0 {
+	if skus.Len() == 0 {
 		return
 	}
 
@@ -125,7 +119,7 @@ func (s *Store) Create(
 	t = sku.GetTransactedPool().Get()
 
 	t.Metadata.Type = s.blobType
-	t.Metadata.Description = bez
+	t.Metadata.Description = description
 	tai := s.clock.GetTai()
 
 	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
@@ -135,7 +129,7 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	if o.Len() > 0 {
+	if skus.Len() > 0 {
 		var wc interfaces.ShaWriteCloser
 
 		if wc, err = s.dirLayout.BlobWriter(); err != nil {
@@ -148,7 +142,7 @@ func (s *Store) Create(
 
 			if _, err = s.blobStore.WriteBlobToWriter(
 				t.GetType(),
-				o,
+				skus,
 				wc,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -167,6 +161,20 @@ func (s *Store) Create(
 		}
 	}
 
+	list := sku.InventoryList{
+		Transacted: t,
+		List:       skus,
+	}
+
+	if err = s.WriteInventoryList(list); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) WriteInventoryList(t sku.InventoryList) (err error) {
 	var wc interfaces.ShaWriteCloser
 
 	if wc, err = s.of.ObjectWriter(); err != nil {
@@ -174,24 +182,22 @@ func (s *Store) Create(
 		return
 	}
 
-	func() {
-		defer errors.DeferredCloser(&err, wc)
+	defer errors.DeferredCloser(&err, wc)
 
-		t.Metadata.Type = s.blobType
+	t.Metadata.Type = s.blobType
 
-		if _, err = s.blobStore.WriteObjectToWriter(
-			t,
-			wc,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}()
+	if _, err = s.blobStore.WriteObjectToWriter(
+		t.Transacted,
+		wc,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	sh := wc.GetShaLike()
 
 	ui.Log().Printf(
-		"saving Bestandsaufnahme with tai: %s -> %s",
+		"saving inventory list with tai: %s -> %s",
 		t.GetObjectId().GetGenre(),
 		sh,
 	)
@@ -223,7 +229,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 			err1 := t.Set(o.ObjectId.String())
 
 			if err1 != nil {
-				err = errors.Wrapf(err, "%s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(o))
+				err = errors.Wrapf(err, "%s", sku.StringTaiGenreObjectIdShaBlob(o))
 				return
 			}
 
@@ -325,7 +331,7 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	if max.GetObjectSha().IsNull() {
 		panic(
 			fmt.Sprintf(
-				"did not find last Bestandsaufnahme: %#v",
+				"did not find last inventory list: %#v",
 				max.GetMetadata(),
 			),
 		)
@@ -400,7 +406,7 @@ func (s *Store) ReadAllSorted(
 }
 
 func (s *Store) ReadAllSkus(
-	f func(besty, sk *sku.Transacted) error,
+	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
 	if err = s.ReadAllInventoryLists(
 		func(t *sku.Transacted) (err error) {

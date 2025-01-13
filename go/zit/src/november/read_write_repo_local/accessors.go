@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
@@ -36,6 +37,10 @@ func (u *Repo) GetRepoLayout() repo_layout.Layout {
 
 func (u *Repo) GetBlobStore() interfaces.BlobStore {
 	return u.GetRepoLayout()
+}
+
+func (u *Repo) GetInventoryListStore() repo.InventoryListStore {
+	return u.GetStore().GetInventoryListStore()
 }
 
 func (u *Repo) GetStore() *store.Store {

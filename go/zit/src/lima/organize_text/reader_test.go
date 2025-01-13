@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
 )
 
@@ -89,8 +88,8 @@ func assertEqualObjects(t *test_logz.T, expected, actual Objects) {
 
 	for i := range actual {
 		// actualObj, expectedObj := actual[i].External.GetSkuExternal(), expected[i].External.GetSkuExternal()
-		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].GetSkuExternal())
-		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].GetSkuExternal())
+		actualObj := sku.StringMetadataSansTai(actual[i].GetSkuExternal())
+		expectedObj := sku.StringMetadataSansTai(expected[i].GetSkuExternal())
 
 		if actualObj != expectedObj {
 			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)

@@ -23,7 +23,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
@@ -764,14 +763,14 @@ func (u *Repo) MakeFormatFunc(
 		f = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt_debug.StringMetadataTai(e),
+				sku.StringMetadataTai(e),
 			)
 			return
 		}
 
 	case "debug-sku":
 		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku_fmt_debug.StringTaiGenreObjectIdShaBlob(e))
+			_, err = fmt.Fprintln(out, sku.StringTaiGenreObjectIdShaBlob(e))
 			return
 		}
 

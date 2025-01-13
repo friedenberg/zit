@@ -25,7 +25,7 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 			o.GetCompressionType(),
 			o.GetLockInternalFiles(),
 		),
-		Reader:          ar.file,
+		Reader: ar.file,
 	}
 
 	if ar.Reader, err = NewReader(fro); err != nil {

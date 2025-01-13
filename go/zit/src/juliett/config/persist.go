@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
@@ -50,7 +49,7 @@ func (kc *Compiled) recompileTags() (err error) {
 			var e ids.Tag
 
 			if err = e.Set(ke.String()); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
+				err = errors.Wrapf(err, "Sku: %s", sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
 				return
 			}
 
