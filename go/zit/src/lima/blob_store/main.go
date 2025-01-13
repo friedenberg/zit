@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 )
 
 type VersionedStores struct {
