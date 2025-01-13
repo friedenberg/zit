@@ -25,7 +25,7 @@ type BlobStoreConfig interface {
 func Default() *TomlV1 {
 	return &TomlV1{
 		StoreVersion: CurrentStoreVersion,
-		RepoType:     repo_type.TypeReadWrite,
+		RepoType:     repo_type.TypeWorkingCopy,
 		BlobStore: BlobStoreTomlV1{
 			CompressionType:   CompressionTypeDefault,
 			LockInternalFiles: true,

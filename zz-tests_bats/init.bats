@@ -21,7 +21,7 @@ function init_compression { # @test
 			---
 
 			store-version = 8
-			repo-type = 'read-write'
+			repo-type = 'working-copy'
 
 			[blob-store]
 			compression-type = 'zstd'

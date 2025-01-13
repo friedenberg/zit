@@ -80,7 +80,7 @@ func (s *Layout) Genesis(bb BigBang) {
 		}
 	}
 
-	if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeReadWrite {
+	if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := s.readAndTransferLines(
 			bb.Yin,
 			filepath.Join(s.DirObjectId(), "Yin"),

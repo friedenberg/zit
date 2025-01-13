@@ -11,17 +11,17 @@ type Type int
 
 const (
 	TypeUnknown = Type(iota)
-	TypeReadWrite
-	TypeRelay
+	TypeWorkingCopy
+	TypeArchive
 )
 
 func (t *Type) Set(v string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(v)) {
-	case "relay":
-		*t = TypeRelay
+	case "archive":
+		*t = TypeArchive
 
-	case "", "read-write":
-		*t = TypeReadWrite
+	case "", "working-copy":
+		*t = TypeWorkingCopy
 
 	default:
 		err = errors.Wrapf(ErrUnsupportedRepoType{}, "Value: %q", v)
@@ -33,11 +33,11 @@ func (t *Type) Set(v string) (err error) {
 
 func (t Type) String() string {
 	switch t {
-	case TypeReadWrite:
-		return "read-write"
+	case TypeWorkingCopy:
+		return "working-copy"
 
-	case TypeRelay:
-		return "relay"
+	case TypeArchive:
+		return "archive"
 
 	default:
 		return fmt.Sprintf("unknown-%d", t)

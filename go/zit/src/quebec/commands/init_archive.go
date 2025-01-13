@@ -9,33 +9,33 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
 
-type InitRelay struct {
+type InitArchive struct {
 	*flag.FlagSet
 	repo_layout.BigBang
 }
 
 func init() {
 	registerCommand(
-		"init-relay",
+		"init-archive",
 		func(f *flag.FlagSet) Command {
-			c := &InitRelay{
+			c := &InitArchive{
 				FlagSet: f,
 				BigBang: repo_layout.BigBang{},
 			}
 
 			c.SetFlagSet(f)
-			c.Config.RepoType = repo_type.TypeRelay
+			c.Config.RepoType = repo_type.TypeArchive
 
 			return c
 		},
 	)
 }
 
-func (c InitRelay) GetFlagSet() *flag.FlagSet {
+func (c InitArchive) GetFlagSet() *flag.FlagSet {
 	return c.FlagSet
 }
 
-func (c InitRelay) Run(
+func (c InitArchive) Run(
 	dependencies Dependencies,
 ) {
 	layout := dir_layout.MakeDefault(

@@ -50,7 +50,7 @@ func (k V0) GetStoreVersion() interfaces.StoreVersion {
 }
 
 func (k V0) GetRepoType() repo_type.Type {
-	return repo_type.TypeReadWrite
+	return repo_type.TypeWorkingCopy
 }
 
 func (k V0) GetAgeEncryption() *age.Age {

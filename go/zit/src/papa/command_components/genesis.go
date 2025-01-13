@@ -32,10 +32,10 @@ func (c Genesis) OnTheFirstDay(
 ) repo.WorkingCopy {
 	switch c.BigBang.Config.RepoType {
 
-	case repo_type.TypeReadWrite:
+	case repo_type.TypeWorkingCopy:
 		return c.readWrite(context, config, envOptions)
 
-	case repo_type.TypeRelay:
+	case repo_type.TypeArchive:
 		fallthrough
 		// return c.relay(context, config, envOptions)
 

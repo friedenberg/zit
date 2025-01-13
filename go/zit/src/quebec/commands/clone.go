@@ -33,7 +33,7 @@ func init() {
 			}
 
 			c.SetFlagSet(f)
-			c.Config.RepoType = repo_type.TypeReadWrite
+			c.Config.RepoType = repo_type.TypeWorkingCopy
 
 			return c
 		},

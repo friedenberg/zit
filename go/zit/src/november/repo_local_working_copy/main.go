@@ -190,9 +190,9 @@ func (repo *Repo) initialize(options Options) (err error) {
 		}
 	}
 
-	if repo.GetConfig().GetRepoType() != repo_type.TypeReadWrite {
+	if repo.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{
-			Expected: repo_type.TypeReadWrite,
+			Expected: repo_type.TypeWorkingCopy,
 			Actual:   repo.GetConfig().GetRepoType(),
 		}
 

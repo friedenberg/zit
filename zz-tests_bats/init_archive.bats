@@ -11,8 +11,8 @@ teardown() {
 	chflags_and_rm
 }
 
-function init_relay { # @test
-	run_zit init-relay \
+function init_archive { # @test
+	run_zit init-archive \
 		-age-identity none \
 		-lock-internal-files=false
 	assert_success
@@ -26,7 +26,7 @@ function init_relay { # @test
 			---
 
 			store-version = 8
-			repo-type = 'relay'
+			repo-type = 'archive'
 
 			[blob-store]
 			compression-type = 'zstd'
