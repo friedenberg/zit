@@ -25,7 +25,7 @@ func (c QueryGroup) MakeQueryGroup(
 ) (qg *query.Group) {
 	var err error
 
-	if qg, err = repo.MakeExternalQueryGroupWithRepoId(
+	if qg, err = repo.MakeExternalQueryGroup(
 		options,
 		c.ExternalQueryOptions,
 		args...,

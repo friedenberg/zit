@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Repo) MakeExternalQueryGroupWithRepoId(
+func (u *Repo) MakeExternalQueryGroup(
 	metaBuilder query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,

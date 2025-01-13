@@ -28,7 +28,7 @@ type ReadWrite interface {
 	// 	args ...string,
 	// ) (qg *query.Group, err error)
 
-	MakeExternalQueryGroupWithRepoId(
+	MakeExternalQueryGroup(
 		builderOptions query.BuilderOptions,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
