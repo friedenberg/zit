@@ -15,10 +15,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func MakeBoxTransactedArchive(env *env.Env, includeTai bool) *BoxTransacted {
-	po := options_print.V0{}.
+func MakeBoxTransactedArchive(
+	env *env.Env,
+	options options_print.V0,
+) *BoxTransacted {
+	po := options.
 		WithPrintShas(true).
-		WithPrintTai(includeTai).
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 

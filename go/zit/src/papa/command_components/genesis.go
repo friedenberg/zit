@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -102,7 +103,10 @@ func (c Genesis) relay(
 	repoLayout.Genesis(c.BigBang)
 
 	objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
-	boxFormat := box_format.MakeBoxTransactedArchive(repoLayout.Env, true)
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		repoLayout.Env,
+		options_print.V0{}.WithPrintTai(true),
+	)
 
 	inventoryListBlobStore := blob_store.MakeInventoryStore(
 		repoLayout,

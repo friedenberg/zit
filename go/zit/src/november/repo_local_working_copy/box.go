@@ -3,7 +3,6 @@ package repo_local_working_copy
 import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 )
@@ -74,30 +73,6 @@ func (u *Repo) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 		options,
 		co,
 		string_format_writer.CliFormatTruncationNone,
-		nil,
-	)
-}
-
-func (repo *Repo) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
-	po := repo.GetConfig().PrintOptions.
-		WithPrintShas(true).
-		WithPrintTai(includeTai).
-		WithExcludeFields(true).
-		WithDescriptionInBox(true)
-
-	co := repo.FormatColorOptionsOut()
-	co.OffEntirely = true
-
-	return box_format.MakeBoxTransacted(
-		co,
-		po,
-		repo.StringFormatWriterFields(
-			string_format_writer.CliFormatTruncationNone,
-			co,
-		),
-		ids.Abbr{},
-		nil,
-		nil,
 		nil,
 	)
 }

@@ -167,7 +167,10 @@ func (repo *Repo) initialize(options Options) (err error) {
 	}
 
 	objectFormat := object_inventory_format.FormatForVersion(repo.layout.GetStoreVersion())
-	boxFormatArchive := repo.MakeBoxArchive(true)
+	boxFormatArchive := box_format.MakeBoxTransactedArchive(
+		repo.GetEnv(),
+		repo.GetConfig().PrintOptions.WithPrintTai(true),
+	)
 
 	repo.blobStore = blob_store.Make(
 		repo.layout,

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -58,9 +59,12 @@ func (s *Store) Initialize(
 		af:            repoLayout,
 		clock:         clock,
 		object_format: pmf,
-		box:           box_format.MakeBoxTransactedArchive(repoLayout.Env, true),
-		options:       op,
-		blobStore:     blobStore,
+		box: box_format.MakeBoxTransactedArchive(
+			repoLayout.Env,
+			options_print.V0{}.WithPrintTai(true),
+		),
+		options:   op,
+		blobStore: blobStore,
 	}
 
 	v := s.sv.GetInt()

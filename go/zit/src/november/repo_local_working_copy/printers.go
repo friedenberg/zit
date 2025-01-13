@@ -138,7 +138,10 @@ func (u *Repo) MakePrinterBoxArchive(
 	out interfaces.WriterAndStringWriter,
 	includeTai bool,
 ) interfaces.FuncIter[*sku.Transacted] {
-	boxFormat := u.MakeBoxArchive(includeTai)
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		u.GetEnv(),
+		u.GetConfig().PrintOptions.WithPrintTai(includeTai),
+	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
