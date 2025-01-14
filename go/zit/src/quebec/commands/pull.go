@@ -11,9 +11,13 @@ import (
 type Pull struct{}
 
 func init() {
-	registerCommandWithRemoteAndQuery(
+	registerCommand(
 		"pull",
-		&Pull{},
+		&commandWithLocalWorkingCopy{
+			Command: &commandWithRemoteAndQuery{
+				CommandWithRemoteAndQuery: &Pull{},
+			},
+		},
 	)
 }
 
