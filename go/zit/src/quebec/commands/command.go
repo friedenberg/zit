@@ -145,21 +145,3 @@ func registerCommandWithQuery(
 		},
 	)
 }
-
-func registerCommandWithRemoteAndQuery(
-	n string,
-	cwraq CommandWithRemoteAndQuery,
-) {
-	registerCommand(
-		n,
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
-			cmd := &commandWithRemoteAndQuery{
-				CommandWithRemoteAndQuery: cwraq,
-			}
-
-			cmd.SetFlagSet(f)
-
-			return cmd
-		},
-	)
-}

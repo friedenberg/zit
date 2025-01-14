@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CommandWithRemoteAndQuery interface {
-	RunWithRemoteAndQuery(
+type WithRemoteAndQuery interface {
+	Run(
 		local *local_working_copy.Repo,
 		remote repo.WorkingCopy,
 		qg *query.Group,
@@ -22,14 +22,14 @@ type CommandWithRemoteAndQuery interface {
 type commandWithRemoteAndQuery struct {
 	command_components.RemoteTransfer
 	command_components.QueryGroup
-	CommandWithRemoteAndQuery
+	Command WithRemoteAndQuery
 }
 
 func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 
-	if cwf, ok := cmd.CommandWithRemoteAndQuery.(interfaces.CommandComponent); ok {
+	if cwf, ok := cmd.Command.(interfaces.CommandComponent); ok {
 		cwf.SetFlagSet(f)
 	}
 }
@@ -39,7 +39,7 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	args ...string,
 ) (err error) {
 	c.QueryGroup.CompleteWithRepo(
-		c.CommandWithRemoteAndQuery,
+		c.Command,
 		u,
 		args...,
 	)
@@ -57,7 +57,7 @@ func (c commandWithRemoteAndQuery) RunWithLocalWorkingCopy(
 	}
 
 	qg := c.MakeQueryGroup(
-		query.MakeBuilderOptions(c.CommandWithRemoteAndQuery),
+		query.MakeBuilderOptions(c.Command),
 		local,
 		args[1:]...,
 	)
@@ -66,5 +66,5 @@ func (c commandWithRemoteAndQuery) RunWithLocalWorkingCopy(
 
 	remote := c.MakeRemote(local.Env, args[0])
 
-	c.RunWithRemoteAndQuery(local, remote, qg, c.RemoteTransferOptions)
+	c.Command.Run(local, remote, qg, c.RemoteTransferOptions)
 }

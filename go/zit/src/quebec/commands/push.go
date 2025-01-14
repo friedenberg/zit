@@ -15,7 +15,7 @@ func init() {
 		"push",
 		&commandWithLocalWorkingCopy{
 			Command: &commandWithRemoteAndQuery{
-				CommandWithRemoteAndQuery: &Push{},
+				Command: &Push{},
 			},
 		},
 	)
@@ -29,7 +29,7 @@ func (c Push) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Push) RunWithRemoteAndQuery(
+func (c Push) Run(
 	local *local_working_copy.Repo,
 	remote repo.WorkingCopy,
 	qg *query.Group,
