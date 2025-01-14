@@ -38,7 +38,7 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Diff) Run(u *local_working_copy.Repo, qg *query.Group) {
 	o := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyDescription: true,
 	}

@@ -57,7 +57,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Edit) RunWithQuery(u *local_working_copy.Repo, eqwk *query.Group) {
+func (c Edit) Run(u *local_working_copy.Repo, eqwk *query.Group) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,
 	}

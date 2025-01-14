@@ -42,7 +42,7 @@ func (c *PullBlobStore) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c *PullBlobStore) RunWithQuery(
+func (c *PullBlobStore) Run(
 	repo *local_working_copy.Repo,
 	qg *query.Group,
 ) {

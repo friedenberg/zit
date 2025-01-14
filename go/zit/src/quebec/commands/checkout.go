@@ -50,7 +50,7 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkout) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Checkout) Run(u *local_working_copy.Repo, qg *query.Group) {
 	opCheckout := user_ops.Checkout{
 		Repo:     u,
 		Organize: c.Organize,

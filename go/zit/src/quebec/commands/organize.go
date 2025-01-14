@@ -66,7 +66,7 @@ func (c *Organize) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c *Organize) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{

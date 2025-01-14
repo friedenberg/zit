@@ -44,7 +44,7 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Export) Run(u *local_working_copy.Repo, qg *query.Group) {
 	var list *sku.List
 
 	{

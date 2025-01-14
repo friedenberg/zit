@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c Fsck) RunWithQuery(
+func (c Fsck) Run(
 	u *local_working_copy.Repo,
 	qg *query.Group,
 ) {

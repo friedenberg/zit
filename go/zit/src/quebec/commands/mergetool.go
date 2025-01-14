@@ -35,7 +35,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Mergetool) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Mergetool) Run(u *local_working_copy.Repo, qg *query.Group) {
 	conflicted := sku.MakeSkuTypeSetMutable()
 
 	if err := u.GetStore().QuerySkuType(

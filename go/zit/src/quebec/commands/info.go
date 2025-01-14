@@ -27,7 +27,7 @@ func init() {
 }
 
 // TODO disambiguate this from repo / env
-func (c Info) RunWithEnv(e *env.Env, args ...string) {
+func (c Info) Run(e *env.Env, args ...string) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}

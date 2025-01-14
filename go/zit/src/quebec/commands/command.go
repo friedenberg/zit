@@ -103,7 +103,7 @@ func registerCommandWithQuery(
 		n,
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			cmd := &commandWithQuery{
-				WithQuery: makeFunc(f),
+				Command: makeFunc(f),
 			}
 
 			cmd.SetFlagSet(f)

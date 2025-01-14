@@ -61,7 +61,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkin) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Checkin) Run(u *local_working_copy.Repo, qg *query.Group) {
 	op := user_ops.Checkin{
 		Delete:             c.Delete,
 		Organize:           c.Organize,

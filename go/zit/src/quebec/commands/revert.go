@@ -48,7 +48,7 @@ func (c Revert) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Revert) RunWithQuery(u *local_working_copy.Repo, ms *query.Group) {
+func (c Revert) Run(u *local_working_copy.Repo, ms *query.Group) {
 	u.Must(u.Lock)
 
 	switch {

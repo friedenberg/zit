@@ -9,7 +9,7 @@ import (
 )
 
 type WithEnv interface {
-	RunWithEnv(*env.Env, ...string)
+	Run(*env.Env, ...string)
 }
 
 type WithArchive interface {
@@ -29,7 +29,7 @@ type WithBlobStore interface {
 }
 
 type WithQuery interface {
-	RunWithQuery(store *local_working_copy.Repo, ids *query.Group)
+	Run(store *local_working_copy.Repo, ids *query.Group)
 }
 
 type WithQueryAndBuilderOptions interface {

@@ -40,5 +40,5 @@ func (cmd commandWithEnv) Run(
 
 	cmdArgs := cmd.Args()
 
-	cmd.Command.RunWithEnv(env, cmdArgs...)
+	cmd.Command.Run(env, cmdArgs...)
 }

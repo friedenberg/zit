@@ -73,7 +73,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
 
-func (c Clean) RunWithQuery(
+func (c Clean) Run(
 	u *local_working_copy.Repo,
 	qg *query.Group,
 ) {

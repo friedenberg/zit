@@ -36,7 +36,7 @@ func (c Status) ModifyBuilder(
 		WithDefaultSigil(ids.SigilExternal)
 }
 
-func (c Status) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c Status) Run(u *local_working_copy.Repo, qg *query.Group) {
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	if err := u.GetStore().QuerySkuType(

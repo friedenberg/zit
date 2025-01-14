@@ -49,7 +49,10 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) RunWithQuery(u *local_working_copy.Repo, qg *query.Group) {
+func (c CatAlfred) Run(
+	u *local_working_copy.Repo,
+	qg *query.Group,
+) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.GetUIFile())
 	defer u.MustFlush(wo)
