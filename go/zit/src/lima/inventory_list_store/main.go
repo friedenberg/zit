@@ -152,42 +152,86 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	if skus.Len() > 0 {
-		var wc interfaces.ShaWriteCloser
-
-		if wc, err = s.repoLayout.BlobWriter(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		func() {
-			defer errors.DeferredCloser(&err, wc)
-
-			if _, err = s.blobStore.WriteBlobToWriter(
-				t.GetType(),
-				skus,
-				wc,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}()
-
-		sh := wc.GetShaLike()
-		t.SetBlobSha(sh)
-
-		if _, _, err = s.blobStore.GetTransactedWithBlob(
-			t,
-		); err != nil {
-			err = errors.Wrapf(err, "Blob Sha: %q", sh)
-			return
-		}
+	if err = s.WriteInventoryListBlob(t, skus); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.WriteInventoryListObject(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (s *Store) WriteInventoryListBlob(
+	t *sku.Transacted,
+	skus *sku.List,
+) (err error) {
+	if skus.Len() == 0 {
+		if !t.GetBlobSha().IsNull() {
+			err = errors.Errorf(
+				"inventory list has non-empty blob but passed in list is empty. %q",
+				sku.String(t),
+			)
+
+			return
+		}
+
+		return
+	}
+
+	var wc interfaces.ShaWriteCloser
+
+	if wc, err = s.repoLayout.BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var n int64
+
+	func() {
+		defer errors.DeferredCloser(&err, wc)
+
+		if n, err = s.blobStore.WriteBlobToWriter(
+			t.GetType(),
+			skus,
+			wc,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	actual := wc.GetShaLike()
+	expected := sha.Make(t.GetBlobSha())
+
+	if t.GetBlobSha().IsNull() {
+		t.SetBlobSha(actual)
+	} else {
+		if err = expected.AssertEqualsShaLike(actual); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if !s.af.HasBlob(actual) {
+		err = errors.Errorf(
+			"inventory list blob missing after write (%d): %q",
+			n,
+			sku.String(t),
+		)
+
+		return
+	}
+
+	// if _, _, err = s.blobStore.GetTransactedWithBlob(
+	// 	t,
+	// ); err != nil {
+	// 	err = errors.Wrapf(err, "Blob Sha: %q", actual)
+	// 	return
+	// }
 
 	return
 }
