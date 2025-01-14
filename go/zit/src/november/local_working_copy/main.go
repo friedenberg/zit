@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -41,7 +40,6 @@ type Repo struct {
 	storesInitialized bool
 	blobStore         *blob_store.VersionedStores
 	store             store.Store
-	age               *age.Age
 	externalStores    map[ids.RepoId]*external_store.Store
 
 	DormantCounter query.DormantCounter
@@ -109,7 +107,7 @@ func Make(
 	repo.config.Reset()
 
 	if err := repo.initialize(options); err != nil {
-		env.CancelWithError(err)
+		repo.CancelWithError(err)
 	}
 
 	repo.After(repo.Flush)
@@ -134,7 +132,9 @@ func (u *Repo) Reset() (err error) {
 	return u.initialize(OptionsEmpty)
 }
 
-func (repo *Repo) initialize(options Options) (err error) {
+func (repo *Repo) initialize(
+	options Options,
+) (err error) {
 	if err = repo.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -188,7 +188,11 @@ func (repo *Repo) initialize(options Options) (err error) {
 		if options.GetAllowConfigReadError() {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(
+				err,
+				"CompressionType: %q",
+				repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType(),
+			)
 			return
 		}
 	}
@@ -294,8 +298,6 @@ func (repo *Repo) initialize(options Options) (err error) {
 
 func (u *Repo) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
-
-	wg.Do(u.age.Close)
 
 	for k, vs := range u.externalStores {
 		ui.Log().Printf("will flush virtual store: %s", k)
