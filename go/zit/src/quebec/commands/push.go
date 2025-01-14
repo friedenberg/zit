@@ -31,15 +31,25 @@ func (c Push) DefaultGenres() ids.Genre {
 
 func (c Push) Run(
 	local *local_working_copy.Repo,
-	remote repo.WorkingCopy,
+	remote repo.Archive,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) {
-	if err := remote.PullQueryGroupFromRemote(
-		local,
-		qg,
-		options.WithPrintCopies(true),
-	); err != nil {
-		local.CancelWithError(err)
+	switch remote := remote.(type) {
+	case repo.WorkingCopy:
+		if err := remote.PullQueryGroupFromRemote(
+			local,
+			qg,
+			options.WithPrintCopies(true),
+		); err != nil {
+			local.CancelWithError(err)
+		}
+
+	case repo.Archive:
+		local.CancelWithBadRequestf(
+			"unsupported repo type: %s (%T)",
+			remote.GetRepoLayout().GetConfig().GetRepoType(),
+			remote,
+		)
 	}
 }

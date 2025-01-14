@@ -32,7 +32,7 @@ func (c Pull) DefaultGenres() ids.Genre {
 
 func (c Pull) Run(
 	local *local_working_copy.Repo,
-	remote repo.WorkingCopy,
+	remote repo.Archive,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) {

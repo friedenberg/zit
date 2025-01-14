@@ -9,6 +9,18 @@ import (
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
+	remote repo.Archive,
+	qg *query.Group,
+	options repo.RemoteTransferOptions,
+) (err error) {
+	return local.pullQueryGroupFromWorkingCopy(
+		remote.(repo.WorkingCopy),
+		qg,
+		options,
+	)
+}
+
+func (local *Repo) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,

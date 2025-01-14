@@ -13,7 +13,7 @@ import (
 type WithRemoteAndQuery interface {
 	Run(
 		local *local_working_copy.Repo,
-		remote repo.WorkingCopy,
+		remote repo.Archive,
 		qg *query.Group,
 		options repo.RemoteTransferOptions,
 	)

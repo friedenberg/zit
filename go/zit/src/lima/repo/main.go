@@ -44,7 +44,7 @@ type WorkingCopy interface {
 	// 	) (err error)
 
 	PullQueryGroupFromRemote(
-		remote WorkingCopy,
+		remote Archive,
 		qg *query.Group,
 		options RemoteTransferOptions,
 	) (err error)

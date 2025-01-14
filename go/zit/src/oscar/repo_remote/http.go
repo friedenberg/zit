@@ -109,6 +109,18 @@ func (repo *HTTP) MakeInventoryList(
 // }
 
 func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
+	remote repo.Archive,
+	qg *query.Group,
+	options repo.RemoteTransferOptions,
+) (err error) {
+	return remoteHTTP.pullQueryGroupFromWorkingCopy(
+		remote.(repo.WorkingCopy),
+		qg,
+		options,
+	)
+}
+
+func (remoteHTTP *HTTP) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
