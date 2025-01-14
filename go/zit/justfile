@@ -94,7 +94,15 @@ clean-go-modcache:
   go clean -modcache
 
 clean-bats-fixtures:
-  ./bin/clean_fixtures_head.bash
+  #! /bin/bash -ex
+
+  dir="$(git rev-parse --show-toplevel)"
+  pushd "$dir" || exit
+
+  git reset HEAD zz-tests_bats/migration/v*/
+  ./go/zit/bin/chflags.bash -R nouchg zz-tests_bats/migration/v*/
+  git clean -fd zz-tests_bats/migration/v*/
+  git checkout zz-tests_bats/migration/
 
 clean-go: clean-go-cache clean-go-modcache
 
