@@ -21,11 +21,13 @@ type blobStore struct {
 	tempFS   dir_layout.TemporaryFS
 }
 
-func MakeBlobStoreFromHome(
+func MakeBlobStoreFromLayout(
 	s Layout,
 ) (bs blobStore, err error) {
 	bs = blobStore{
-		Config: s.config.BlobStoreImmutableConfig,
+		Config: dir_layout.MakeConfigFromImmutableBlobConfig(
+			s.GetConfig().GetBlobStoreImmutableConfig(),
+		),
 		tempFS: s.TempLocal,
 	}
 
@@ -42,7 +44,6 @@ func MakeBlobStore(
 	config dir_layout.Config,
 	tempFS dir_layout.TemporaryFS,
 ) blobStore {
-	ui.DebugBatsTestBody().Printf("%#v", config)
 	return blobStore{
 		Config:   config,
 		basePath: basePath,

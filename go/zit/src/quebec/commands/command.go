@@ -24,6 +24,24 @@ type Command interface {
 	Run(Dependencies)
 }
 
+type Command2 interface {
+	Run(Dependencies)
+	interfaces.CommandComponent
+}
+
+type commandWrapper struct {
+	*flag.FlagSet
+	Command2
+}
+
+func (wrapper commandWrapper) GetFlagSet() *flag.FlagSet {
+	return wrapper.FlagSet
+}
+
+func (wrapper commandWrapper) SetFlagSet(f *flag.FlagSet) {
+	wrapper.Command2.SetFlagSet(f)
+}
+
 type CommandWithEnv interface {
 	RunWithEnv(*env.Env, ...string)
 }
@@ -65,7 +83,7 @@ func Commands() map[string]Command {
 
 func registerCommand(
 	n string,
-	makeFunc any,
+	commandOrCommandBuildFunc any,
 ) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
@@ -73,30 +91,40 @@ func registerCommand(
 		panic("command added more than once: " + n)
 	}
 
-	switch mft := makeFunc.(type) {
+	switch cmd := commandOrCommandBuildFunc.(type) {
+	case Command2:
+		wrapper := commandWrapper{
+			FlagSet:  f,
+			Command2: cmd,
+		}
+
+		wrapper.SetFlagSet(f)
+
+		commands[n] = wrapper
+
 	case func(*flag.FlagSet) Command:
-		commands[n] = mft(f)
+		commands[n] = cmd(f)
 
 	case func(*flag.FlagSet) CommandWithEnv:
 		commands[n] = commandWithEnv{
-			Command: mft(f),
+			Command: cmd(f),
 			FlagSet: f,
 		}
 
 	case func(*flag.FlagSet) CommandWithLocalWorkingCopy:
-		commands[n] = commandWithRepo{
-			Command: mft(f),
+		commands[n] = commandWithLocalWorkingCopy{
+			Command: cmd(f),
 			FlagSet: f,
 		}
 
 	case func(*flag.FlagSet) CommandWithBlobStore:
 		commands[n] = commandWithBlobStore{
-			Command: mft(f),
+			Command: cmd(f),
 			FlagSet: f,
 		}
 
 	default:
-		panic(fmt.Sprintf("command make func not supported: %T", mft))
+		panic(fmt.Sprintf("command or command build func not supported: %T", cmd))
 	}
 }
 
@@ -131,20 +159,6 @@ func registerCommandWithRemoteAndQuery(
 
 			cmd.SetFlagSet(f)
 
-			return cmd
-		},
-	)
-}
-
-// TODO explore a different flag and command model
-func registerCommandWithFlags(
-	n string,
-	cmd interfaces.CommandComponent,
-) {
-	registerCommand(
-		n,
-		func(f *flag.FlagSet) interfaces.CommandComponent {
-			cmd.SetFlagSet(f)
 			return cmd
 		},
 	)

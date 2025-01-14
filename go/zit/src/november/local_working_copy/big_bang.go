@@ -12,11 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
@@ -25,40 +22,23 @@ import (
 
 func Genesis(
 	bb repo_layout.BigBang,
-	context *errors.Context,
-	config config_mutable_cli.Config,
-	options env.Options,
+	repoLayout repo_layout.Layout,
 ) (repo *Repo) {
-	dirLayout := dir_layout.MakeDefaultAndInitialize(
-		context,
-		config.Debug,
-		bb.OverrideXDGWithCwd,
-	)
-
-	env := env.Make(
-		context,
-		config,
-		dirLayout,
-		options,
-	)
-
-	repo = Make(env, OptionsEmpty)
-
-	repo.layout.Genesis(bb)
+	repo = MakeWithLayout(OptionsEmpty, repoLayout)
 
 	if err := repo.dormantIndex.Flush(
 		repo.GetRepoLayout(),
 		repo.PrinterHeader(),
 		repo.config.DryRun,
 	); err != nil {
-		context.CancelWithError(err)
+		repo.CancelWithError(err)
 	}
 
 	repo.Must(repo.Reset)
 	repo.Must(repo.layout.ResetCache)
 
 	if err := repo.initDefaultTypeAndConfig(bb); err != nil {
-		context.CancelWithError(err)
+		repo.CancelWithError(err)
 	}
 
 	repo.Must(repo.Lock)

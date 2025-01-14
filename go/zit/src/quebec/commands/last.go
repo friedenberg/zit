@@ -9,10 +9,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -27,17 +33,17 @@ type Last struct {
 func init() {
 	registerCommand(
 		"last",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
-			c := &Last{}
-
-			f.Var(&c.RepoId, "kasten", "none or Browser")
-			f.StringVar(&c.Format, "format", "log", "format")
-			f.BoolVar(&c.Organize, "organize", false, "")
-			f.BoolVar(&c.Edit, "edit", false, "")
-
-			return c
+		&commandWithArchive{
+			Command: &Last{},
 		},
 	)
+}
+
+func (c *Last) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&c.RepoId, "kasten", "none or Browser")
+	f.StringVar(&c.Format, "format", "log", "format")
+	f.BoolVar(&c.Organize, "organize", false, "")
+	f.BoolVar(&c.Edit, "edit", false, "")
 }
 
 func (c Last) CompletionGenres() ids.Genre {
@@ -46,15 +52,50 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c Last) RunWithArchive(archive repo.Archive, args ...string) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
+	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
+		c.runLocalWorkingCopy(localWorkingCopy)
+	} else {
+		c.runArchive(archive)
+	}
+}
+
+func (c Last) runArchive(archive repo.Archive) {
+	if (c.Edit || c.Organize) && c.Format != "" {
+		archive.GetRepoLayout().CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
+	}
+
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		archive.GetRepoLayout().Env,
+		options_print.V0{}.WithPrintTai(true),
+	)
+
+	f := string_format_writer.MakeDelim(
+		"\n",
+		archive.GetRepoLayout().GetUIFile(),
+		string_format_writer.MakeFunc(
+			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+				return boxFormat.WriteStringFormat(w, o)
+			},
+		),
+	)
+
+	f = quiter.MakeSyncSerializer(f)
+
+	if err := c.runWithInventoryList(archive, f); err != nil {
+		archive.GetRepoLayout().CancelWithError(err)
+	}
+}
+
+func (c Last) runLocalWorkingCopy(archive *local_working_copy.Repo) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		u.CancelWithErrorf("cannot organize and edit at the same time")
+		archive.GetRepoLayout().CancelWithErrorf("cannot organize and edit at the same time")
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -67,21 +108,24 @@ func (c Last) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string
 		{
 			var err error
 
-			if f, err = u.MakeFormatFunc(c.Format, u.GetUIFile()); err != nil {
-				u.CancelWithError(err)
+			if f, err = archive.MakeFormatFunc(
+				c.Format,
+				archive.GetRepoLayout().GetUIFile(),
+			); err != nil {
+				archive.GetRepoLayout().CancelWithError(err)
 			}
 		}
 	}
 
 	f = quiter.MakeSyncSerializer(f)
 
-	if err := c.runWithInventoryList(u, f); err != nil {
-		u.CancelWithError(err)
+	if err := c.runWithInventoryList(archive, f); err != nil {
+		archive.GetRepoLayout().CancelWithError(err)
 	}
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Repo: u,
+			Repo: archive,
 			Metadata: organize_text.Metadata{
 				OptionCommentSet: organize_text.MakeOptionCommentSet(nil),
 			},
@@ -93,44 +137,59 @@ func (c Last) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
-				u.CancelWithError(err)
+				archive.GetRepoLayout().CancelWithError(err)
 			}
 		}
 
-		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
-			u.CancelWithError(err)
+		if _, err := archive.LockAndCommitOrganizeResults(results); err != nil {
+			archive.GetRepoLayout().CancelWithError(err)
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
-			Repo: u,
+			Repo: archive,
 			Edit: true,
 		}
 
 		if _, err := opCheckout.Run(skus); err != nil {
-			u.CancelWithError(err)
+			archive.GetRepoLayout().CancelWithError(err)
 		}
 	}
 }
 
 func (c Last) runWithInventoryList(
-	u *local_working_copy.Repo,
+	archive repo.Archive,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	s := u.GetStore()
-
 	var b *sku.Transacted
 
-	if b, err = s.GetInventoryListStore().ReadLast(); err != nil {
+	inventoryListStore := archive.GetInventoryListStore()
+
+	if b, err = inventoryListStore.ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	objectFormat := object_inventory_format.FormatForVersion(
+		archive.GetRepoLayout().GetStoreVersion(),
+	)
+
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		archive.GetRepoLayout().Env,
+		options_print.V0{}.WithPrintTai(true),
+	)
+
+	inventoryListBlobStore := blob_store.MakeInventoryStore(
+		archive.GetRepoLayout(),
+		objectFormat,
+		boxFormat,
+	)
+
 	var twb sku.TransactedWithBlob[*sku.List]
 
-	if twb, _, err = s.GetBlobStore().GetInventoryList().GetTransactedWithBlob(
+	if twb, _, err = inventoryListBlobStore.GetTransactedWithBlob(
 		b,
 	); err != nil {
 		err = errors.Wrapf(err, "InventoryList: %q", b)
@@ -140,7 +199,6 @@ func (c Last) runWithInventoryList(
 	ui.TodoP3("support log line format for skus")
 	if err = twb.Blob.EachPtr(
 		func(sk *sku.Transacted) (err error) {
-
 			return f(sk)
 		},
 	); err != nil {

@@ -98,9 +98,34 @@ func MakeFromConfigAndXDGDotenvPath(
 func Make(
 	env *env.Env,
 	options Options,
+) *Repo {
+	layoutOptions := repo_layout.Options{
+		BasePath: env.GetCLIConfig().BasePath,
+	}
+
+	var repoLayout repo_layout.Layout
+
+	{
+		var err error
+
+		if repoLayout, err = repo_layout.Make(
+			env,
+			layoutOptions,
+		); err != nil {
+			env.CancelWithError(err)
+		}
+	}
+
+	return MakeWithLayout(options, repoLayout)
+}
+
+func MakeWithLayout(
+	options Options,
+	repoLayout repo_layout.Layout,
 ) (repo *Repo) {
 	repo = &Repo{
-		Env:            env,
+		Env:            repoLayout.Env,
+		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
@@ -140,22 +165,8 @@ func (repo *Repo) initialize(
 		return
 	}
 
+	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
 	repo.sunrise = ids.NowTai()
-
-	ui.TodoP4("find a better place for this")
-	{
-		layoutOptions := repo_layout.Options{
-			BasePath: repo.GetCLIConfig().BasePath,
-		}
-
-		if repo.layout, err = repo_layout.Make(
-			repo.Env,
-			layoutOptions,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	repo.fileEncoder = store_fs.MakeFileEncoder(repo.layout, &repo.config)
 

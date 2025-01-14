@@ -3,22 +3,37 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type commandWithRepo struct {
+type commandWithLocalWorkingCopy struct {
 	*flag.FlagSet
-	command_components.RepoLocal
+	command_components.Repo
 	Command CommandWithLocalWorkingCopy
 }
 
-func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
+func (cmd *commandWithLocalWorkingCopy) GetCommand2() Command2 {
+	return cmd
+}
+
+func (cmd *commandWithLocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
+	cmd.FlagSet = f
+
+	if cmp, ok := cmd.Command.(interfaces.CommandComponent); ok {
+		cmp.SetFlagSet(f)
+	}
+
+	cmd.Repo.SetFlagSet(f)
+}
+
+func (cmd commandWithLocalWorkingCopy) GetFlagSet() *flag.FlagSet {
 	return cmd.FlagSet
 }
 
-func (cmd commandWithRepo) Run(
+func (cmd commandWithLocalWorkingCopy) Run(
 	dependencies Dependencies,
 ) {
 	var envOptions env.Options
@@ -35,7 +50,7 @@ func (cmd commandWithRepo) Run(
 
 	cmdArgs := cmd.Args()
 
-	repo := cmd.MakeRepoLocal(
+	repo := cmd.MakeLocalWorkingCopy(
 		dependencies.Context,
 		dependencies.Config,
 		envOptions,
@@ -52,7 +67,7 @@ func (cmd commandWithRepo) Run(
 	}
 }
 
-func (cmd commandWithRepo) getCommandCompletionWithRepo(
+func (cmd commandWithLocalWorkingCopy) getCommandCompletionWithRepo(
 	dependencies Dependencies,
 ) (t CommandCompletionWithRepo) {
 	haystack := any(cmd.Command)

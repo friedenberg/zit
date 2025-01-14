@@ -95,11 +95,18 @@ func Make(
 	}
 
 	if err = s.loadImmutableConfig(); err != nil {
+	}
+
+	if err = s.setupStores(); err != nil {
 		errors.Wrap(err)
 		return
 	}
 
-	if s.local, err = MakeBlobStoreFromHome(s); err != nil {
+	return
+}
+
+func (s *Layout) setupStores() (err error) {
+	if s.local, err = MakeBlobStoreFromLayout(*s); err != nil {
 		errors.Wrap(err)
 		return
 	}

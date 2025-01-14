@@ -5,21 +5,17 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Genesis struct {
 	repo_layout.BigBang
+	Repo
 }
 
 func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
@@ -31,45 +27,10 @@ func (c Genesis) OnTheFirstDay(
 	config config_mutable_cli.Config,
 	envOptions env.Options,
 ) repo.Archive {
-	switch c.BigBang.Config.RepoType {
-	case repo_type.TypeWorkingCopy:
-		return c.makeWorkingCopy(context, config, envOptions)
-
-	case repo_type.TypeArchive:
-		return c.makeArchive(context, config, envOptions)
-
-	default:
-		context.CancelWithError(
-			repo_type.ErrUnsupportedRepoType{Actual: c.BigBang.Config.RepoType},
-		)
-	}
-
-	return nil
-}
-
-func (c Genesis) makeWorkingCopy(
-	context *errors.Context,
-	config config_mutable_cli.Config,
-	envOptions env.Options,
-) repo.WorkingCopy {
-	local := local_working_copy.Genesis(
-		c.BigBang,
-		context,
-		config,
-		envOptions,
-	)
-
-	return local
-}
-
-func (c Genesis) makeArchive(
-	context *errors.Context,
-	config config_mutable_cli.Config,
-	envOptions env.Options,
-) repo.Archive {
-	layout := dir_layout.MakeDefault(
+	layout := dir_layout.MakeDefaultAndInitialize(
 		context,
 		config.Debug,
+		c.OverrideXDGWithCwd,
 	)
 
 	env := env.Make(
@@ -95,33 +56,39 @@ func (c Genesis) makeArchive(
 		); err != nil {
 			env.CancelWithError(err)
 		}
-
 	}
 
 	repoLayout.Genesis(c.BigBang)
 
-	objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
-	boxFormat := box_format.MakeBoxTransactedArchive(
-		repoLayout.Env,
-		options_print.V0{}.WithPrintTai(true),
-	)
+	switch c.BigBang.Config.RepoType {
+	case repo_type.TypeWorkingCopy:
+		return c.makeWorkingCopy(repoLayout)
 
-	inventoryListBlobStore := blob_store.MakeInventoryStore(
-		repoLayout,
-		objectFormat,
-		boxFormat,
-	)
+	case repo_type.TypeArchive:
+		return c.makeArchive(repoLayout)
 
-	var inventoryListStore inventory_list_store.Store
-
-	if err := inventoryListStore.Initialize(
-		repoLayout,
-		objectFormat,
-		nil,
-		inventoryListBlobStore,
-	); err != nil {
-		env.CancelWithError(err)
+	default:
+		context.CancelWithError(
+			repo_type.ErrUnsupportedRepoType{Actual: c.BigBang.Config.RepoType},
+		)
 	}
 
-	return &inventoryListStore
+	return nil
+}
+
+func (c Genesis) makeWorkingCopy(
+	repoLayout repo_layout.Layout,
+) repo.WorkingCopy {
+	local := local_working_copy.Genesis(
+		c.BigBang,
+		repoLayout,
+	)
+
+	return local
+}
+
+func (c Genesis) makeArchive(
+	repoLayout repo_layout.Layout,
+) repo.Archive {
+	return c.MakeLocalArchive(repoLayout)
 }

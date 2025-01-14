@@ -98,6 +98,10 @@ func (s *Layout) Genesis(bb BigBang) {
 		writeFile(s.FileConfigMutable(), "")
 		writeFile(s.FileCacheDormant(), "")
 	}
+
+	if err := s.setupStores(); err != nil {
+		s.CancelWithError(err)
+	}
 }
 
 func (s Layout) readAndTransferLines(in, out string) (err error) {

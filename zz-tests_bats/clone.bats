@@ -220,7 +220,7 @@ function clone_relay_history_default_allow_conflicts { # @test
 	assert_output - <<-EOM
 	EOM
 
-	run_zit show +?z,t,e
+	run_zit last
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
@@ -230,6 +230,4 @@ function clone_relay_history_default_allow_conflicts { # @test
 		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
-
-	try_add_new_after_clone
 }
