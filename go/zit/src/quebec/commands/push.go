@@ -11,9 +11,13 @@ import (
 type Push struct{}
 
 func init() {
-	registerCommandWithRemoteAndQuery(
+	registerCommand(
 		"push",
-		&Push{},
+		&commandWithLocalWorkingCopy{
+			Command: &commandWithRemoteAndQuery{
+				CommandWithRemoteAndQuery: &Push{},
+			},
+		},
 	)
 }
 
