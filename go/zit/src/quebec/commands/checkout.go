@@ -20,7 +20,7 @@ type Checkout struct {
 func init() {
 	registerCommandWithQuery(
 		"checkout",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Checkout{
 				CheckoutOptions: checkout_options.Options{
 					CheckoutMode: checkout_mode.MetadataOnly,

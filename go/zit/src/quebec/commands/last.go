@@ -52,7 +52,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) RunWithArchive(archive repo.Archive, args ...string) {
+func (c Last) Run(archive repo.Archive, args ...string) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}

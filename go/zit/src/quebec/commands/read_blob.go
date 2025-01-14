@@ -16,7 +16,7 @@ type ReadBlob struct{}
 func init() {
 	registerCommand(
 		"read-blob",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &ReadBlob{}
 
 			return c

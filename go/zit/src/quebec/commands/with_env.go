@@ -8,7 +8,7 @@ import (
 )
 
 type commandWithEnv struct {
-	Command CommandWithEnv
+	Command WithEnv
 	*flag.FlagSet
 }
 

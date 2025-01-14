@@ -20,7 +20,7 @@ type FormatOrganize struct {
 func init() {
 	registerCommand(
 		"format-organize",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatOrganize{
 				Flags: organize_text.MakeFlags(),
 			}

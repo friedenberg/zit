@@ -11,7 +11,7 @@ type Reindex struct{}
 func init() {
 	registerCommand(
 		"reindex",
-		func(_ *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(_ *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Reindex{}
 
 			return c

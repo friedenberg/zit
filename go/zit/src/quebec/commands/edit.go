@@ -23,7 +23,7 @@ type Edit struct {
 func init() {
 	registerCommandWithQuery(
 		"edit",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Edit{
 				Workspace:    true,
 				CheckoutMode: checkout_mode.MetadataOnly,

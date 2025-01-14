@@ -12,7 +12,7 @@ type DormantAdd struct{}
 func init() {
 	registerCommand(
 		"dormant-add",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &DormantAdd{}
 
 			return c

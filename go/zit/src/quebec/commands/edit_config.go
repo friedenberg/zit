@@ -20,7 +20,7 @@ type EditConfig struct{}
 func init() {
 	registerCommand(
 		"edit-config",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &EditConfig{}
 
 			return c

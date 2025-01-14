@@ -14,7 +14,7 @@ type PeekZettelIds struct{}
 func init() {
 	registerCommand(
 		"peek-zettel-ids",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &PeekZettelIds{}
 
 			return c

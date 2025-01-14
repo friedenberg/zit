@@ -15,7 +15,7 @@ type Serve struct {
 func init() {
 	registerCommand(
 		"serve",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Serve{}
 
 			return c

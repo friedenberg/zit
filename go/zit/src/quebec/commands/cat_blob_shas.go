@@ -15,7 +15,7 @@ type CatBlobShas struct{}
 func init() {
 	registerCommand(
 		"cat-blob-shas",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &CatBlobShas{}
 
 			return c

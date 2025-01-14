@@ -7,11 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
-	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type Dependencies struct {
@@ -42,37 +38,8 @@ func (wrapper commandWrapper) SetFlagSet(f *flag.FlagSet) {
 	wrapper.Command2.SetFlagSet(f)
 }
 
-type CommandWithEnv interface {
-	RunWithEnv(*env.Env, ...string)
-}
-
-type CommandWithArchive interface {
-	RunWithArchive(repo.Archive, ...string)
-}
-
-type CommandWithWorkingCopy interface {
-	RunWithWorkingCopy(repo.WorkingCopy, ...string)
-}
-
-type CommandWithLocalWorkingCopy interface {
-	RunWithLocalWorkingCopy(*local_working_copy.Repo, ...string)
-}
-
-type CommandWithBlobStore interface {
-	RunWithBlobStore(command_components.BlobStoreWithEnv, ...string)
-}
-
-type CommandWithQuery interface {
-	RunWithQuery(store *local_working_copy.Repo, ids *query.Group)
-}
-
-type CommandWithQueryAndBuilderOptions interface {
-	query.BuilderOptionGetter
-	CommandWithQuery
-}
-
-type CommandCompletionWithRepo interface {
-	CompleteWithRepo(u *local_working_copy.Repo, args ...string)
+type CompleteWithRepo interface {
+	Complete(u *local_working_copy.Repo, args ...string)
 }
 
 var commands = map[string]Command{}
@@ -105,19 +72,19 @@ func registerCommand(
 	case func(*flag.FlagSet) Command:
 		commands[n] = cmd(f)
 
-	case func(*flag.FlagSet) CommandWithEnv:
+	case func(*flag.FlagSet) WithEnv:
 		commands[n] = commandWithEnv{
 			Command: cmd(f),
 			FlagSet: f,
 		}
 
-	case func(*flag.FlagSet) CommandWithLocalWorkingCopy:
+	case func(*flag.FlagSet) WithLocalWorkingCopy:
 		commands[n] = commandWithLocalWorkingCopy{
 			Command: cmd(f),
 			FlagSet: f,
 		}
 
-	case func(*flag.FlagSet) CommandWithBlobStore:
+	case func(*flag.FlagSet) WithBlobStore:
 		commands[n] = commandWithBlobStore{
 			Command: cmd(f),
 			FlagSet: f,
@@ -130,13 +97,13 @@ func registerCommand(
 
 func registerCommandWithQuery(
 	n string,
-	makeFunc func(*flag.FlagSet) CommandWithQuery,
+	makeFunc func(*flag.FlagSet) WithQuery,
 ) {
 	registerCommand(
 		n,
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			cmd := &commandWithQuery{
-				CommandWithQuery: makeFunc(f),
+				WithQuery: makeFunc(f),
 			}
 
 			cmd.SetFlagSet(f)

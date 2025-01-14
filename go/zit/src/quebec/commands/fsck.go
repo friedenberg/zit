@@ -18,7 +18,7 @@ type Fsck struct {
 func init() {
 	registerCommandWithQuery(
 		"fsck",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Fsck{
 				Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
 			}

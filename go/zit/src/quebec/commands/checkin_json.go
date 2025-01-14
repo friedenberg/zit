@@ -14,7 +14,7 @@ type CheckinJson struct{}
 func init() {
 	registerCommand(
 		"checkin-json",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &CheckinJson{}
 
 			return c

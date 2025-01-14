@@ -17,7 +17,7 @@ type Status struct{}
 func init() {
 	registerCommandWithQuery(
 		"status",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Status{}
 
 			return c

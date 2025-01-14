@@ -16,7 +16,7 @@ type Info struct {
 func init() {
 	registerCommand(
 		"info",
-		func(f *flag.FlagSet) CommandWithEnv {
+		func(f *flag.FlagSet) WithEnv {
 			c := &Info{
 				Config: immutable_config.Default(),
 			}

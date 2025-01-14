@@ -23,7 +23,7 @@ type WriteBlob struct {
 func init() {
 	registerCommand(
 		"write-blob",
-		func(f *flag.FlagSet) CommandWithBlobStore {
+		func(f *flag.FlagSet) WithBlobStore {
 			c := &WriteBlob{}
 
 			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")

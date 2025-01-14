@@ -22,7 +22,7 @@ type CheckinBlob struct {
 func init() {
 	registerCommand(
 		"checkin-blob",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &CheckinBlob{
 				NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
 					collections_ptr.SetterPolicyAppend,

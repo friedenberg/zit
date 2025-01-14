@@ -18,7 +18,7 @@ type Exec struct{}
 func init() {
 	registerCommand(
 		"exec",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Exec{}
 			return c
 		},

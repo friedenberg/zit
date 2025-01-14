@@ -11,7 +11,7 @@ type Test struct{}
 func init() {
 	registerCommand(
 		"test",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Test{}
 
 			return c

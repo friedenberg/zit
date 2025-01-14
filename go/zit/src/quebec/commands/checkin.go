@@ -23,7 +23,7 @@ type Checkin struct {
 }
 
 func init() {
-	f := func(f *flag.FlagSet) CommandWithQuery {
+	f := func(f *flag.FlagSet) WithQuery {
 		c := &Checkin{}
 
 		f.BoolVar(

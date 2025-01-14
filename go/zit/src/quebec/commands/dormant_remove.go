@@ -12,7 +12,7 @@ type DormantRemove struct{}
 func init() {
 	registerCommand(
 		"dormant-remove",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &DormantRemove{}
 
 			return c

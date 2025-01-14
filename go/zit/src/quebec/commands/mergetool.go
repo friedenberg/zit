@@ -23,7 +23,7 @@ type Mergetool struct{}
 func init() {
 	registerCommandWithQuery(
 		"merge-tool",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Mergetool{}
 
 			return c

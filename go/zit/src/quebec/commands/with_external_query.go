@@ -10,15 +10,15 @@ import (
 )
 
 type commandWithQuery struct {
-	CommandWithQuery
+	WithQuery
 	command_components.QueryGroup
 }
 
-func (c commandWithQuery) CompleteWithRepo(
+func (c commandWithQuery) Complete(
 	local *local_working_copy.Repo,
 	args ...string,
 ) {
-	if _, ok := c.CommandWithQuery.(command_components.CompletionGenresGetter); !ok {
+	if _, ok := c.WithQuery.(command_components.CompletionGenresGetter); !ok {
 		return
 	}
 
@@ -26,7 +26,7 @@ func (c commandWithQuery) CompleteWithRepo(
 	defer local.MustClose(w)
 
 	qg := c.MakeQueryGroup(
-		query.MakeBuilderOptions(c.CommandWithQuery),
+		query.MakeBuilderOptions(c.WithQuery),
 		local,
 		args...,
 	)
@@ -44,7 +44,7 @@ func (c commandWithQuery) RunWithLocalWorkingCopy(
 	args ...string,
 ) {
 	qg := c.MakeQueryGroup(
-		query.MakeBuilderOptions(c.CommandWithQuery),
+		query.MakeBuilderOptions(c.WithQuery),
 		local,
 		args...,
 	)

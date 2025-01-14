@@ -17,13 +17,13 @@ import (
 
 type CatAlfred struct {
 	genres.Genre
-	CommandWithLocalWorkingCopy
+	WithLocalWorkingCopy
 }
 
 func init() {
 	registerCommandWithQuery(
 		"cat-alfred",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &CatAlfred{}
 
 			f.Var(&c.Genre, "genre", "extract this element from all matching objects")

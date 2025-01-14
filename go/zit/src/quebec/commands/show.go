@@ -60,7 +60,7 @@ func (cmd Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) RunWithArchive(
+func (cmd Show) Run(
 	archive repo.Archive,
 	args ...string,
 ) {

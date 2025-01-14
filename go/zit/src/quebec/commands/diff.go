@@ -20,7 +20,7 @@ type Diff struct{}
 func init() {
 	registerCommandWithQuery(
 		"diff",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Diff{}
 
 			return c

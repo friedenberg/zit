@@ -21,7 +21,7 @@ type PullBlobStore struct {
 func init() {
 	registerCommandWithQuery(
 		"pull-blob-store",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			cmd := &PullBlobStore{}
 			cmd.SetFlagSet(f)
 			return cmd

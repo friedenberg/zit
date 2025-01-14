@@ -25,7 +25,7 @@ type FormatObject struct {
 func init() {
 	registerCommand(
 		"format-object",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatObject{
 				CheckoutMode: checkout_mode.BlobOnly,
 			}

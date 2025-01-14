@@ -11,7 +11,7 @@ import (
 type commandWithBlobStore struct {
 	*flag.FlagSet
 	command_components.BlobStoreLocal
-	Command CommandWithBlobStore
+	Command WithBlobStore
 }
 
 func (cmd commandWithBlobStore) GetFlagSet() *flag.FlagSet {

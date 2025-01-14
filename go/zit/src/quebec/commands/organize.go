@@ -31,7 +31,7 @@ type Organize struct {
 func init() {
 	registerCommandWithQuery(
 		"organize",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Organize{
 				Flags: organize_text.MakeFlags(),
 			}

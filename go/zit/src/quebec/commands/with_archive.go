@@ -12,7 +12,7 @@ import (
 type commandWithArchive struct {
 	*flag.FlagSet
 	command_components.Repo
-	Command CommandWithArchive
+	Command WithArchive
 }
 
 func (cmd *commandWithArchive) GetCommand2() Command2 {
@@ -57,5 +57,5 @@ func (cmd commandWithArchive) Run(
 		repoOptions,
 	)
 
-	cmd.Command.RunWithArchive(repo, cmdArgs...)
+	cmd.Command.Run(repo, cmdArgs...)
 }

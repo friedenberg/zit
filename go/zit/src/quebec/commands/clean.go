@@ -27,7 +27,7 @@ type Clean struct {
 func init() {
 	registerCommandWithQuery(
 		"clean",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Clean{}
 
 			f.BoolVar(

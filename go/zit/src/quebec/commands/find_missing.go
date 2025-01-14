@@ -12,7 +12,7 @@ type FindMissing struct{}
 func init() {
 	registerCommand(
 		"find-missing",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FindMissing{}
 
 			return c

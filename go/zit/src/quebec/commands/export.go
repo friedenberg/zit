@@ -23,7 +23,7 @@ type Export struct {
 func init() {
 	registerCommandWithQuery(
 		"export",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Export{
 				CompressionType: immutable_config.CompressionTypeEmpty,
 			}

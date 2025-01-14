@@ -12,7 +12,7 @@ import (
 type commandWithLocalWorkingCopy struct {
 	*flag.FlagSet
 	command_components.Repo
-	Command CommandWithLocalWorkingCopy
+	Command WithLocalWorkingCopy
 }
 
 func (cmd *commandWithLocalWorkingCopy) GetCommand2() Command2 {
@@ -60,7 +60,7 @@ func (cmd commandWithLocalWorkingCopy) Run(
 	switch {
 	case repo.GetConfig().Complete:
 		t := cmd.getCommandCompletionWithRepo(dependencies)
-		t.CompleteWithRepo(repo, cmdArgs...)
+		t.Complete(repo, cmdArgs...)
 
 	default:
 		cmd.Command.RunWithLocalWorkingCopy(repo, cmdArgs...)
@@ -69,7 +69,7 @@ func (cmd commandWithLocalWorkingCopy) Run(
 
 func (cmd commandWithLocalWorkingCopy) getCommandCompletionWithRepo(
 	dependencies Dependencies,
-) (t CommandCompletionWithRepo) {
+) (t CompleteWithRepo) {
 	haystack := any(cmd.Command)
 
 	for {
@@ -78,7 +78,7 @@ func (cmd commandWithLocalWorkingCopy) getCommandCompletionWithRepo(
 			t = c
 			return
 
-		case CommandCompletionWithRepo:
+		case CompleteWithRepo:
 			t = c
 			return
 

@@ -19,7 +19,7 @@ type Revert struct {
 func init() {
 	registerCommandWithQuery(
 		"revert",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) WithQuery {
 			c := &Revert{}
 
 			f.BoolVar(&c.Last, "last", false, "revert the last changes")

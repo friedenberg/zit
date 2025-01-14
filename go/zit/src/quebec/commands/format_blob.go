@@ -24,7 +24,7 @@ type FormatBlob struct {
 func init() {
 	registerCommand(
 		"format-blob",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatBlob{}
 
 			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")

@@ -17,7 +17,7 @@ type Deinit struct {
 func init() {
 	registerCommand(
 		"deinit",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Deinit{}
 
 			f.BoolVar(

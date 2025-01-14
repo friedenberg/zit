@@ -26,7 +26,7 @@ type Import struct {
 func init() {
 	registerCommand(
 		"import",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Import{
 				StoreVersion: immutable_config.CurrentStoreVersion,
 			}

@@ -13,7 +13,7 @@ type RepoInfo struct{}
 func init() {
 	registerCommand(
 		"repo-info",
-		func(f *flag.FlagSet) CommandWithLocalWorkingCopy {
+		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &RepoInfo{}
 
 			return c
