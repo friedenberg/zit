@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c Deinit) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c Deinit) Run(u *local_working_copy.Repo, args ...string) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}

@@ -79,7 +79,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c *New) Run(u *local_working_copy.Repo, args ...string) {
 	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
 		u.CancelWithError(err)
 	}

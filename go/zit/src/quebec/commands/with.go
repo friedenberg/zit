@@ -17,15 +17,15 @@ type WithArchive interface {
 }
 
 type WithWorkingCopy interface {
-	RunWithWorkingCopy(repo.WorkingCopy, ...string)
+	Run(repo.WorkingCopy, ...string)
 }
 
 type WithLocalWorkingCopy interface {
-	RunWithLocalWorkingCopy(*local_working_copy.Repo, ...string)
+	Run(*local_working_copy.Repo, ...string)
 }
 
 type WithBlobStore interface {
-	RunWithBlobStore(command_components.BlobStoreWithEnv, ...string)
+	Run(command_components.BlobStoreWithEnv, ...string)
 }
 
 type WithQuery interface {

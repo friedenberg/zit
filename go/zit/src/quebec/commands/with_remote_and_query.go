@@ -47,7 +47,7 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	return
 }
 
-func (c commandWithRemoteAndQuery) RunWithLocalWorkingCopy(
+func (c commandWithRemoteAndQuery) Run(
 	local *local_working_copy.Repo,
 	args ...string,
 ) {

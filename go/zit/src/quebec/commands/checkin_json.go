@@ -32,7 +32,7 @@ type TomlBookmark struct {
 	Url      string
 }
 
-func (c CheckinJson) RunWithLocalWorkingCopy(
+func (c CheckinJson) Run(
 	u *local_working_copy.Repo,
 	args ...string,
 ) {

@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c DormantEdit) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c DormantEdit) Run(u *local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}

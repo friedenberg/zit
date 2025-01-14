@@ -23,7 +23,7 @@ func (c Reindex) GetLocalRepoOptions() local_working_copy.Options {
 	return local_working_copy.OptionsAllowConfigReadError
 }
 
-func (c Reindex) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c Reindex) Run(u *local_working_copy.Repo, args ...string) {
 	if len(args) > 0 {
 		u.CancelWithErrorf("reindex does not support arguments")
 	}

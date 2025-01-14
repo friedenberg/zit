@@ -22,7 +22,7 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) RunWithLocalWorkingCopy(repo *local_working_copy.Repo, args ...string) {
+func (c PeekZettelIds) Run(repo *local_working_copy.Repo, args ...string) {
 	n := 0
 
 	if len(args) > 0 {

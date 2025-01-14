@@ -20,7 +20,7 @@ func init() {
 	)
 }
 
-func (c DormantAdd) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c DormantAdd) Run(u *local_working_copy.Repo, args ...string) {
 	u.Must(u.Lock)
 
 	for _, v := range args {

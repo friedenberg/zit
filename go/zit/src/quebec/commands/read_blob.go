@@ -28,7 +28,7 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c ReadBlob) Run(u *local_working_copy.Repo, args ...string) {
 	dec := json.NewDecoder(u.GetInFile())
 
 	for {

@@ -95,7 +95,7 @@ func (c CatBlob) makeBlobWriter(
 	}
 }
 
-func (c CatBlob) RunWithBlobStore(
+func (c CatBlob) Run(
 	blobStore command_components.BlobStoreWithEnv,
 	args ...string,
 ) {

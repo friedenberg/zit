@@ -29,7 +29,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) RunWithLocalWorkingCopy(u *local_working_copy.Repo, _ ...string) {
+func (c CatBlobShas) Run(u *local_working_copy.Repo, _ ...string) {
 	if err := u.GetRepoLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {

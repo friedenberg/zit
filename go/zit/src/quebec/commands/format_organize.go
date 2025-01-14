@@ -32,7 +32,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c *FormatOrganize) Run(u *local_working_copy.Repo, args ...string) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {

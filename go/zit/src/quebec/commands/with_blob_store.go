@@ -47,6 +47,6 @@ func (cmd commandWithBlobStore) Run(
 		dependencies.CancelWithBadRequestf("completion not supported")
 
 	default:
-		cmd.Command.RunWithBlobStore(blobStore, cmdArgs...)
+		cmd.Command.Run(blobStore, cmdArgs...)
 	}
 }

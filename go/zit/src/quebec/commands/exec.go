@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Exec) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c Exec) Run(u *local_working_copy.Repo, args ...string) {
 	if len(args) == 0 {
 		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
 	}

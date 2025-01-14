@@ -22,7 +22,7 @@ func init() {
 }
 
 // TODO disambiguate this from repo / env
-func (cmd RepoInfo) RunWithLocalWorkingCopy(repo *local_working_copy.Repo, args ...string) {
+func (cmd RepoInfo) Run(repo *local_working_copy.Repo, args ...string) {
 	c := repo.GetConfig()
 
 	if len(args) == 0 {

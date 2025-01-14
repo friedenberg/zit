@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c Import) RunWithLocalWorkingCopy(local *local_working_copy.Repo, args ...string) {
+func (c Import) Run(local *local_working_copy.Repo, args ...string) {
 	if c.InventoryList == "" {
 		local.CancelWithBadRequestf("empty inventory list")
 		return

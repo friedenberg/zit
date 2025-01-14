@@ -20,7 +20,7 @@ func init() {
 	)
 }
 
-func (c FindMissing) RunWithLocalWorkingCopy(
+func (c FindMissing) Run(
 	u *local_working_copy.Repo,
 	args ...string,
 ) {

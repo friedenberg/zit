@@ -43,7 +43,7 @@ func init() {
 	)
 }
 
-func (c *FormatObject) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c *FormatObject) Run(u *local_working_copy.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)

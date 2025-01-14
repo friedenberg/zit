@@ -41,7 +41,7 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 	if len(args)%2 != 0 {
 		u.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",

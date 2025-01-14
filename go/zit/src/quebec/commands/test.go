@@ -19,7 +19,7 @@ func init() {
 	)
 }
 
-func (c Test) RunWithLocalWorkingCopy(
+func (c Test) Run(
 	u *local_working_copy.Repo,
 	args ...string,
 ) {

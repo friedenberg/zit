@@ -39,7 +39,7 @@ func (c commandWithQuery) Complete(
 	}
 }
 
-func (c commandWithQuery) RunWithLocalWorkingCopy(
+func (c commandWithQuery) Run(
 	local *local_working_copy.Repo,
 	args ...string,
 ) {

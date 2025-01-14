@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c EditConfig) RunWithLocalWorkingCopy(
+func (c EditConfig) Run(
 	workingCopy *local_working_copy.Repo,
 	args ...string,
 ) {

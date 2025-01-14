@@ -63,7 +63,7 @@ func (cmd commandWithLocalWorkingCopy) Run(
 		t.Complete(repo, cmdArgs...)
 
 	default:
-		cmd.Command.RunWithLocalWorkingCopy(repo, cmdArgs...)
+		cmd.Command.Run(repo, cmdArgs...)
 	}
 }
 

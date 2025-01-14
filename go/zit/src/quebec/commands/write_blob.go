@@ -42,7 +42,7 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) RunWithBlobStore(
+func (c WriteBlob) Run(
 	blobStore command_components.BlobStoreWithEnv,
 	args ...string,
 ) {

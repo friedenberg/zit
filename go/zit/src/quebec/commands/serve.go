@@ -29,7 +29,7 @@ func (c Serve) GetEnvOptions() env.Options {
 	}
 }
 
-func (c Serve) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c Serve) Run(u *local_working_copy.Repo, args ...string) {
 	u.SetCancelOnSIGHUP()
 
 	// TODO switch network to be RemoteServeType
