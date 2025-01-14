@@ -15,6 +15,11 @@ func ReadInventoryListBlob(
 	if err = vf.StreamInventoryListBlobSkus(
 		r,
 		func(sk *sku.Transacted) (err error) {
+			if err = sk.CalculateObjectShas(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			if err = a.Add(sk); err != nil {
 				err = errors.Wrap(err)
 				return

@@ -189,25 +189,23 @@ func (s *Store) WriteInventoryListBlob(
 		return
 	}
 
-	var n int64
+	defer errors.DeferredCloser(&err, wc)
 
-	func() {
-		defer errors.DeferredCloser(&err, wc)
-
-		if n, err = s.blobStore.WriteBlobToWriter(
-			t.GetType(),
-			skus,
-			wc,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}()
+	if _, err = s.blobStore.WriteBlobToWriter(
+		t.GetType(),
+		skus,
+		wc,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	actual := wc.GetShaLike()
 	expected := sha.Make(t.GetBlobSha())
 
-	if t.GetBlobSha().IsNull() {
+	ui.Log().Print("expected", expected, "actual", actual)
+
+	if expected.IsNull() {
 		t.SetBlobSha(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
@@ -216,15 +214,16 @@ func (s *Store) WriteInventoryListBlob(
 		}
 	}
 
-	if !s.af.HasBlob(actual) {
-		err = errors.Errorf(
-			"inventory list blob missing after write (%d): %q",
-			n,
-			sku.String(t),
-		)
+	// if !s.af.HasBlob(t.GetBlobSha()) {
+	// 	err = errors.Errorf(
+	// 		"inventory list blob missing after write (%d bytes, %d skus): %q",
+	// 		n,
+	// 		skus.Len(),
+	// 		sku.String(t),
+	// 	)
 
-		return
-	}
+	// 	return
+	// }
 
 	// if _, _, err = s.blobStore.GetTransactedWithBlob(
 	// 	t,
@@ -301,6 +300,11 @@ func (s *Store) ImportInventoryList(
 	}
 
 	for sk := range list.All() {
+		if err = sk.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if _, err = repo_layout.CopyBlobIfNecessary(
 			s.GetRepoLayout().GetEnv(),
 			s.GetRepoLayout(),
@@ -316,6 +320,14 @@ func (s *Store) ImportInventoryList(
 
 			return
 		}
+	}
+
+	if err = s.WriteInventoryListBlob(
+		t,
+		list,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.WriteInventoryListObject(

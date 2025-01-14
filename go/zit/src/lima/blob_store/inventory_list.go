@@ -133,13 +133,13 @@ func (a InventoryList) WriteObjectToWriter(
 
 func (a InventoryList) WriteBlobToWriter(
 	tipe ids.Type,
-	b sku.Collection,
+	list sku.Collection,
 	w io.Writer,
 ) (n int64, err error) {
 	switch tipe.String() {
 	case "", builtin_types.InventoryListTypeV0:
 		if n, err = a.v0.WriteInventoryListBlob(
-			b,
+			list,
 			w,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -148,7 +148,7 @@ func (a InventoryList) WriteBlobToWriter(
 
 	case builtin_types.InventoryListTypeV1:
 		if n, err = a.v1.WriteInventoryListBlob(
-			b,
+			list,
 			w,
 		); err != nil {
 			err = errors.Wrap(err)

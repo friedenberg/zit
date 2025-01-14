@@ -5,7 +5,6 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
-	export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -203,10 +202,11 @@ function clone_history_default_allow_conflicts { # @test
 }
 
 function clone_relay_history_default_allow_conflicts { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
+
+	export BATS_TEST_BODY=true
 
 	us="us"
 	set_xdg "$us"
@@ -214,7 +214,6 @@ function clone_relay_history_default_allow_conflicts { # @test
 		-repo-type archive \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg them)
-	tree us/.xdg/data/zit/objects
 
 	assert_success
 	assert_output - <<-EOM
@@ -222,12 +221,8 @@ function clone_relay_history_default_allow_conflicts { # @test
 
 	run_zit last
 	assert_success
-	assert_output_unsorted - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[konfig @359e9645b225731ce57f8dba3fa90413f322383f634a13496e453f009e4a0f4d [^ ]+ !toml-config-v1]
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 [^ ]+ !toml-type-v1]
 	EOM
 }

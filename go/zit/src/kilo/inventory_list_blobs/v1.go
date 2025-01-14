@@ -31,7 +31,7 @@ func (s V1) WriteInventoryListBlob(
 
 	for sk := range o.All() {
 		if sk.Metadata.Sha().IsNull() {
-			err = errors.Errorf("empty sha: %s", sk)
+			err = errors.Errorf("empty sha: %q", sku.String(sk))
 			return
 		}
 
@@ -117,6 +117,11 @@ func (s V1) StreamInventoryListBlobSkus(
 				return
 			}
 		}
+
+		// if err = o.CalculateObjectShas(); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
 
 		if err = f(o); err != nil {
 			err = errors.Wrapf(err, "Object: %s", sku.String(o))
