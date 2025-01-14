@@ -32,7 +32,7 @@ type Store struct {
 	ls         interfaces.LockSmith
 	sv         interfaces.StoreVersion
 	of         interfaces.ObjectIOFactory
-	af         interfaces.BlobIOFactory
+	af         interfaces.BlobStore
 	clock      ids.Clock
 	blobStore  blob_store.InventoryList
 
@@ -143,9 +143,6 @@ func (s *Store) Create(
 	t.Metadata.Type = s.blobType
 	t.Metadata.Description = description
 
-	if s.clock == nil {
-	}
-
 	tai := s.GetTai()
 
 	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
@@ -222,18 +219,15 @@ func (s *Store) WriteInventoryListObject(t *sku.Transacted) (err error) {
 		return
 	}
 
-	sh := wc.GetShaLike()
-
-	ui.Log().Printf(
-		"saving inventory list with tai: %s -> %s",
-		t.GetObjectId().GetGenre(),
-		sh,
-	)
-
 	if err = t.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	ui.Log().Printf(
+		"saved inventory list: %q",
+		sku.String(t),
+	)
 
 	return
 }

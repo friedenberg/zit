@@ -192,7 +192,7 @@ func (c Last) runWithInventoryList(
 	if twb, _, err = inventoryListBlobStore.GetTransactedWithBlob(
 		b,
 	); err != nil {
-		err = errors.Wrapf(err, "InventoryList: %q", b)
+		err = errors.Wrapf(err, "InventoryList: %q", sku.String(b))
 		return
 	}
 
