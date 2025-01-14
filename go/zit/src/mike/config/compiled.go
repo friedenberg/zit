@@ -85,9 +85,7 @@ func (k *compiled) loadMutableConfigBlob(
 	// k.lock.Lock()
 	// defer k.lock.Unlock()
 
-	kag := blobStore.GetConfig()
-
-	if k.mutable_config_private, _, err = kag.ParseTypedBlob(
+	if k.mutable_config_private, _, err = blobStore.GetConfig().ParseTypedBlob(
 		mutableConfigType,
 		blobSha,
 	); err != nil {

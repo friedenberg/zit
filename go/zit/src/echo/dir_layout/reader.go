@@ -10,10 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type Reader interface {
-	sha.ReadCloser
-}
-
 type reader struct {
 	hash    hash.Hash
 	rAge    io.Reader

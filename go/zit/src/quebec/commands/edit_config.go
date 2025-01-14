@@ -28,7 +28,10 @@ func init() {
 	)
 }
 
-func (c EditConfig) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...string) {
+func (c EditConfig) RunWithLocalWorkingCopy(
+	workingCopy *local_working_copy.Repo,
+	args ...string,
+) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -38,22 +41,22 @@ func (c EditConfig) RunWithLocalWorkingCopy(u *local_working_copy.Repo, args ...
 	{
 		var err error
 
-		if sk, err = c.editInVim(u); err != nil {
-			u.CancelWithError(err)
+		if sk, err = c.editInVim(workingCopy); err != nil {
+			workingCopy.CancelWithError(err)
 		}
 	}
 
-	u.Must(u.Reset)
-	u.Must(u.Lock)
+	workingCopy.Must(workingCopy.Reset)
+	workingCopy.Must(workingCopy.Lock)
 
-	if err := u.GetStore().CreateOrUpdate(
+	if err := workingCopy.GetStore().CreateOrUpdate(
 		sk,
 		sku.StoreOptions{},
 	); err != nil {
-		u.CancelWithError(err)
+		workingCopy.CancelWithError(err)
 	}
 
-	u.Must(u.Unlock)
+	workingCopy.Must(workingCopy.Unlock)
 }
 
 func (c EditConfig) editInVim(

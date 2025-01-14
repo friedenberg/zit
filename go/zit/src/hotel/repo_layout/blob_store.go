@@ -203,7 +203,12 @@ func (s CopyingBlobStore) BlobReader(
 
 	ui.Err().Printf("copied Blob %s (%d bytes)", sh, n)
 
-	return s.local.BlobReader(sh)
+	if r, err = s.local.BlobReader(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func CopyBlobIfNecessary(

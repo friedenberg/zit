@@ -36,25 +36,25 @@ func MakeBlobStore[
 func (s *BlobStore[A, APtr]) GetBlob(
 	sh interfaces.Sha,
 ) (a APtr, err error) {
-	var ar interfaces.ShaReadCloser
+	var rc interfaces.ShaReadCloser
 
-	if ar, err = s.dirLayout.BlobReader(sh); err != nil {
+	if rc, err = s.dirLayout.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.DeferredCloser(&err, rc)
 
 	var a1 A
 	a = APtr(&a1)
 	s.resetFunc(a)
 
-	if _, err = s.ParseBlob(ar, a); err != nil {
-		err = errors.Wrap(err)
+	if _, err = s.ParseBlob(rc, a); err != nil {
+		err = errors.Wrapf(err, "BlobReader: %q", rc)
 		return
 	}
 
-	actual := ar.GetShaLike()
+	actual := rc.GetShaLike()
 
 	if !actual.EqualsSha(sh) {
 		err = errors.Errorf("expected sha %s but got %s", sh, actual)

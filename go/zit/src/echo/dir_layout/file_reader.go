@@ -4,10 +4,11 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
-func NewFileReader(o FileReadOptions) (r Reader, err error) {
+func NewFileReader(o FileReadOptions) (r interfaces.ShaReadCloser, err error) {
 	ar := objectReader{}
 
 	if o.Path == "-" {
@@ -28,7 +29,7 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 		Reader: ar.file,
 	}
 
-	if ar.Reader, err = NewReader(fro); err != nil {
+	if ar.ShaReadCloser, err = NewReader(fro); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -40,7 +41,11 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 
 type objectReader struct {
 	file *os.File
-	Reader
+	interfaces.ShaReadCloser
+}
+
+func (r objectReader) String() string {
+	return r.file.Name()
 }
 
 func (ar objectReader) Close() (err error) {
@@ -49,12 +54,12 @@ func (ar objectReader) Close() (err error) {
 		return
 	}
 
-	if ar.Reader == nil {
+	if ar.ShaReadCloser == nil {
 		err = errors.Errorf("nil object reader")
 		return
 	}
 
-	if err = ar.Reader.Close(); err != nil {
+	if err = ar.ShaReadCloser.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
