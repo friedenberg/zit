@@ -43,5 +43,7 @@ function init_archive { # @test
 	assert_output
 
 	run_zit show
-	assert_failure
+	assert_success
+	assert_output - <<-'EOM'
+	EOM
 }

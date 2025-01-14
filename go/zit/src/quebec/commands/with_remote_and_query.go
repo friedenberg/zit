@@ -2,12 +2,9 @@ package commands
 
 import (
 	"flag"
-	"os"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -41,37 +38,11 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	u *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
-	var cgg CompletionGenresGetter
-	ok := false
-
-	if cgg, ok = c.CommandWithRemoteAndQuery.(CompletionGenresGetter); !ok {
-		return
-	}
-
-	w := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer errors.DeferredCloser(&err, w)
-
-	b := u.MakeQueryBuilderExcludingHidden(
-		cgg.CompletionGenres(),
-		query.MakeBuilderOptions(c.CommandWithRemoteAndQuery),
+	c.QueryGroup.CompleteWithRepo(
+		c.CommandWithRemoteAndQuery,
+		u,
+		args...,
 	)
-
-	var qg *query.Group
-
-	if qg, err = b.BuildQueryGroupWithRepoId(
-		c.ExternalQueryOptions,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.GetStore().QueryTransacted(
-		qg,
-		w.WriteOneTransacted,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

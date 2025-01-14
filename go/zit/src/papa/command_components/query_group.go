@@ -2,11 +2,19 @@ package command_components
 
 import (
 	"flag"
+	"os"
 
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
+
+type CompletionGenresGetter interface {
+	CompletionGenres() ids.Genre
+}
 
 type QueryGroup struct {
 	sku.ExternalQueryOptions
@@ -34,4 +42,30 @@ func (c QueryGroup) MakeQueryGroup(
 	}
 
 	return
+}
+
+func (c QueryGroup) CompleteWithRepo(
+	cmd any,
+	local *local_working_copy.Repo,
+	args ...string,
+) {
+	if _, ok := cmd.(CompletionGenresGetter); !ok {
+		return
+	}
+
+	w := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer local.MustClose(w)
+
+	qg := c.MakeQueryGroup(
+		query.MakeBuilderOptions(cmd),
+		local,
+		args...,
+	)
+
+	if err := local.GetStore().QueryTransacted(
+		qg,
+		w.WriteOneTransacted,
+	); err != nil {
+		local.CancelWithError(err)
+	}
 }

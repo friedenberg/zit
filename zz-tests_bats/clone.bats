@@ -216,13 +216,20 @@ function clone_relay_history_default_allow_conflicts { # @test
 		<(print_their_xdg them)
 
 	assert_success
-	assert_output - <<-EOM
-	EOM
+	assert_output ''
 
-	run_zit last
+	run_zit show
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[konfig @359e9645b225731ce57f8dba3fa90413f322383f634a13496e453f009e4a0f4d [^ ]+ !toml-config-v1]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 [^ ]+ !toml-type-v1]
+		\[.+ @.+ !inventory_list-v1]
+		\[.+ @.+ !inventory_list-v1]
+		\[.+ @.+ !inventory_list-v1]
+		\[konfig @359e9645b225731ce57f8dba3fa90413f322383f634a13496e453f009e4a0f4d .+ !toml-config-v1]
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 .+ !toml-type-v1]
+		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b .+ !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 .+ !md "wow" tag]
+		\[tag .+]
+		\[this_is_the_first .+]
+		\[this_is_the_second .+]
 	EOM
 }

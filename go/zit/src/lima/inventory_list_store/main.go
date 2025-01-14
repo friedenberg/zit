@@ -318,7 +318,7 @@ func (s *Store) ImportInventoryList(
 				return
 			}
 
-			return
+			continue
 		}
 	}
 
