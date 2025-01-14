@@ -242,7 +242,6 @@ func (s *Store) ImportInventoryList(
 	bs interfaces.BlobStore,
 	t *sku.Transacted,
 ) (err error) {
-	ui.Debug().Print(sku.String(t))
 	var rc interfaces.ShaReadCloser
 
 	if rc, err = bs.BlobReader(
@@ -263,13 +262,8 @@ func (s *Store) ImportInventoryList(
 		return
 	}
 
-	ui.Debug().Print(list)
-
 	for sk := range list.All() {
-		ui.Debug().Print(sku.String(sk))
-		var n int64
-
-		if n, err = repo_layout.CopyBlobIfNecessary(
+		if _, err = repo_layout.CopyBlobIfNecessary(
 			s.GetRepoLayout().GetEnv(),
 			s.GetRepoLayout(),
 			bs,
@@ -284,8 +278,6 @@ func (s *Store) ImportInventoryList(
 
 			return
 		}
-
-		ui.Debug().Print(n)
 	}
 
 	if err = s.WriteInventoryListObject(

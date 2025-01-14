@@ -15,6 +15,8 @@ type InventoryListStore interface {
 	// WriteInventoryListStream(list *Transacted, ) (err error)
 	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
 
+	ReadLast() (max *Transacted, err error)
+
 	StreamInventoryList(
 		blobSha interfaces.Sha,
 		f interfaces.FuncIter[*Transacted],
