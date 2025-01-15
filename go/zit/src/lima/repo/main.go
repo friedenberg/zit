@@ -37,12 +37,6 @@ type WorkingCopy interface {
 		qg *query.Group,
 	) (list *sku.List, err error)
 
-	// 	PullQueryGroupFromRemote2(
-	// 		remote ReadWrite,
-	// 		options RemoteTransferOptions,
-	// 		query ...string,
-	// 	) (err error)
-
 	PullQueryGroupFromRemote(
 		remote Archive,
 		qg *query.Group,
@@ -52,6 +46,4 @@ type WorkingCopy interface {
 	ReadObjectHistory(
 		oid *ids.ObjectId,
 	) (skus []*sku.Transacted, err error)
-
-	GetBlobStore() interfaces.BlobStore
 }

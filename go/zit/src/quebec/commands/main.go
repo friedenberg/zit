@@ -42,6 +42,7 @@ func Run(
 		Dependencies{
 			Context: ctx,
 			Config:  configCli,
+			FlagSet: cmd.GetFlagSet(),
 		},
 	)
 }

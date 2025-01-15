@@ -3,13 +3,11 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -75,7 +73,7 @@ func (cmd Clone) Run(
 		env.Options{},
 	)
 
-	remote := cmd.MakeRemote(
+	remote := cmd.MakeWorkingCopy(
 		repoGeneric.GetRepoLayout().GetEnv(),
 		cmd.GetFlagSet().Args()[0],
 	)
@@ -104,23 +102,6 @@ func (cmd Clone) Run(
 		}
 
 	case repo.Archive:
-		remoteInventoryListStore := remote.GetInventoryListStore()
-		localInventoryListStore := local.GetInventoryListStore()
-
-		if err := remoteInventoryListStore.ReadAllInventoryLists(
-			func(sk *sku.Transacted) (err error) {
-				if err = localInventoryListStore.ImportInventoryList(
-					remote.GetBlobStore(),
-					sk,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
+		cmd.PushAllToArchive(local, remote)
 	}
 }

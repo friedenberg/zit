@@ -13,6 +13,7 @@ import (
 type Dependencies struct {
 	*errors.Context
 	config_mutable_cli.Config
+	*flag.FlagSet
 }
 
 type Command interface {

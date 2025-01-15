@@ -62,9 +62,7 @@ func (c commandWithRemoteAndQuery) Run(
 		args[1:]...,
 	)
 
-	defer local.PrintMatchedDormantIfNecessary()
-
-	remote := c.MakeRemote(local.Env, args[0])
+	remote := c.MakeWorkingCopy(local.Env, args[0])
 
 	c.Command.Run(local, remote, qg, c.RemoteTransferOptions)
 }
