@@ -15,14 +15,15 @@ import (
 
 type Genesis struct {
 	repo_layout.BigBang
-	Repo
+	LocalWorkingCopy
+	LocalArchive
 }
 
 func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 	cmd.BigBang.SetFlagSet(f)
 }
 
-func (c Genesis) OnTheFirstDay(
+func (cmd Genesis) OnTheFirstDay(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
@@ -30,7 +31,7 @@ func (c Genesis) OnTheFirstDay(
 	layout := dir_layout.MakeDefaultAndInitialize(
 		context,
 		config.Debug,
-		c.OverrideXDGWithCwd,
+		cmd.OverrideXDGWithCwd,
 	)
 
 	env := env.Make(
@@ -58,37 +59,23 @@ func (c Genesis) OnTheFirstDay(
 		}
 	}
 
-	repoLayout.Genesis(c.BigBang)
+	repoLayout.Genesis(cmd.BigBang)
 
-	switch c.BigBang.Config.RepoType {
+	switch cmd.BigBang.Config.RepoType {
 	case repo_type.TypeWorkingCopy:
-		return c.makeWorkingCopy(repoLayout)
+		return local_working_copy.Genesis(
+			cmd.BigBang,
+			repoLayout,
+		)
 
 	case repo_type.TypeArchive:
-		return c.makeArchive(repoLayout)
+		return cmd.MakeLocalArchive(repoLayout)
 
 	default:
 		context.CancelWithError(
-			repo_type.ErrUnsupportedRepoType{Actual: c.BigBang.Config.RepoType},
+			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.Config.RepoType},
 		)
 	}
 
 	return nil
-}
-
-func (c Genesis) makeWorkingCopy(
-	repoLayout repo_layout.Layout,
-) repo.WorkingCopy {
-	local := local_working_copy.Genesis(
-		c.BigBang,
-		repoLayout,
-	)
-
-	return local
-}
-
-func (c Genesis) makeArchive(
-	repoLayout repo_layout.Layout,
-) repo.Archive {
-	return c.MakeLocalArchive(repoLayout)
 }
