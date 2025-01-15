@@ -11,6 +11,8 @@ import (
 )
 
 type Remote struct {
+	LocalWorkingCopy
+	LocalArchive
 	RemoteType repo.RemoteType
 }
 
@@ -30,13 +32,16 @@ func (cmd Remote) MakeWorkingCopyFromFlagSet(
 	return cmd.MakeWorkingCopy(env, f.Args()[0])
 }
 
-func (c Remote) MakeArchive(
+// TODO
+func (cmd Remote) MakeArchiveFromFlagSet(
 	env *env.Env,
-	remoteArg string,
+	f *flag.FlagSet,
 ) (remote repo.Archive) {
+	remoteArg := f.Args()[0]
+
 	var err error
 
-	switch c.RemoteType {
+	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
 		if remote, err = local_working_copy.MakeFromConfigAndXDGDotenvPath(
 			env.Context,
@@ -47,7 +52,7 @@ func (c Remote) MakeArchive(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -60,7 +65,7 @@ func (c Remote) MakeArchive(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -73,7 +78,7 @@ func (c Remote) MakeArchive(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -88,7 +93,7 @@ func (c Remote) MakeArchive(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -100,13 +105,13 @@ func (c Remote) MakeArchive(
 	return
 }
 
-func (c Remote) MakeWorkingCopy(
+func (cmd Remote) MakeWorkingCopy(
 	env *env.Env,
 	remoteArg string,
 ) (remote repo.WorkingCopy) {
 	var err error
 
-	switch c.RemoteType {
+	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
 		if remote, err = local_working_copy.MakeFromConfigAndXDGDotenvPath(
 			env.Context,
@@ -117,7 +122,7 @@ func (c Remote) MakeWorkingCopy(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -130,7 +135,7 @@ func (c Remote) MakeWorkingCopy(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -143,7 +148,7 @@ func (c Remote) MakeWorkingCopy(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
@@ -158,7 +163,7 @@ func (c Remote) MakeWorkingCopy(
 			env.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
+				cmd.RemoteType,
 				remoteArg,
 			)
 		}
