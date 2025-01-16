@@ -20,7 +20,7 @@ func Run(
 	}
 
 	cmds := Commands()
-	var cmd Command
+	var cmd command.Command
 	var ok bool
 
 	specifiedSubcommand := args[1]
