@@ -1,34 +1,35 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type Exec struct{}
-
 func init() {
-	registerCommandOld(
-		"exec",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Exec{}
-			return c
-		},
-	)
+	registerCommand("exec", &Exec{})
 }
 
-func (c Exec) Run(u *local_working_copy.Repo, args ...string) {
+type Exec struct {
+	command_components.LocalWorkingCopy
+}
+
+func (cmd Exec) Run(dep command.Dep) {
+	args := dep.Args()
+
 	if len(args) == 0 {
-		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
+		dep.CancelWithBadRequestf("needs at least Sku and possibly function name")
 	}
+
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	k, args := args[0], args[1:]
 
@@ -37,24 +38,24 @@ func (c Exec) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if sk, err = u.GetSkuFromString(k); err != nil {
-			u.CancelWithError(err)
+		if sk, err = localWorkingCopy.GetSkuFromString(k); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
 	switch {
 	case strings.HasPrefix(sk.GetType().String(), "bash"):
-		if err := c.runBash(u, sk, args...); err != nil {
-			u.CancelWithError(err)
+		if err := cmd.runBash(localWorkingCopy, sk, args...); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	case strings.HasPrefix(sk.GetType().String(), "lua"):
 		execLuaOp := user_ops.ExecLua{
-			Repo: u,
+			Repo: localWorkingCopy,
 		}
 
 		if err := execLuaOp.Run(sk, args...); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 }
