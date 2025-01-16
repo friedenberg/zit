@@ -6,10 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -41,34 +39,30 @@ func (c Pull) DefaultGenres() ids.Genre {
 }
 
 func (cmd Pull) Run(
-	dependencies command.Dep,
+	dep command.Dep,
 ) {
-	local := cmd.MakeLocalWorkingCopy(
-		dependencies,
-		env.Options{},
-		local_working_copy.OptionsEmpty,
-	)
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	remote := cmd.MakeWorkingCopyFromFlagSet(local.Env, dependencies.FlagSet)
+	remote := cmd.MakeWorkingCopyFromFlagSet(localWorkingCopy.Env, dep.FlagSet)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
-		local,
-		dependencies.Args()[1:]...,
+		localWorkingCopy,
+		dep.Args()[1:]...,
 	)
 
 	switch remote := remote.(type) {
 	case repo.WorkingCopy:
-		if err := local.PullQueryGroupFromRemote(
+		if err := localWorkingCopy.PullQueryGroupFromRemote(
 			remote,
 			qg,
 			cmd.WithPrintCopies(true),
 		); err != nil {
-			local.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	case repo.Archive:
-		local.CancelWithBadRequestf(
+		localWorkingCopy.CancelWithBadRequestf(
 			"unsupported repo type: %s (%T)",
 			remote.GetRepoLayout().GetConfig().GetRepoType(),
 			remote,

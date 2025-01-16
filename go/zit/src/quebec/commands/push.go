@@ -6,10 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -40,34 +38,28 @@ func (c Push) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (cmd Push) Run(
-	dependencies command.Dep,
-) {
-	local := cmd.MakeLocalWorkingCopy(
-		dependencies,
-		env.Options{},
-		local_working_copy.OptionsEmpty,
-	)
+func (cmd Push) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	remote := cmd.MakeArchiveFromFlagSet(local.Env, dependencies.FlagSet)
+	remote := cmd.MakeArchiveFromFlagSet(localWorkingCopy.Env, dep.FlagSet)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
-		local,
-		dependencies.Args()[1:]...,
+		localWorkingCopy,
+		dep.Args()[1:]...,
 	)
 
 	switch remote := remote.(type) {
 	case repo.WorkingCopy:
 		if err := remote.PullQueryGroupFromRemote(
-			local,
+			localWorkingCopy,
 			qg,
 			cmd.WithPrintCopies(true),
 		); err != nil {
-			local.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	case repo.Archive:
-		cmd.PushAllToArchive(local, remote)
+		cmd.PushAllToArchive(localWorkingCopy, remote)
 	}
 }

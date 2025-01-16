@@ -11,9 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -77,11 +75,7 @@ func (cmd CheckinBlob) Run(dep command.Dep) {
 		pairs[i] = p
 	}
 
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(
-		dep,
-		env.Options{},
-		local_working_copy.OptionsEmpty,
-	)
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	zettels := make([]*sku.Transacted, len(pairs))
 

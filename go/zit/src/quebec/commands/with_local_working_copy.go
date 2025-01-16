@@ -51,7 +51,7 @@ func (cmd commandWithLocalWorkingCopy) Run(
 
 	cmdArgs := cmd.Args()
 
-	repo := cmd.MakeLocalWorkingCopy(
+	repo := cmd.MakeLocalWorkingCopyWithOptions(
 		dependencies,
 		envOptions,
 		repoOptions,
