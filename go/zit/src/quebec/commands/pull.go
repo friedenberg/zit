@@ -18,10 +18,7 @@ type Pull struct {
 }
 
 func init() {
-	registerCommandOld(
-		"pull",
-		&Pull{},
-	)
+	registerCommand("pull", &Pull{})
 }
 
 func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
@@ -38,9 +35,7 @@ func (c Pull) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (cmd Pull) Run(
-	dep command.Dep,
-) {
+func (cmd Pull) Run(dep command.Dep) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	remote := cmd.MakeWorkingCopyFromFlagSet(localWorkingCopy.Env, dep.FlagSet)

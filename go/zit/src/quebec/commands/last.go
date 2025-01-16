@@ -25,6 +25,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand("last", &Last{})
+}
+
 type Last struct {
 	command_components.RepoLayout
 	command_components.LocalArchive
@@ -33,13 +37,6 @@ type Last struct {
 	Edit     bool
 	Organize bool
 	Format   string
-}
-
-func init() {
-	registerCommandOld(
-		"last",
-		&Last{},
-	)
 }
 
 func (cmd *Last) SetFlagSet(f *flag.FlagSet) {
