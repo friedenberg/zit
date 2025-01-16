@@ -9,28 +9,26 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/alfred_sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CatAlfred struct {
-	genres.Genre
-	WithLocalWorkingCopy
+func init() {
+	registerCommand("cat-alfred", &CatAlfred{})
 }
 
-func init() {
-	registerCommandWithQuery(
-		"cat-alfred",
-		func(f *flag.FlagSet) WithQuery {
-			c := &CatAlfred{}
+type CatAlfred struct {
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
 
-			f.Var(&c.Genre, "genre", "extract this element from all matching objects")
+	genres.Genre
+}
 
-			return c
-		},
-	)
+func (cmd *CatAlfred) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.Genre, "genre", "extract this element from all matching objects")
 }
 
 func (c CatAlfred) CompletionGenres() ids.Genre {
@@ -49,13 +47,18 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) Run(
-	u *local_working_copy.Repo,
-	qg *query.Group,
-) {
+func (c CatAlfred) Run(dep command.Dep) {
+	localWorkingCopy := c.MakeLocalWorkingCopy(dep)
+
+	queryGroup := c.MakeQueryGroup(
+		query.MakeBuilderOptions(c),
+		localWorkingCopy,
+		dep.Args(),
+	)
+
 	// this command does its own error handling
-	wo := bufio.NewWriter(u.GetUIFile())
-	defer u.MustFlush(wo)
+	wo := bufio.NewWriter(localWorkingCopy.GetUIFile())
+	defer localWorkingCopy.MustFlush(wo)
 
 	var aiw alfred.Writer
 
@@ -66,8 +69,8 @@ func (c CatAlfred) Run(
 		{
 			var err error
 
-			if aiw, err = alfred.NewDebouncingWriter(u.GetUIFile()); err != nil {
-				u.CancelWithError(err)
+			if aiw, err = alfred.NewDebouncingWriter(localWorkingCopy.GetUIFile()); err != nil {
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 
@@ -75,8 +78,8 @@ func (c CatAlfred) Run(
 		{
 			var err error
 
-			if aiw, err = alfred.NewWriter(u.GetUIFile(), itemPool); err != nil {
-				u.CancelWithError(err)
+			if aiw, err = alfred.NewWriter(localWorkingCopy.GetUIFile(), itemPool); err != nil {
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 	}
@@ -88,26 +91,26 @@ func (c CatAlfred) Run(
 
 		if aw, err = alfred_sku.New(
 			wo,
-			u.GetStore().GetAbbrStore().GetAbbr(),
-			u.SkuFormatBoxTransactedNoColor(),
+			localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
+			localWorkingCopy.SkuFormatBoxTransactedNoColor(),
 			aiw,
 			itemPool,
 		); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	defer u.MustClose(aw)
+	defer localWorkingCopy.MustClose(aw)
 
-	if err := u.GetStore().QueryTransacted(
-		qg,
+	if err := localWorkingCopy.GetStore().QueryTransacted(
+		queryGroup,
 		func(object *sku.Transacted) (err error) {
 			switch c.Genre {
 			case genres.Tag:
 				for t := range object.Metadata.GetTags().All() {
 					var tagObject *sku.Transacted
 
-					if tagObject, err = u.GetStore().ReadTransactedFromObjectId(
+					if tagObject, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 						t,
 					); err != nil {
 						if collections.IsErrNotFound(err) {
@@ -134,7 +137,7 @@ func (c CatAlfred) Run(
 					return
 				}
 
-				if object, err = u.GetStore().ReadTransactedFromObjectId(
+				if object, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 					tipe.GetType(),
 				); err != nil {
 					err = errors.Wrap(err)
