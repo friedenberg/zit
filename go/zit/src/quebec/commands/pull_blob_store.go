@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	registerCommand("pull-blob-store", &PullBlobStore{})
+	command.Register("pull-blob-store", &PullBlobStore{})
 }
 
 type PullBlobStore struct {

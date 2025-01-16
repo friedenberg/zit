@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registerCommand("dormant-remove", &DormantRemove{})
+	command.Register("dormant-remove", &DormantRemove{})
 }
 
 type DormantRemove struct {

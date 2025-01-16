@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	registerCommand("repo-info", &RepoInfo{})
+	command.Register("repo-info", &RepoInfo{})
 }
 
 type RepoInfo struct {

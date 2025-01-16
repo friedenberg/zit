@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	registerCommand("status", &Status{})
+	command.Register("status", &Status{})
 }
 
 type Status struct {

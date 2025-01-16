@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	registerCommand("cat-alfred", &CatAlfred{})
+	command.Register("cat-alfred", &CatAlfred{})
 }
 
 type CatAlfred struct {

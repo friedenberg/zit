@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	registerCommand("edit-config", &EditConfig{})
+	command.Register("edit-config", &EditConfig{})
 }
 
 type EditConfig struct {

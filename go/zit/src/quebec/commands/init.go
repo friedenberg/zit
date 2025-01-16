@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	registerCommand("init", &Init{})
+	command.Register("init", &Init{})
 }
 
 type Init struct {

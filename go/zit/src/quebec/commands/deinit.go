@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	registerCommand("deinit", &Deinit{})
+	command.Register("deinit", &Deinit{})
 }
 
 type Deinit struct {

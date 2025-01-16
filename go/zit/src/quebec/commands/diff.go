@@ -17,7 +17,7 @@ import (
 
 // TODO switch to registerCommandWithExternalQuery
 func init() {
-	registerCommand("diff", &Diff{})
+	command.Register("diff", &Diff{})
 }
 
 type Diff struct {

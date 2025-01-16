@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 )
 
 func PrintUsage(ctx *errors.Context, in error) {
@@ -17,9 +18,11 @@ func PrintUsage(ctx *errors.Context, in error) {
 
 	ui.Err().Print("Usage for zit:")
 
-	fs := make([]*flag.FlagSet, 0, len(Commands()))
+	commands := command.Commands()
 
-	for name, cmd := range Commands() {
+	fs := make([]*flag.FlagSet, 0, len(commands))
+
+	for name, cmd := range commands {
 		f := flag.NewFlagSet(name, flag.ExitOnError)
 		cmd.SetFlagSet(f)
 		fs = append(fs, f)

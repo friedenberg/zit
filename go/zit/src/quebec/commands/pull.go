@@ -18,7 +18,7 @@ type Pull struct {
 }
 
 func init() {
-	registerCommand("pull", &Pull{})
+	command.Register("pull", &Pull{})
 }
 
 func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {

@@ -26,7 +26,7 @@ import (
 )
 
 func init() {
-	registerCommand("last", &Last{})
+	command.Register("last", &Last{})
 }
 
 type Last struct {

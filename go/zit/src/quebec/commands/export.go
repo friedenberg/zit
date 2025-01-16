@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"export",
 		&Export{
 			CompressionType: immutable_config.CompressionTypeEmpty,

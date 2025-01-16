@@ -20,7 +20,7 @@ import (
 )
 
 func init() {
-	registerCommand("merge-tool", &Mergetool{})
+	command.Register("merge-tool", &Mergetool{})
 }
 
 type Mergetool struct {

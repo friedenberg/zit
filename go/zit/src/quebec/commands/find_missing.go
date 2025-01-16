@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registerCommand("find-missing", &FindMissing{})
+	command.Register("find-missing", &FindMissing{})
 }
 
 type FindMissing struct {

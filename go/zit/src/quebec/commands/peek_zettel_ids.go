@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	registerCommand("peek-zettel-ids", &PeekZettelIds{})
+	command.Register("peek-zettel-ids", &PeekZettelIds{})
 }
 
 type PeekZettelIds struct {

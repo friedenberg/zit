@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"init-archive",
 		&InitArchive{
 			BigBang: repo_layout.BigBang{},

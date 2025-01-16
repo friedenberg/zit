@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	registerCommand("clean", &Clean{})
+	command.Register("clean", &Clean{})
 }
 
 type Clean struct {

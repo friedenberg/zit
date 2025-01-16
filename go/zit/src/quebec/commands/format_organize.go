@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"format-organize",
 		&FormatOrganize{
 			Flags: organize_text.MakeFlags(),

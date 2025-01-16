@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	registerCommand("format-blob", &FormatBlob{})
+	command.Register("format-blob", &FormatBlob{})
 }
 
 type FormatBlob struct {

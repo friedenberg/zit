@@ -21,7 +21,7 @@ import (
 )
 
 func init() {
-	registerCommand("show", &Show{})
+	command.Register("show", &Show{})
 }
 
 type Show struct {

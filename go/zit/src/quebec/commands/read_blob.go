@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	registerCommand("read-blob", &ReadBlob{})
+	command.Register("read-blob", &ReadBlob{})
 }
 
 type ReadBlob struct {

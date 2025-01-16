@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"import",
 		&Import{
 			StoreVersion: immutable_config.CurrentStoreVersion,

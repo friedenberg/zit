@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"organize",
 		&Organize{
 			Flags: organize_text.MakeFlags(),
@@ -44,7 +44,7 @@ type Organize struct {
 func (c *Organize) SetFlagSet(f *flag.FlagSet) {
 	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
-  c.Flags.SetFlagSet(f)
+	c.Flags.SetFlagSet(f)
 
 	f.Var(
 		&c.Filter,

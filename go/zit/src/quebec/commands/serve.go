@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	registerCommand("serve", &Serve{})
+	command.Register("serve", &Serve{})
 }
 
 type Serve struct {

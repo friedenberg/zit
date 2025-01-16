@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	registerCommand("cat-blob-shas", &CatBlobShas{})
+	command.Register("cat-blob-shas", &CatBlobShas{})
 }
 
 type CatBlobShas struct {

@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"edit",
 		&Edit{
 			Workspace:    true,

@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	registerCommand("exec", &Exec{})
+	command.Register("exec", &Exec{})
 }
 
 type Exec struct {

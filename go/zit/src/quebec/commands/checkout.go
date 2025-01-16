@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"checkout",
 		&Checkout{
 			CheckoutOptions: checkout_options.Options{

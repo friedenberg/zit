@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	registerCommand("push", &Push{})
+	command.Register("push", &Push{})
 }
 
 type Push struct {

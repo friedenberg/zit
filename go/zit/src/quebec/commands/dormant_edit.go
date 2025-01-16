@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	registerCommand("dormant-edit", &DormantEdit{})
+	command.Register("dormant-edit", &DormantEdit{})
 }
 
 type DormantEdit struct {

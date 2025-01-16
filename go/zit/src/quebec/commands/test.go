@@ -9,7 +9,7 @@ import (
 type Test struct{}
 
 func init() {
-	registerCommand("test", &Test{})
+	command.Register("test", &Test{})
 }
 
 func (*Test) SetFlagSet(*flag.FlagSet) {}

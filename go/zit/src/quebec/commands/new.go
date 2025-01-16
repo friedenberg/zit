@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	registerCommand("new", &New{})
+	command.Register("new", &New{})
 }
 
 type New struct {

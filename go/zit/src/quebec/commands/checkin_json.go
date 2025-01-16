@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	registerCommand("checkin-json", &CheckinJson{})
+	command.Register("checkin-json", &CheckinJson{})
 }
 
 type CheckinJson struct {

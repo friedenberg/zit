@@ -19,7 +19,7 @@ func Run(
 		)
 	}
 
-	cmds := Commands()
+	cmds := command.Commands()
 	var cmd command.Command
 	var ok bool
 

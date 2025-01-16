@@ -14,9 +14,9 @@ import (
 
 func init() {
 	cmd := &Checkin{}
-	registerCommand("checkin", cmd)
-	registerCommand("add", cmd)
-	registerCommand("save", cmd)
+	command.Register("checkin", cmd)
+	command.Register("add", cmd)
+	command.Register("save", cmd)
 }
 
 type Checkin struct {

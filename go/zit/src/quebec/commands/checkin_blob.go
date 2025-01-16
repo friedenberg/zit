@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"checkin-blob",
 		&CheckinBlob{
 			NewTags: collections_ptr.MakeFlagCommas[ids.Tag](

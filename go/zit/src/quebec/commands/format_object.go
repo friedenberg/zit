@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"format-object",
 		&FormatObject{
 			CheckoutMode: checkout_mode.BlobOnly,

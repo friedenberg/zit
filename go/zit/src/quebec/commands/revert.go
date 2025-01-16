@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	registerCommand("revert", &Revert{})
+	command.Register("revert", &Revert{})
 }
 
 type Revert struct {

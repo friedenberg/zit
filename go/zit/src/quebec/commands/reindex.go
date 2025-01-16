@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	registerCommand("reindex", &Reindex{})
+	command.Register("reindex", &Reindex{})
 }
 
 type Reindex struct {

@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	registerCommand(
+	command.Register(
 		"fsck",
 		&Fsck{
 			Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
