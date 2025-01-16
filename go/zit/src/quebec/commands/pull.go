@@ -35,15 +35,22 @@ func (c Pull) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (cmd Pull) Run(dep command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+func (cmd Pull) Run(req command.Request) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	remote := cmd.MakeWorkingCopyFromFlagSet(dep)
+	if len(req.Args()) == 0 {
+		// TODO add info about remote options
+		req.CancelWithBadRequestf("requires a remote to be specified")
+	}
+
+	remoteArg := req.Args()[0]
+
+	remote := cmd.MakeRemoteWorkingCopy(req, remoteArg)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
-		dep.Args()[1:],
+		req.Args()[1:],
 	)
 
 	switch remote := remote.(type) {

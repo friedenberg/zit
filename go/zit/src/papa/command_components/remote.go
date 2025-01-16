@@ -25,17 +25,6 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
 }
 
-func (cmd Remote) MakeWorkingCopyFromFlagSet(
-	req command.Request,
-) (remote repo.WorkingCopy) {
-	if len(req.Args()) == 0 {
-		// TODO add info about remote options
-		req.CancelWithBadRequestf("requires a remote to be specified")
-	}
-
-	return cmd.MakeRemoteWorkingCopy(req, req.Args()[0])
-}
-
 // TODO
 func (cmd Remote) MakeArchive(
 	req command.Request,
