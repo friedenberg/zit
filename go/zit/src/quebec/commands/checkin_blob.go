@@ -10,40 +10,45 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CheckinBlob struct {
-	Delete  bool
-	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
-}
-
 func init() {
-	registerCommandOld(
+	registerCommand(
 		"checkin-blob",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &CheckinBlob{
-				NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
-					collections_ptr.SetterPolicyAppend,
-				),
-			}
-
-			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
-			f.Var(
-				c.NewTags,
-				"new-tags",
-				"comma-separated tags (will replace existing tags)",
-			)
-
-			return c
+		&CheckinBlob{
+			NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
+				collections_ptr.SetterPolicyAppend,
+			),
 		},
 	)
 }
 
-func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
+type CheckinBlob struct {
+	command_components.LocalWorkingCopy
+
+	Delete  bool
+	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
+}
+
+func (cmd *CheckinBlob) SetFlagSet(f *flag.FlagSet) {
+	f.BoolVar(&cmd.Delete, "delete", false, "the checked-out file")
+	f.Var(
+		cmd.NewTags,
+		"new-tags",
+		"comma-separated tags (will replace existing tags)",
+	)
+}
+
+func (cmd CheckinBlob) Run(dep command.Dep) {
+	args := dep.Args()
+
 	if len(args)%2 != 0 {
-		u.CancelWithErrorf(
+		dep.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",
 		)
 	}
@@ -64,13 +69,20 @@ func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 			var err error
 
 			if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
-				u.CancelWithError(err)
+				dep.CancelWithError(err)
 			}
 		}
 
 		p.path = ap
 		pairs[i] = p
 	}
+
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(
+		dep.Context,
+		dep.Config,
+		env.Options{},
+		local_working_copy.OptionsEmpty,
+	)
 
 	zettels := make([]*sku.Transacted, len(pairs))
 
@@ -79,10 +91,10 @@ func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 		{
 			var err error
 
-			if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
+			if zettels[i], err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 				p.ZettelId,
 			); err != nil {
-				u.CancelWithError(err)
+				dep.CancelWithError(err)
 			}
 		}
 	}
@@ -93,8 +105,8 @@ func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 		{
 			var err error
 
-			if ow, err = u.GetRepoLayout().BlobWriter(); err != nil {
-				u.CancelWithError(err)
+			if ow, err = localWorkingCopy.GetRepoLayout().BlobWriter(); err != nil {
+				dep.CancelWithError(err)
 			}
 		}
 
@@ -110,27 +122,27 @@ func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 				var err error
 
 				if f, err = files.Open(p.path); err != nil {
-					u.CancelWithError(err)
+					dep.CancelWithError(err)
 				}
 			}
 
-			defer u.MustClose(f)
+			defer dep.MustClose(f)
 
 			if _, err := io.Copy(ow, f); err != nil {
-				u.CancelWithError(err)
+				dep.CancelWithError(err)
 			}
 
 			if err := ow.Close(); err != nil {
-				u.CancelWithError(err)
+				dep.CancelWithError(err)
 			}
 
 			{
 				var err error
 
-				if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
+				if zettels[i], err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 					p.ZettelId,
 				); err != nil {
-					u.CancelWithError(err)
+					dep.CancelWithError(err)
 				}
 			}
 
@@ -140,29 +152,27 @@ func (c CheckinBlob) Run(u *local_working_copy.Repo, args ...string) {
 			zettels[i].SetBlobSha(&as)
 
 		default:
-			u.CancelWithError(errors.Errorf("argument is neither sha nor path"))
+			dep.CancelWithError(errors.Errorf("argument is neither sha nor path"))
 		}
 
-		if c.NewTags.Len() > 0 {
+		if cmd.NewTags.Len() > 0 {
 			m := zettels[i].GetMetadata()
-			m.SetTags(c.NewTags)
+			m.SetTags(cmd.NewTags)
 		}
 	}
 
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-	}
-
-	defer u.Must(u.Unlock)
+	dep.Must(localWorkingCopy.Lock)
 
 	for _, z := range zettels {
-		if err := u.GetStore().CreateOrUpdate(
+		if err := localWorkingCopy.GetStore().CreateOrUpdate(
 			z,
 			sku.StoreOptions{
 				MergeCheckedOut: true,
 			},
 		); err != nil {
-			u.CancelWithError(err)
+			dep.CancelWithError(err)
 		}
 	}
+
+	dep.Must(localWorkingCopy.Unlock)
 }
