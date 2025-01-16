@@ -1,28 +1,24 @@
 package commands
 
 import (
-	"flag"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type RepoInfo struct{}
-
 func init() {
-	registerCommandOld(
-		"repo-info",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &RepoInfo{}
-
-			return c
-		},
-	)
+	registerCommand("repo-info", &RepoInfo{})
 }
 
-// TODO disambiguate this from repo / env
-func (cmd RepoInfo) Run(repo *local_working_copy.Repo, args ...string) {
+type RepoInfo struct {
+	command_components.RepoLayout
+}
+
+func (cmd RepoInfo) Run(dep command.Dep) {
+	args := dep.Args()
+	repo := cmd.MakeRepoLayout(dep, false)
 	c := repo.GetConfig()
 
 	if len(args) == 0 {
