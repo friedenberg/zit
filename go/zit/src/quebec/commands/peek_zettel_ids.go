@@ -17,7 +17,7 @@ type PeekZettelIds struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd PeekZettelIds) Run(dep command.Dep) {
+func (cmd PeekZettelIds) Run(dep command.Request) {
 	args := dep.Args()
 
 	n := 0

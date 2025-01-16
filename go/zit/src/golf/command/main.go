@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
-type Dep struct {
+type Request struct {
 	*errors.Context
 	config_mutable_cli.Config
 	*flag.FlagSet
@@ -16,7 +16,7 @@ type Dep struct {
 
 type Command interface {
 	interfaces.CommandComponent
-	Run(Dep)
+	Run(Request)
 }
 
 var commands = map[string]Command{}

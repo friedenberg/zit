@@ -50,7 +50,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (cmd Clone) Run(dep command.Dep) {
+func (cmd Clone) Run(dep command.Request) {
 	repoGeneric := cmd.OnTheFirstDay(dep)
 
 	remote := cmd.MakeRemoteWorkingCopy(

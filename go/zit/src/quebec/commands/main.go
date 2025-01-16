@@ -42,7 +42,7 @@ func Run(ctx *errors.Context, args ...string) {
 		ctx.CancelWithError(err)
 	}
 
-	dep := command.Dep{
+	dep := command.Request{
 		Context: ctx,
 		Config:  configCli,
 		FlagSet: f,

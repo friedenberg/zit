@@ -22,7 +22,7 @@ type Exec struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd Exec) Run(dep command.Dep) {
+func (cmd Exec) Run(dep command.Request) {
 	args := dep.Args()
 
 	if len(args) == 0 {

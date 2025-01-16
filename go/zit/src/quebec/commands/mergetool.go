@@ -31,7 +31,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (cmd Mergetool) Run(dep command.Dep) {
+func (cmd Mergetool) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

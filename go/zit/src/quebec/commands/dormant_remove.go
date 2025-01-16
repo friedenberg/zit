@@ -14,7 +14,7 @@ type DormantRemove struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd DormantRemove) Run(dep command.Dep) {
+func (cmd DormantRemove) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 	localWorkingCopy.Must(localWorkingCopy.Lock)
 

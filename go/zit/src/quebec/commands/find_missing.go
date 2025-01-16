@@ -14,7 +14,7 @@ type FindMissing struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd FindMissing) Run(dep command.Dep) {
+func (cmd FindMissing) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	var lookupStored map[sha.Bytes][]string

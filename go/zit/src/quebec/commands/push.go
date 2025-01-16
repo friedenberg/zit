@@ -35,7 +35,7 @@ func (c Push) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (cmd Push) Run(dep command.Dep) {
+func (cmd Push) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	remote := cmd.MakeArchiveFromFlagSet(localWorkingCopy.Env, dep.FlagSet)

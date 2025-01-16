@@ -26,7 +26,7 @@ func init() {
 
 func (c Info) SetFlagSet(f *flag.FlagSet) {}
 
-func (c Info) Run(dependencies command.Dep) {
+func (c Info) Run(dependencies command.Request) {
 	layout := dir_layout.MakeDefault(
 		dependencies.Context,
 		dependencies.Debug,

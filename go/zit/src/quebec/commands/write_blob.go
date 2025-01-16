@@ -43,7 +43,7 @@ type answer struct {
 }
 
 func (cmd WriteBlob) Run(
-	dep command.Dep,
+	dep command.Request,
 ) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		dep.Context,

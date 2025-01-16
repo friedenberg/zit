@@ -31,7 +31,7 @@ func (cmd *Deinit) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (cmd Deinit) Run(dep command.Dep) {
+func (cmd Deinit) Run(dep command.Request) {
 	// TODO switch to archive
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 

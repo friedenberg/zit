@@ -70,7 +70,7 @@ func (c *Organize) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd *Organize) Run(dep command.Dep) {
+func (cmd *Organize) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

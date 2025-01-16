@@ -47,7 +47,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd CatAlfred) Run(dep command.Dep) {
+func (cmd CatAlfred) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

@@ -33,7 +33,7 @@ func (cmd *FormatOrganize) SetFlagSet(f *flag.FlagSet) {
 	cmd.Flags.SetFlagSet(f)
 }
 
-func (cmd *FormatOrganize) Run(dep command.Dep) {
+func (cmd *FormatOrganize) Run(dep command.Request) {
 	args := dep.Args()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 

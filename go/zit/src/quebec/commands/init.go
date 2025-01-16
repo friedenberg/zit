@@ -19,6 +19,6 @@ func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
 	cmd.Genesis.SetFlagSet(f)
 }
 
-func (cmd *Init) Run(dep command.Dep) {
+func (cmd *Init) Run(dep command.Request) {
 	cmd.OnTheFirstDay(dep)
 }

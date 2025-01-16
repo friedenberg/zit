@@ -28,7 +28,7 @@ func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
 	c.Config.RepoType = repo_type.TypeArchive
 }
 
-func (c InitArchive) Run(dependencies command.Dep) {
+func (c InitArchive) Run(dependencies command.Request) {
 	layout := dir_layout.MakeDefault(
 		dependencies.Context,
 		dependencies.Debug,

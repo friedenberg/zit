@@ -96,7 +96,7 @@ func (c CatBlob) makeBlobWriter(
 }
 
 func (cmd CatBlob) Run(
-	dep command.Dep,
+	dep command.Request,
 ) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		dep.Context,

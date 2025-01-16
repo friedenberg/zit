@@ -24,7 +24,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) Run(dep command.Dep) {
+func (c CatBlobShas) Run(dep command.Request) {
 	repoLayout := c.MakeRepoLayout(dep, false)
 
 	if err := repoLayout.ReadAllShasForGenre(

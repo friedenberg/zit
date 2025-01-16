@@ -16,7 +16,7 @@ type RepoInfo struct {
 	command_components.RepoLayout
 }
 
-func (cmd RepoInfo) Run(dep command.Dep) {
+func (cmd RepoInfo) Run(dep command.Request) {
 	args := dep.Args()
 	repo := cmd.MakeRepoLayout(dep, false)
 	c := repo.GetConfig()

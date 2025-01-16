@@ -32,7 +32,7 @@ func (cmd *Fsck) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.Genres, "genres", "")
 }
 
-func (cmd Fsck) Run(dep command.Dep) {
+func (cmd Fsck) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

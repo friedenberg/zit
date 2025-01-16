@@ -42,7 +42,7 @@ func (cmd *FormatBlob) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (cmd *FormatBlob) Run(dep command.Dep) {
+func (cmd *FormatBlob) Run(dep command.Request) {
 	args := dep.Args()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 

@@ -77,7 +77,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (cmd *New) Run(dep command.Dep) {
+func (cmd *New) Run(dep command.Request) {
 	args := dep.Args()
 	u := cmd.MakeLocalWorkingCopy(dep)
 

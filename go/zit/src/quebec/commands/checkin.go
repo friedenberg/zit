@@ -62,7 +62,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (cmd Checkin) Run(dep command.Dep) {
+func (cmd Checkin) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

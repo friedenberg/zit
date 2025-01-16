@@ -14,7 +14,7 @@ type RepoLayout struct{}
 func (cmd *RepoLayout) SetFlagSet(f *flag.FlagSet) {}
 
 func (cmd RepoLayout) MakeRepoLayout(
-	dep command.Dep,
+	dep command.Request,
 	permitNoZitDirectory bool,
 ) repo_layout.Layout {
 	layout := dir_layout.MakeDefault(

@@ -60,7 +60,7 @@ func (cmd Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) Run(dep command.Dep) {
+func (cmd Show) Run(dep command.Request) {
 	repoLayout := cmd.MakeRepoLayout(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)

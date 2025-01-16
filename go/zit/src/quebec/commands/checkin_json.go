@@ -27,7 +27,7 @@ type TomlBookmark struct {
 	Url      string
 }
 
-func (cmd CheckinJson) Run(dep command.Dep) {
+func (cmd CheckinJson) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	dec := json.NewDecoder(localWorkingCopy.GetInFile())

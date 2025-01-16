@@ -24,7 +24,7 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(dep command.Dep) {
+func (c ReadBlob) Run(dep command.Request) {
 	repoLayout := c.MakeRepoLayout(dep, false)
 
 	dec := json.NewDecoder(repoLayout.GetInFile())

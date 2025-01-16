@@ -26,7 +26,7 @@ type DormantEdit struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd DormantEdit) Run(dep command.Dep) {
+func (cmd DormantEdit) Run(dep command.Request) {
 	args := dep.Args()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 

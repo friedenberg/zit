@@ -55,7 +55,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Last) Run(dep command.Dep) {
+func (cmd Last) Run(dep command.Request) {
 	repoLayout := cmd.MakeRepoLayout(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)

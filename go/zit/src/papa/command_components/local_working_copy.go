@@ -17,7 +17,7 @@ func (cmd *LocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c LocalWorkingCopy) MakeLocalWorkingCopy(
-	dep command.Dep,
+	dep command.Request,
 ) *local_working_copy.Repo {
 	return c.MakeLocalWorkingCopyWithOptions(
 		dep,
@@ -27,7 +27,7 @@ func (c LocalWorkingCopy) MakeLocalWorkingCopy(
 }
 
 func (c LocalWorkingCopy) MakeLocalWorkingCopyWithOptions(
-	dep command.Dep,
+	dep command.Request,
 	envOptions env.Options,
 	repoOptions local_working_copy.Options,
 ) *local_working_copy.Repo {

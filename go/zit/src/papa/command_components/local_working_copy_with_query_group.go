@@ -19,7 +19,7 @@ func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
-	dep command.Dep,
+	dep command.Request,
 	builderOptions query.BuilderOptions,
 ) (*local_working_copy.Repo, *query.Group) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)

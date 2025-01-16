@@ -59,7 +59,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Edit) Run(dep command.Dep) {
+func (cmd Edit) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

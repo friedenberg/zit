@@ -17,7 +17,7 @@ type Serve struct {
 	command_components.LocalWorkingCopy
 }
 
-func (c Serve) Run(dep command.Dep) {
+func (c Serve) Run(dep command.Request) {
 	args := dep.Args()
 	dep.SetCancelOnSIGHUP()
 

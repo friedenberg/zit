@@ -42,7 +42,7 @@ func (cmd *CheckinBlob) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (cmd CheckinBlob) Run(dep command.Dep) {
+func (cmd CheckinBlob) Run(dep command.Request) {
 	args := dep.Args()
 
 	if len(args)%2 != 0 {

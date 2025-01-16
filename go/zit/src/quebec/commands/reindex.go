@@ -15,7 +15,7 @@ type Reindex struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd Reindex) Run(dep command.Dep) {
+func (cmd Reindex) Run(dep command.Request) {
 	args := dep.Args()
 
 	if len(args) > 0 {

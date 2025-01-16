@@ -38,7 +38,7 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (cmd Diff) Run(dep command.Dep) {
+func (cmd Diff) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),

@@ -43,7 +43,7 @@ func (cmd *Import) SetFlagSet(f *flag.FlagSet) {
 	cmd.Proto.SetFlagSet(f)
 }
 
-func (cmd Import) Run(dep command.Dep) {
+func (cmd Import) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if cmd.InventoryList == "" {

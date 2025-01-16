@@ -38,7 +38,7 @@ func (c *PullBlobStore) DefaultGenres() ids.Genre {
 }
 
 func (cmd *PullBlobStore) Run(
-	dep command.Dep,
+	dep command.Request,
 ) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,

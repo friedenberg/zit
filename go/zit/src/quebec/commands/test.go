@@ -14,4 +14,4 @@ func init() {
 
 func (*Test) SetFlagSet(*flag.FlagSet) {}
 
-func (c Test) Run(dep command.Dep) {}
+func (c Test) Run(dep command.Request) {}
