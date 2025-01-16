@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -17,7 +18,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand("new", &New{})
+}
+
 type New struct {
+	command_components.LocalWorkingCopy
+
 	ids.RepoId
 	Count int
 	// TODO combine organize and edit and refactor
@@ -29,40 +36,31 @@ type New struct {
 	sku.Proto
 }
 
-func init() {
-	registerCommandOld(
-		"new",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &New{}
+func (cmd *New) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 
-			f.Var(&c.RepoId, "kasten", "none or Browser")
-
-			f.BoolVar(
-				&c.Shas,
-				"shas",
-				false,
-				"treat arguments as blobs that are already checked in",
-			)
-
-			f.IntVar(
-				&c.Count,
-				"count",
-				1,
-				"when creating new empty zettels, how many to create. otherwise ignored",
-			)
-
-			f.Var(
-				&c.Filter,
-				"filter",
-				"a script to run for each file to transform it the standard zettel format",
-			)
-
-			c.Metadata.SetFlagSet(f)
-			c.Checkout.SetFlagSet(f)
-
-			return c
-		},
+	f.BoolVar(
+		&cmd.Shas,
+		"shas",
+		false,
+		"treat arguments as blobs that are already checked in",
 	)
+
+	f.IntVar(
+		&cmd.Count,
+		"count",
+		1,
+		"when creating new empty zettels, how many to create. otherwise ignored",
+	)
+
+	f.Var(
+		&cmd.Filter,
+		"filter",
+		"a script to run for each file to transform it the standard zettel format",
+	)
+
+	cmd.Metadata.SetFlagSet(f)
+	cmd.Checkout.SetFlagSet(f)
 }
 
 func (c New) ValidateFlagsAndArgs(
@@ -79,8 +77,11 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) Run(u *local_working_copy.Repo, args ...string) {
-	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
+func (cmd *New) Run(dep command.Dep) {
+	args := dep.Args()
+	u := cmd.MakeLocalWorkingCopy(dep)
+
+	if err := cmd.ValidateFlagsAndArgs(u, args...); err != nil {
 		u.CancelWithError(err)
 	}
 
@@ -103,14 +104,14 @@ func (c *New) Run(u *local_working_copy.Repo, args ...string) {
 		{
 			var err error
 
-			if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
+			if zts, err = emptyOp.RunMany(cmd.Proto, cmd.Count); err != nil {
 				u.CancelWithError(err)
 			}
 		}
-	} else if c.Shas {
+	} else if cmd.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
 			Repo:  u,
-			Proto: c.Proto,
+			Proto: cmd.Proto,
 		}
 
 		{
@@ -124,9 +125,9 @@ func (c *New) Run(u *local_working_copy.Repo, args ...string) {
 		opCreateFromPath := user_ops.CreateFromPaths{
 			Repo:       u,
 			TextParser: f,
-			Filter:     c.Filter,
-			Delete:     c.Delete,
-			Proto:      c.Proto,
+			Filter:     cmd.Filter,
+			Delete:     cmd.Delete,
+			Proto:      cmd.Proto,
 		}
 
 		{
@@ -143,7 +144,7 @@ func (c *New) Run(u *local_working_copy.Repo, args ...string) {
 	}
 
 	// TODO make mutually exclusive with organize
-	if c.Edit {
+	if cmd.Edit {
 		opCheckout := user_ops.Checkout{
 			Repo: u,
 			Options: checkout_options.Options{
@@ -163,13 +164,13 @@ func (c *New) Run(u *local_working_copy.Repo, args ...string) {
 		}
 	}
 
-	if c.Organize {
+	if cmd.Organize {
 		opOrganize := user_ops.Organize{
 			Repo: u,
 		}
 
 		if err := opOrganize.Metadata.SetFromObjectMetadata(
-			&c.Metadata,
+			&cmd.Metadata,
 			ids.RepoId{},
 		); err != nil {
 			u.CancelWithError(err)
