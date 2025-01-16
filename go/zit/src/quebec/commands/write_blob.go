@@ -11,29 +11,29 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type WriteBlob struct {
+	command_components.BlobStoreLocal
+
 	Check         bool
 	UtilityBefore script_value.Utility
 	UtilityAfter  script_value.Utility
 }
 
 func init() {
-	registerCommand(
-		"write-blob",
-		func(f *flag.FlagSet) WithBlobStore {
-			c := &WriteBlob{}
+	registerCommand("write-blob", &WriteBlob{})
+}
 
-			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")
+func (cmd *WriteBlob) SetFlagSet(f *flag.FlagSet) {
+	f.BoolVar(&cmd.Check, "check", false, "only check if the object already exists")
 
-			f.Var(&c.UtilityBefore, "utility-before", "")
-			f.Var(&c.UtilityAfter, "utility-after", "")
-
-			return c
-		},
-	)
+	f.Var(&cmd.UtilityBefore, "utility-before", "")
+	f.Var(&cmd.UtilityAfter, "utility-after", "")
 }
 
 type answer struct {
@@ -42,15 +42,21 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) Run(
-	blobStore command_components.BlobStoreWithEnv,
-	args ...string,
+func (cmd WriteBlob) Run(
+	dep command.Dep,
 ) {
+	blobStore := cmd.MakeBlobStoreLocal(
+		dep.Context,
+		dep.Config,
+		env.Options{},
+		local_working_copy.OptionsEmpty,
+	)
+
 	var failCount atomic.Uint32
 
 	sawStdin := false
 
-	for _, p := range args {
+	for _, p := range dep.Args() {
 		switch {
 		case sawStdin:
 			ui.Err().Print("'-' passed in more than once. Ignoring")
@@ -62,7 +68,7 @@ func (c WriteBlob) Run(
 
 		a := answer{Path: p}
 
-		a.Sha, a.error = c.doOne(blobStore, p)
+		a.Sha, a.error = cmd.doOne(blobStore, p)
 
 		if a.error != nil {
 			blobStore.GetErr().Printf("%s: (error: %q)", a.Path, a.error)
@@ -73,7 +79,7 @@ func (c WriteBlob) Run(
 		hasBlob := blobStore.HasBlob(a.Sha)
 
 		if hasBlob {
-			if c.Check {
+			if cmd.Check {
 				blobStore.GetUI().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
 			} else {
 				blobStore.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
@@ -81,7 +87,7 @@ func (c WriteBlob) Run(
 		} else {
 			ui.Err().Printf("%s %s (untracked)", a.GetShaLike(), a.Path)
 
-			if c.Check {
+			if cmd.Check {
 				failCount.Add(1)
 			}
 		}

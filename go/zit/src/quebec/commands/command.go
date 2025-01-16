@@ -57,12 +57,6 @@ func registerCommand(
 			FlagSet: f,
 		}
 
-	case func(*flag.FlagSet) WithBlobStore:
-		commands[n] = commandWithBlobStore{
-			Command: cmd(f),
-			FlagSet: f,
-		}
-
 	default:
 		panic(fmt.Sprintf("command or command build func not supported: %T", cmd))
 	}
