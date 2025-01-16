@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
@@ -16,18 +17,29 @@ type Info struct {
 func init() {
 	registerCommand(
 		"info",
-		func(f *flag.FlagSet) WithEnv {
-			c := &Info{
-				Config: immutable_config.Default(),
-			}
-
-			return c
+		&Info{
+			Config: immutable_config.Default(),
 		},
 	)
 }
 
-// TODO disambiguate this from repo / env
-func (c Info) Run(e *env.Env, args ...string) {
+func (c Info) SetFlagSet(f *flag.FlagSet) {}
+
+func (c Info) Run(dependencies Dependencies) {
+	layout := dir_layout.MakeDefault(
+		dependencies.Context,
+		dependencies.Debug,
+	)
+
+	env := env.Make(
+		dependencies.Context,
+		dependencies.Config,
+		layout,
+		env.Options{},
+	)
+
+	args := dependencies.Args()
+
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}
@@ -35,23 +47,23 @@ func (c Info) Run(e *env.Env, args ...string) {
 	for _, arg := range args {
 		switch strings.ToLower(arg) {
 		case "store-version":
-			e.GetUI().Print(c.Config.GetStoreVersion())
+			env.GetUI().Print(c.Config.GetStoreVersion())
 
 		case "compression-type":
-			e.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
+			env.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
 
 		case "age-encryption":
-			e.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
+			env.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
 
 		case "xdg":
-			ecksDeeGee := e.GetDirLayout().GetXDG()
+			ecksDeeGee := env.GetDirLayout().GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,
 			}
 
-			if _, err := dotenv.WriteTo(e.GetOutFile()); err != nil {
-				e.CancelWithError(err)
+			if _, err := dotenv.WriteTo(env.GetOutFile()); err != nil {
+				env.CancelWithError(err)
 			}
 		}
 	}
