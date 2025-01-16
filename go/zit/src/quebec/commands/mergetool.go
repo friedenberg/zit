@@ -2,7 +2,6 @@ package commands
 
 import (
 	"bufio"
-	"flag"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -13,33 +12,35 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Mergetool struct{}
-
 func init() {
-	registerCommandWithQuery(
-		"merge-tool",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Mergetool{}
+	registerCommand("merge-tool", &Mergetool{})
+}
 
-			return c
-		},
-	)
+type Mergetool struct {
+	command_components.LocalWorkingCopyWithQueryGroup
 }
 
 func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Mergetool) Run(u *local_working_copy.Repo, qg *query.Group) {
+func (cmd Mergetool) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
 	conflicted := sku.MakeSkuTypeSetMutable()
 
-	if err := u.GetStore().QuerySkuType(
-		qg,
+	if err := localWorkingCopy.GetStore().QuerySkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
 			if co.GetState() != checked_out_state.Conflicted {
 				return
@@ -53,22 +54,22 @@ func (c Mergetool) Run(u *local_working_copy.Repo, qg *query.Group) {
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
-	u.Must(u.Lock)
+	localWorkingCopy.Must(localWorkingCopy.Lock)
 
 	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1 and use Err
-		u.GetUI().Printf("nothing to merge")
+		localWorkingCopy.GetUI().Printf("nothing to merge")
 		return
 	}
 
 	for co := range conflicted.All() {
-		c.doOne(u, co)
+		cmd.doOne(localWorkingCopy, co)
 	}
 
-	u.Must(u.Unlock)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
 
 func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {

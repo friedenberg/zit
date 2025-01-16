@@ -7,29 +7,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("pull-blob-store", &PullBlobStore{})
+}
+
 type PullBlobStore struct {
+	command_components.LocalWorkingCopyWithQueryGroup
 	command_components.RemoteBlobStore
 }
 
-func init() {
-	registerCommandWithQuery(
-		"pull-blob-store",
-		func(f *flag.FlagSet) WithQuery {
-			cmd := &PullBlobStore{}
-			cmd.SetFlagSet(f)
-			return cmd
-		},
-	)
-}
-
 func (cmd *PullBlobStore) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	cmd.RemoteBlobStore.SetFlagSet(f)
 }
 
@@ -42,10 +37,14 @@ func (c *PullBlobStore) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c *PullBlobStore) Run(
-	repo *local_working_copy.Repo,
-	qg *query.Group,
+func (cmd *PullBlobStore) Run(
+	dep command.Dep,
 ) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
 	importerOptions := store.ImporterOptions{
 		ExcludeObjects: true,
 		PrintCopies:    true,
@@ -54,22 +53,22 @@ func (c *PullBlobStore) Run(
 	{
 		var err error
 
-		if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(
-			repo.Env,
+		if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
+			localWorkingCopy.Env,
 		); err != nil {
-			repo.CancelWithError(err)
+			dep.CancelWithError(err)
 		}
 	}
 
-	importer := repo.MakeImporter(importerOptions)
+	importer := localWorkingCopy.MakeImporter(importerOptions)
 
-	if err := repo.GetStore().QueryTransacted(
-		qg,
+	if err := localWorkingCopy.GetStore().QueryTransacted(
+		queryGroup,
 		func(sk *sku.Transacted) (err error) {
 			if err = importer.ImportBlobIfNecessary(sk); err != nil {
 				if dir_layout.IsErrBlobMissing(err) {
 					err = nil
-					repo.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobSha())
+					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobSha())
 				} else {
 					err = errors.Wrap(err)
 				}
@@ -80,6 +79,6 @@ func (c *PullBlobStore) Run(
 			return
 		},
 	); err != nil {
-		repo.CancelWithError(err)
+		dep.CancelWithError(err)
 	}
 }
