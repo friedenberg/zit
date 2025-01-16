@@ -3,10 +3,9 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
@@ -24,19 +23,18 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Genesis) OnTheFirstDay(
-	context *errors.Context,
-	config config_mutable_cli.Config,
+	dep command.Dep,
 	envOptions env.Options,
 ) repo.Archive {
 	layout := dir_layout.MakeDefaultAndInitialize(
-		context,
-		config.Debug,
+		dep.Context,
+		dep.Config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	env := env.Make(
-		context,
-		config,
+		dep.Context,
+		dep.Config,
 		layout,
 		env.Options{},
 	)
@@ -44,7 +42,7 @@ func (cmd Genesis) OnTheFirstDay(
 	var repoLayout repo_layout.Layout
 
 	layoutOptions := repo_layout.Options{
-		BasePath:             config.BasePath,
+		BasePath:             dep.Config.BasePath,
 		PermitNoZitDirectory: true,
 	}
 
@@ -72,7 +70,7 @@ func (cmd Genesis) OnTheFirstDay(
 		return cmd.MakeLocalArchive(repoLayout)
 
 	default:
-		context.CancelWithError(
+		dep.CancelWithError(
 			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.Config.RepoType},
 		)
 	}

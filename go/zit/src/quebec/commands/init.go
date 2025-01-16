@@ -8,39 +8,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("init", &Init{})
+}
+
 type Init struct {
-	*flag.FlagSet
 	command_components.Genesis
 }
 
-func init() {
-	registerCommandOld(
-		"init",
-		func(f *flag.FlagSet) CommandOld {
-			c := &Init{}
-
-			c.SetFlagSet(f)
-
-			return c
-		},
-	)
-}
-
 func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
-	cmd.FlagSet = f
 	cmd.Genesis.SetFlagSet(f)
 }
 
-func (c *Init) GetFlagSet() *flag.FlagSet {
-	return c.FlagSet
-}
-
-func (cmd *Init) Run(
-	dependencies command.Dep,
-) {
+func (cmd *Init) Run(dep command.Dep) {
 	cmd.OnTheFirstDay(
-		dependencies.Context,
-		dependencies.Config,
+		dep,
 		env.Options{},
 	)
 }

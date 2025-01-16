@@ -38,7 +38,7 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 
-  // must happen after genesis set flag set as cmd.Config is nil until then
+	// must happen after genesis set flag set as cmd.Config is nil until then
 	cmd.Config.RepoType = repo_type.TypeWorkingCopy
 }
 
@@ -53,8 +53,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 
 func (cmd Clone) Run(dep command.Dep) {
 	repoGeneric := cmd.OnTheFirstDay(
-		dep.Context,
-		dep.Config,
+		dep,
 		env.Options{},
 	)
 
