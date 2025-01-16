@@ -1,4 +1,4 @@
-package repo_remote
+package remote_http
 
 import (
 	"bufio"
@@ -22,20 +22,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-type HTTP struct {
+type Remote struct {
 	http.Client
 	*local_working_copy.Repo
 }
 
-func (repo *HTTP) GetReadWriteRepo() repo.WorkingCopy {
+func (repo *Remote) GetReadWriteRepo() repo.WorkingCopy {
 	return repo
 }
 
-func (repo *HTTP) GetBlobStore() interfaces.BlobStore {
+func (repo *Remote) GetBlobStore() interfaces.BlobStore {
 	return &HTTPBlobStore{repo: repo}
 }
 
-func (repo *HTTP) MakeExternalQueryGroup(
+func (repo *Remote) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
@@ -44,7 +44,7 @@ func (repo *HTTP) MakeExternalQueryGroup(
 	return
 }
 
-func (repo *HTTP) MakeInventoryList(
+func (repo *Remote) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
 	var request *http.Request
@@ -108,7 +108,7 @@ func (repo *HTTP) MakeInventoryList(
 // 	return
 // }
 
-func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
+func (remoteHTTP *Remote) PullQueryGroupFromRemote(
 	remote repo.Archive,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
@@ -120,7 +120,7 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	)
 }
 
-func (remoteHTTP *HTTP) pullQueryGroupFromWorkingCopy(
+func (remoteHTTP *Remote) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
@@ -210,7 +210,7 @@ func (remoteHTTP *HTTP) pullQueryGroupFromWorkingCopy(
 	return
 }
 
-func (remote *HTTP) WriteBlobToRemote(
+func (remote *Remote) WriteBlobToRemote(
 	local repo.WorkingCopy,
 	expected *sha.Sha,
 ) (err error) {
@@ -281,7 +281,7 @@ func (remote *HTTP) WriteBlobToRemote(
 	return
 }
 
-func (remote *HTTP) ReadObjectHistory(
+func (remote *Remote) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	err = todo.Implement()
@@ -289,7 +289,7 @@ func (remote *HTTP) ReadObjectHistory(
 }
 
 type HTTPBlobStore struct {
-	repo *HTTP
+	repo *Remote
 }
 
 func (blobStore *HTTPBlobStore) GetBlobStore() interfaces.BlobStore {

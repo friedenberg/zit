@@ -1,4 +1,4 @@
-package repo_remote
+package remote_http
 
 import (
 	"bufio"

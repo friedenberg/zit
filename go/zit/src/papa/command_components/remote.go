@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
-	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
+	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 )
 
 type Remote struct {
@@ -118,18 +118,18 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env.Options,
-) (remoteHTTP *repo_remote.HTTP) {
+) (remoteHTTP *remote_http.Remote) {
 	remote := cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 		req,
 		xdgDotenvPath,
 		options,
 	)
 
-	remoteHTTP = &repo_remote.HTTP{
+	remoteHTTP = &remote_http.Remote{
 		Repo: remote,
 	}
 
-	var httpRoundTripper repo_remote.HTTPRoundTripperUnixSocket
+	var httpRoundTripper remote_http.HTTPRoundTripperUnixSocket
 
 	if err := httpRoundTripper.Initialize(remote); err != nil {
 		req.CancelWithError(err)
@@ -151,17 +151,17 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 func (cmd *Remote) MakeRemoteStdioSSH(
 	env *env.Env,
 	arg string,
-) (remoteHTTP *repo_remote.HTTP) {
+) (remoteHTTP *remote_http.Remote) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
 	)
 
-	remoteHTTP = &repo_remote.HTTP{
+	remoteHTTP = &remote_http.Remote{
 		Repo: remote,
 	}
 
-	var httpRoundTripper repo_remote.HTTPRoundTripperStdio
+	var httpRoundTripper remote_http.HTTPRoundTripperStdio
 
 	if err := httpRoundTripper.InitializeWithSSH(
 		remote,
@@ -178,17 +178,17 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 func (cmd *Remote) MakeRemoteStdioLocal(
 	env *env.Env,
 	dir string,
-) (remoteHTTP *repo_remote.HTTP) {
+) (remoteHTTP *remote_http.Remote) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
 	)
 
-	remoteHTTP = &repo_remote.HTTP{
+	remoteHTTP = &remote_http.Remote{
 		Repo: remote,
 	}
 
-	var httpRoundTripper repo_remote.HTTPRoundTripperStdio
+	var httpRoundTripper remote_http.HTTPRoundTripperStdio
 
 	httpRoundTripper.Dir = dir
 
