@@ -43,11 +43,11 @@ func (repo *Client) GetInventoryListStore() sku.InventoryListStore {
 	return repo
 }
 
-func (repo *Client) GetBlobStore() interfaces.BlobStore {
-	return &HTTPBlobStore{client: repo}
+func (client *Client) GetBlobStore() interfaces.BlobStore {
+	return client
 }
 
-func (repo *Client) MakeExternalQueryGroup(
+func (client *Client) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
@@ -120,19 +120,19 @@ func (client *Client) MakeInventoryList(
 // 	return
 // }
 
-func (remoteHTTP *Client) PullQueryGroupFromRemote(
+func (client *Client) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
-	return remoteHTTP.pullQueryGroupFromWorkingCopy(
+	return client.pullQueryGroupFromWorkingCopy(
 		remote.(repo.WorkingCopy),
 		qg,
 		options,
 	)
 }
 
-func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
+func (client *Client) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
@@ -146,7 +146,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 
 	// TODO local / remote version negotiation
 
-	bf := remoteHTTP.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
 		immutable_config.CurrentStoreVersion,
 	)
 
@@ -163,7 +163,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			remoteHTTP.GetEnv().Context,
+			client.GetEnv().Context,
 			"POST",
 			"/inventory_lists",
 			b,
@@ -176,7 +176,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
 		}
 
-		if response, err = remoteHTTP.Do(request); err != nil {
+		if response, err = client.Do(request); err != nil {
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
@@ -194,7 +194,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 
 	br := bufio.NewReader(response.Body)
 
-	remoteHTTP.GetEnv().ContinueOrPanicOnDone()
+	client.GetEnv().ContinueOrPanicOnDone()
 
 	var shas sha.Slice
 
@@ -210,7 +210,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 
 	if options.IncludeBlobs {
 		for _, expected := range shas {
-			if err = remoteHTTP.WriteBlobToRemote(remote, expected); err != nil {
+			if err = client.WriteBlobToRemote(remote, expected); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -222,7 +222,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 	return
 }
 
-func (remote *Client) WriteBlobToRemote(
+func (client *Client) WriteBlobToRemote(
 	local repo.WorkingCopy,
 	expected *sha.Sha,
 ) (err error) {
@@ -250,7 +250,7 @@ func (remote *Client) WriteBlobToRemote(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		remote.GetEnv().Context,
+		client.GetEnv().Context,
 		"POST",
 		"/blobs",
 		rc,
@@ -263,7 +263,7 @@ func (remote *Client) WriteBlobToRemote(
 
 	var response *http.Response
 
-	if response, err = remote.Do(request); err != nil {
+	if response, err = client.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
@@ -293,91 +293,9 @@ func (remote *Client) WriteBlobToRemote(
 	return
 }
 
-func (remote *Client) ReadObjectHistory(
+func (client *Client) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	err = todo.Implement()
-	return
-}
-
-type HTTPBlobStore struct {
-	client *Client
-}
-
-func (blobStore *HTTPBlobStore) GetBlobStore() interfaces.BlobStore {
-	return blobStore
-}
-
-func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
-	var request *http.Request
-
-	{
-		var err error
-
-		if request, err = http.NewRequestWithContext(
-			blobStore.client.GetEnv().Context,
-			"HEAD",
-			"/blobs",
-			strings.NewReader(sh.GetShaLike().GetShaString()),
-		); err != nil {
-			blobStore.client.GetEnv().CancelWithError(err)
-		}
-	}
-
-	var response *http.Response
-
-	{
-		var err error
-
-		if response, err = blobStore.client.Do(request); err != nil {
-			blobStore.client.GetEnv().CancelWithError(err)
-		}
-	}
-
-	ok = response.StatusCode == http.StatusNoContent
-
-	return
-}
-
-func (blobStore *HTTPBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
-	err = todo.Implement()
-	return
-}
-
-func (blobStore *HTTPBlobStore) BlobReader(
-	sh interfaces.Sha,
-) (r interfaces.ShaReadCloser, err error) {
-	var request *http.Request
-
-	if request, err = http.NewRequestWithContext(
-		blobStore.client.GetEnv().Context,
-		"GET",
-		"/blobs",
-		strings.NewReader(sh.GetShaLike().GetShaString()),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var response *http.Response
-
-	if response, err = blobStore.client.Do(request); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO refactor this into a common structure
-	if response.StatusCode >= 300 {
-		var sb strings.Builder
-
-		if _, err = io.Copy(&sb, response.Body); err != nil {
-		}
-
-		err = errors.Errorf("remote responded with error: %q", &sb)
-		return
-	}
-
-	r = sha.MakeReadCloser(response.Body)
-
 	return
 }
