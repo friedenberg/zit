@@ -13,42 +13,46 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand(
+		"organize",
+		&Organize{
+			Flags: organize_text.MakeFlags(),
+		},
+	)
+}
+
 // Refactor and fold components into userops
 type Organize struct {
+	command_components.LocalWorkingCopyWithQueryGroup
+
 	organize_text.Flags
 	Mode organize_text_mode.Mode
 
 	Filter script_value.ScriptValue
 }
 
-func init() {
-	registerCommandWithQuery(
-		"organize",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Organize{
-				Flags: organize_text.MakeFlags(),
-			}
+func (c *Organize) SetFlagSet(f *flag.FlagSet) {
+	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
-			f.Var(
-				&c.Filter,
-				"filter",
-				"a script to run for each file to transform it the standard zettel format",
-			)
+  c.Flags.SetFlagSet(f)
 
-			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
-
-			c.SetFlagSet(f)
-
-			return c
-		},
+	f.Var(
+		&c.Filter,
+		"filter",
+		"a script to run for each file to transform it the standard zettel format",
 	)
+
+	f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 }
 
 func (c *Organize) ModifyBuilder(b *query.Builder) {
@@ -66,18 +70,23 @@ func (c *Organize) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
-	u.ApplyToOrganizeOptions(&c.Options)
+func (cmd *Organize) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
+	localWorkingCopy.ApplyToOrganizeOptions(&cmd.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Repo: u,
-		Options: u.MakeOrganizeOptionsWithQueryGroup(
-			c.Flags,
-			qg,
+		Repo: localWorkingCopy,
+		Options: localWorkingCopy.MakeOrganizeOptionsWithQueryGroup(
+			cmd.Flags,
+			queryGroup,
 		),
 	}
 
-	typen := qg.GetTypes()
+	typen := queryGroup.GetTypes()
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Type = typen.Any()
@@ -86,8 +95,8 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.RWMutex
 
-	if err := u.GetStore().QueryTransactedAsSkuType(
-		qg,
+	if err := localWorkingCopy.GetStore().QueryTransactedAsSkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -95,12 +104,12 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 			return skus.Add(co.Clone())
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
 	createOrganizeFileOp.Skus = skus
 
-	switch c.Mode {
+	switch cmd.Mode {
 	case organize_text_mode.ModeCommitDirectly:
 		ui.Log().Print("neither stdin or stdout is a tty")
 		ui.Log().Print("generate organize, read from stdin, commit")
@@ -113,13 +122,13 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 			var err error
 
 			if f, err = files.TempFileWithPattern(
-				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				u.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 
-		defer u.MustClose(f)
+		defer localWorkingCopy.MustClose(f)
 
 		{
 			var err error
@@ -127,7 +136,7 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				u.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 
@@ -139,29 +148,29 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 			var err error
 
 			if organizeText, err = readOrganizeTextOp.Run(
-				u,
+				localWorkingCopy,
 				os.Stdin,
-				organize_text.NewMetadata(qg.RepoId),
+				organize_text.NewMetadata(queryGroup.RepoId),
 			); err != nil {
-				u.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 
-		if _, err := u.LockAndCommitOrganizeResults(
+		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
 				Original:   skus,
-				QueryGroup: qg,
+				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	case organize_text_mode.ModeOutputOnly:
 		ui.Log().Print("generate organize file and write to stdout")
 		if _, err := createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	case organize_text_mode.ModeInteractive:
@@ -175,13 +184,13 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 		{
 			var err error
 
-			if f, err = u.GetRepoLayout().TempLocal.FileTempWithTemplate(
-				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			if f, err = localWorkingCopy.GetRepoLayout().TempLocal.FileTempWithTemplate(
+				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				u.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 
-			defer u.MustClose(f)
+			defer localWorkingCopy.MustClose(f)
 		}
 
 		{
@@ -190,7 +199,7 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				u.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
+				localWorkingCopy.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
 			}
 		}
 
@@ -199,29 +208,29 @@ func (c *Organize) Run(u *local_working_copy.Repo, qg *query.Group) {
 		{
 			var err error
 
-			if organizeText, err = c.readFromVim(
-				u,
+			if organizeText, err = cmd.readFromVim(
+				localWorkingCopy,
 				f.Name(),
 				createOrganizeFileResults,
-				qg,
+				queryGroup,
 			); err != nil {
-				u.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
+				localWorkingCopy.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
 			}
 		}
 
-		if _, err := u.LockAndCommitOrganizeResults(
+		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
 				Original:   skus,
-				QueryGroup: qg,
+				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	default:
-		u.CancelWithErrorf("unknown mode")
+		localWorkingCopy.CancelWithErrorf("unknown mode")
 	}
 }
 

@@ -26,14 +26,15 @@ func init() {
 }
 
 type Export struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
 }
 
 func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+
 	f.Var(&cmd.AgeIdentity, "age-identity", "")
 	cmd.CompressionType.SetFlagSet(f)
 }
@@ -47,12 +48,9 @@ func (c Export) DefaultGenres() ids.Genre {
 }
 
 func (cmd Export) Run(dep command.Dep) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
-
-	queryGroup := cmd.MakeQueryGroup(
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
 		query.MakeBuilderOptions(cmd),
-		localWorkingCopy,
-		dep.Args(),
 	)
 
 	var list *sku.List

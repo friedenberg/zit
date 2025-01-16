@@ -1,28 +1,22 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Status struct{}
-
 func init() {
-	registerCommandWithQuery(
-		"status",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Status{}
+	registerCommandWithQuery("status", &Status{})
+}
 
-			return c
-		},
-	)
+type Status struct {
+	command_components.LocalWorkingCopyWithQueryGroup
 }
 
 func (c Status) DefaultGenres() ids.Genre {
@@ -36,7 +30,12 @@ func (c Status) ModifyBuilder(
 		WithDefaultSigil(ids.SigilExternal)
 }
 
-func (c Status) Run(u *local_working_copy.Repo, qg *query.Group) {
+func (cmd Status) Run(dep command.Dep) {
+	u, qg := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	if err := u.GetStore().QuerySkuType(

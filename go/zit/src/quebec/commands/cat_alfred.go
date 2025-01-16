@@ -21,13 +21,13 @@ func init() {
 }
 
 type CatAlfred struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 
 	genres.Genre
 }
 
 func (cmd *CatAlfred) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	f.Var(&cmd.Genre, "genre", "extract this element from all matching objects")
 }
 
@@ -47,13 +47,10 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) Run(dep command.Dep) {
-	localWorkingCopy := c.MakeLocalWorkingCopy(dep)
-
-	queryGroup := c.MakeQueryGroup(
-		query.MakeBuilderOptions(c),
-		localWorkingCopy,
-		dep.Args(),
+func (cmd CatAlfred) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
 	)
 
 	// this command does its own error handling
@@ -64,7 +61,7 @@ func (c CatAlfred) Run(dep command.Dep) {
 
 	itemPool := alfred.MakeItemPool()
 
-	switch c.Genre {
+	switch cmd.Genre {
 	case genres.Type, genres.Tag:
 		{
 			var err error
@@ -105,7 +102,7 @@ func (c CatAlfred) Run(dep command.Dep) {
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,
 		func(object *sku.Transacted) (err error) {
-			switch c.Genre {
+			switch cmd.Genre {
 			case genres.Tag:
 				for t := range object.Metadata.GetTags().All() {
 					var tagObject *sku.Transacted
