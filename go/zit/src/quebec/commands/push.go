@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
@@ -40,7 +41,7 @@ func (c Push) DefaultGenres() ids.Genre {
 }
 
 func (cmd Push) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	local := cmd.MakeLocalWorkingCopy(
 		dependencies.Context,

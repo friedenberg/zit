@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -63,7 +64,7 @@ func (cmd Show) DefaultGenres() ids.Genre {
 }
 
 func (cmd Show) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	repoLayout := cmd.MakeRepoLayout(
 		dependencies.Context,

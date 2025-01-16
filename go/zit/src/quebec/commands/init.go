@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -35,7 +36,7 @@ func (c *Init) GetFlagSet() *flag.FlagSet {
 }
 
 func (cmd *Init) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	cmd.OnTheFirstDay(
 		dependencies.Context,

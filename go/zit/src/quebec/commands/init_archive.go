@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
@@ -36,7 +37,7 @@ func (c InitArchive) GetFlagSet() *flag.FlagSet {
 }
 
 func (c InitArchive) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	layout := dir_layout.MakeDefault(
 		dependencies.Context,

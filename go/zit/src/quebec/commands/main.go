@@ -3,6 +3,7 @@ package commands
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 )
 
 func Run(
@@ -39,7 +40,7 @@ func Run(
 	}
 
 	cmd.Run(
-		Dependencies{
+		command.Dep{
 			Context: ctx,
 			Config:  configCli,
 			FlagSet: cmd.GetFlagSet(),

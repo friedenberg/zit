@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -19,7 +20,7 @@ func (cmd commandWithBlobStore) GetFlagSet() *flag.FlagSet {
 }
 
 func (cmd commandWithBlobStore) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	var envOptions env.Options
 

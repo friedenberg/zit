@@ -4,25 +4,18 @@ import (
 	"flag"
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-type Dependencies struct {
-	*errors.Context
-	config_mutable_cli.Config
-	*flag.FlagSet
-}
-
 type Command interface {
 	GetFlagSet() *flag.FlagSet
-	Run(Dependencies)
+	Run(command.Dep)
 }
 
 type Command2 interface {
-	Run(Dependencies)
+	Run(command.Dep)
 	interfaces.CommandComponent
 }
 

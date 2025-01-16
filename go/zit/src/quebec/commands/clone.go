@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -65,7 +66,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 }
 
 func (cmd Clone) Run(
-	dependencies Dependencies,
+	dependencies command.Dep,
 ) {
 	repoGeneric := cmd.OnTheFirstDay(
 		dependencies.Context,
