@@ -4,33 +4,14 @@ import (
 	"flag"
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-type Command interface {
-	GetFlagSet() *flag.FlagSet
-	Run(command.Dep)
-}
-
-type Command2 interface {
-	Run(command.Dep)
-	interfaces.CommandComponent
-}
-
-type commandWrapper struct {
-	*flag.FlagSet
-	Command2
-}
-
-func (wrapper commandWrapper) GetFlagSet() *flag.FlagSet {
-	return wrapper.FlagSet
-}
-
-func (wrapper commandWrapper) SetFlagSet(f *flag.FlagSet) {
-	wrapper.Command2.SetFlagSet(f)
-}
+type (
+	Command  = command.Command
+	Command2 = command.Command2
+)
 
 type CompleteWithRepo interface {
 	Complete(u *local_working_copy.Repo, args ...string)
@@ -54,7 +35,7 @@ func registerCommand(
 
 	switch cmd := commandOrCommandBuildFunc.(type) {
 	case Command2:
-		wrapper := commandWrapper{
+		wrapper := command.Wrapper{
 			FlagSet:  f,
 			Command2: cmd,
 		}

@@ -2,15 +2,15 @@ package command
 
 import "flag"
 
-type commandWrapper struct {
+type Wrapper struct {
 	*flag.FlagSet
 	Command2
 }
 
-func (wrapper commandWrapper) GetFlagSet() *flag.FlagSet {
+func (wrapper Wrapper) GetFlagSet() *flag.FlagSet {
 	return wrapper.FlagSet
 }
 
-func (wrapper commandWrapper) SetFlagSet(f *flag.FlagSet) {
+func (wrapper Wrapper) SetFlagSet(f *flag.FlagSet) {
 	wrapper.Command2.SetFlagSet(f)
 }

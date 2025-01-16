@@ -43,7 +43,7 @@ func Register(
 
 	switch cmd := commandOrCommandBuildFunc.(type) {
 	case Command2:
-		wrapper := commandWrapper{
+		wrapper := Wrapper{
 			FlagSet:  f,
 			Command2: cmd,
 		}
