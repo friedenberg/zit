@@ -32,7 +32,7 @@ func (cmd Remote) MakeWorkingCopyFromFlagSet(
 		env.CancelWithBadRequestf("requires a remote to be specified")
 	}
 
-	return cmd.MakeWorkingCopy(env, f.Args()[0])
+	return cmd.MakeRemoteWorkingCopy(env, f.Args()[0])
 }
 
 // TODO
@@ -108,7 +108,7 @@ func (cmd Remote) MakeArchiveFromFlagSet(
 	return
 }
 
-func (cmd Remote) MakeWorkingCopy(
+func (cmd Remote) MakeRemoteWorkingCopy(
 	env *env.Env,
 	remoteArg string,
 ) (remote repo.WorkingCopy) {

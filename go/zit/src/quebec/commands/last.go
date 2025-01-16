@@ -20,10 +20,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Last struct {
+	command_components.RepoLayout
+	command_components.LocalArchive
+
 	RepoId   ids.RepoId
 	Edit     bool
 	Organize bool
@@ -33,17 +37,18 @@ type Last struct {
 func init() {
 	registerCommand(
 		"last",
-		&commandWithArchive{
-			Command: &Last{},
-		},
+		&Last{},
 	)
 }
 
-func (c *Last) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&c.RepoId, "kasten", "none or Browser")
-	f.StringVar(&c.Format, "format", "log", "format")
-	f.BoolVar(&c.Organize, "organize", false, "")
-	f.BoolVar(&c.Edit, "edit", false, "")
+func (cmd *Last) SetFlagSet(f *flag.FlagSet) {
+	cmd.RepoLayout.SetFlagSet(f)
+	cmd.LocalArchive.SetFlagSet(f)
+
+	f.Var(&cmd.RepoId, "kasten", "none or Browser")
+	f.StringVar(&cmd.Format, "format", "log", "format")
+	f.BoolVar(&cmd.Organize, "organize", false, "")
+	f.BoolVar(&cmd.Edit, "edit", false, "")
 }
 
 func (c Last) CompletionGenres() ids.Genre {
@@ -52,15 +57,23 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) Run(archive repo.Archive, args ...string) {
-	if len(args) != 0 {
+func (cmd Last) Run(dependencies Dependencies) {
+	repoLayout := cmd.MakeRepoLayout(
+		dependencies.Context,
+		dependencies.Config,
+		false,
+	)
+
+	archive := cmd.MakeLocalArchive(repoLayout)
+
+	if len(dependencies.Args()) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		c.runLocalWorkingCopy(localWorkingCopy)
+		cmd.runLocalWorkingCopy(localWorkingCopy)
 	} else {
-		c.runArchive(archive)
+		cmd.runArchive(archive)
 	}
 }
 

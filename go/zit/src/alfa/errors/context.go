@@ -33,7 +33,7 @@ func (err errContextCancelledExpected) Is(target error) bool {
 
 type Context struct {
 	context.Context
-	cancel context.CancelCauseFunc
+	cancelFunc context.CancelCauseFunc
 
 	signals chan os.Signal
 
@@ -50,9 +50,9 @@ func MakeContext(in context.Context) *Context {
 	ctx, cancel := context.WithCancelCause(in)
 
 	return &Context{
-		Context: ctx,
-		cancel:  cancel,
-		signals: make(chan os.Signal, 1),
+		Context:    ctx,
+		cancelFunc: cancel,
+		signals:    make(chan os.Signal, 1),
 	}
 }
 
@@ -142,6 +142,10 @@ func (c *Context) Run(f func(*Context)) error {
 	}
 
 	return c.Cause()
+}
+
+func (c *Context) cancel(err error) {
+	c.cancelFunc(err)
 }
 
 //go:noinline

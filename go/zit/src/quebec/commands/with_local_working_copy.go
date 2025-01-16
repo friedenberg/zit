@@ -11,7 +11,7 @@ import (
 
 type commandWithLocalWorkingCopy struct {
 	*flag.FlagSet
-	command_components.Repo
+	command_components.LocalWorkingCopy
 	Command WithLocalWorkingCopy
 }
 
@@ -26,7 +26,7 @@ func (cmd *commandWithLocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
 		cmp.SetFlagSet(f)
 	}
 
-	cmd.Repo.SetFlagSet(f)
+	cmd.LocalWorkingCopy.SetFlagSet(f)
 }
 
 func (cmd commandWithLocalWorkingCopy) GetFlagSet() *flag.FlagSet {

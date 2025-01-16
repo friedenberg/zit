@@ -13,7 +13,7 @@ import (
 )
 
 type Pull struct {
-	command_components.Repo
+	command_components.LocalWorkingCopy
 	command_components.RemoteTransfer
 	command_components.QueryGroup
 }
@@ -28,7 +28,7 @@ func init() {
 func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
-	cmd.Repo.SetFlagSet(f)
+	cmd.LocalWorkingCopy.SetFlagSet(f)
 }
 
 func (c Pull) DefaultSigil() ids.Sigil {

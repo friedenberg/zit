@@ -73,7 +73,7 @@ func (cmd Clone) Run(
 		env.Options{},
 	)
 
-	remote := cmd.MakeWorkingCopy(
+	remote := cmd.MakeRemoteWorkingCopy(
 		repoGeneric.GetRepoLayout().GetEnv(),
 		cmd.GetFlagSet().Args()[0],
 	)

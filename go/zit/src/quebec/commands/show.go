@@ -20,6 +20,8 @@ import (
 )
 
 type Show struct {
+	command_components.RepoLayout
+	command_components.LocalArchive
 	command_components.QueryGroup
 
 	After  ids.Tai
@@ -30,13 +32,13 @@ type Show struct {
 func init() {
 	registerCommand(
 		"show",
-		&commandWithArchive{
-			Command: &Show{},
-		},
+		&Show{},
 	)
 }
 
 func (cmd *Show) SetFlagSet(f *flag.FlagSet) {
+	cmd.RepoLayout.SetFlagSet(f)
+	cmd.LocalArchive.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 
 	f.StringVar(&cmd.Format, "format", "log", "format")
@@ -61,9 +63,18 @@ func (cmd Show) DefaultGenres() ids.Genre {
 }
 
 func (cmd Show) Run(
-	archive repo.Archive,
-	args ...string,
+	dependencies Dependencies,
 ) {
+	repoLayout := cmd.MakeRepoLayout(
+		dependencies.Context,
+		dependencies.Config,
+		false,
+	)
+
+	archive := cmd.MakeLocalArchive(repoLayout)
+
+	args := dependencies.Args()
+
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {
 		case archive.GetRepoLayout().Env.GetCLIConfig().Complete:
@@ -178,9 +189,6 @@ func (cmd Show) runWithArchive(
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
+		archive.GetRepoLayout().CancelWithError(err)
 	}
-
-	return
 }

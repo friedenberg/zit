@@ -3,12 +3,15 @@ package command_components
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type LocalArchive struct{}
@@ -18,29 +21,44 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 
 func (c LocalArchive) MakeLocalArchive(
 	repoLayout repo_layout.Layout,
-) *inventory_list_store.Store {
-	objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
-	boxFormat := box_format.MakeBoxTransactedArchive(
-		repoLayout.Env,
-		options_print.V0{}.WithPrintTai(true),
-	)
+) repo.Archive {
+	repoType := repoLayout.GetConfig().GetRepoType()
 
-	inventoryListBlobStore := blob_store.MakeInventoryStore(
-		repoLayout,
-		objectFormat,
-		boxFormat,
-	)
+	switch repoType {
+	case repo_type.TypeArchive:
+		objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
+		boxFormat := box_format.MakeBoxTransactedArchive(
+			repoLayout.Env,
+			options_print.V0{}.WithPrintTai(true),
+		)
 
-	var inventoryListStore inventory_list_store.Store
+		inventoryListBlobStore := blob_store.MakeInventoryStore(
+			repoLayout,
+			objectFormat,
+			boxFormat,
+		)
 
-	if err := inventoryListStore.Initialize(
-		repoLayout,
-		objectFormat,
-		nil,
-		inventoryListBlobStore,
-	); err != nil {
-		repoLayout.CancelWithError(err)
+		var inventoryListStore inventory_list_store.Store
+
+		if err := inventoryListStore.Initialize(
+			repoLayout,
+			objectFormat,
+			nil,
+			inventoryListBlobStore,
+		); err != nil {
+			repoLayout.CancelWithError(err)
+		}
+
+		return &inventoryListStore
+
+	case repo_type.TypeWorkingCopy:
+		return local_working_copy.MakeWithLayout(
+			local_working_copy.OptionsEmpty,
+			repoLayout,
+		)
+
+	default:
+		repoLayout.CancelWithErrorf("unsupported repo type: %q", repoType)
+		return nil
 	}
-
-	return &inventoryListStore
 }

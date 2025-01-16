@@ -1,6 +1,8 @@
 package command_components
 
 import (
+	"flag"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -10,9 +12,12 @@ import (
 
 type RepoLayout struct{}
 
+func (cmd *RepoLayout) SetFlagSet(f *flag.FlagSet) {}
+
 func (cmd RepoLayout) MakeRepoLayout(
 	context *errors.Context,
 	config config_mutable_cli.Config,
+	permitNoZitDirectory bool,
 ) repo_layout.Layout {
 	layout := dir_layout.MakeDefault(
 		context,
@@ -30,7 +35,7 @@ func (cmd RepoLayout) MakeRepoLayout(
 
 	layoutOptions := repo_layout.Options{
 		BasePath:             config.BasePath,
-		PermitNoZitDirectory: true,
+		PermitNoZitDirectory: permitNoZitDirectory,
 	}
 
 	{
