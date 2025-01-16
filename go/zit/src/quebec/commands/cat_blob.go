@@ -12,10 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type CatBlob struct {
+	command_components.BlobStoreLocal
+
 	Utility   script_value.Utility
 	PrefixSha bool
 }
@@ -23,15 +28,13 @@ type CatBlob struct {
 func init() {
 	registerCommand(
 		"cat-blob",
-		func(f *flag.FlagSet) WithBlobStore {
-			c := &CatBlob{}
-
-			f.Var(&c.Utility, "utility", "")
-			f.BoolVar(&c.PrefixSha, "prefix-sha", false, "")
-
-			return c
-		},
+		&CatBlob{},
 	)
+}
+
+func (cmd *CatBlob) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.Utility, "utility", "")
+	f.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")
 }
 
 type shaWithReadCloser struct {
@@ -95,20 +98,26 @@ func (c CatBlob) makeBlobWriter(
 	}
 }
 
-func (c CatBlob) Run(
-	blobStore command_components.BlobStoreWithEnv,
-	args ...string,
+func (cmd CatBlob) Run(
+	dep command.Dep,
 ) {
-	blobWriter := c.makeBlobWriter(blobStore)
+	blobStore := cmd.MakeBlobStoreLocal(
+		dep.Context,
+		dep.Config,
+		env.Options{},
+		local_working_copy.OptionsEmpty,
+	)
 
-	for _, v := range args {
+	blobWriter := cmd.makeBlobWriter(blobStore)
+
+	for _, v := range dep.Args() {
 		var sh sha.Sha
 
 		if err := sh.Set(v); err != nil {
 			blobStore.CancelWithError(err)
 		}
 
-		if err := c.blob(blobStore, &sh, blobWriter); err != nil {
+		if err := cmd.blob(blobStore, &sh, blobWriter); err != nil {
 			ui.Err().Print(err)
 		}
 	}
