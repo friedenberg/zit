@@ -33,7 +33,7 @@ func Run(
 	args = args[2:]
 
 	configCli := config_mutable_cli.Default()
-	configCli.AddToFlags(cmd.GetFlagSet())
+	configCli.SetFlagSet(cmd.GetFlagSet())
 
 	if err := cmd.GetFlagSet().Parse(args); err != nil {
 		ctx.CancelWithError(err)

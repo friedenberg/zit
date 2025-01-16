@@ -30,7 +30,7 @@ type Config struct {
 	descriptions.Description
 }
 
-func (c *Config) AddToFlags(f *flag.FlagSet) {
+func (c *Config) SetFlagSet(f *flag.FlagSet) {
 	f.StringVar(&c.BasePath, "dir-zit", "", "")
 
 	f.Var(&c.Debug, "debug", "debugging options")
