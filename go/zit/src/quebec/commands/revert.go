@@ -6,27 +6,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("revert", &Revert{})
+}
+
 type Revert struct {
+	command_components.LocalWorkingCopyWithQueryGroup
+
 	Last bool
 }
 
-func init() {
-	registerCommandWithQuery(
-		"revert",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Revert{}
-
-			f.BoolVar(&c.Last, "last", false, "revert the last changes")
-
-			return c
-		},
-	)
+func (c *Revert) SetFlagSet(f *flag.FlagSet) {
+	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	f.BoolVar(&c.Last, "last", false, "revert the last changes")
 }
 
 func (c Revert) CompletionGenres() ids.Genre {
@@ -48,22 +48,27 @@ func (c Revert) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Revert) Run(u *local_working_copy.Repo, ms *query.Group) {
-	u.Must(u.Lock)
+func (cmd Revert) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
+	localWorkingCopy.Must(localWorkingCopy.Lock)
 
 	switch {
-	case c.Last:
-		if err := c.runRevertFromLast(u); err != nil {
-			u.CancelWithError(err)
+	case cmd.Last:
+		if err := cmd.runRevertFromLast(localWorkingCopy); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 
 	default:
-		if err := c.runRevertFromQuery(u, ms); err != nil {
-			u.CancelWithError(err)
+		if err := cmd.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	u.Must(u.Unlock)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
 
 func (c Revert) runRevertFromQuery(
