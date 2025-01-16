@@ -18,7 +18,7 @@ type InitArchive struct {
 func init() {
 	registerCommand(
 		"init-archive",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandOld {
 			c := &InitArchive{
 				FlagSet: f,
 				BigBang: repo_layout.BigBang{},

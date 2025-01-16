@@ -16,7 +16,7 @@ type commandWithLocalWorkingCopy struct {
 	Command WithLocalWorkingCopy
 }
 
-func (cmd *commandWithLocalWorkingCopy) GetCommand2() Command2 {
+func (cmd *commandWithLocalWorkingCopy) GetCommand2() Command {
 	return cmd
 }
 

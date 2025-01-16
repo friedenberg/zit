@@ -24,7 +24,7 @@ type Clone struct {
 func init() {
 	registerCommand(
 		"clone",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandOld {
 			c := &Clone{
 				FlagSet: f,
 				Genesis: command_components.Genesis{
@@ -42,7 +42,7 @@ func init() {
 	)
 }
 
-func (cmd *Clone) GetCommandWithDependencies() Command {
+func (cmd *Clone) GetCommandWithDependencies() CommandOld {
 	return cmd
 }
 

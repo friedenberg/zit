@@ -4,7 +4,7 @@ import "flag"
 
 type Wrapper struct {
 	*flag.FlagSet
-	Command2
+	Command
 }
 
 func (wrapper Wrapper) GetFlagSet() *flag.FlagSet {
@@ -12,5 +12,5 @@ func (wrapper Wrapper) GetFlagSet() *flag.FlagSet {
 }
 
 func (wrapper Wrapper) SetFlagSet(f *flag.FlagSet) {
-	wrapper.Command2.SetFlagSet(f)
+	wrapper.Command.SetFlagSet(f)
 }

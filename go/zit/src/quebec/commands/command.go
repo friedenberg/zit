@@ -9,17 +9,21 @@ import (
 )
 
 type (
-	Command  = command.Command
-	Command2 = command.Command2
+	CommandOld interface {
+		GetFlagSet() *flag.FlagSet
+		Run(command.Dep)
+	}
+
+	Command = command.Command
 )
 
 type CompleteWithRepo interface {
 	Complete(u *local_working_copy.Repo, args ...string)
 }
 
-var commands = map[string]Command{}
+var commands = map[string]CommandOld{}
 
-func Commands() map[string]Command {
+func Commands() map[string]CommandOld {
 	return commands
 }
 
@@ -34,17 +38,17 @@ func registerCommand(
 	}
 
 	switch cmd := commandOrCommandBuildFunc.(type) {
-	case Command2:
+	case Command:
 		wrapper := command.Wrapper{
-			FlagSet:  f,
-			Command2: cmd,
+			FlagSet: f,
+			Command: cmd,
 		}
 
 		wrapper.SetFlagSet(f)
 
 		commands[n] = wrapper
 
-	case func(*flag.FlagSet) Command:
+	case func(*flag.FlagSet) CommandOld:
 		commands[n] = cmd(f)
 
 	case func(*flag.FlagSet) WithLocalWorkingCopy:
