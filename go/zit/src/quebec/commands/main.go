@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"flag"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -18,7 +20,7 @@ func Run(
 	}
 
 	cmds := Commands()
-	var cmd CommandOld
+	var cmd Command
 	var ok bool
 
 	specifiedSubcommand := args[1]
@@ -30,12 +32,15 @@ func Run(
 		)
 	}
 
+	f := flag.NewFlagSet(specifiedSubcommand, flag.ExitOnError)
+	cmd.SetFlagSet(f)
+
 	args = args[2:]
 
 	configCli := config_mutable_cli.Default()
-	configCli.SetFlagSet(cmd.GetFlagSet())
+	configCli.SetFlagSet(f)
 
-	if err := cmd.GetFlagSet().Parse(args); err != nil {
+	if err := f.Parse(args); err != nil {
 		ctx.CancelWithError(err)
 	}
 
@@ -43,7 +48,7 @@ func Run(
 		command.Dep{
 			Context: ctx,
 			Config:  configCli,
-			FlagSet: cmd.GetFlagSet(),
+			FlagSet: f,
 		},
 	)
 }

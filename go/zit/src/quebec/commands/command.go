@@ -20,9 +20,9 @@ type CompleteWithRepo interface {
 	Complete(u *local_working_copy.Repo, args ...string)
 }
 
-var commands = map[string]CommandOld{}
+var commands = map[string]Command{}
 
-func Commands() map[string]CommandOld {
+func Commands() map[string]Command {
 	return commands
 }
 

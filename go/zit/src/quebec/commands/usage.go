@@ -17,10 +17,12 @@ func PrintUsage(ctx *errors.Context, in error) {
 
 	ui.Err().Print("Usage for zit:")
 
-	fs := make([]flag.FlagSet, 0, len(Commands()))
+	fs := make([]*flag.FlagSet, 0, len(Commands()))
 
-	for _, c := range Commands() {
-		fs = append(fs, *c.GetFlagSet())
+	for name, cmd := range Commands() {
+		f := flag.NewFlagSet(name, flag.ExitOnError)
+		cmd.SetFlagSet(f)
+		fs = append(fs, f)
 	}
 
 	sort.Slice(fs, func(i, j int) bool {
