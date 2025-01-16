@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	registerCommandWithQuery("status", &Status{})
+	registerCommand("status", &Status{})
 }
 
 type Status struct {
@@ -31,15 +31,15 @@ func (c Status) ModifyBuilder(
 }
 
 func (cmd Status) Run(dep command.Dep) {
-	u, qg := cmd.MakeLocalWorkingCopyAndQueryGroup(
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.MakeBuilderOptions(cmd),
 	)
 
-	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
+	pcol := localWorkingCopy.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
-	if err := u.GetStore().QuerySkuType(
-		qg,
+	if err := localWorkingCopy.GetStore().QuerySkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
 			if err = pcol(co); err != nil {
 				err = errors.Wrap(err)
@@ -49,6 +49,6 @@ func (cmd Status) Run(dep command.Dep) {
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 }

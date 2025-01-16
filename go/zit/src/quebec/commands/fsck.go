@@ -6,46 +6,50 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Fsck struct {
-	Genres ids.Genre
-}
-
 func init() {
-	registerCommandWithQuery(
+	registerCommand(
 		"fsck",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Fsck{
-				Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
-			}
-
-			f.Var(&c.Genres, "genres", "")
-
-			return c
+		&Fsck{
+			Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
 		},
 	)
 }
 
-func (c Fsck) Run(
-	u *local_working_copy.Repo,
-	qg *query.Group,
-) {
-	p := u.PrinterTransacted()
+type Fsck struct {
+	command_components.LocalWorkingCopyWithQueryGroup
 
-	if err := u.GetStore().QueryTransacted(
-		qg,
+	Genres ids.Genre
+}
+
+func (cmd *Fsck) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	f.Var(&cmd.Genres, "genres", "")
+}
+
+func (cmd Fsck) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
+	p := localWorkingCopy.PrinterTransacted()
+
+	if err := localWorkingCopy.GetStore().QueryTransacted(
+		queryGroup,
 		func(sk *sku.Transacted) (err error) {
-			if !c.Genres.Contains(sk.GetGenre()) {
+			if !cmd.Genres.Contains(sk.GetGenre()) {
 				return
 			}
 
 			blobSha := sk.GetBlobSha()
 
-			if u.GetRepoLayout().HasBlob(blobSha) {
+			if localWorkingCopy.GetRepoLayout().HasBlob(blobSha) {
 				return
 			}
 
@@ -57,6 +61,6 @@ func (c Fsck) Run(
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 }
