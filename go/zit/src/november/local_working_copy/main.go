@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/config"
@@ -89,14 +88,6 @@ func MakeWithLayout(
 
 func (u *Repo) GetRepoType() repo_type.Type {
 	return u.GetRepoLayout().GetConfig().GetRepoType()
-}
-
-func (u *Repo) GetRelayRepo() repo.Archive {
-	return u
-}
-
-func (u *Repo) GetReadWriteRepo() repo.WorkingCopy {
-	return u
 }
 
 // TODO investigate removing unnecessary resets like from organize

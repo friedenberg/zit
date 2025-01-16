@@ -21,7 +21,7 @@ func (cmd *RemoteTransfer) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd *RemoteTransfer) PushAllToArchive(
 	req command.Request,
-	local, remote repo.Archive,
+	local, remote repo.Repo,
 ) {
 	remoteInventoryListStore := remote.GetInventoryListStore()
 	localInventoryListStore := local.GetInventoryListStore()

@@ -68,7 +68,7 @@ func (cmd Clone) Run(req command.Request) {
 
 	case repo.WorkingCopy:
 		qg := cmd.MakeQueryGroup(
-      req,
+			req,
 			query.MakeBuilderOptions(cmd),
 			local,
 			req.Args()[1:],
@@ -82,7 +82,7 @@ func (cmd Clone) Run(req command.Request) {
 			req.CancelWithError(err)
 		}
 
-	case repo.Archive:
+	case repo.Repo:
 		cmd.PushAllToArchive(req, local, remote)
 	}
 }

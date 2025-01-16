@@ -22,7 +22,7 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 	cmd.BigBang.SetFlagSet(f)
 }
 
-func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Archive {
+func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
 	layout := dir_layout.MakeDefaultAndInitialize(
 		dep.Context,
 		dep.Config.Debug,

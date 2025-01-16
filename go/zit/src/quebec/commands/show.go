@@ -154,7 +154,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 
 func (cmd Show) runWithArchive(
 	env *env.Env,
-	archive repo.Archive,
+	archive repo.Repo,
 	// qg *query.Group,
 ) {
 	boxFormat := box_format.MakeBoxTransactedArchive(

@@ -29,7 +29,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 func (cmd Remote) MakeArchive(
 	req command.Request,
 	remoteArg string,
-) (remote repo.Archive) {
+) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
 
 	switch cmd.RemoteType {
@@ -108,7 +108,7 @@ func (cmd *Remote) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env.Options,
-) repo.Archive {
+) repo.Repo {
 	repoLayout := cmd.MakeRepoLayout(req, false)
 
 	return cmd.MakeLocalArchive(repoLayout)

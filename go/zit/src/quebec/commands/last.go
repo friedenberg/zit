@@ -72,7 +72,7 @@ func (cmd Last) Run(dep command.Request) {
 	}
 }
 
-func (c Last) runArchive(repoLayout repo_layout.Layout, archive repo.Archive) {
+func (c Last) runArchive(repoLayout repo_layout.Layout, archive repo.Repo) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		repoLayout.CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
 	}
@@ -173,7 +173,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 
 func (c Last) runWithInventoryList(
 	repoLayout repo_layout.Layout,
-	archive repo.Archive,
+	archive repo.Repo,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var b *sku.Transacted

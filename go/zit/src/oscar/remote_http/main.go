@@ -9,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -24,16 +25,16 @@ import (
 
 type Remote struct {
 	http.Client
-	// Repo *local_working_copy.Repo
-	*local_working_copy.Repo
+	Repo *local_working_copy.Repo
+	// *local_working_copy.Repo
+}
+
+func (repo *Remote) GetRepoType() repo_type.Type {
+	return repo_type.TypeUnknown
 }
 
 func (repo *Remote) GetInventoryListStore() sku.InventoryListStore {
 	return nil
-}
-
-func (repo *Remote) GetReadWriteRepo() repo.WorkingCopy {
-	return repo
 }
 
 func (repo *Remote) GetBlobStore() interfaces.BlobStore {
@@ -114,7 +115,7 @@ func (repo *Remote) MakeInventoryList(
 // }
 
 func (remoteHTTP *Remote) PullQueryGroupFromRemote(
-	remote repo.Archive,
+	remote repo.Repo,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {

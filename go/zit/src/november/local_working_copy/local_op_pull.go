@@ -9,7 +9,7 @@ import (
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
-	remote repo.Archive,
+	remote repo.Repo,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {

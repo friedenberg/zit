@@ -21,7 +21,7 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 
 func (c LocalArchive) MakeLocalArchive(
 	repoLayout repo_layout.Layout,
-) repo.Archive {
+) repo.Repo {
 	repoType := repoLayout.GetConfig().GetRepoType()
 
 	switch repoType {

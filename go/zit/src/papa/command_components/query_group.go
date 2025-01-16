@@ -60,7 +60,7 @@ func (c QueryGroup) CompleteWithRepo(
 	defer local.MustClose(w)
 
 	qg := c.MakeQueryGroup(
-    req,
+		req,
 		query.MakeBuilderOptions(cmd),
 		local,
 		args,

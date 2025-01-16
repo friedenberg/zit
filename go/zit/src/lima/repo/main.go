@@ -8,21 +8,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
+// TODO explore permissions for who can read / write from the inventory list
+// store
 type Repo interface {
 	GetRepoType() repo_type.Type
+	GetBlobStore() interfaces.BlobStore
+	GetInventoryListStore() sku.InventoryListStore
+	// GetEnv() *env.RemoteEnv
 	// GetRepoLayout() repo_layout.Layout
 }
 
-// TODO explore permissions for who can read / write from the archive
-type Archive interface {
-	Repo
-	GetBlobStore() interfaces.BlobStore
-	GetInventoryListStore() sku.InventoryListStore
-	// InitializeUnixSocket(config net.ListenConfig, path string) (UnixSocket, error)
-}
-
 type WorkingCopy interface {
-	Archive
+	Repo
 
 	// MakeQueryGroup(
 	// 	builderOptions query.BuilderOptions,
@@ -40,7 +37,7 @@ type WorkingCopy interface {
 	) (list *sku.List, err error)
 
 	PullQueryGroupFromRemote(
-		remote Archive,
+		remote Repo,
 		qg *query.Group,
 		options RemoteTransferOptions,
 	) (err error)
