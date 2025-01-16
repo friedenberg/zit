@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
-	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type WithWorkingCopy interface {
@@ -13,10 +12,6 @@ type WithWorkingCopy interface {
 
 type WithLocalWorkingCopy interface {
 	Run(*local_working_copy.Repo, ...string)
-}
-
-type WithBlobStore interface {
-	Run(command_components.BlobStoreWithEnv, ...string)
 }
 
 type WithQuery interface {
