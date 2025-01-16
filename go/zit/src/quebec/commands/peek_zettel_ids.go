@@ -1,28 +1,25 @@
 package commands
 
 import (
-	"flag"
 	"sort"
 	"strconv"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type PeekZettelIds struct{}
-
 func init() {
-	registerCommandOld(
-		"peek-zettel-ids",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &PeekZettelIds{}
-
-			return c
-		},
-	)
+	registerCommandOld("peek-zettel-ids", &PeekZettelIds{})
 }
 
-func (c PeekZettelIds) Run(repo *local_working_copy.Repo, args ...string) {
+type PeekZettelIds struct {
+	command_components.LocalWorkingCopy
+}
+
+func (cmd PeekZettelIds) Run(dep command.Dep) {
+	args := dep.Args()
+
 	n := 0
 
 	if len(args) > 0 {
@@ -30,19 +27,21 @@ func (c PeekZettelIds) Run(repo *local_working_copy.Repo, args ...string) {
 			var err error
 
 			if n, err = strconv.Atoi(args[0]); err != nil {
-				repo.CancelWithErrorf("expected int but got %s", args[0])
+				dep.CancelWithErrorf("expected int but got %s", args[0])
 			}
 		}
 	}
+
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	var hs []*ids.ZettelId
 
 	{
 		var err error
-		if hs, err = repo.GetStore().GetZettelIdIndex().PeekZettelIds(
+		if hs, err = localWorkingCopy.GetStore().GetZettelIdIndex().PeekZettelIds(
 			n,
 		); err != nil {
-			repo.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
@@ -54,7 +53,7 @@ func (c PeekZettelIds) Run(repo *local_working_copy.Repo, args ...string) {
 	)
 
 	for i, h := range hs {
-		repo.GetUI().Printf("%d: %s", i, h)
+		localWorkingCopy.GetUI().Printf("%d: %s", i, h)
 	}
 
 	return
