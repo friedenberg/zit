@@ -11,17 +11,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("push", &Push{})
+}
+
 type Push struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteTransfer
 	command_components.QueryGroup
-}
-
-func init() {
-	registerCommandOld(
-		"push",
-		&Push{},
-	)
 }
 
 func (cmd *Push) SetFlagSet(f *flag.FlagSet) {

@@ -2,34 +2,32 @@ package commands
 
 import (
 	"encoding/json"
-	"flag"
 	"io"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type ReadBlob struct{}
-
 func init() {
-	registerCommandOld(
-		"read-blob",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &ReadBlob{}
+	registerCommand("read-blob", &ReadBlob{})
+}
 
-			return c
-		},
-	)
+type ReadBlob struct {
+	command_components.RepoLayout
 }
 
 type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(u *local_working_copy.Repo, args ...string) {
-	dec := json.NewDecoder(u.GetInFile())
+func (c ReadBlob) Run(dep command.Dep) {
+	repoLayout := c.MakeRepoLayout(dep, false)
+
+	dec := json.NewDecoder(repoLayout.GetInFile())
 
 	for {
 		var entry readBlobEntry
@@ -38,7 +36,7 @@ func (c ReadBlob) Run(u *local_working_copy.Repo, args ...string) {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				u.CancelWithError(err)
+				repoLayout.CancelWithError(err)
 			}
 
 			return
@@ -47,17 +45,20 @@ func (c ReadBlob) Run(u *local_working_copy.Repo, args ...string) {
 		{
 			var err error
 
-			if _, err = c.readOneBlob(u, entry); err != nil {
-				u.CancelWithError(err)
+			if _, err = c.readOneBlob(repoLayout, entry); err != nil {
+				repoLayout.CancelWithError(err)
 			}
 		}
 	}
 }
 
-func (ReadBlob) readOneBlob(u *local_working_copy.Repo, entry readBlobEntry) (sh *sha.Sha, err error) {
+func (ReadBlob) readOneBlob(
+	repoLayout repo_layout.Layout,
+	entry readBlobEntry,
+) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetRepoLayout().BlobWriter(); err != nil {
+	if aw, err = repoLayout.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
