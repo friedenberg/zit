@@ -1,36 +1,33 @@
 package commands
 
 import (
-	"flag"
 	"net"
 
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Serve struct {
-	Privileges string
-}
-
 func init() {
-	registerCommandOld(
-		"serve",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Serve{}
+	registerCommand("serve", &Serve{})
+}
 
-			return c
+type Serve struct {
+	command_components.LocalWorkingCopy
+}
+
+func (c Serve) Run(dep command.Dep) {
+	args := dep.Args()
+	dep.SetCancelOnSIGHUP()
+
+	localWorkingCopy := c.MakeLocalWorkingCopyWithOptions(
+		dep,
+		env.Options{
+			UIFileIsStderr: true,
 		},
+		local_working_copy.OptionsEmpty,
 	)
-}
-
-func (c Serve) GetEnvOptions() env.Options {
-	return env.Options{
-		UIFileIsStderr: true,
-	}
-}
-
-func (c Serve) Run(u *local_working_copy.Repo, args ...string) {
-	u.SetCancelOnSIGHUP()
 
 	// TODO switch network to be RemoteServeType
 	var network, address string
@@ -49,8 +46,8 @@ func (c Serve) Run(u *local_working_copy.Repo, args ...string) {
 	}
 
 	if network == "-" {
-		if err := u.ServeStdio(); err != nil {
-			u.CancelWithError(err)
+		if err := localWorkingCopy.ServeStdio(); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	} else {
 		var listener net.Listener
@@ -58,15 +55,15 @@ func (c Serve) Run(u *local_working_copy.Repo, args ...string) {
 		{
 			var err error
 
-			if listener, err = u.InitializeListener(network, address); err != nil {
-				u.CancelWithError(err)
+			if listener, err = localWorkingCopy.InitializeListener(network, address); err != nil {
+				localWorkingCopy.CancelWithError(err)
 			}
 
-			defer u.MustClose(listener)
+			defer localWorkingCopy.MustClose(listener)
 		}
 
-		if err := u.Serve(listener); err != nil {
-			u.CancelWithError(err)
+		if err := localWorkingCopy.Serve(listener); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 }
