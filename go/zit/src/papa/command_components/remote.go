@@ -37,10 +37,10 @@ func (cmd Remote) MakeWorkingCopyFromFlagSet(
 }
 
 // TODO
-func (cmd Remote) MakeArchiveFromFlagSet(
+func (cmd Remote) MakeArchive(
 	req command.Request,
+	remoteArg string,
 ) (remote repo.Archive) {
-	remoteArg := req.Args()[0]
 	env := cmd.MakeEnv(req)
 
 	switch cmd.RemoteType {

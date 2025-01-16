@@ -35,15 +35,16 @@ func (c Push) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (cmd Push) Run(dep command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+func (cmd Push) Run(req command.Request) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	remote := cmd.MakeArchiveFromFlagSet(dep)
+	remoteArg := req.Args()[0]
+	remote := cmd.MakeArchive(req, remoteArg)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
-		dep.Args()[1:],
+		req.Args()[1:],
 	)
 
 	switch remote := remote.(type) {
