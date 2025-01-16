@@ -1,4 +1,4 @@
-package local_working_copy
+package remote_http
 
 import (
 	"bufio"
@@ -21,9 +21,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-func (env *Repo) InitializeListener(
+type Server struct {
+	*local_working_copy.Repo
+}
+
+func (env Server) InitializeListener(
 	network, address string,
 ) (listener net.Listener, err error) {
 	var config net.ListenConfig
@@ -55,7 +60,7 @@ func (env *Repo) InitializeListener(
 	return
 }
 
-func (repo *Repo) InitializeUnixSocket(
+func (repo Server) InitializeUnixSocket(
 	config net.ListenConfig,
 	path string,
 ) (sock repo.UnixSocket, err error) {
@@ -87,7 +92,7 @@ type HTTPPort struct {
 	Port int
 }
 
-func (env *Repo) InitializeHTTP(
+func (env Server) InitializeHTTP(
 	config net.ListenConfig,
 	port int,
 ) (httpPort HTTPPort, err error) {
@@ -107,7 +112,7 @@ func (env *Repo) InitializeHTTP(
 	return
 }
 
-func (env *Repo) Serve(listener net.Listener) (err error) {
+func (env Server) Serve(listener net.Listener) (err error) {
 	httpServer := http.Server{Handler: env}
 
 	go func() {
@@ -139,7 +144,7 @@ func (env *Repo) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (repo *Repo) ServeStdio() (err error) {
+func (repo Server) ServeStdio() (err error) {
 	// shuts down the server when the main context is complete (on SIGHUP / SIGINT).
 	repo.After(repo.GetIn().GetFile().Close)
 	repo.After(repo.GetOut().GetFile().Close)
@@ -238,7 +243,7 @@ func (r *Response) Error(err error) {
 	r.ErrorWithStatus(http.StatusInternalServerError, err)
 }
 
-func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (local Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	request := Request{
 		MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 		Headers:    req.Header,
@@ -263,7 +268,7 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 // TODO add path multiplexing to handle versions
-func (local *Repo) ServeRequest(request Request) (response Response) {
+func (local Server) ServeRequest(request Request) (response Response) {
 	defer local.ContinueOrPanicOnDone()
 
 	ui.Log().Printf("serving: %s %s", request.Method, request.Path)

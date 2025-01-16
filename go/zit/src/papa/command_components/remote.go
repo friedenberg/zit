@@ -118,20 +118,24 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env.Options,
-) (remoteHTTP *remote_http.Remote) {
+) (remoteHTTP *remote_http.Client) {
 	remote := cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 		req,
 		xdgDotenvPath,
 		options,
 	)
 
-	remoteHTTP = &remote_http.Remote{
+	server := remote_http.Server{
+		Repo: remote,
+	}
+
+	remoteHTTP = &remote_http.Client{
 		Repo: remote,
 	}
 
 	var httpRoundTripper remote_http.HTTPRoundTripperUnixSocket
 
-	if err := httpRoundTripper.Initialize(remote); err != nil {
+	if err := httpRoundTripper.Initialize(server); err != nil {
 		req.CancelWithError(err)
 	}
 
@@ -140,7 +144,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	}
 
 	go func() {
-		if err := remote.Serve(httpRoundTripper.UnixSocket); err != nil {
+		if err := server.Serve(httpRoundTripper.UnixSocket); err != nil {
 			req.CancelWithError(err)
 		}
 	}()
@@ -151,13 +155,13 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 func (cmd *Remote) MakeRemoteStdioSSH(
 	env *env.Env,
 	arg string,
-) (remoteHTTP *remote_http.Remote) {
+) (remoteHTTP *remote_http.Client) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
 	)
 
-	remoteHTTP = &remote_http.Remote{
+	remoteHTTP = &remote_http.Client{
 		Repo: remote,
 	}
 
@@ -178,13 +182,13 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 func (cmd *Remote) MakeRemoteStdioLocal(
 	env *env.Env,
 	dir string,
-) (remoteHTTP *remote_http.Remote) {
+) (remoteHTTP *remote_http.Client) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
 	)
 
-	remoteHTTP = &remote_http.Remote{
+	remoteHTTP = &remote_http.Client{
 		Repo: remote,
 	}
 

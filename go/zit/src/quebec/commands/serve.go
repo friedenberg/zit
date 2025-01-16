@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -17,17 +18,19 @@ type Serve struct {
 	command_components.LocalWorkingCopy
 }
 
-func (c Serve) Run(dep command.Request) {
-	args := dep.Args()
-	dep.SetCancelOnSIGHUP()
+func (c Serve) Run(req command.Request) {
+	args := req.Args()
+	req.SetCancelOnSIGHUP()
 
 	localWorkingCopy := c.MakeLocalWorkingCopyWithOptions(
-		dep,
+		req,
 		env.Options{
 			UIFileIsStderr: true,
 		},
 		local_working_copy.OptionsEmpty,
 	)
+
+	server := remote_http.Server{Repo: localWorkingCopy}
 
 	// TODO switch network to be RemoteServeType
 	var network, address string
@@ -46,7 +49,7 @@ func (c Serve) Run(dep command.Request) {
 	}
 
 	if network == "-" {
-		if err := localWorkingCopy.ServeStdio(); err != nil {
+		if err := server.ServeStdio(); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	} else {
@@ -55,14 +58,14 @@ func (c Serve) Run(dep command.Request) {
 		{
 			var err error
 
-			if listener, err = localWorkingCopy.InitializeListener(network, address); err != nil {
+			if listener, err = server.InitializeListener(network, address); err != nil {
 				localWorkingCopy.CancelWithError(err)
 			}
 
 			defer localWorkingCopy.MustClose(listener)
 		}
 
-		if err := localWorkingCopy.Serve(listener); err != nil {
+		if err := server.Serve(listener); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}
