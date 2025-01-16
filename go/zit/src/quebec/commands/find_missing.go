@@ -1,52 +1,45 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type FindMissing struct{}
-
 func init() {
-	registerCommandOld(
-		"find-missing",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &FindMissing{}
-
-			return c
-		},
-	)
+	registerCommand("find-missing", &FindMissing{})
 }
 
-func (c FindMissing) Run(
-	u *local_working_copy.Repo,
-	args ...string,
-) {
+type FindMissing struct {
+	command_components.LocalWorkingCopy
+}
+
+func (cmd FindMissing) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
 	var lookupStored map[sha.Bytes][]string
 
 	{
 		var err error
 
-		if lookupStored, err = u.GetStore().MakeBlobShaBytesMap(); err != nil {
-			u.CancelWithError(err)
+		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobShaBytesMap(); err != nil {
+			dep.CancelWithError(err)
 		}
 	}
 
-	for _, shSt := range args {
+	for _, shSt := range dep.Args() {
 		var sh sha.Sha
 
 		if err := sh.Set(shSt); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
 		oids, ok := lookupStored[sh.GetBytes()]
 
 		if ok {
-			u.GetUI().Printf("%s (checked in as %q)", &sh, oids)
+			localWorkingCopy.GetUI().Printf("%s (checked in as %q)", &sh, oids)
 		} else {
-			u.GetUI().Printf("%s (missing)", &sh)
+			localWorkingCopy.GetUI().Printf("%s (missing)", &sh)
 		}
 	}
 }

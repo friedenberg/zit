@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"os"
 
@@ -11,26 +10,26 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type DormantEdit struct{}
-
 func init() {
-	registerCommandOld(
-		"dormant-edit",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &DormantEdit{}
-
-			return c
-		},
-	)
+	registerCommand("dormant-edit", &DormantEdit{})
 }
 
-func (c DormantEdit) Run(u *local_working_copy.Repo, args ...string) {
+type DormantEdit struct {
+	command_components.LocalWorkingCopy
+}
+
+func (cmd DormantEdit) Run(dep command.Dep) {
+	args := dep.Args()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
 	if len(args) > 0 {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
@@ -40,26 +39,26 @@ func (c DormantEdit) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if sh, err = c.editInVim(u); err != nil {
-			u.CancelWithError(err)
+		if sh, err = cmd.editInVim(localWorkingCopy); err != nil {
+			localWorkingCopy.CancelWithError(err)
 			return
 		}
 	}
 
-	if err := u.Reset(); err != nil {
-		u.CancelWithError(err)
+	if err := localWorkingCopy.Reset(); err != nil {
+		localWorkingCopy.CancelWithError(err)
 		return
 	}
 
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
+	if err := localWorkingCopy.Lock(); err != nil {
+		localWorkingCopy.CancelWithError(err)
 		return
 	}
 
-	defer u.Must(u.Unlock)
+	defer localWorkingCopy.Must(localWorkingCopy.Unlock)
 
-	if _, err := u.GetStore().UpdateKonfig(sh); err != nil {
-		u.CancelWithError(err)
+	if _, err := localWorkingCopy.GetStore().UpdateKonfig(sh); err != nil {
+		localWorkingCopy.CancelWithError(err)
 		return
 	}
 }
