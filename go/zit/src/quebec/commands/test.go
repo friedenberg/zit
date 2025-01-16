@@ -3,24 +3,15 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 )
 
 type Test struct{}
 
 func init() {
-	registerCommandOld(
-		"test",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Test{}
-
-			return c
-		},
-	)
+	registerCommand("test", &Test{})
 }
 
-func (c Test) Run(
-	u *local_working_copy.Repo,
-	args ...string,
-) {
-}
+func (*Test) SetFlagSet(*flag.FlagSet) {}
+
+func (c Test) Run(dep command.Dep) {}

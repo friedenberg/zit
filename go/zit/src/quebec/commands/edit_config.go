@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"flag"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -10,28 +9,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type EditConfig struct{}
-
 func init() {
-	registerCommandOld(
-		"edit-config",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &EditConfig{}
-
-			return c
-		},
-	)
+	registerCommand("edit-config", &EditConfig{})
 }
 
-func (c EditConfig) Run(
-	workingCopy *local_working_copy.Repo,
-	args ...string,
+type EditConfig struct {
+	command_components.LocalWorkingCopy
+}
+
+func (cmd EditConfig) Run(
+	dep command.Dep,
 ) {
+	args := dep.Args()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -41,22 +39,22 @@ func (c EditConfig) Run(
 	{
 		var err error
 
-		if sk, err = c.editInVim(workingCopy); err != nil {
-			workingCopy.CancelWithError(err)
+		if sk, err = cmd.editInVim(localWorkingCopy); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	workingCopy.Must(workingCopy.Reset)
-	workingCopy.Must(workingCopy.Lock)
+	localWorkingCopy.Must(localWorkingCopy.Reset)
+	localWorkingCopy.Must(localWorkingCopy.Lock)
 
-	if err := workingCopy.GetStore().CreateOrUpdate(
+	if err := localWorkingCopy.GetStore().CreateOrUpdate(
 		sk,
 		sku.StoreOptions{},
 	); err != nil {
-		workingCopy.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
-	workingCopy.Must(workingCopy.Unlock)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
 
 func (c EditConfig) editInVim(
