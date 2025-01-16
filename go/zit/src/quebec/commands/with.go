@@ -8,10 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type WithEnv interface {
-	Run(*env.Env, ...string)
-}
-
 type WithArchive interface {
 	Run(repo.Archive, ...string)
 }

@@ -73,12 +73,6 @@ func registerCommand(
 	case func(*flag.FlagSet) Command:
 		commands[n] = cmd(f)
 
-	case func(*flag.FlagSet) WithEnv:
-		commands[n] = commandWithEnv{
-			Command: cmd(f),
-			FlagSet: f,
-		}
-
 	case func(*flag.FlagSet) WithLocalWorkingCopy:
 		commands[n] = commandWithLocalWorkingCopy{
 			Command: cmd(f),

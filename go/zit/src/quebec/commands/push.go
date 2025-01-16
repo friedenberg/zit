@@ -49,7 +49,7 @@ func (cmd Push) Run(
 		local_working_copy.OptionsEmpty,
 	)
 
-	remote := cmd.MakeWorkingCopyFromFlagSet(local.Env, dependencies.FlagSet)
+	remote := cmd.MakeArchiveFromFlagSet(local.Env, dependencies.FlagSet)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
