@@ -7,32 +7,34 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("deinit", &Deinit{})
+}
+
 type Deinit struct {
+	command_components.LocalWorkingCopy
+
 	Force bool
 }
 
-func init() {
-	registerCommandOld(
-		"deinit",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Deinit{}
-
-			f.BoolVar(
-				&c.Force,
-				"force",
-				false,
-				"force deinit",
-			)
-
-			return c
-		},
+func (c *Deinit) SetFlagSet(f *flag.FlagSet) {
+	f.BoolVar(
+		&c.Force,
+		"force",
+		false,
+		"force deinit",
 	)
 }
 
-func (c Deinit) Run(u *local_working_copy.Repo, args ...string) {
+func (c Deinit) Run(dep command.Dep) {
+	// TODO switch to archive
+	u := c.MakeLocalWorkingCopy(dep)
+
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
