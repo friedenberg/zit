@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	registerCommandOld(
+	registerCommand(
 		"clone",
 		&Clone{
 			Genesis: command_components.Genesis{

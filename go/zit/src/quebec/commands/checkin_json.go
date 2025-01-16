@@ -2,24 +2,19 @@ package commands
 
 import (
 	"encoding/json"
-	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CheckinJson struct{}
-
 func init() {
-	registerCommandOld(
-		"checkin-json",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &CheckinJson{}
+	registerCommand("checkin-json", &CheckinJson{})
+}
 
-			return c
-		},
-	)
+type CheckinJson struct {
+	command_components.LocalWorkingCopy
 }
 
 func (c CheckinJson) DefaultGenres() ids.Genre {
@@ -32,11 +27,10 @@ type TomlBookmark struct {
 	Url      string
 }
 
-func (c CheckinJson) Run(
-	u *local_working_copy.Repo,
-	args ...string,
-) {
-	dec := json.NewDecoder(u.GetInFile())
+func (cmd CheckinJson) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	dec := json.NewDecoder(localWorkingCopy.GetInFile())
 
 	for {
 		var entry TomlBookmark
@@ -46,7 +40,7 @@ func (c CheckinJson) Run(
 				err = nil
 				break
 			} else {
-				u.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 	}
