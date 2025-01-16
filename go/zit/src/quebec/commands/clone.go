@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
@@ -52,10 +51,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 }
 
 func (cmd Clone) Run(dep command.Dep) {
-	repoGeneric := cmd.OnTheFirstDay(
-		dep,
-		env.Options{},
-	)
+	repoGeneric := cmd.OnTheFirstDay(dep)
 
 	remote := cmd.MakeRemoteWorkingCopy(
 		repoGeneric.GetRepoLayout().GetEnv(),

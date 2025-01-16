@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -21,8 +20,5 @@ func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *Init) Run(dep command.Dep) {
-	cmd.OnTheFirstDay(
-		dep,
-		env.Options{},
-	)
+	cmd.OnTheFirstDay(dep)
 }
