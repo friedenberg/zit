@@ -9,44 +9,49 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand(
+		"format-object",
+		&FormatObject{
+			CheckoutMode: checkout_mode.BlobOnly,
+		},
+	)
+}
+
 type FormatObject struct {
+	command_components.LocalWorkingCopy
+
 	CheckoutMode checkout_mode.Mode // add test that says this is unused for stdin
 	Stdin        bool               // switch to using `-`
 	ids.RepoId
 	UTIGroup string
 }
 
-func init() {
-	registerCommandOld(
-		"format-object",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &FormatObject{
-				CheckoutMode: checkout_mode.BlobOnly,
-			}
+func (cmd *FormatObject) SetFlagSet(f *flag.FlagSet) {
+	f.BoolVar(&cmd.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
 
-			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
+	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 
-			f.Var(&c.RepoId, "kasten", "none or Browser")
+	f.StringVar(&cmd.UTIGroup, "uti-group", "", "lookup format from UTI group")
 
-			f.StringVar(&c.UTIGroup, "uti-group", "", "lookup format from UTI group")
-
-			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
-
-			return c
-		},
-	)
+	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the zettel")
 }
 
-func (c *FormatObject) Run(u *local_working_copy.Repo, args ...string) {
-	if c.Stdin {
-		if err := c.FormatFromStdin(u, args...); err != nil {
-			u.CancelWithError(err)
+func (cmd *FormatObject) Run(dep command.Dep) {
+	args := dep.Args()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	if cmd.Stdin {
+		if err := cmd.FormatFromStdin(localWorkingCopy, args...); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 
 		return
@@ -66,7 +71,7 @@ func (c *FormatObject) Run(u *local_working_copy.Repo, args ...string) {
 		objectIdString = args[0]
 
 	default:
-		u.CancelWithErrorf(
+		localWorkingCopy.CancelWithErrorf(
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
@@ -77,8 +82,8 @@ func (c *FormatObject) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if object, err = u.GetSkuFromObjectId(objectIdString); err != nil {
-			u.CancelWithError(err)
+		if object, err = localWorkingCopy.GetSkuFromObjectId(objectIdString); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
@@ -87,41 +92,41 @@ func (c *FormatObject) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if blobFormatter, err = u.GetBlobFormatter(
+		if blobFormatter, err = localWorkingCopy.GetBlobFormatter(
 			tipe,
 			formatId,
-			c.UTIGroup,
+			cmd.UTIGroup,
 		); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
 	f := blob_store.MakeTextFormatterWithBlobFormatter(
-		u.GetRepoLayout(),
+		localWorkingCopy.GetRepoLayout(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
 		},
-		u.GetConfig(),
+		localWorkingCopy.GetConfig(),
 		blobFormatter,
 	)
 
-	if err := u.GetStore().TryFormatHook(object); err != nil {
-		u.CancelWithError(err)
+	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
+		localWorkingCopy.CancelWithError(err)
 	}
 
 	if _, err := f.WriteStringFormatWithMode(
-		u.GetUIFile(),
+		localWorkingCopy.GetUIFile(),
 		object,
-		c.CheckoutMode,
+		cmd.CheckoutMode,
 	); err != nil {
 		var errBlobFormatterFailed *object_metadata.ErrBlobFormatterFailed
 
 		if errors.As(err, &errBlobFormatterFailed) {
-			u.CancelWithError(errBlobFormatterFailed)
+			localWorkingCopy.CancelWithError(errBlobFormatterFailed)
 			// err = nil
 			// ui.Err().Print(errExit)
 		} else {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 }
