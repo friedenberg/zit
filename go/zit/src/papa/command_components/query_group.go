@@ -29,7 +29,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 func (c QueryGroup) MakeQueryGroup(
 	options query.BuilderOptions,
 	repo repo.WorkingCopy,
-	args ...string,
+	args []string,
 ) (qg *query.Group) {
 	var err error
 
@@ -59,7 +59,7 @@ func (c QueryGroup) CompleteWithRepo(
 	qg := c.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
 		local,
-		args...,
+		args,
 	)
 
 	if err := local.GetStore().QueryTransacted(

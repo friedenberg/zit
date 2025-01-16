@@ -28,7 +28,7 @@ func (c commandWithQuery) Complete(
 	qg := c.MakeQueryGroup(
 		query.MakeBuilderOptions(c.Command),
 		local,
-		args...,
+		args,
 	)
 
 	if err := local.GetStore().QueryTransacted(
@@ -46,7 +46,7 @@ func (c commandWithQuery) Run(
 	qg := c.MakeQueryGroup(
 		query.MakeBuilderOptions(c.Command),
 		local,
-		args...,
+		args,
 	)
 
 	defer local.PrintMatchedDormantIfNecessary()

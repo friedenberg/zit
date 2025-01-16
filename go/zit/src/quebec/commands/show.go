@@ -76,7 +76,7 @@ func (cmd Show) Run(dep command.Dep) {
 			qg := cmd.MakeQueryGroup(
 				query.MakeBuilderOptions(cmd),
 				localWorkingCopy,
-				args...,
+				args,
 			)
 
 			cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, qg)

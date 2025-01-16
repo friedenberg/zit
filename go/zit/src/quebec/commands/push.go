@@ -43,7 +43,7 @@ func (cmd Push) Run(dep command.Dep) {
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
-		dep.Args()[1:]...,
+		dep.Args()[1:],
 	)
 
 	switch remote := remote.(type) {

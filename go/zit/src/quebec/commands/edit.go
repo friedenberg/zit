@@ -7,36 +7,37 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand(
+		"edit",
+		&Edit{
+			Workspace:    true,
+			CheckoutMode: checkout_mode.MetadataOnly,
+		},
+	)
+}
+
 type Edit struct {
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
+
 	// TODO-P3 add force
 	Workspace bool
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
 
-func init() {
-	registerCommandWithQuery(
-		"edit",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Edit{
-				Workspace:    true,
-				CheckoutMode: checkout_mode.MetadataOnly,
-			}
+func (cmd *Edit) SetFlagSet(f *flag.FlagSet) {
+	cmd.Checkout.SetFlagSet(f)
 
-			c.Checkout.SetFlagSet(f)
-
-			f.Var(&c.CheckoutMode, "mode", "mode for checking out the object")
-			f.BoolVar(&c.Workspace, "use-workspace", true, "checkout the object into the current workspace (CWD)")
-
-			return c
-		},
-	)
+	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
+	f.BoolVar(&cmd.Workspace, "use-workspace", true, "checkout the object into the current workspace (CWD)")
 }
 
 func (c Edit) CompletionGenres() ids.Genre {
@@ -57,20 +58,28 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Edit) Run(u *local_working_copy.Repo, eqwk *query.Group) {
+func (cmd Edit) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	queryGroup := cmd.MakeQueryGroup(
+		query.MakeBuilderOptions(cmd),
+		localWorkingCopy,
+		dep.Args(),
+	)
+
 	options := checkout_options.Options{
-		CheckoutMode: c.CheckoutMode,
+		CheckoutMode: cmd.CheckoutMode,
 	}
 
 	opEdit := user_ops.Checkout{
-		Repo:    u,
+		Repo:    localWorkingCopy,
 		Options: options,
 		Edit:    true,
 	}
 
-	opEdit.Options.Workspace = c.Workspace
+	opEdit.Options.Workspace = cmd.Workspace
 
-	if _, err := opEdit.RunQuery(eqwk); err != nil {
-		u.CancelWithError(err)
+	if _, err := opEdit.RunQuery(queryGroup); err != nil {
+		localWorkingCopy.CancelWithError(err)
 	}
 }

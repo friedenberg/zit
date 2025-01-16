@@ -70,7 +70,7 @@ func (cmd Clone) Run(dep command.Dep) {
 		qg := cmd.MakeQueryGroup(
 			query.MakeBuilderOptions(cmd),
 			local,
-			dep.Args()[1:]...,
+			dep.Args()[1:],
 		)
 
 		if err := local.PullQueryGroupFromRemote(

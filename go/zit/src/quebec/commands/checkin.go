@@ -67,7 +67,7 @@ func (cmd Checkin) Run(dep command.Dep) {
 	queryGroup := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
-		dep.Args()...,
+		dep.Args(),
 	)
 
 	op := user_ops.Checkin{
