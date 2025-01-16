@@ -2,10 +2,8 @@ package command_components
 
 import (
 	"flag"
-	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -38,37 +36,17 @@ func (c LocalWorkingCopy) MakeLocalWorkingCopy(
 	return local_working_copy.Make(env, repoOptions)
 }
 
+// TODO modify to work with archives
 func (cmd LocalWorkingCopy) MakeFromConfigAndXDGDotenvPath(
 	context *errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
 	options env.Options,
 ) (local *local_working_copy.Repo, err error) {
-	dotenv := xdg.Dotenv{
-		XDG: &xdg.XDG{},
-	}
-
-	var f *os.File
-
-	if f, err = os.Open(xdgDotenvPath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = dotenv.ReadFrom(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = f.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	dirLayout := dir_layout.MakeWithXDG(
+	dirLayout := dir_layout.MakeFromXDGDotenvPath(
 		context,
-		config.Debug,
-		*dotenv.XDG,
+		config,
+		xdgDotenvPath,
 	)
 
 	env := env.Make(

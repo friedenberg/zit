@@ -16,6 +16,7 @@ import (
 type Remote struct {
 	LocalWorkingCopy
 	LocalArchive
+
 	RemoteType repo.RemoteType
 }
 

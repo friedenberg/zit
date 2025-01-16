@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
 const (
@@ -20,6 +21,40 @@ type Layout struct {
 	*errors.Context
 	beforeXDG
 	xdg.XDG
+}
+
+func MakeFromXDGDotenvPath(
+	context *errors.Context,
+	config config_mutable_cli.Config,
+	xdgDotenvPath string,
+) Layout {
+	dotenv := xdg.Dotenv{
+		XDG: &xdg.XDG{},
+	}
+
+	var f *os.File
+
+	{
+		var err error
+
+		if f, err = os.Open(xdgDotenvPath); err != nil {
+			context.CancelWithError(err)
+		}
+	}
+
+	if _, err := dotenv.ReadFrom(f); err != nil {
+		context.CancelWithError(err)
+	}
+
+	if err := f.Close(); err != nil {
+		context.CancelWithError(err)
+	}
+
+	return MakeWithXDG(
+		context,
+		config.Debug,
+		*dotenv.XDG,
+	)
 }
 
 func MakeDefault(
