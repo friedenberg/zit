@@ -64,17 +64,13 @@ func (cmd Show) DefaultGenres() ids.Genre {
 }
 
 func (cmd Show) Run(
-	dependencies command.Dep,
+	dep command.Dep,
 ) {
-	repoLayout := cmd.MakeRepoLayout(
-		dependencies.Context,
-		dependencies.Config,
-		false,
-	)
+	repoLayout := cmd.MakeRepoLayout(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 
-	args := dependencies.Args()
+	args := dep.Args()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {

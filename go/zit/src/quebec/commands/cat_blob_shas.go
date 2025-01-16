@@ -1,26 +1,21 @@
 package commands
 
 import (
-	"flag"
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CatBlobShas struct{}
+type CatBlobShas struct {
+	command_components.RepoLayout
+}
 
 func init() {
-	registerCommand(
-		"cat-blob-shas",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &CatBlobShas{}
-
-			return c
-		},
-	)
+	registerCommand("cat-blob-shas", &CatBlobShas{})
 }
 
 func (c CatBlobShas) CompletionGenres() ids.Genre {
@@ -29,14 +24,16 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) Run(u *local_working_copy.Repo, _ ...string) {
-	if err := u.GetRepoLayout().ReadAllShasForGenre(
+func (c CatBlobShas) Run(dep command.Dep) {
+	repoLayout := c.MakeRepoLayout(dep, false)
+
+	if err := repoLayout.ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
-			_, err = fmt.Fprintln(u.GetUIFile(), s)
+			_, err = fmt.Fprintln(repoLayout.GetUIFile(), s)
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		dep.CancelWithError(err)
 	}
 }

@@ -58,16 +58,12 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Last) Run(dependencies command.Dep) {
-	repoLayout := cmd.MakeRepoLayout(
-		dependencies.Context,
-		dependencies.Config,
-		false,
-	)
+func (cmd Last) Run(dep command.Dep) {
+	repoLayout := cmd.MakeRepoLayout(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 
-	if len(dependencies.Args()) != 0 {
+	if len(dep.Args()) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
