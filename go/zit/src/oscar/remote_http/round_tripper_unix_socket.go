@@ -8,13 +8,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
-type HTTPRoundTripperUnixSocket struct {
+type RoundTripperUnixSocket struct {
 	repo.UnixSocket
 	net.Conn
-	HTTPRoundTripperBufio
+	roundTripperBufio
 }
 
-func (roundTripper *HTTPRoundTripperUnixSocket) Initialize(
+func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote Server,
 ) (err error) {
 	if roundTripper.UnixSocket, err = remote.InitializeUnixSocket(

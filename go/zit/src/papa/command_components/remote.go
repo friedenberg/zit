@@ -133,7 +133,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		Repo: remote,
 	}
 
-	var httpRoundTripper remote_http.HTTPRoundTripperUnixSocket
+	var httpRoundTripper remote_http.RoundTripperUnixSocket
 
 	if err := httpRoundTripper.Initialize(server); err != nil {
 		req.CancelWithError(err)
@@ -165,7 +165,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 		Repo: remote,
 	}
 
-	var httpRoundTripper remote_http.HTTPRoundTripperStdio
+	var httpRoundTripper remote_http.RoundTripperStdio
 
 	if err := httpRoundTripper.InitializeWithSSH(
 		remote,
@@ -192,7 +192,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 		Repo: remote,
 	}
 
-	var httpRoundTripper remote_http.HTTPRoundTripperStdio
+	var httpRoundTripper remote_http.RoundTripperStdio
 
 	httpRoundTripper.Dir = dir
 

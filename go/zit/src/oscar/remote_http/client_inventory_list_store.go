@@ -10,7 +10,10 @@ func (client Client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 	return todo.Implement()
 }
 
-func (client Client) ImportInventoryList(bs interfaces.BlobStore, t *sku.Transacted) (err error) {
+func (client Client) ImportInventoryList(
+	bs interfaces.BlobStore,
+	t *sku.Transacted,
+) (err error) {
 	return todo.Implement()
 }
 

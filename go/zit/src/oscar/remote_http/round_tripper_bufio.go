@@ -7,12 +7,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-type HTTPRoundTripperBufio struct {
+type roundTripperBufio struct {
 	*bufio.Writer
 	*bufio.Reader
 }
 
-func (roundTripper *HTTPRoundTripperBufio) RoundTrip(
+func (roundTripper *roundTripperBufio) RoundTrip(
 	request *http.Request,
 ) (response *http.Response, err error) {
 	if err = request.Write(roundTripper.Writer); err != nil {

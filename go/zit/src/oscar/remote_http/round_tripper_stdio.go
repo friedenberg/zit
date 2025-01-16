@@ -12,14 +12,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-type HTTPRoundTripperStdio struct {
+type RoundTripperStdio struct {
 	exec.Cmd
 	io.WriteCloser
 	io.ReadCloser
-	HTTPRoundTripperBufio
+	roundTripperBufio
 }
 
-func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
+func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	remote *local_working_copy.Repo,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
@@ -46,7 +46,7 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
 	return
 }
 
-func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
+func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 	remote *local_working_copy.Repo,
 	arg string,
 ) (err error) {
@@ -76,7 +76,7 @@ func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
 	return
 }
 
-func (roundTripper *HTTPRoundTripperStdio) initialize(
+func (roundTripper *RoundTripperStdio) initialize(
 	remote *local_working_copy.Repo,
 ) (err error) {
 	// roundTripper.Stderr = os.Stderr
@@ -124,7 +124,7 @@ func (roundTripper *HTTPRoundTripperStdio) initialize(
 	return
 }
 
-func (roundTripper *HTTPRoundTripperStdio) cancel() (err error) {
+func (roundTripper *RoundTripperStdio) cancel() (err error) {
 	if roundTripper.Process != nil {
 		if err = roundTripper.WriteCloser.Close(); err != nil {
 			err = errors.Wrap(err)
