@@ -7,49 +7,50 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-// Switch to External store
-type Import struct {
-	immutable_config.StoreVersion
-	InventoryList string
-	command_components.RemoteBlobStore
-	PrintCopies bool
-	sku.Proto
-}
-
 func init() {
-	registerCommandOld(
+	registerCommand(
 		"import",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Import{
-				StoreVersion: immutable_config.CurrentStoreVersion,
-			}
-
-			f.Var(&c.StoreVersion, "store-version", "")
-			f.StringVar(&c.InventoryList, "inventory-list", "", "")
-			c.RemoteBlobStore.SetFlagSet(f)
-			f.BoolVar(&c.PrintCopies, "print-copies", true, "output when blobs are copied")
-
-			c.Proto.SetFlagSet(f)
-
-			return c
+		&Import{
+			StoreVersion: immutable_config.CurrentStoreVersion,
 		},
 	)
 }
 
-func (c Import) Run(local *local_working_copy.Repo, args ...string) {
-	if c.InventoryList == "" {
-		local.CancelWithBadRequestf("empty inventory list")
-		return
+// Switch to External store
+type Import struct {
+	command_components.LocalWorkingCopy
+	command_components.RemoteBlobStore
+
+	immutable_config.StoreVersion
+	InventoryList string
+	PrintCopies   bool
+	sku.Proto
+}
+
+func (cmd *Import) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.StoreVersion, "store-version", "")
+	f.StringVar(&cmd.InventoryList, "inventory-list", "", "")
+	cmd.RemoteBlobStore.SetFlagSet(f)
+	f.BoolVar(&cmd.PrintCopies, "print-copies", true, "output when blobs are copied")
+
+	cmd.Proto.SetFlagSet(f)
+}
+
+func (cmd Import) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	if cmd.InventoryList == "" {
+		dep.CancelWithBadRequestf("empty inventory list")
 	}
 
-	bf := local.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
+	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(cmd.StoreVersion)
 
 	var rc io.ReadCloser
 
@@ -57,20 +58,20 @@ func (c Import) Run(local *local_working_copy.Repo, args ...string) {
 	{
 		o := dir_layout.FileReadOptions{
 			Config: dir_layout.MakeConfig(
-				c.Config.GetAgeEncryption(),
-				c.Config.GetCompressionType(),
+				cmd.Config.GetAgeEncryption(),
+				cmd.Config.GetCompressionType(),
 				false,
 			),
-			Path: c.InventoryList,
+			Path: cmd.InventoryList,
 		}
 
 		var err error
 
 		if rc, err = dir_layout.NewFileReader(o); err != nil {
-			local.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 
-		defer local.MustClose(rc)
+		defer localWorkingCopy.MustClose(rc)
 	}
 
 	list := sku.MakeList()
@@ -81,29 +82,29 @@ func (c Import) Run(local *local_working_copy.Repo, args ...string) {
 		rc,
 		list,
 	); err != nil {
-		local.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
 	importerOptions := store.ImporterOptions{
-		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+		CheckedOutPrinter: localWorkingCopy.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
-	if c.Blobs != "" {
+	if cmd.Blobs != "" {
 		{
 			var err error
 
-			if importerOptions.RemoteBlobStore, err = c.MakeRemoteBlobStore(
-				local.Env,
+			if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
+				localWorkingCopy.Env,
 			); err != nil {
-				local.CancelWithError(err)
+				localWorkingCopy.CancelWithError(err)
 			}
 		}
 	}
 
-	importerOptions.PrintCopies = c.PrintCopies
-	importer := local.MakeImporter(importerOptions)
+	importerOptions.PrintCopies = cmd.PrintCopies
+	importer := localWorkingCopy.MakeImporter(importerOptions)
 
-	if err := local.ImportList(
+	if err := localWorkingCopy.ImportList(
 		list,
 		importer,
 	); err != nil {
@@ -111,6 +112,6 @@ func (c Import) Run(local *local_working_copy.Repo, args ...string) {
 			err = errors.Wrap(err)
 		}
 
-		local.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 }
