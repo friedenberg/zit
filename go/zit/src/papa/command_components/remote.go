@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
@@ -51,13 +52,13 @@ func (cmd Remote) MakeArchiveFromFlagSet(
 		)
 
 	case repo.RemoteTypeStdioLocal:
-		remote = repo_remote.MakeRemoteStdioLocal(
+		remote = cmd.MakeRemoteStdioLocal(
 			env,
 			remoteArg,
 		)
 
 	case repo.RemoteTypeStdioSSH:
-		remote = repo_remote.MakeRemoteStdioSSH(
+		remote = cmd.MakeRemoteStdioSSH(
 			env,
 			remoteArg,
 		)
@@ -89,13 +90,13 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 		)
 
 	case repo.RemoteTypeStdioLocal:
-		remote = repo_remote.MakeRemoteStdioLocal(
+		remote = cmd.MakeRemoteStdioLocal(
 			cmd.MakeEnv(req),
 			remoteArg,
 		)
 
 	case repo.RemoteTypeStdioSSH:
-		remote = repo_remote.MakeRemoteStdioSSH(
+		remote = cmd.MakeRemoteStdioSSH(
 			cmd.MakeEnv(req),
 			remoteArg,
 		)
@@ -154,6 +155,59 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 			req.CancelWithError(err)
 		}
 	}()
+
+	return
+}
+
+func (cmd *Remote) MakeRemoteStdioSSH(
+	env *env.Env,
+	arg string,
+) (remoteHTTP *repo_remote.HTTP) {
+	remote := local_working_copy.Make(
+		env,
+		local_working_copy.OptionsEmpty,
+	)
+
+	remoteHTTP = &repo_remote.HTTP{
+		Repo: remote,
+	}
+
+	var httpRoundTripper repo_remote.HTTPRoundTripperStdio
+
+	if err := httpRoundTripper.InitializeWithSSH(
+		remote,
+		arg,
+	); err != nil {
+		env.CancelWithError(err)
+	}
+
+	remoteHTTP.Client.Transport = &httpRoundTripper
+
+	return
+}
+
+func (cmd *Remote) MakeRemoteStdioLocal(
+	env *env.Env,
+	dir string,
+) (remoteHTTP *repo_remote.HTTP) {
+	remote := local_working_copy.Make(
+		env,
+		local_working_copy.OptionsEmpty,
+	)
+
+	remoteHTTP = &repo_remote.HTTP{
+		Repo: remote,
+	}
+
+	var httpRoundTripper repo_remote.HTTPRoundTripperStdio
+
+	httpRoundTripper.Dir = dir
+
+	if err := httpRoundTripper.InitializeWithLocal(remote); err != nil {
+		env.CancelWithError(err)
+	}
+
+	remoteHTTP.Client.Transport = &httpRoundTripper
 
 	return
 }
