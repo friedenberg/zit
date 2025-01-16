@@ -10,30 +10,32 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand(
+		"export",
+		&Export{
+			CompressionType: immutable_config.CompressionTypeEmpty,
+		},
+	)
+}
+
 type Export struct {
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
+
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
 }
 
-func init() {
-	registerCommandWithQuery(
-		"export",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Export{
-				CompressionType: immutable_config.CompressionTypeEmpty,
-			}
-
-			f.Var(&c.AgeIdentity, "age-identity", "")
-			c.CompressionType.SetFlagSet(f)
-
-			return c
-		},
-	)
+func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.AgeIdentity, "age-identity", "")
+	cmd.CompressionType.SetFlagSet(f)
 }
 
 func (c Export) DefaultSigil() ids.Sigil {
@@ -44,21 +46,29 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) Run(u *local_working_copy.Repo, qg *query.Group) {
+func (cmd Export) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	queryGroup := cmd.MakeQueryGroup(
+		query.MakeBuilderOptions(cmd),
+		localWorkingCopy,
+		dep.Args(),
+	)
+
 	var list *sku.List
 
 	{
 		var err error
 
-		if list, err = u.MakeInventoryList(qg); err != nil {
-			u.CancelWithError(err)
+		if list, err = localWorkingCopy.MakeInventoryList(queryGroup); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
 	var ag age.Age
 
-	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		u.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
+	if err := ag.AddIdentity(cmd.AgeIdentity); err != nil {
+		localWorkingCopy.CancelWithErrorAndFormat(err, "age-identity: %q", &cmd.AgeIdentity)
 	}
 
 	var wc io.WriteCloser
@@ -66,32 +76,32 @@ func (c Export) Run(u *local_working_copy.Repo, qg *query.Group) {
 	o := dir_layout.WriteOptions{
 		Config: dir_layout.MakeConfig(
 			&ag,
-			c.CompressionType,
+			cmd.CompressionType,
 			false,
 		),
-		Writer: u.GetUIFile(),
+		Writer: localWorkingCopy.GetUIFile(),
 	}
 
 	{
 		var err error
 
 		if wc, err = dir_layout.NewWriter(o); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	defer u.MustClose(wc)
+	defer localWorkingCopy.MustClose(wc)
 
 	bw := bufio.NewWriter(wc)
-	defer u.MustFlush(bw)
+	defer localWorkingCopy.MustFlush(bw)
 
-	printer := u.MakePrinterBoxArchive(bw, u.GetConfig().PrintOptions.PrintTime)
+	printer := localWorkingCopy.MakePrinterBoxArchive(bw, localWorkingCopy.GetConfig().PrintOptions.PrintTime)
 
 	var sk *sku.Transacted
 	var hasMore bool
 
 	for {
-		u.ContinueOrPanicOnDone()
+		localWorkingCopy.ContinueOrPanicOnDone()
 
 		sk, hasMore = list.Pop()
 
@@ -100,7 +110,7 @@ func (c Export) Run(u *local_working_copy.Repo, qg *query.Group) {
 		}
 
 		if err := printer(sk); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 }

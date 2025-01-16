@@ -7,25 +7,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type Diff struct{}
-
 // TODO switch to registerCommandWithExternalQuery
 func init() {
-	registerCommandWithQuery(
-		"diff",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Diff{}
+	registerCommand("diff", &Diff{})
+}
 
-			return c
-		},
-	)
+type Diff struct {
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
+}
+
+func (cmd *Diff) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopy.SetFlagSet(f)
+	cmd.QueryGroup.SetFlagSet(f)
 }
 
 func (c Diff) DefaultGenres() ids.Genre {
@@ -38,23 +40,31 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) Run(u *local_working_copy.Repo, qg *query.Group) {
+func (c Diff) Run(dep command.Dep) {
+	localWorkingCopy := c.MakeLocalWorkingCopy(dep)
+
+	queryGroup := c.MakeQueryGroup(
+		query.MakeBuilderOptions(c),
+		localWorkingCopy,
+		dep.Args(),
+	)
+
 	o := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyDescription: true,
 	}
 
 	opDiffFS := user_ops.Diff{
-		Repo: u,
+		Repo: localWorkingCopy,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				DirLayout: u.GetRepoLayout().Layout,
-				BlobStore: u.GetRepoLayout(),
+				DirLayout: localWorkingCopy.GetRepoLayout().Layout,
+				BlobStore: localWorkingCopy.GetRepoLayout(),
 			},
 		),
 	}
 
-	if err := u.GetStore().QuerySkuType(
-		qg,
+	if err := localWorkingCopy.GetStore().QuerySkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
 			if err = opDiffFS.Run(co, o); err != nil {
 				err = errors.Wrap(err)
@@ -64,6 +74,6 @@ func (c Diff) Run(u *local_working_copy.Repo, qg *query.Group) {
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 }
