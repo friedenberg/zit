@@ -78,8 +78,7 @@ func (cmd CheckinBlob) Run(dep command.Dep) {
 	}
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(
-		dep.Context,
-		dep.Config,
+		dep,
 		env.Options{},
 		local_working_copy.OptionsEmpty,
 	)

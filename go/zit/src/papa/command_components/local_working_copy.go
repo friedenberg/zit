@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
@@ -16,19 +17,18 @@ func (cmd *LocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c LocalWorkingCopy) MakeLocalWorkingCopy(
-	context *errors.Context,
-	config config_mutable_cli.Config,
+	dep command.Dep,
 	envOptions env.Options,
 	repoOptions local_working_copy.Options,
 ) *local_working_copy.Repo {
 	layout := dir_layout.MakeDefault(
-		context,
-		config.Debug,
+		dep.Context,
+		dep.Config.Debug,
 	)
 
 	env := env.Make(
-		context,
-		config,
+		dep.Context,
+		dep.Config,
 		layout,
 		envOptions,
 	)

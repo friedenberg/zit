@@ -65,8 +65,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 
 func (cmd Checkin) Run(dep command.Dep) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(
-		dep.Context,
-		dep.Config,
+		dep,
 		env.Options{},
 		local_working_copy.OptionsEmpty,
 	)

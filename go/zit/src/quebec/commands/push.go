@@ -44,8 +44,7 @@ func (cmd Push) Run(
 	dependencies command.Dep,
 ) {
 	local := cmd.MakeLocalWorkingCopy(
-		dependencies.Context,
-		dependencies.Config,
+		dependencies,
 		env.Options{},
 		local_working_copy.OptionsEmpty,
 	)
