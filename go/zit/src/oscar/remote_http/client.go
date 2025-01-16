@@ -9,17 +9,40 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
+
+type Client struct {
+	*env.Env
+	http.Client
+	// Repo repo.WorkingCopy
+	Repo *local_working_copy.Repo
+	// *local_working_copy.Repo
+}
+
+func (repo *Client) GetRepoType() repo_type.Type {
+	return repo_type.TypeUnknown
+}
+
+func (repo *Client) GetInventoryListStore() sku.InventoryListStore {
+	return repo
+}
+
+func (repo *Client) GetBlobStore() interfaces.BlobStore {
+	return &HTTPBlobStore{client: repo}
+}
 
 func (repo *Client) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
@@ -30,13 +53,13 @@ func (repo *Client) MakeExternalQueryGroup(
 	return
 }
 
-func (repo *Client) MakeInventoryList(
+func (client *Client) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		repo.Repo.Context,
+		client.Env.Context,
 		"GET",
 		"/inventory_lists",
 		strings.NewReader(qg.String()),
@@ -47,13 +70,13 @@ func (repo *Client) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = repo.Do(request); err != nil {
+	if response, err = client.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
 
-	bf := repo.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-		repo.Repo.GetConfig().GetStoreVersion(),
+	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+		client.Repo.GetConfig().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -137,7 +160,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			remoteHTTP.Repo.Context,
+			remoteHTTP.Context,
 			"POST",
 			"/inventory_lists",
 			b,
@@ -168,7 +191,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 
 	br := bufio.NewReader(response.Body)
 
-	remoteHTTP.Repo.ContinueOrPanicOnDone()
+	remoteHTTP.ContinueOrPanicOnDone()
 
 	var shas sha.Slice
 
@@ -224,7 +247,7 @@ func (remote *Client) WriteBlobToRemote(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		remote.Repo.Context,
+		remote.Context,
 		"POST",
 		"/blobs",
 		rc,
@@ -275,7 +298,7 @@ func (remote *Client) ReadObjectHistory(
 }
 
 type HTTPBlobStore struct {
-	repo *Client
+	client *Client
 }
 
 func (blobStore *HTTPBlobStore) GetBlobStore() interfaces.BlobStore {
@@ -289,12 +312,12 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if request, err = http.NewRequestWithContext(
-			blobStore.repo.Repo.Context,
+			blobStore.client.Context,
 			"HEAD",
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
 		); err != nil {
-			blobStore.repo.Repo.CancelWithError(err)
+			blobStore.client.CancelWithError(err)
 		}
 	}
 
@@ -303,8 +326,8 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	{
 		var err error
 
-		if response, err = blobStore.repo.Do(request); err != nil {
-			blobStore.repo.Repo.CancelWithError(err)
+		if response, err = blobStore.client.Do(request); err != nil {
+			blobStore.client.CancelWithError(err)
 		}
 	}
 
@@ -324,7 +347,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		blobStore.repo.Repo.Context,
+		blobStore.client.Context,
 		"GET",
 		"/blobs",
 		strings.NewReader(sh.GetShaLike().GetShaString()),
@@ -335,7 +358,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 
 	var response *http.Response
 
-	if response, err = blobStore.repo.Do(request); err != nil {
+	if response, err = blobStore.client.Do(request); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

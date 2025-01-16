@@ -130,6 +130,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	}
 
 	remoteHTTP = &remote_http.Client{
+		Env:  remote.Env,
 		Repo: remote,
 	}
 
@@ -162,6 +163,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	)
 
 	remoteHTTP = &remote_http.Client{
+		Env:  remote.Env,
 		Repo: remote,
 	}
 
@@ -189,6 +191,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	)
 
 	remoteHTTP = &remote_http.Client{
+		Env:  remote.Env,
 		Repo: remote,
 	}
 
