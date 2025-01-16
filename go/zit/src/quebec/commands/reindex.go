@@ -9,7 +9,7 @@ import (
 type Reindex struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"reindex",
 		func(_ *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Reindex{}

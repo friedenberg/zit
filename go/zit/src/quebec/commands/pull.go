@@ -20,7 +20,7 @@ type Pull struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"pull",
 		&Pull{},
 	)

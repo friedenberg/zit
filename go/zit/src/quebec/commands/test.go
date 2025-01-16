@@ -9,7 +9,7 @@ import (
 type Test struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"test",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Test{}

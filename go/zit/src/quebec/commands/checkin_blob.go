@@ -20,7 +20,7 @@ type CheckinBlob struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"checkin-blob",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &CheckinBlob{

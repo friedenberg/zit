@@ -24,7 +24,7 @@ type Import struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"import",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Import{

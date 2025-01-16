@@ -14,7 +14,7 @@ type Init struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"init",
 		func(f *flag.FlagSet) CommandOld {
 			c := &Init{}

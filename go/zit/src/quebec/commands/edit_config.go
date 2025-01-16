@@ -18,7 +18,7 @@ import (
 type EditConfig struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"edit-config",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &EditConfig{}

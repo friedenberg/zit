@@ -30,7 +30,7 @@ type New struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"new",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &New{}

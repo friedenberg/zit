@@ -16,7 +16,7 @@ type Info struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"info",
 		&Info{
 			Config: immutable_config.Default(),

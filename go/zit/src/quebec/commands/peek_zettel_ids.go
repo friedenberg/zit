@@ -12,7 +12,7 @@ import (
 type PeekZettelIds struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"peek-zettel-ids",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &PeekZettelIds{}

@@ -20,7 +20,7 @@ type Push struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"push",
 		&Push{},
 	)

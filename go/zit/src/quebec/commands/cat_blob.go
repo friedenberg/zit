@@ -18,18 +18,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("cat-blob", &CatBlob{})
+}
+
 type CatBlob struct {
 	command_components.BlobStoreLocal
 
 	Utility   script_value.Utility
 	PrefixSha bool
-}
-
-func init() {
-	registerCommand(
-		"cat-blob",
-		&CatBlob{},
-	)
 }
 
 func (cmd *CatBlob) SetFlagSet(f *flag.FlagSet) {

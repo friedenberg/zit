@@ -10,7 +10,7 @@ import (
 type DormantAdd struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"dormant-add",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &DormantAdd{}

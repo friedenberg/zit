@@ -27,10 +27,11 @@ func Commands() map[string]CommandOld {
 	return commands
 }
 
-func registerCommand(
-	n string,
-	commandOrCommandBuildFunc any,
-) {
+func registerCommand(name string, cmd Command) {
+	registerCommandOld(name, cmd)
+}
+
+func registerCommandOld(n string, commandOrCommandBuildFunc any) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
 	if _, ok := commands[n]; ok {
@@ -66,7 +67,7 @@ func registerCommandWithQuery(
 	n string,
 	makeFunc func(*flag.FlagSet) WithQuery,
 ) {
-	registerCommand(
+	registerCommandOld(
 		n,
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			cmd := &commandWithQuery{

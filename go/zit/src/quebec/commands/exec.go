@@ -16,7 +16,7 @@ import (
 type Exec struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"exec",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Exec{}

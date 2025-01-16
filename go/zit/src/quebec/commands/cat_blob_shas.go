@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type CatBlobShas struct {
-	command_components.RepoLayout
-}
-
 func init() {
 	registerCommand("cat-blob-shas", &CatBlobShas{})
+}
+
+type CatBlobShas struct {
+	command_components.RepoLayout
 }
 
 func (c CatBlobShas) CompletionGenres() ids.Genre {

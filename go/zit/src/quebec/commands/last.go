@@ -36,7 +36,7 @@ type Last struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"last",
 		&Last{},
 	)

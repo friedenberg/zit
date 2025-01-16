@@ -10,7 +10,7 @@ import (
 type FindMissing struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"find-missing",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FindMissing{}

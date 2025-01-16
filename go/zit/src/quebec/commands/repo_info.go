@@ -11,7 +11,7 @@ import (
 type RepoInfo struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"repo-info",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &RepoInfo{}

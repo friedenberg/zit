@@ -18,7 +18,7 @@ type FormatOrganize struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"format-organize",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatOrganize{

@@ -22,7 +22,7 @@ type Clone struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"clone",
 		func(f *flag.FlagSet) CommandOld {
 			c := &Clone{

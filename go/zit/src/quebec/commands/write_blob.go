@@ -17,16 +17,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("write-blob", &WriteBlob{})
+}
+
 type WriteBlob struct {
 	command_components.BlobStoreLocal
 
 	Check         bool
 	UtilityBefore script_value.Utility
 	UtilityAfter  script_value.Utility
-}
-
-func init() {
-	registerCommand("write-blob", &WriteBlob{})
 }
 
 func (cmd *WriteBlob) SetFlagSet(f *flag.FlagSet) {

@@ -16,7 +16,7 @@ type InitArchive struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"init-archive",
 		func(f *flag.FlagSet) CommandOld {
 			c := &InitArchive{

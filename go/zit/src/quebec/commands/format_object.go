@@ -23,7 +23,7 @@ type FormatObject struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"format-object",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatObject{

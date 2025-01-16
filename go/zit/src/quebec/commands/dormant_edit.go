@@ -20,7 +20,7 @@ import (
 type DormantEdit struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"dormant-edit",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &DormantEdit{}

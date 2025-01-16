@@ -31,7 +31,7 @@ type Show struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"show",
 		&Show{},
 	)

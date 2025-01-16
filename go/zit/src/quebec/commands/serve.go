@@ -13,7 +13,7 @@ type Serve struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"serve",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &Serve{}

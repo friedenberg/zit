@@ -22,7 +22,7 @@ type FormatBlob struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"format-blob",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &FormatBlob{}

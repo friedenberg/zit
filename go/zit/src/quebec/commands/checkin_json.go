@@ -12,7 +12,7 @@ import (
 type CheckinJson struct{}
 
 func init() {
-	registerCommand(
+	registerCommandOld(
 		"checkin-json",
 		func(f *flag.FlagSet) WithLocalWorkingCopy {
 			c := &CheckinJson{}
