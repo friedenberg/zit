@@ -9,44 +9,46 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("format-blob", &FormatBlob{})
+}
+
 type FormatBlob struct {
+	command_components.LocalWorkingCopy
+
 	Stdin  bool
 	Format string
 	ids.RepoId
 	UTIGroup string
 }
 
-func init() {
-	registerCommandOld(
-		"format-blob",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &FormatBlob{}
+func (cmd *FormatBlob) SetFlagSet(f *flag.FlagSet) {
+	f.BoolVar(&cmd.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
 
-			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
+	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 
-			f.Var(&c.RepoId, "kasten", "none or Browser")
-
-			f.StringVar(
-				&c.UTIGroup,
-				"uti-group",
-				"",
-				"lookup format from UTI group",
-			)
-
-			return c
-		},
+	f.StringVar(
+		&cmd.UTIGroup,
+		"uti-group",
+		"",
+		"lookup format from UTI group",
 	)
 }
 
-func (c *FormatBlob) Run(u *local_working_copy.Repo, args ...string) {
-	if c.Stdin {
-		if err := c.FormatFromStdin(u, args...); err != nil {
-			u.CancelWithError(err)
+func (cmd *FormatBlob) Run(dep command.Dep) {
+	args := dep.Args()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	if cmd.Stdin {
+		if err := cmd.FormatFromStdin(localWorkingCopy, args...); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 
 		return
@@ -66,7 +68,7 @@ func (c *FormatBlob) Run(u *local_working_copy.Repo, args ...string) {
 		objectIdString = args[0]
 
 	default:
-		u.CancelWithErrorf(
+		localWorkingCopy.CancelWithErrorf(
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
@@ -77,8 +79,8 @@ func (c *FormatBlob) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if object, err = u.GetSkuFromObjectId(objectIdString); err != nil {
-			u.CancelWithError(err)
+		if object, err = localWorkingCopy.GetSkuFromObjectId(objectIdString); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
@@ -87,34 +89,34 @@ func (c *FormatBlob) Run(u *local_working_copy.Repo, args ...string) {
 	{
 		var err error
 
-		if blobFormatter, err = u.GetBlobFormatter(
+		if blobFormatter, err = localWorkingCopy.GetBlobFormatter(
 			tipe,
 			formatId,
-			c.UTIGroup,
+			cmd.UTIGroup,
 		); err != nil {
-			u.CancelWithError(err)
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
 	f := blob_store.MakeTextFormatterWithBlobFormatter(
-		u.GetRepoLayout(),
+		localWorkingCopy.GetRepoLayout(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
 		},
-		u.GetConfig(),
+		localWorkingCopy.GetConfig(),
 		blobFormatter,
 	)
 
-	if err := u.GetStore().TryFormatHook(object); err != nil {
-		u.CancelWithError(err)
+	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
+		localWorkingCopy.CancelWithError(err)
 	}
 
 	if _, err := f.WriteStringFormatWithMode(
-		u.GetUIFile(),
+		localWorkingCopy.GetUIFile(),
 		object,
 		checkout_mode.BlobOnly,
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 }
 
