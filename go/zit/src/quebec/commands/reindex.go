@@ -1,35 +1,35 @@
 package commands
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Reindex struct{}
-
 func init() {
-	registerCommandOld(
-		"reindex",
-		func(_ *flag.FlagSet) WithLocalWorkingCopy {
-			c := &Reindex{}
-
-			return c
-		},
-	)
+	registerCommand("reindex", &Reindex{})
 }
 
-func (c Reindex) GetLocalRepoOptions() local_working_copy.Options {
-	return local_working_copy.OptionsAllowConfigReadError
+type Reindex struct {
+	command_components.LocalWorkingCopy
 }
 
-func (c Reindex) Run(u *local_working_copy.Repo, args ...string) {
+func (cmd Reindex) Run(dep command.Dep) {
+	args := dep.Args()
+
 	if len(args) > 0 {
-		u.CancelWithErrorf("reindex does not support arguments")
+		dep.CancelWithErrorf("reindex does not support arguments")
 	}
 
-	u.Must(u.Lock)
-	u.Must(u.GetConfig().Reset)
-	u.Must(u.GetStore().Reindex)
-	u.Must(u.Unlock)
+	localWorkingCopy := cmd.MakeLocalWorkingCopyWithOptions(
+		dep,
+		env.Options{},
+		local_working_copy.OptionsAllowConfigReadError,
+	)
+
+	localWorkingCopy.Must(localWorkingCopy.Lock)
+	localWorkingCopy.Must(localWorkingCopy.GetConfig().Reset)
+	localWorkingCopy.Must(localWorkingCopy.GetStore().Reindex)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
