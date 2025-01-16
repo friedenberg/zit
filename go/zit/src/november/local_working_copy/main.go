@@ -87,8 +87,8 @@ func MakeWithLayout(
 	return
 }
 
-func (u *Repo) GetRepo() repo.Repo {
-	return u
+func (u *Repo) GetRepoType() repo_type.Type {
+	return u.GetRepoLayout().GetConfig().GetRepoType()
 }
 
 func (u *Repo) GetRelayRepo() repo.Archive {

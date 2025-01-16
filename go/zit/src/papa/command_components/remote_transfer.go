@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
@@ -19,6 +20,7 @@ func (cmd *RemoteTransfer) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *RemoteTransfer) PushAllToArchive(
+	req command.Request,
 	local, remote repo.Archive,
 ) {
 	remoteInventoryListStore := remote.GetInventoryListStore()
@@ -37,6 +39,6 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 			return
 		},
 	); err != nil {
-		local.GetRepoLayout().CancelWithError(err)
+		req.CancelWithError(err)
 	}
 }

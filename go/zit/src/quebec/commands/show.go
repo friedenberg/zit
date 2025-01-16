@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -60,20 +61,21 @@ func (cmd Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) Run(dep command.Request) {
-	repoLayout := cmd.MakeRepoLayout(dep, false)
+func (cmd Show) Run(req command.Request) {
+	repoLayout := cmd.MakeRepoLayout(req, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 
-	args := dep.Args()
+	args := req.Args()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {
-		case archive.GetRepoLayout().Env.GetCLIConfig().Complete:
-			cmd.CompleteWithRepo(cmd, localWorkingCopy, args...)
+		case repoLayout.Env.GetCLIConfig().Complete:
+			cmd.CompleteWithRepo(req, cmd, localWorkingCopy, args...)
 
 		default:
 			qg := cmd.MakeQueryGroup(
+				req,
 				query.MakeBuilderOptions(cmd),
 				localWorkingCopy,
 				args,
@@ -86,7 +88,7 @@ func (cmd Show) Run(dep command.Request) {
 			ui.Err().Print("ignoring arguments for archive repo")
 		}
 
-		cmd.runWithArchive(archive)
+		cmd.runWithArchive(repoLayout.Env, archive)
 	}
 }
 
@@ -151,17 +153,18 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 }
 
 func (cmd Show) runWithArchive(
+	env *env.Env,
 	archive repo.Archive,
 	// qg *query.Group,
 ) {
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		archive.GetRepoLayout().Env,
+		env,
 		options_print.V0{}.WithPrintTai(true),
 	)
 
 	f := string_format_writer.MakeDelim(
 		"\n",
-		archive.GetRepoLayout().GetUIFile(),
+		env.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return boxFormat.WriteStringFormat(w, o)
@@ -181,6 +184,6 @@ func (cmd Show) runWithArchive(
 			return
 		},
 	); err != nil {
-		archive.GetRepoLayout().CancelWithError(err)
+		env.CancelWithError(err)
 	}
 }

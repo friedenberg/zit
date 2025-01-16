@@ -24,7 +24,12 @@ import (
 
 type Remote struct {
 	http.Client
+	// Repo *local_working_copy.Repo
 	*local_working_copy.Repo
+}
+
+func (repo *Remote) GetInventoryListStore() sku.InventoryListStore {
+	return nil
 }
 
 func (repo *Remote) GetReadWriteRepo() repo.WorkingCopy {

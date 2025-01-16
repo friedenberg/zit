@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
@@ -78,6 +79,10 @@ func (s *Store) Initialize(
 	}
 
 	return
+}
+
+func (s *Store) GetRepoType() repo_type.Type {
+	return s.GetRepoLayout().GetConfig().GetRepoType()
 }
 
 func (s *Store) Flush() (err error) {

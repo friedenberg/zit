@@ -42,6 +42,7 @@ func (cmd Push) Run(req command.Request) {
 	remote := cmd.MakeArchive(req, remoteArg)
 
 	qg := cmd.MakeQueryGroup(
+    req,
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
 		req.Args()[1:],
@@ -58,6 +59,6 @@ func (cmd Push) Run(req command.Request) {
 		}
 
 	case repo.Archive:
-		cmd.PushAllToArchive(localWorkingCopy, remote)
+		cmd.PushAllToArchive(req, localWorkingCopy, remote)
 	}
 }

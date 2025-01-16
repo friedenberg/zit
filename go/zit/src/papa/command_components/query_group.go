@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
@@ -27,6 +28,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c QueryGroup) MakeQueryGroup(
+	req command.Request,
 	options query.BuilderOptions,
 	repo repo.WorkingCopy,
 	args []string,
@@ -38,13 +40,14 @@ func (c QueryGroup) MakeQueryGroup(
 		c.ExternalQueryOptions,
 		args...,
 	); err != nil {
-		repo.GetRepoLayout().GetEnv().CancelWithError(err)
+		req.CancelWithError(err)
 	}
 
 	return
 }
 
 func (c QueryGroup) CompleteWithRepo(
+	req command.Request,
 	cmd any,
 	local *local_working_copy.Repo,
 	args ...string,
@@ -57,6 +60,7 @@ func (c QueryGroup) CompleteWithRepo(
 	defer local.MustClose(w)
 
 	qg := c.MakeQueryGroup(
+    req,
 		query.MakeBuilderOptions(cmd),
 		local,
 		args,

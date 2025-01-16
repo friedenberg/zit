@@ -48,6 +48,7 @@ func (cmd Pull) Run(req command.Request) {
 	remote := cmd.MakeRemoteWorkingCopy(req, remoteArg)
 
 	qg := cmd.MakeQueryGroup(
+    req,
 		query.MakeBuilderOptions(cmd),
 		localWorkingCopy,
 		req.Args()[1:],
@@ -66,7 +67,7 @@ func (cmd Pull) Run(req command.Request) {
 	case repo.Archive:
 		localWorkingCopy.CancelWithBadRequestf(
 			"unsupported repo type: %s (%T)",
-			remote.GetRepoLayout().GetConfig().GetRepoType(),
+			remote.GetRepoType(),
 			remote,
 		)
 	}

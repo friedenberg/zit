@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
@@ -67,23 +68,23 @@ func (cmd Last) Run(dep command.Request) {
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		cmd.runLocalWorkingCopy(localWorkingCopy)
 	} else {
-		cmd.runArchive(archive)
+		cmd.runArchive(repoLayout, archive)
 	}
 }
 
-func (c Last) runArchive(archive repo.Archive) {
+func (c Last) runArchive(repoLayout repo_layout.Layout, archive repo.Archive) {
 	if (c.Edit || c.Organize) && c.Format != "" {
-		archive.GetRepoLayout().CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
+		repoLayout.CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
 	}
 
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		archive.GetRepoLayout().Env,
+		repoLayout.Env,
 		options_print.V0{}.WithPrintTai(true),
 	)
 
 	f := string_format_writer.MakeDelim(
 		"\n",
-		archive.GetRepoLayout().GetUIFile(),
+		repoLayout.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return boxFormat.WriteStringFormat(w, o)
@@ -93,16 +94,16 @@ func (c Last) runArchive(archive repo.Archive) {
 
 	f = quiter.MakeSyncSerializer(f)
 
-	if err := c.runWithInventoryList(archive, f); err != nil {
-		archive.GetRepoLayout().CancelWithError(err)
+	if err := c.runWithInventoryList(repoLayout, archive, f); err != nil {
+		repoLayout.CancelWithError(err)
 	}
 }
 
-func (c Last) runLocalWorkingCopy(archive *local_working_copy.Repo) {
+func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		archive.GetRepoLayout().CancelWithErrorf("cannot organize and edit at the same time")
+		localWorkingCopy.GetRepoLayout().CancelWithErrorf("cannot organize and edit at the same time")
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -115,24 +116,28 @@ func (c Last) runLocalWorkingCopy(archive *local_working_copy.Repo) {
 		{
 			var err error
 
-			if f, err = archive.MakeFormatFunc(
+			if f, err = localWorkingCopy.MakeFormatFunc(
 				c.Format,
-				archive.GetRepoLayout().GetUIFile(),
+				localWorkingCopy.GetRepoLayout().GetUIFile(),
 			); err != nil {
-				archive.GetRepoLayout().CancelWithError(err)
+				localWorkingCopy.GetRepoLayout().CancelWithError(err)
 			}
 		}
 	}
 
 	f = quiter.MakeSyncSerializer(f)
 
-	if err := c.runWithInventoryList(archive, f); err != nil {
-		archive.GetRepoLayout().CancelWithError(err)
+	if err := c.runWithInventoryList(
+		localWorkingCopy.GetRepoLayout(),
+		localWorkingCopy,
+		f,
+	); err != nil {
+		localWorkingCopy.GetRepoLayout().CancelWithError(err)
 	}
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Repo: archive,
+			Repo: localWorkingCopy,
 			Metadata: organize_text.Metadata{
 				OptionCommentSet: organize_text.MakeOptionCommentSet(nil),
 			},
@@ -144,29 +149,30 @@ func (c Last) runLocalWorkingCopy(archive *local_working_copy.Repo) {
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
-				archive.GetRepoLayout().CancelWithError(err)
+				localWorkingCopy.GetRepoLayout().CancelWithError(err)
 			}
 		}
 
-		if _, err := archive.LockAndCommitOrganizeResults(results); err != nil {
-			archive.GetRepoLayout().CancelWithError(err)
+		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(results); err != nil {
+			localWorkingCopy.GetRepoLayout().CancelWithError(err)
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
-			Repo: archive,
+			Repo: localWorkingCopy,
 			Edit: true,
 		}
 
 		if _, err := opCheckout.Run(skus); err != nil {
-			archive.GetRepoLayout().CancelWithError(err)
+			localWorkingCopy.GetRepoLayout().CancelWithError(err)
 		}
 	}
 }
 
 func (c Last) runWithInventoryList(
+	repoLayout repo_layout.Layout,
 	archive repo.Archive,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -180,16 +186,16 @@ func (c Last) runWithInventoryList(
 	}
 
 	objectFormat := object_inventory_format.FormatForVersion(
-		archive.GetRepoLayout().GetStoreVersion(),
+		repoLayout.GetStoreVersion(),
 	)
 
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		archive.GetRepoLayout().Env,
+		repoLayout.Env,
 		options_print.V0{}.WithPrintTai(true),
 	)
 
 	inventoryListBlobStore := blob_store.MakeInventoryStore(
-		archive.GetRepoLayout(),
+		repoLayout,
 		objectFormat,
 		boxFormat,
 	)

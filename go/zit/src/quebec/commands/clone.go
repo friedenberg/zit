@@ -50,27 +50,28 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (cmd Clone) Run(dep command.Request) {
-	repoGeneric := cmd.OnTheFirstDay(dep)
+func (cmd Clone) Run(req command.Request) {
+	repoGeneric := cmd.OnTheFirstDay(req)
 
 	remote := cmd.MakeRemoteWorkingCopy(
-		dep,
-		dep.Args()[0],
+		req,
+		req.Args()[0],
 	)
 
 	switch local := repoGeneric.(type) {
 	default:
-		dep.CancelWithBadRequestf(
+		req.CancelWithBadRequestf(
 			"unsupported repo type: %q (%T)",
-			local.GetRepoLayout().GetConfig().GetRepoType(),
+			local.GetRepoType(),
 			local,
 		)
 
 	case repo.WorkingCopy:
 		qg := cmd.MakeQueryGroup(
+      req,
 			query.MakeBuilderOptions(cmd),
 			local,
-			dep.Args()[1:],
+			req.Args()[1:],
 		)
 
 		if err := local.PullQueryGroupFromRemote(
@@ -78,10 +79,10 @@ func (cmd Clone) Run(dep command.Request) {
 			qg,
 			cmd.RemoteTransferOptions.WithPrintCopies(true),
 		); err != nil {
-			dep.CancelWithError(err)
+			req.CancelWithError(err)
 		}
 
 	case repo.Archive:
-		cmd.PushAllToArchive(local, remote)
+		cmd.PushAllToArchive(req, local, remote)
 	}
 }
