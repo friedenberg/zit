@@ -5,11 +5,12 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type HTTPRoundTripperUnixSocket struct {
-	local_working_copy.UnixSocket
+	repo.UnixSocket
 	net.Conn
 	HTTPRoundTripperBufio
 }

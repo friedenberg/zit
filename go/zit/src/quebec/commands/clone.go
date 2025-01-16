@@ -54,7 +54,7 @@ func (cmd Clone) Run(dep command.Request) {
 	repoGeneric := cmd.OnTheFirstDay(dep)
 
 	remote := cmd.MakeRemoteWorkingCopy(
-		repoGeneric.GetRepoLayout().GetEnv(),
+		dep,
 		dep.Args()[0],
 	)
 

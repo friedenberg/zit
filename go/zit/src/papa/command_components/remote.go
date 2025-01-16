@@ -6,14 +6,15 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
 type Remote struct {
+	Env
+	RepoLayout
 	LocalWorkingCopy
 	LocalArchive
 
@@ -25,54 +26,38 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Remote) MakeWorkingCopyFromFlagSet(
-	env *env.Env,
-	f *flag.FlagSet,
+	req command.Request,
 ) (remote repo.WorkingCopy) {
-	if len(f.Args()) == 0 {
+	if len(req.Args()) == 0 {
 		// TODO add info about remote options
-		env.CancelWithBadRequestf("requires a remote to be specified")
+		req.CancelWithBadRequestf("requires a remote to be specified")
 	}
 
-	return cmd.MakeRemoteWorkingCopy(env, f.Args()[0])
+	return cmd.MakeRemoteWorkingCopy(req, req.Args()[0])
 }
 
 // TODO
 func (cmd Remote) MakeArchiveFromFlagSet(
-	env *env.Env,
-	f *flag.FlagSet,
+	req command.Request,
 ) (remote repo.Archive) {
-	remoteArg := f.Args()[0]
+	remoteArg := req.Args()[0]
+	env := cmd.MakeEnv(req)
 
 	var err error
 
 	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		if remote, err = cmd.MakeFromConfigAndXDGDotenvPath(
-			env.Context,
-			env.GetCLIConfig(),
+		remote = cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+			req,
 			remoteArg,
 			env.GetOptions(),
-		); err != nil {
-			env.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				cmd.RemoteType,
-				remoteArg,
-			)
-		}
+		)
 
 	case repo.RemoteTypeStdioLocal:
-		if remote, err = repo_remote.MakeRemoteStdioLocal(
+		remote = repo_remote.MakeRemoteStdioLocal(
 			env,
 			remoteArg,
-		); err != nil {
-			env.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				cmd.RemoteType,
-				remoteArg,
-			)
-		}
+		)
 
 	case repo.RemoteTypeStdioSSH:
 		if remote, err = repo_remote.MakeRemoteStdioSSH(
@@ -89,8 +74,7 @@ func (cmd Remote) MakeArchiveFromFlagSet(
 
 	case repo.RemoteTypeSocketUnix:
 		if remote, err = cmd.MakeRemoteHTTPFromXDGDotenvPath(
-			env.Context,
-			env.GetCLIConfig(),
+			req,
 			remoteArg,
 			env.GetOptions(),
 		); err != nil {
@@ -110,46 +94,31 @@ func (cmd Remote) MakeArchiveFromFlagSet(
 }
 
 func (cmd Remote) MakeRemoteWorkingCopy(
-	env *env.Env,
+	req command.Request,
 	remoteArg string,
 ) (remote repo.WorkingCopy) {
 	var err error
 
 	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		if remote, err = cmd.MakeFromConfigAndXDGDotenvPath(
-			env.Context,
-			env.GetCLIConfig(),
+		remote = cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+			req,
 			remoteArg,
-			env.GetOptions(),
-		); err != nil {
-			env.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				cmd.RemoteType,
-				remoteArg,
-			)
-		}
+			env.Options{},
+		)
 
 	case repo.RemoteTypeStdioLocal:
-		if remote, err = repo_remote.MakeRemoteStdioLocal(
-			env,
+		remote = repo_remote.MakeRemoteStdioLocal(
+			cmd.MakeEnv(req),
 			remoteArg,
-		); err != nil {
-			env.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				cmd.RemoteType,
-				remoteArg,
-			)
-		}
+		)
 
 	case repo.RemoteTypeStdioSSH:
 		if remote, err = repo_remote.MakeRemoteStdioSSH(
-			env,
+			cmd.MakeEnv(req),
 			remoteArg,
 		); err != nil {
-			env.CancelWithErrorAndFormat(
+			req.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
 				cmd.RemoteType,
@@ -159,12 +128,11 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 
 	case repo.RemoteTypeSocketUnix:
 		if remote, err = cmd.MakeRemoteHTTPFromXDGDotenvPath(
-			env.Context,
-			env.GetCLIConfig(),
+			req,
 			remoteArg,
-			env.GetOptions(),
+			env.Options{},
 		); err != nil {
-			env.CancelWithErrorAndFormat(
+			req.CancelWithErrorAndFormat(
 				err,
 				"RemoteType: %q, Remote: %q",
 				cmd.RemoteType,
@@ -173,29 +141,32 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 		}
 
 	default:
-		env.CancelWithNotImplemented()
+		req.CancelWithNotImplemented()
 	}
 
 	return
 }
 
+func (cmd *Remote) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+	req command.Request,
+	xdgDotenvPath string,
+	options env.Options,
+) repo.Archive {
+	repoLayout := cmd.MakeRepoLayout(req, false)
+
+	return cmd.MakeLocalArchive(repoLayout)
+}
+
 func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
-	context *errors.Context,
-	config config_mutable_cli.Config,
+	req command.Request,
 	xdgDotenvPath string,
 	options env.Options,
 ) (remoteHTTP *repo_remote.HTTP, err error) {
-	var remote *local_working_copy.Repo
-
-	if remote, err = cmd.MakeFromConfigAndXDGDotenvPath(
-		context,
-		config,
+	remote := cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+		req,
 		xdgDotenvPath,
 		options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	remoteHTTP = &repo_remote.HTTP{
 		Repo: remote,
@@ -214,7 +185,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 
 	go func() {
 		if err := remote.Serve(httpRoundTripper.UnixSocket); err != nil {
-			remote.CancelWithError(err)
+			req.CancelWithError(err)
 		}
 	}()
 

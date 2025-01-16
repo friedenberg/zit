@@ -17,6 +17,7 @@ type Archive interface {
 	Repo
 	GetBlobStore() interfaces.BlobStore
 	GetInventoryListStore() sku.InventoryListStore
+	// InitializeUnixSocket(config net.ListenConfig, path string) (UnixSocket, error)
 }
 
 type WorkingCopy interface {

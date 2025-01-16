@@ -38,7 +38,7 @@ func (c Push) DefaultGenres() ids.Genre {
 func (cmd Push) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	remote := cmd.MakeArchiveFromFlagSet(localWorkingCopy.Env, dep.FlagSet)
+	remote := cmd.MakeArchiveFromFlagSet(dep)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),

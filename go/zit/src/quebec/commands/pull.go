@@ -11,14 +11,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	command.Register("pull", &Pull{})
+}
+
 type Pull struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteTransfer
 	command_components.QueryGroup
-}
-
-func init() {
-	command.Register("pull", &Pull{})
 }
 
 func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
@@ -38,7 +38,7 @@ func (c Pull) DefaultGenres() ids.Genre {
 func (cmd Pull) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	remote := cmd.MakeWorkingCopyFromFlagSet(localWorkingCopy.Env, dep.FlagSet)
+	remote := cmd.MakeWorkingCopyFromFlagSet(dep)
 
 	qg := cmd.MakeQueryGroup(
 		query.MakeBuilderOptions(cmd),

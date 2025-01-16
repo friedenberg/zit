@@ -9,7 +9,7 @@ import (
 func MakeRemoteStdioLocal(
 	env *env.Env,
 	dir string,
-) (remoteHTTP *HTTP, err error) {
+) (remoteHTTP *HTTP) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
@@ -23,9 +23,8 @@ func MakeRemoteStdioLocal(
 
 	httpRoundTripper.Dir = dir
 
-	if err = httpRoundTripper.InitializeWithLocal(remote); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := httpRoundTripper.InitializeWithLocal(remote); err != nil {
+		env.CancelWithError(err)
 	}
 
 	remoteHTTP.Client.Transport = &httpRoundTripper

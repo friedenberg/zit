@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -54,19 +55,14 @@ func (env *Repo) InitializeListener(
 	return
 }
 
-type UnixSocket struct {
-	net.Listener
-	Path string
-}
-
-func (env *Repo) InitializeUnixSocket(
+func (repo *Repo) InitializeUnixSocket(
 	config net.ListenConfig,
 	path string,
-) (sock UnixSocket, err error) {
+) (sock repo.UnixSocket, err error) {
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := env.GetRepoLayout().GetXDG().State
+		dir := repo.GetRepoLayout().GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -78,7 +74,7 @@ func (env *Repo) InitializeUnixSocket(
 
 	ui.Log().Printf("starting unix domain server on socket: %q", sock.Path)
 
-	if sock.Listener, err = config.Listen(env.Context, "unix", sock.Path); err != nil {
+	if sock.Listener, err = config.Listen(repo.Context, "unix", sock.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
