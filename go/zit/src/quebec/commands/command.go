@@ -62,21 +62,3 @@ func registerCommandOld(n string, commandOrCommandBuildFunc any) {
 		panic(fmt.Sprintf("command or command build func not supported: %T", cmd))
 	}
 }
-
-func registerCommandWithQuery(
-	n string,
-	makeFunc func(*flag.FlagSet) WithQuery,
-) {
-	registerCommandOld(
-		n,
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			cmd := &commandWithQuery{
-				Command: makeFunc(f),
-			}
-
-			cmd.SetFlagSet(f)
-
-			return cmd
-		},
-	)
-}

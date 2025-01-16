@@ -23,8 +23,7 @@ func init() {
 }
 
 type Clean struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 
 	force                    bool
 	includeRecognizedBlobs   bool
@@ -34,8 +33,7 @@ type Clean struct {
 }
 
 func (c *Clean) SetFlagSet(f *flag.FlagSet) {
-	c.LocalWorkingCopy.SetFlagSet(f)
-	c.QueryGroup.SetFlagSet(f)
+	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
 	f.BoolVar(
 		&c.force,
@@ -77,12 +75,9 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 }
 
 func (cmd Clean) Run(dep command.Dep) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
-
-	queryGroup := cmd.MakeQueryGroup(
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
 		query.MakeBuilderOptions(cmd),
-		localWorkingCopy,
-		dep.Args(),
 	)
 
 	if cmd.organize {

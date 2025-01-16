@@ -21,13 +21,11 @@ func init() {
 }
 
 type Diff struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 }
 
 func (cmd *Diff) SetFlagSet(f *flag.FlagSet) {
-	cmd.LocalWorkingCopy.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 }
 
 func (c Diff) DefaultGenres() ids.Genre {
@@ -40,13 +38,10 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) Run(dep command.Dep) {
-	localWorkingCopy := c.MakeLocalWorkingCopy(dep)
-
-	queryGroup := c.MakeQueryGroup(
-		query.MakeBuilderOptions(c),
-		localWorkingCopy,
-		dep.Args(),
+func (cmd Diff) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
 	)
 
 	o := checkout_options.TextFormatterOptions{

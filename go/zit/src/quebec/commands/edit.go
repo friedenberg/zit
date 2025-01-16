@@ -24,8 +24,7 @@ func init() {
 }
 
 type Edit struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 
 	// TODO-P3 add force
 	Workspace bool
@@ -34,6 +33,8 @@ type Edit struct {
 }
 
 func (cmd *Edit) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+
 	cmd.Checkout.SetFlagSet(f)
 
 	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
@@ -59,12 +60,9 @@ func (c Edit) DefaultGenres() ids.Genre {
 }
 
 func (cmd Edit) Run(dep command.Dep) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
-
-	queryGroup := cmd.MakeQueryGroup(
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
 		query.MakeBuilderOptions(cmd),
-		localWorkingCopy,
-		dep.Args(),
 	)
 
 	options := checkout_options.Options{

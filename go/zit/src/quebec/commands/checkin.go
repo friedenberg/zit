@@ -20,8 +20,7 @@ func init() {
 }
 
 type Checkin struct {
-	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 
 	IgnoreBlob bool
 	Proto      sku.Proto
@@ -33,6 +32,8 @@ type Checkin struct {
 }
 
 func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+
 	f.BoolVar(
 		&cmd.IgnoreBlob,
 		"ignore-blob",
@@ -62,12 +63,9 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 }
 
 func (cmd Checkin) Run(dep command.Dep) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
-
-	queryGroup := cmd.MakeQueryGroup(
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
 		query.MakeBuilderOptions(cmd),
-		localWorkingCopy,
-		dep.Args(),
 	)
 
 	op := user_ops.Checkin{
