@@ -1,35 +1,31 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type DormantAdd struct{}
-
 func init() {
-	registerCommandOld(
-		"dormant-add",
-		func(f *flag.FlagSet) WithLocalWorkingCopy {
-			c := &DormantAdd{}
-
-			return c
-		},
-	)
+	registerCommand("dormant-add", &DormantAdd{})
 }
 
-func (c DormantAdd) Run(u *local_working_copy.Repo, args ...string) {
-	u.Must(u.Lock)
+type DormantAdd struct {
+	command_components.LocalWorkingCopy
+}
 
-	for _, v := range args {
+func (cmd DormantAdd) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	localWorkingCopy.Must(localWorkingCopy.Lock)
+
+	for _, v := range dep.Args() {
 		cs := catgut.MakeFromString(v)
 
-		if err := u.GetDormantIndex().AddDormantTag(cs); err != nil {
-			u.CancelWithError(err)
+		if err := localWorkingCopy.GetDormantIndex().AddDormantTag(cs); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	u.Must(u.Unlock)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
