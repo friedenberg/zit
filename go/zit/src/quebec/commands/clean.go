@@ -8,15 +8,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand("clean", &Clean{})
+}
+
 type Clean struct {
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
+
 	force                    bool
 	includeRecognizedBlobs   bool
 	includeRecognizedZettels bool
@@ -24,45 +33,39 @@ type Clean struct {
 	organize                 bool
 }
 
-func init() {
-	registerCommandWithQuery(
-		"clean",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Clean{}
+func (c *Clean) SetFlagSet(f *flag.FlagSet) {
+	c.LocalWorkingCopy.SetFlagSet(f)
+	c.QueryGroup.SetFlagSet(f)
 
-			f.BoolVar(
-				&c.force,
-				"force",
-				false,
-				"remove objects in working directory even if they have changes",
-			)
-
-			f.BoolVar(
-				&c.includeParent,
-				"include-mutter",
-				false,
-				"remove objects in working directory if they match their Mutter",
-			)
-
-			f.BoolVar(
-				&c.includeRecognizedBlobs,
-				"recognized-blobs",
-				false,
-				"remove blobs in working directory or args that are recognized",
-			)
-
-			f.BoolVar(
-				&c.includeRecognizedZettels,
-				"recognized-zettelen",
-				false,
-				"remove Zetteln in working directory or args that are recognized",
-			)
-
-			f.BoolVar(&c.organize, "organize", false, "")
-
-			return c
-		},
+	f.BoolVar(
+		&c.force,
+		"force",
+		false,
+		"remove objects in working directory even if they have changes",
 	)
+
+	f.BoolVar(
+		&c.includeParent,
+		"include-mutter",
+		false,
+		"remove objects in working directory if they match their Mutter",
+	)
+
+	f.BoolVar(
+		&c.includeRecognizedBlobs,
+		"recognized-blobs",
+		false,
+		"remove blobs in working directory or args that are recognized",
+	)
+
+	f.BoolVar(
+		&c.includeRecognizedZettels,
+		"recognized-zettelen",
+		false,
+		"remove Zetteln in working directory or args that are recognized",
+	)
+
+	f.BoolVar(&c.organize, "organize", false, "")
 }
 
 func (c Clean) DefaultGenres() ids.Genre {
@@ -73,28 +76,33 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
 
-func (c Clean) Run(
-	u *local_working_copy.Repo,
-	qg *query.Group,
-) {
-	if c.organize {
-		if err := c.runOrganize(u, qg); err != nil {
-			u.CancelWithError(err)
+func (cmd Clean) Run(dep command.Dep) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+
+	queryGroup := cmd.MakeQueryGroup(
+		query.MakeBuilderOptions(cmd),
+		localWorkingCopy,
+		dep.Args(),
+	)
+
+	if cmd.organize {
+		if err := cmd.runOrganize(localWorkingCopy, queryGroup); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 
 		return
 	}
 
-	u.Must(u.Lock)
+	localWorkingCopy.Must(localWorkingCopy.Lock)
 
-	if err := u.GetStore().QuerySkuType(
-		qg,
+	if err := localWorkingCopy.GetStore().QuerySkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
-			if !c.shouldClean(u, co, qg) {
+			if !cmd.shouldClean(localWorkingCopy, co, queryGroup) {
 				return
 			}
 
-			if err = u.GetStore().DeleteCheckedOut(co); err != nil {
+			if err = localWorkingCopy.GetStore().DeleteCheckedOut(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -102,10 +110,10 @@ func (c Clean) Run(
 			return
 		},
 	); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
-	u.Must(u.Unlock)
+	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
 
 func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Group) (err error) {
