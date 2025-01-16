@@ -22,31 +22,31 @@ type Deinit struct {
 	Force bool
 }
 
-func (c *Deinit) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Deinit) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(
-		&c.Force,
+		&cmd.Force,
 		"force",
 		false,
 		"force deinit",
 	)
 }
 
-func (c Deinit) Run(dep command.Dep) {
+func (cmd Deinit) Run(dep command.Dep) {
 	// TODO switch to archive
-	u := c.MakeLocalWorkingCopy(dep)
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	if !c.Force && !c.getPermission(u) {
+	if !cmd.Force && !cmd.getPermission(localWorkingCopy) {
 		return
 	}
 
-	base := path.Join(u.GetRepoLayout().Dir())
+	base := path.Join(localWorkingCopy.GetRepoLayout().Dir())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
-		u.CancelWithError(err)
+		localWorkingCopy.CancelWithError(err)
 	}
 
-	if err := u.GetRepoLayout().DeleteAll(base); err != nil {
-		u.CancelWithError(err)
+	if err := localWorkingCopy.GetRepoLayout().DeleteAll(base); err != nil {
+		localWorkingCopy.CancelWithError(err)
 	}
 }
 

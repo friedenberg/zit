@@ -14,46 +14,32 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
-type Clone struct {
-	*flag.FlagSet
-	command_components.Genesis
-	command_components.RemoteTransfer
-	command_components.QueryGroup
-}
-
 func init() {
 	registerCommandOld(
 		"clone",
-		func(f *flag.FlagSet) CommandOld {
-			c := &Clone{
-				FlagSet: f,
-				Genesis: command_components.Genesis{
-					BigBang: repo_layout.BigBang{
-						ExcludeDefaultType: true,
-					},
+		&Clone{
+			Genesis: command_components.Genesis{
+				BigBang: repo_layout.BigBang{
+					ExcludeDefaultType: true,
 				},
-			}
-
-			c.SetFlagSet(f)
-			c.Config.RepoType = repo_type.TypeWorkingCopy
-
-			return c
+			},
 		},
 	)
 }
 
-func (cmd *Clone) GetCommandWithDependencies() CommandOld {
-	return cmd
-}
-
-func (cmd *Clone) GetFlagSet() *flag.FlagSet {
-	return cmd.FlagSet
+type Clone struct {
+	command_components.Genesis
+	command_components.RemoteTransfer
+	command_components.QueryGroup
 }
 
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.Genesis.SetFlagSet(f)
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
+
+  // must happen after genesis set flag set as cmd.Config is nil until then
+	cmd.Config.RepoType = repo_type.TypeWorkingCopy
 }
 
 func (c Clone) DefaultSigil() ids.Sigil {
@@ -65,23 +51,21 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (cmd Clone) Run(
-	dependencies command.Dep,
-) {
+func (cmd Clone) Run(dep command.Dep) {
 	repoGeneric := cmd.OnTheFirstDay(
-		dependencies.Context,
-		dependencies.Config,
+		dep.Context,
+		dep.Config,
 		env.Options{},
 	)
 
 	remote := cmd.MakeRemoteWorkingCopy(
 		repoGeneric.GetRepoLayout().GetEnv(),
-		cmd.GetFlagSet().Args()[0],
+		dep.Args()[0],
 	)
 
 	switch local := repoGeneric.(type) {
 	default:
-		dependencies.CancelWithBadRequestf(
+		dep.CancelWithBadRequestf(
 			"unsupported repo type: %q (%T)",
 			local.GetRepoLayout().GetConfig().GetRepoType(),
 			local,
@@ -91,7 +75,7 @@ func (cmd Clone) Run(
 		qg := cmd.MakeQueryGroup(
 			query.MakeBuilderOptions(cmd),
 			local,
-			cmd.Args()[1:]...,
+			dep.Args()[1:]...,
 		)
 
 		if err := local.PullQueryGroupFromRemote(
@@ -99,7 +83,7 @@ func (cmd Clone) Run(
 			qg,
 			cmd.RemoteTransferOptions.WithPrintCopies(true),
 		); err != nil {
-			dependencies.CancelWithError(err)
+			dep.CancelWithError(err)
 		}
 
 	case repo.Archive:
