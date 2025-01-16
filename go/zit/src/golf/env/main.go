@@ -23,7 +23,7 @@ type Env struct {
 	out fd.Std
 	err fd.Std
 
-	dir_layout.Layout
+	dir_layout.Layout // not valid for remotes
 
 	debug *debug.Context
 

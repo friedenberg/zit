@@ -25,11 +25,14 @@ import (
 )
 
 type Client struct {
-	*env.Env
 	http.Client
 	// Repo repo.WorkingCopy
 	Repo *local_working_copy.Repo
 	// *local_working_copy.Repo
+}
+
+func (repo *Client) GetEnv() *env.Env {
+	return repo.Repo.GetEnv()
 }
 
 func (repo *Client) GetRepoType() repo_type.Type {
@@ -59,7 +62,7 @@ func (client *Client) MakeInventoryList(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		client.Env.Context,
+		client.GetEnv().Context,
 		"GET",
 		"/inventory_lists",
 		strings.NewReader(qg.String()),
@@ -160,7 +163,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			remoteHTTP.Context,
+			remoteHTTP.GetEnv().Context,
 			"POST",
 			"/inventory_lists",
 			b,
@@ -191,7 +194,7 @@ func (remoteHTTP *Client) pullQueryGroupFromWorkingCopy(
 
 	br := bufio.NewReader(response.Body)
 
-	remoteHTTP.ContinueOrPanicOnDone()
+	remoteHTTP.GetEnv().ContinueOrPanicOnDone()
 
 	var shas sha.Slice
 
@@ -247,7 +250,7 @@ func (remote *Client) WriteBlobToRemote(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		remote.Context,
+		remote.GetEnv().Context,
 		"POST",
 		"/blobs",
 		rc,
@@ -312,12 +315,12 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if request, err = http.NewRequestWithContext(
-			blobStore.client.Context,
+			blobStore.client.GetEnv().Context,
 			"HEAD",
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
 		); err != nil {
-			blobStore.client.CancelWithError(err)
+			blobStore.client.GetEnv().CancelWithError(err)
 		}
 	}
 
@@ -327,7 +330,7 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if response, err = blobStore.client.Do(request); err != nil {
-			blobStore.client.CancelWithError(err)
+			blobStore.client.GetEnv().CancelWithError(err)
 		}
 	}
 
@@ -347,7 +350,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		blobStore.client.Context,
+		blobStore.client.GetEnv().Context,
 		"GET",
 		"/blobs",
 		strings.NewReader(sh.GetShaLike().GetShaString()),
