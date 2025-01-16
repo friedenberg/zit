@@ -1,7 +1,6 @@
 package repo_remote
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
@@ -35,7 +34,7 @@ func MakeRemoteStdioLocal(
 func MakeRemoteStdioSSH(
 	env *env.Env,
 	arg string,
-) (remoteHTTP *HTTP, err error) {
+) (remoteHTTP *HTTP) {
 	remote := local_working_copy.Make(
 		env,
 		local_working_copy.OptionsEmpty,
@@ -47,12 +46,11 @@ func MakeRemoteStdioSSH(
 
 	var httpRoundTripper HTTPRoundTripperStdio
 
-	if err = httpRoundTripper.InitializeWithSSH(
+	if err := httpRoundTripper.InitializeWithSSH(
 		remote,
 		arg,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
+		env.CancelWithError(err)
 	}
 
 	remoteHTTP.Client.Transport = &httpRoundTripper
