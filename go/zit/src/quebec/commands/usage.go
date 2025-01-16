@@ -23,7 +23,7 @@ func PrintUsage(ctx *errors.Context, in error) {
 	fs := make([]*flag.FlagSet, 0, len(commands))
 
 	for name, cmd := range commands {
-		f := flag.NewFlagSet(name, flag.ExitOnError)
+		f := flag.NewFlagSet(name, flag.ContinueOnError)
 		cmd.SetFlagSet(f)
 		fs = append(fs, f)
 	}

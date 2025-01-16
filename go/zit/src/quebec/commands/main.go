@@ -32,7 +32,7 @@ func Run(
 		)
 	}
 
-	f := flag.NewFlagSet(specifiedSubcommand, flag.ExitOnError)
+	f := flag.NewFlagSet(specifiedSubcommand, flag.ContinueOnError)
 	cmd.SetFlagSet(f)
 
 	args = args[2:]
