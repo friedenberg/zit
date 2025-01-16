@@ -20,6 +20,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
+func init() {
+	registerCommand("show", &Show{})
+}
+
 type Show struct {
 	command_components.RepoLayout
 	command_components.LocalArchive
@@ -28,13 +32,6 @@ type Show struct {
 	After  ids.Tai
 	Before ids.Tai
 	Format string
-}
-
-func init() {
-	registerCommandOld(
-		"show",
-		&Show{},
-	)
 }
 
 func (cmd *Show) SetFlagSet(f *flag.FlagSet) {
@@ -63,9 +60,7 @@ func (cmd Show) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) Run(
-	dep command.Dep,
-) {
+func (cmd Show) Run(dep command.Dep) {
 	repoLayout := cmd.MakeRepoLayout(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)

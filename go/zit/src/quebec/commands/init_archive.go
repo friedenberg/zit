@@ -10,35 +10,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
 
-type InitArchive struct {
-	*flag.FlagSet
-	repo_layout.BigBang
-}
-
 func init() {
-	registerCommandOld(
+	registerCommand(
 		"init-archive",
-		func(f *flag.FlagSet) CommandOld {
-			c := &InitArchive{
-				FlagSet: f,
-				BigBang: repo_layout.BigBang{},
-			}
-
-			c.SetFlagSet(f)
-			c.Config.RepoType = repo_type.TypeArchive
-
-			return c
+		&InitArchive{
+			BigBang: repo_layout.BigBang{},
 		},
 	)
 }
 
-func (c InitArchive) GetFlagSet() *flag.FlagSet {
-	return c.FlagSet
+type InitArchive struct {
+	repo_layout.BigBang
 }
 
-func (c InitArchive) Run(
-	dependencies command.Dep,
-) {
+func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
+	c.BigBang.SetFlagSet(f)
+	c.Config.RepoType = repo_type.TypeArchive
+}
+
+func (c InitArchive) Run(dependencies command.Dep) {
 	layout := dir_layout.MakeDefault(
 		dependencies.Context,
 		dependencies.Debug,
