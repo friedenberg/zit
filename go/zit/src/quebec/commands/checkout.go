@@ -7,33 +7,34 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+func init() {
+	registerCommand(
+		"checkout",
+		&Checkout{
+			CheckoutOptions: checkout_options.Options{
+				CheckoutMode: checkout_mode.MetadataOnly,
+			},
+		},
+	)
+}
+
 type Checkout struct {
+	command_components.LocalWorkingCopyWithQueryGroup
+
 	CheckoutOptions checkout_options.Options
 	Organize        bool
 }
 
-func init() {
-	registerCommandWithQuery(
-		"checkout",
-		func(f *flag.FlagSet) WithQuery {
-			c := &Checkout{
-				CheckoutOptions: checkout_options.Options{
-					CheckoutMode: checkout_mode.MetadataOnly,
-				},
-			}
-
-			f.BoolVar(&c.Organize, "organize", false, "")
-
-			c.CheckoutOptions.SetFlagSet(f)
-
-			return c
-		},
-	)
+func (c *Checkout) SetFlagSet(f *flag.FlagSet) {
+	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	f.BoolVar(&c.Organize, "organize", false, "")
+	c.CheckoutOptions.SetFlagSet(f)
 }
 
 func (c Checkout) DefaultGenres() ids.Genre {
@@ -50,16 +51,21 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkout) Run(u *local_working_copy.Repo, qg *query.Group) {
+func (cmd Checkout) Run(dep command.Dep) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+		dep,
+		query.MakeBuilderOptions(cmd),
+	)
+
 	opCheckout := user_ops.Checkout{
-		Repo:     u,
-		Organize: c.Organize,
-		Options:  c.CheckoutOptions,
+		Repo:     localWorkingCopy,
+		Organize: cmd.Organize,
+		Options:  cmd.CheckoutOptions,
 	}
 
 	opCheckout.Options.Workspace = true
 
-	if _, err := opCheckout.RunQuery(qg); err != nil {
-		u.CancelWithError(err)
+	if _, err := opCheckout.RunQuery(queryGroup); err != nil {
+		localWorkingCopy.CancelWithError(err)
 	}
 }
