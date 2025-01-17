@@ -18,7 +18,7 @@ type Getter interface {
 }
 
 type Layout struct {
-	env.IEnv
+	env.Env
 
 	config config
 
@@ -35,10 +35,10 @@ type Layout struct {
 }
 
 func Make(
-	env env.IEnv,
+	env env.Env,
 	o Options,
 ) (s Layout, err error) {
-	s.IEnv = env
+	s.Env = env
 
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(dir_layout.EnvDir)
@@ -114,7 +114,7 @@ func (s *Layout) setupStores() (err error) {
 		return
 	}
 
-	s.CopyingBlobStore = MakeCopyingBlobStore(s.IEnv, s.local, s.remote)
+	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
@@ -126,8 +126,8 @@ func (s *Layout) setupStores() (err error) {
 	return
 }
 
-func (a Layout) GetEnv() env.IEnv {
-	return a.IEnv
+func (a Layout) GetEnv() env.Env {
+	return a.Env
 }
 
 func (a Layout) SansObjectAge() (b Layout) {

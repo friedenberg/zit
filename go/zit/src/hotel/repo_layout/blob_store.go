@@ -149,7 +149,7 @@ func (s blobStore) blobReaderFrom(
 }
 
 func MakeCopyingBlobStore(
-	env env.IEnv,
+	env env.Env,
 	local, remote interfaces.BlobStore,
 ) CopyingBlobStore {
 	if local == nil {
@@ -157,14 +157,14 @@ func MakeCopyingBlobStore(
 	}
 
 	return CopyingBlobStore{
-		IEnv:    env,
+		Env:    env,
 		local:  local,
 		remote: remote,
 	}
 }
 
 type CopyingBlobStore struct {
-	env.IEnv
+	env.Env
 	local, remote interfaces.BlobStore
 }
 
@@ -213,7 +213,7 @@ func (s CopyingBlobStore) BlobReader(
 }
 
 func CopyBlobIfNecessary(
-	env env.IEnv,
+	env env.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobShaGetter interfaces.ShaGetter,
@@ -238,7 +238,7 @@ func CopyBlobIfNecessary(
 
 // TODO make this honor context closure and abort early
 func CopyBlob(
-	env env.IEnv,
+	env env.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobSha interfaces.Sha,

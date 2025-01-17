@@ -22,7 +22,7 @@ func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
-	e env.IEnv,
+	e env.Env,
 ) (blobStore interfaces.BlobStore, err error) {
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,

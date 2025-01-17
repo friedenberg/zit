@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Repo) GetEnv() env.IEnv {
+func (u *Repo) GetEnv() env.Env {
 	return u
 }
 

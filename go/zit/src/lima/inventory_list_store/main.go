@@ -82,7 +82,7 @@ func (s *Store) Initialize(
 	return
 }
 
-func (s *Store) GetEnv() env.IEnv {
+func (s *Store) GetEnv() env.Env {
 	return s.GetRepoLayout()
 }
 

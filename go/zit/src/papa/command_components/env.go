@@ -8,7 +8,7 @@ import (
 
 type Env struct{}
 
-func (cmd *Env) MakeEnv(req command.Request) env.IEnv {
+func (cmd *Env) MakeEnv(req command.Request) env.Env {
 	return cmd.MakeEnvWithOptions(
 		req,
 		env.Options{},
@@ -18,7 +18,7 @@ func (cmd *Env) MakeEnv(req command.Request) env.IEnv {
 func (cmd *Env) MakeEnvWithOptions(
 	req command.Request,
 	options env.Options,
-) env.IEnv {
+) env.Env {
 	layout := dir_layout.MakeDefault(
 		req,
 		req.Config.Debug,
@@ -36,7 +36,7 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 	req command.Request,
 	xdgDotenvPath string,
 	options env.Options,
-) env.IEnv {
+) env.Env {
 	dirLayout := dir_layout.MakeFromXDGDotenvPath(
 		req,
 		req.Config,

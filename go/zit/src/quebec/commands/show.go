@@ -153,7 +153,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 }
 
 func (cmd Show) runWithArchive(
-	env env.IEnv,
+	env env.Env,
 	archive repo.Repo,
 	// qg *query.Group,
 ) {

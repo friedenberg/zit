@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
-type IEnv interface {
+type Env interface {
 	errors.Context
 
 	GetContext() errors.Context
@@ -39,7 +39,7 @@ type IEnv interface {
 	) interfaces.StringFormatWriter[string_format_writer.Box]
 }
 
-type Env struct {
+type env struct {
 	errors.Context
 
 	options Options
@@ -58,7 +58,7 @@ type Env struct {
 
 func MakeDefault(
 	layout dir_layout.Layout,
-) *Env {
+) *env {
 	return Make(
 		errors.MakeContextDefault(),
 		config_mutable_cli.Config{},
@@ -72,8 +72,8 @@ func Make(
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 	options Options,
-) *Env {
-	e := &Env{
+) *env {
+	e := &env{
 		Context:  context,
 		options:   options,
 		in:        fd.MakeStd(os.Stdin),
@@ -110,50 +110,50 @@ func Make(
 	return e
 }
 
-func (u Env) GetContext() errors.Context {
+func (u env) GetContext() errors.Context {
 	return u.Context
 }
 
-func (u Env) GetOptions() Options {
+func (u env) GetOptions() Options {
 	return u.options
 }
 
-func (u *Env) GetIn() fd.Std {
+func (u *env) GetIn() fd.Std {
 	return u.in
 }
 
-func (u *Env) GetInFile() io.Reader {
+func (u *env) GetInFile() io.Reader {
 	return u.in.GetFile()
 }
 
-func (u *Env) GetUI() fd.Std {
+func (u *env) GetUI() fd.Std {
 	return u.ui
 }
 
-func (u *Env) GetUIFile() interfaces.WriterAndStringWriter {
+func (u *env) GetUIFile() interfaces.WriterAndStringWriter {
 	return u.ui.GetFile()
 }
 
-func (u *Env) GetOut() fd.Std {
+func (u *env) GetOut() fd.Std {
 	return u.out
 }
 
-func (u *Env) GetOutFile() interfaces.WriterAndStringWriter {
+func (u *env) GetOutFile() interfaces.WriterAndStringWriter {
 	return u.out.GetFile()
 }
 
-func (u *Env) GetErr() fd.Std {
+func (u *env) GetErr() fd.Std {
 	return u.err
 }
 
-func (u *Env) GetErrFile() interfaces.WriterAndStringWriter {
+func (u *env) GetErrFile() interfaces.WriterAndStringWriter {
 	return u.err.GetFile()
 }
 
-func (u *Env) GetCLIConfig() config_mutable_cli.Config {
+func (u *env) GetCLIConfig() config_mutable_cli.Config {
 	return u.cliConfig
 }
 
-func (u *Env) GetDirLayout() dir_layout.Layout {
+func (u *env) GetDirLayout() dir_layout.Layout {
 	return u.Layout
 }

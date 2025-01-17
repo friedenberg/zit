@@ -234,7 +234,7 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 	return
 }
 
-func (e *page) PrintAll(env env.IEnv) (err error) {
+func (e *page) PrintAll(env env.Env) (err error) {
 	e.Lock()
 	defer e.Unlock()
 

@@ -31,7 +31,7 @@ type Client struct {
 	// *local_working_copy.Repo
 }
 
-func (repo *Client) GetEnv() env.IEnv {
+func (repo *Client) GetEnv() env.Env {
 	return repo.Repo.GetEnv()
 }
 

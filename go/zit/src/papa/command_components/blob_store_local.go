@@ -18,7 +18,7 @@ func (cmd *BlobStoreLocal) SetFlagSet(f *flag.FlagSet) {
 }
 
 type BlobStoreWithEnv struct {
-	env.IEnv
+	env.Env
 	interfaces.BlobStore
 }
 
@@ -58,7 +58,7 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 	}
 
 	return BlobStoreWithEnv{
-		IEnv:       env,
+		Env:       env,
 		BlobStore: repoLayout,
 	}
 }
