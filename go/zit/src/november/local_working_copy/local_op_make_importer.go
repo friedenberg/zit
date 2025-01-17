@@ -1,14 +1,15 @@
 package local_working_copy
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (env *Repo) MakeImporter(
+func (repo *Repo) MakeImporter(
 	options store.ImporterOptions,
 ) (importer store.Importer) {
 	importer = store.Importer{
-		Store:               env.GetStore(),
+		Store:               repo.GetStore(),
 		ExcludeObjects:      options.ExcludeObjects,
 		RemoteBlobStore:     options.RemoteBlobStore,
 		BlobCopierDelegate:  options.BlobCopierDelegate,
@@ -20,18 +21,8 @@ func (env *Repo) MakeImporter(
 	if importer.BlobCopierDelegate == nil &&
 		importer.RemoteBlobStore != nil &&
 		options.PrintCopies {
-		importer.BlobCopierDelegate = env.MakeBlobCopierDelegate()
+		importer.BlobCopierDelegate = sku.MakeBlobCopierDelegate(repo.GetUI())
 	}
 
 	return
-}
-
-func (env *Repo) MakeBlobCopierDelegate() func(store.BlobCopyResult) error {
-	return func(result store.BlobCopyResult) error {
-		return env.GetUI().Printf(
-			"copied Blob %s (%d bytes)",
-			result.Sha,
-			result.N,
-		)
-	}
 }

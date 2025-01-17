@@ -3,6 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -59,4 +60,23 @@ type (
 			TransactedWithBlob[T],
 		) error
 	}
+
+	BlobCopyResult struct {
+		*Transacted    // may be nil
+		interfaces.Sha // may not be nil
+
+		// -1: no remote blob store and the blob doesn't exist locally
+		// -2: no remote blob store and the blob exists locally
+		N int64
+	}
 )
+
+func MakeBlobCopierDelegate(ui fd.Std) func(BlobCopyResult) error {
+	return func(result BlobCopyResult) error {
+		return ui.Printf(
+			"copied Blob %s (%d bytes)",
+			result.Sha,
+			result.N,
+		)
+	}
+}

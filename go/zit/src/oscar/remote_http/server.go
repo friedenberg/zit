@@ -25,7 +25,7 @@ import (
 )
 
 type Server struct {
-	// Repo repo.WorkingCopy
+	// Repo repo.LocalWorkingCopy
 	Repo *local_working_copy.Repo
 }
 
@@ -359,10 +359,12 @@ func (server Server) ServeRequest(request Request) (response Response) {
 
 		sh := wc.GetShaLike()
 
-		blobCopierDelegate := server.Repo.MakeBlobCopierDelegate()
+		blobCopierDelegate := sku.MakeBlobCopierDelegate(
+			server.Repo.GetEnv().GetUI(),
+		)
 
 		if err := blobCopierDelegate(
-			store.BlobCopyResult{
+			sku.BlobCopyResult{
 				Sha: sh,
 				N:   n,
 			},
@@ -415,6 +417,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		// TODO make this more performant by returning a proper reader
 		b := bytes.NewBuffer(nil)
 
+		// TODO
 		printer := server.Repo.MakePrinterBoxArchive(b, true)
 
 		var sk *sku.Transacted
@@ -439,8 +442,9 @@ func (server Server) ServeRequest(request Request) (response Response) {
 
 	case MethodPath{"POST", "/inventory_lists"}:
 		// TODO get version from header?
+		// TODO
 		bf := server.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-			server.Repo.GetConfig().GetStoreVersion(),
+			server.Repo.GetStoreVersion(),
 		)
 
 		list := sku.MakeList()
@@ -458,6 +462,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 
 		// TODO make option to read from headers
 		importerOptions := store.ImporterOptions{
+			// TODO
 			CheckedOutPrinter: server.Repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 		}
 
@@ -466,9 +471,9 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		}
 
 		importerOptions.BlobCopierDelegate = func(
-			result store.BlobCopyResult,
+			result sku.BlobCopyResult,
 		) (err error) {
-			server.Repo.ContinueOrPanicOnDone()
+			server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 			if result.N != -1 {
 				return
@@ -482,8 +487,10 @@ func (server Server) ServeRequest(request Request) (response Response) {
 			return
 		}
 
+		// TODO
 		importer := server.Repo.MakeImporter(importerOptions)
 
+		// TODO
 		if err := server.Repo.ImportList(
 			list,
 			importer,
