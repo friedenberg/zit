@@ -7,7 +7,7 @@ import (
 )
 
 // TODO only call reset temp when actually not resetting temp
-func (s Layout) resetTempOnExit(ctx errors.IContext) (err error) {
+func (s Layout) resetTempOnExit(ctx errors.Context) (err error) {
 	errIn := ctx.Cause()
 
 	if errIn != nil || s.GetDebug().NoTempDirCleanup {

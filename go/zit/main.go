@@ -16,7 +16,7 @@ func main() {
 		ctx.SetCancelOnSIGINT()
 
 		if err := ctx.Run(
-			func(ctx errors.IContext) {
+			func(ctx errors.Context) {
 				commands.Run(ctx, os.Args...)
 			},
 		); err != nil {

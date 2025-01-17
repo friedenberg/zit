@@ -1,5 +1,7 @@
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805 h1:u2qwJeEvnypw+OCPUHmoZE3IqwfuN5kgDfo5MLzpNM0=
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805/go.mod h1:FomMrUJ2Lxt5jCLmZkG3FHa72zUprnhd3v/Z18Snm4w=
+code.linenisgreat.com/chrest v0.0.0-20250117135547-4340c86d1f59 h1:MPRCkVr2AtjlEigqF1H39N6E+yN4KWi9YAQCb9E6XhU=
+code.linenisgreat.com/chrest v0.0.0-20250117135547-4340c86d1f59/go.mod h1:RlMRYvuISt0/0EvS2gq4p6x1RV7fDdGLRUid58sM+p4=
 code.linenisgreat.com/chrest/go v0.0.0-20241228133601-d8eb38b220ac h1:HNYHCAJDhO4F3KSIQz7Q/QWaj0HIVg9h+RWlHF6kMFo=
 code.linenisgreat.com/chrest/go v0.0.0-20241228133601-d8eb38b220ac/go.mod h1:1OeTp6Bs0EDkf2qY1nl0xP+L9WwAsUvPUFPz6HTvgtk=
 filippo.io/age v1.2.1 h1:X0TZjehAZylOIj4DubWYU1vWQxv9bJpo+Uu2/LGhi1o=

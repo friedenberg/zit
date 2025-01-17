@@ -23,7 +23,7 @@ type BlobStoreWithEnv struct {
 }
 
 func (c BlobStoreLocal) MakeBlobStoreLocal(
-	context errors.IContext,
+	context errors.Context,
 	config config_mutable_cli.Config,
 	envOptions env.Options,
 	repoOptions local_working_copy.Options,

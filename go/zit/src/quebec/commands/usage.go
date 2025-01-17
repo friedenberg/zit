@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 )
 
-func PrintUsage(ctx errors.IContext, in error) {
+func PrintUsage(ctx errors.Context, in error) {
 	if in != nil {
 		defer ctx.CancelWithError(in)
 	}

@@ -56,6 +56,6 @@ func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
 	}
 }
 
-func (e ErrUnableToAcquireLock) Recover(ctx errors.IContext) {
+func (e ErrUnableToAcquireLock) Recover(ctx errors.Context) {
 	// TODO delete existing lock
 }

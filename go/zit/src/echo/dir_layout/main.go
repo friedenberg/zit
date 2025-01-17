@@ -18,13 +18,13 @@ const (
 )
 
 type Layout struct {
-	errors.IContext
+	errors.Context
 	beforeXDG
 	xdg.XDG
 }
 
 func MakeFromXDGDotenvPath(
-	context errors.IContext,
+	context errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
 ) Layout {
@@ -58,7 +58,7 @@ func MakeFromXDGDotenvPath(
 }
 
 func MakeDefault(
-	context errors.IContext,
+	context errors.Context,
 	do debug.Options,
 ) Layout {
 	var home string
@@ -75,7 +75,7 @@ func MakeDefault(
 }
 
 func MakeDefaultAndInitialize(
-	context errors.IContext,
+	context errors.Context,
 	do debug.Options,
 	overrideXDG bool,
 ) Layout {
@@ -97,12 +97,12 @@ func MakeDefaultAndInitialize(
 }
 
 func MakeWithHome(
-	context errors.IContext,
+	context errors.Context,
 	home string,
 	do debug.Options,
 	permitCwdXDGOverride bool,
 ) (s Layout) {
-	s.IContext = context
+	s.Context = context
 
 	xdg := xdg.XDG{
 		Home: home,
@@ -137,12 +137,12 @@ func MakeWithHome(
 }
 
 func MakeWithHomeAndInitialize(
-	context errors.IContext,
+	context errors.Context,
 	home string,
 	do debug.Options,
 	cwdXDGOverride bool,
 ) (s Layout) {
-	s.IContext = context
+	s.Context = context
 
 	xdg := xdg.XDG{
 		Home: home,
@@ -177,11 +177,11 @@ func MakeWithHomeAndInitialize(
 }
 
 func MakeWithXDG(
-	context errors.IContext,
+	context errors.Context,
 	do debug.Options,
 	xdg xdg.XDG,
 ) (s Layout) {
-	s.IContext = context
+	s.Context = context
 
 	if err := s.beforeXDG.initialize(do); err != nil {
 		s.CancelWithError(err)

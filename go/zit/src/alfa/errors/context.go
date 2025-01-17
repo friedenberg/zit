@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"context"
+	ConTeXT "context"
 	"fmt"
 	"io"
 	"os"
@@ -31,8 +31,8 @@ func (err errContextCancelledExpected) Is(target error) bool {
 	return ok
 }
 
-type IContext interface {
-	context.Context
+type Context interface {
+	ConTeXT.Context
 
 	Cause() error
 	Continue() bool
@@ -40,20 +40,20 @@ type IContext interface {
 	SetCancelOnSIGINT()
 	SetCancelOnSIGHUP()
 	SetCancelOnSignals(signals ...os.Signal)
-	Run(f func(IContext)) error
+	Run(f func(Context)) error
 
 	// `After` runs a function after the context is complete (regardless of any
 	// errors). `After`s are run in the reverse order of when they are called, like
 	// defers but on a whole-program level.
 	After(f func() error)
-	AfterWithContext(f func(IContext) error)
+	AfterWithContext(f func(Context) error)
 
 	// `Must` executes a function even if the context has been cancelled. If the
 	// function returns an error, `Must` cancels the context and offers a heartbeat to
 	// panic. It is meant for defers that must be executed, like closing files,
 	// flushing buffers, releasing locks.
 	Must(f func() error)
-	MustWithContext(f func(IContext) error)
+	MustWithContext(f func(Context) error)
 	MustClose(closer io.Closer)
 	MustFlush(flusher Flusher)
 	Cancel()
@@ -65,9 +65,9 @@ type IContext interface {
 	CancelWithNotImplemented()
 }
 
-type Context struct {
-	context.Context
-	cancelFunc context.CancelCauseFunc
+type context struct {
+	ConTeXT.Context
+	cancelFunc ConTeXT.CancelCauseFunc
 
 	signals chan os.Signal
 
@@ -76,22 +76,22 @@ type Context struct {
 	doAfterErrors []error // TODO expose and use
 }
 
-func MakeContextDefault() *Context {
-	return MakeContext(context.Background())
+func MakeContextDefault() *context {
+	return MakeContext(ConTeXT.Background())
 }
 
-func MakeContext(in context.Context) *Context {
-	ctx, cancel := context.WithCancelCause(in)
+func MakeContext(in ConTeXT.Context) *context {
+	ctx, cancel := ConTeXT.WithCancelCause(in)
 
-	return &Context{
+	return &context{
 		Context:    ctx,
 		cancelFunc: cancel,
 		signals:    make(chan os.Signal, 1),
 	}
 }
 
-func (c *Context) Cause() error {
-	if err := context.Cause(c.Context); err != nil {
+func (c *context) Cause() error {
+	if err := ConTeXT.Cause(c.Context); err != nil {
 		if Is(err, errContextCancelled) {
 			return nil
 		} else {
@@ -102,7 +102,7 @@ func (c *Context) Cause() error {
 	return nil
 }
 
-func (c *Context) Continue() bool {
+func (c *context) Continue() bool {
 	select {
 	default:
 		return true
@@ -112,25 +112,25 @@ func (c *Context) Continue() bool {
 	}
 }
 
-func (c *Context) ContinueOrPanicOnDone() {
+func (c *context) ContinueOrPanicOnDone() {
 	if !c.Continue() {
 		panic(errContextCancelled)
 	}
 }
 
-func (c *Context) SetCancelOnSIGINT() {
+func (c *context) SetCancelOnSIGINT() {
 	c.SetCancelOnSignals(syscall.SIGINT)
 }
 
-func (c *Context) SetCancelOnSIGHUP() {
+func (c *context) SetCancelOnSIGHUP() {
 	c.SetCancelOnSignals(syscall.SIGHUP)
 }
 
-func (c *Context) SetCancelOnSignals(signals ...os.Signal) {
+func (c *context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(c.signals, signals...)
 }
 
-func (c *Context) Run(f func(IContext)) error {
+func (c *context) Run(f func(Context)) error {
 	go func() {
 		select {
 		case <-c.Done():
@@ -178,12 +178,12 @@ func (c *Context) Run(f func(IContext)) error {
 	return c.Cause()
 }
 
-func (c *Context) cancel(err error) {
+func (c *context) cancel(err error) {
 	c.cancelFunc(err)
 }
 
 //go:noinline
-func (c *Context) after(skip int, f func() error) {
+func (c *context) after(skip int, f func() error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -203,12 +203,12 @@ func (c *Context) after(skip int, f func() error) {
 // defers but on a whole-program level.
 //
 //go:noinline
-func (c *Context) After(f func() error) {
+func (c *context) After(f func() error) {
 	c.after(1, f)
 }
 
 //go:noinline
-func (c *Context) AfterWithContext(f func(IContext) error) {
+func (c *context) AfterWithContext(f func(Context) error) {
 	c.after(1, func() error { return f(c) })
 }
 
@@ -216,7 +216,7 @@ func (c *Context) AfterWithContext(f func(IContext) error) {
 // function returns an error, `Must` cancels the context and offers a heartbeat to
 // panic. It is meant for defers that must be executed, like closing files,
 // flushing buffers, releasing locks.
-func (c *Context) Must(f func() error) {
+func (c *context) Must(f func() error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(); err != nil {
@@ -224,7 +224,7 @@ func (c *Context) Must(f func() error) {
 	}
 }
 
-func (c *Context) MustWithContext(f func(IContext) error) {
+func (c *context) MustWithContext(f func(Context) error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(c); err != nil {
@@ -232,30 +232,30 @@ func (c *Context) MustWithContext(f func(IContext) error) {
 	}
 }
 
-func (c *Context) MustClose(closer io.Closer) {
+func (c *context) MustClose(closer io.Closer) {
 	c.Must(closer.Close)
 }
 
-func (c *Context) MustFlush(flusher Flusher) {
+func (c *context) MustFlush(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
 
 // TODO make this private and part of the run method
-func (c *Context) Cancel() {
+func (c *context) Cancel() {
 	defer c.ContinueOrPanicOnDone()
 	c.cancelWithoutPanic()
 }
 
-func (c *Context) cancelWithoutPanic() {
+func (c *context) cancelWithoutPanic() {
 	c.cancel(errContextCancelled)
 }
 
-func (c *Context) CancelWithError(err error) {
+func (c *context) CancelWithError(err error) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(WrapN(1, err))
 }
 
-func (c *Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
+func (c *context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(
 		&stackWrapError{
@@ -266,17 +266,17 @@ func (c *Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	)
 }
 
-func (c *Context) CancelWithErrorf(f string, values ...any) {
+func (c *context) CancelWithErrorf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(WrapSkip(1, fmt.Errorf(f, values...)))
 }
 
-func (c *Context) CancelWithBadRequestf(f string, values ...any) {
+func (c *context) CancelWithBadRequestf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(&errBadRequest{xerrors.Errorf(f, values...)})
 }
 
-func (c *Context) CancelWithNotImplemented() {
+func (c *context) CancelWithNotImplemented() {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(ErrNotImplemented)
 }

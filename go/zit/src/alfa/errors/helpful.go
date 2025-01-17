@@ -9,5 +9,5 @@ type Helpful interface {
 
 type Retryable interface {
 	GetRetryableError() Retryable
-	Recover(IContext)
+	Recover(Context)
 }

@@ -1,17 +1,17 @@
 package errors
 
 import (
-	"context"
+	ConTeXT "context"
 	"testing"
 )
 
 func TestContextCancelled(t *testing.T) {
-	ctx := MakeContext(context.Background())
+	ctx := MakeContext(ConTeXT.Background())
 
 	var must1, must2, after1 bool
 
 	if err := ctx.Run(
-		func(ctx IContext) {
+		func(ctx Context) {
 			didPanic := false
 
 			defer func() {

@@ -15,9 +15,9 @@ import (
 )
 
 type IEnv interface {
-	errors.IContext
+	errors.Context
 
-	GetContext() errors.IContext
+	GetContext() errors.Context
 	GetOptions() Options
 	GetIn() fd.Std
 	GetInFile() io.Reader
@@ -40,7 +40,7 @@ type IEnv interface {
 }
 
 type Env struct {
-	errors.IContext
+	errors.Context
 
 	options Options
 
@@ -68,13 +68,13 @@ func MakeDefault(
 }
 
 func Make(
-	context errors.IContext,
+	context errors.Context,
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 	options Options,
 ) *Env {
 	e := &Env{
-		IContext:  context,
+		Context:  context,
 		options:   options,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
@@ -110,8 +110,8 @@ func Make(
 	return e
 }
 
-func (u Env) GetContext() errors.IContext {
-	return u.IContext
+func (u Env) GetContext() errors.Context {
+	return u.Context
 }
 
 func (u Env) GetOptions() Options {

@@ -5,8 +5,7 @@ type Flusher interface {
 }
 
 type (
-	Func        func() error
-	FuncContext func(*Context) error
+	Func func() error
 )
 
 type FuncWithStackInfo struct {

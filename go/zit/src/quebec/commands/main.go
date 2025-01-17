@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 )
 
-func Run(ctx errors.IContext, args ...string) {
+func Run(ctx errors.Context, args ...string) {
 	if len(args) <= 1 {
 		PrintUsage(
 			ctx,
@@ -43,7 +43,7 @@ func Run(ctx errors.IContext, args ...string) {
 	}
 
 	dep := command.Request{
-		IContext: ctx,
+		Context: ctx,
 		Config:  configCli,
 		FlagSet: f,
 	}

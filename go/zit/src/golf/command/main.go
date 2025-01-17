@@ -9,7 +9,7 @@ import (
 )
 
 type Request struct {
-	errors.IContext
+	errors.Context
 	config_mutable_cli.Config
 	*flag.FlagSet
 }
