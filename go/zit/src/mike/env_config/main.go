@@ -1,4 +1,4 @@
-package config
+package env_config
 
 import (
 	"encoding/gob"
@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -38,11 +39,35 @@ func init() {
 	gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
-type Compiled struct {
+type (
+	Env  = *env
+	Env2 interface {
+		ids.InlineTypeChecker
+		GetCLIConfig() config_mutable_cli.Config
+		GetFileExtensions() interfaces.FileExtensionGetter
+		HasChanges() (ok bool)
+		GetChanges() (out []string)
+		Flush(
+			dirLayout env_repo.Env,
+			blobStore *blob_store.VersionedStores,
+			printerHeader interfaces.FuncIter[string],
+		) (err error)
+	}
+)
+
+func Make() Env {
+	return &env{}
+}
+
+type env struct {
 	cli
 	compiled
 	immutable_config_private
 	dormant *dormant_index.Index
+}
+
+func (a *env) GetCLIConfig() config_mutable_cli.Config {
+	return a.cli
 }
 
 func (a *compiled) Reset() error {
@@ -64,11 +89,11 @@ func (a *compiled) Reset() error {
 	return nil
 }
 
-func (a *Compiled) GetMutableConfig() mutable_config_blobs.Blob {
+func (a *env) GetMutableConfig() mutable_config_blobs.Blob {
 	return a.mutable_config_private
 }
 
-func (c *Compiled) Initialize(
+func (c *env) Initialize(
 	dirLayout env_repo.Env,
 	kcli config_mutable_cli.Config,
 	dormant *dormant_index.Index,
@@ -102,33 +127,33 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) SetCli(k config_mutable_cli.Config) {
+func (kc *env) SetCli(k config_mutable_cli.Config) {
 	kc.cli = k
 }
 
-func (kc *Compiled) SetCliFromCommander(k config_mutable_cli.Config) {
+func (kc *env) SetCliFromCommander(k config_mutable_cli.Config) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
 }
 
-func (k *Compiled) IsDryRun() bool {
+func (k *env) IsDryRun() bool {
 	return k.DryRun
 }
 
-func (k *Compiled) SetDryRun(v bool) {
+func (k *env) SetDryRun(v bool) {
 	k.DryRun = v
 }
 
-func (k *Compiled) GetTypeStringFromExtension(t string) string {
+func (k *env) GetTypeStringFromExtension(t string) string {
 	return k.ExtensionsToTypes[t]
 }
 
-func (k *Compiled) GetTypeExtension(v string) string {
+func (k *env) GetTypeExtension(v string) string {
 	return k.TypesToExtensions[v]
 }
 
-func (k *Compiled) AddTransacted(
+func (k *env) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
 	ak *blob_store.VersionedStores,
@@ -207,7 +232,7 @@ func (k *Compiled) AddTransacted(
 	return
 }
 
-func (kc *Compiled) IsInlineType(k ids.Type) (isInline bool) {
+func (kc *env) IsInlineType(k ids.Type) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true

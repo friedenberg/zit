@@ -1,4 +1,4 @@
-package config
+package env_config
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"

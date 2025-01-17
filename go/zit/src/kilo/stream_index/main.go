@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 )
 
 type State int
@@ -52,7 +52,7 @@ func init() {
 type Index struct {
 	directoryLayout env_repo.Env
 	sunrise         ids.Tai
-	mutable_config  *config.Compiled
+	mutable_config  env_config.Env
 	path            string
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
@@ -62,7 +62,7 @@ type Index struct {
 
 func MakeIndex(
 	s env_repo.Env,
-	k *config.Compiled,
+	k env_config.Env,
 	dir string,
 	sunrise ids.Tai,
 ) (i *Index, err error) {

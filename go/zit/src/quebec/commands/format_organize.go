@@ -88,7 +88,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	}
 
 	ot.Options = cmd.Flags.GetOptionsWithMetadata(
-		localWorkingCopy.GetConfig().PrintOptions,
+		localWorkingCopy.GetConfig().GetCLIConfig().PrintOptions,
 		localWorkingCopy.SkuFormatBoxCheckedOutNoColor(),
 		localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
 		localWorkingCopy.GetExternalLikePoolForRepoId(repoId),

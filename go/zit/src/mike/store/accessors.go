@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 )
 
 func (u *Store) GetBrowserStore() *external_store.Store {
@@ -66,7 +66,7 @@ func (s *Store) GetDirectoryLayout() env_repo.Env {
 	return s.dirLayout
 }
 
-func (s *Store) GetConfig() *config.Compiled {
+func (s *Store) GetConfig() env_config.Env {
 	return s.config
 }
 

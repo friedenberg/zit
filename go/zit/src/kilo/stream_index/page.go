@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 )
 
 type PageId = sha.PageId
@@ -29,7 +29,7 @@ type Page struct {
 	added, addedLatest *sku.List
 	hasChanges         bool
 	repoLayout         env_repo.Env
-	config             *config.Compiled
+	config             env_config.Env
 	oids               map[string]struct{}
 }
 

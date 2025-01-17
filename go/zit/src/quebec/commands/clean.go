@@ -140,7 +140,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Group) (err err
 	var changes organize_text.Changes
 
 	if changes, err = organize_text.ChangesFromResults(
-		u.GetConfig().PrintOptions,
+		u.GetConfig().GetCLIConfig().PrintOptions,
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

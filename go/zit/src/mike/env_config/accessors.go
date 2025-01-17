@@ -1,4 +1,4 @@
-package config
+package env_config
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func (c *compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 
-func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
+func (kc *env) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.immutable_config_private
 }
 
@@ -206,6 +206,6 @@ func (c *compiled) getImplicitTags(
 	return s
 }
 
-func (kc *Compiled) Cli() config_mutable_cli.Config {
+func (kc *env) Cli() config_mutable_cli.Config {
 	return kc.cli
 }

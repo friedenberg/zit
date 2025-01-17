@@ -13,7 +13,7 @@ import (
 )
 
 func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	po := repo.config.PrintOptions.
+	po := repo.config.GetCLIConfig().PrintOptions.
 		WithPrintShas(true).
 		WithExcludeFields(true)
 
@@ -36,7 +36,7 @@ func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
-	po := repo.config.PrintOptions.
+	po := repo.config.GetCLIConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false)
 
@@ -63,7 +63,7 @@ func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut
 // TODO make generic external version
 func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
-		u.GetConfig().DryRun,
+		u.GetConfig().GetCLIConfig().DryRun,
 		id_fmts.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
 			u.layout.MakeRelativePathStringFormatWriter(),
@@ -78,7 +78,7 @@ func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 }
 
 func (u *Repo) PrinterHeader() interfaces.FuncIter[string] {
-	if u.config.PrintOptions.PrintFlush {
+	if u.config.GetCLIConfig().PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim(
 			"\n",
 			u.GetErrFile(),
@@ -100,7 +100,7 @@ func (u *Repo) PrinterCheckedOut(
 	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
-	po := u.config.PrintOptions.
+	po := u.config.GetCLIConfig().PrintOptions.
 		WithPrintShas(true)
 
 	out := string_format_writer.MakeDelim(
@@ -140,7 +140,7 @@ func (u *Repo) MakePrinterBoxArchive(
 ) interfaces.FuncIter[*sku.Transacted] {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		u.GetEnv(),
-		u.GetConfig().PrintOptions.WithPrintTai(includeTai),
+		u.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(includeTai),
 	)
 
 	return string_format_writer.MakeDelim(

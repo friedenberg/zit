@@ -1,4 +1,4 @@
-package config
+package env_config
 
 import (
 	"encoding/gob"
@@ -23,7 +23,7 @@ func init() {
 	gob.Register(mutable_config_blobs.V0{})
 }
 
-func (kc *Compiled) recompile(
+func (kc *env) recompile(
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	if err = kc.recompileTags(); err != nil {
@@ -39,7 +39,7 @@ func (kc *Compiled) recompile(
 	return
 }
 
-func (kc *Compiled) recompileTags() (err error) {
+func (kc *env) recompileTags() (err error) {
 	kc.DefaultTags = ids.MakeTagSet(kc.GetDefaults().GetTags()...)
 
 	kc.ImplicitTags = make(implicitTagMap)
@@ -73,7 +73,7 @@ func (kc *Compiled) recompileTags() (err error) {
 	return
 }
 
-func (kc *Compiled) recompileTypes(
+func (kc *env) recompileTypes(
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
@@ -131,7 +131,7 @@ func (kc *Compiled) recompileTypes(
 	return
 }
 
-func (kc *Compiled) HasChanges() (ok bool) {
+func (kc *env) HasChanges() (ok bool) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
@@ -144,7 +144,7 @@ func (kc *Compiled) HasChanges() (ok bool) {
 	return
 }
 
-func (kc *Compiled) GetChanges() (out []string) {
+func (kc *env) GetChanges() (out []string) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
@@ -165,7 +165,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *Compiled) loadMutableConfig(
+func (kc *env) loadMutableConfig(
 	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
@@ -204,7 +204,7 @@ func (kc *Compiled) loadMutableConfig(
 	return
 }
 
-func (kc *Compiled) Flush(
+func (kc *env) Flush(
 	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
@@ -233,7 +233,7 @@ func (kc *Compiled) Flush(
 	return
 }
 
-func (kc *Compiled) flushMutableConfig(
+func (kc *env) flushMutableConfig(
 	s env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],

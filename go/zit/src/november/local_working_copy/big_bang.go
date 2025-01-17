@@ -29,7 +29,7 @@ func Genesis(
 	if err := repo.dormantIndex.Flush(
 		repo.GetRepoLayout(),
 		repo.PrinterHeader(),
-		repo.config.DryRun,
+		repo.config.GetCLIConfig().DryRun,
 	); err != nil {
 		repo.CancelWithError(err)
 	}

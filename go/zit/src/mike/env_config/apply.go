@@ -1,4 +1,4 @@
-package config
+package env_config
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -12,7 +12,7 @@ import (
 )
 
 // TODO
-func (k *Compiled) ApplyDormantAndRealizeTags(
+func (k *env) ApplyDormantAndRealizeTags(
 	sk *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", sk)
@@ -71,7 +71,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	return
 }
 
-func (k *Compiled) addSuperTags(
+func (k *env) addSuperTags(
 	sk *sku.Transacted,
 ) (err error) {
 	g := sk.GetGenre()
@@ -141,7 +141,7 @@ func (k *Compiled) addSuperTags(
 	return
 }
 
-func (k *Compiled) addImplicitTags(
+func (k *env) addImplicitTags(
 	sk *sku.Transacted,
 ) (err error) {
 	mp := &sk.Metadata

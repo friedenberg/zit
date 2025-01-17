@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -22,8 +22,8 @@ func (u *Repo) GetTime() time.Time {
 	return time.Now()
 }
 
-func (u *Repo) GetConfig() *config.Compiled {
-	return &u.config
+func (u *Repo) GetConfig() env_config.Env {
+	return u.config
 }
 
 func (u *Repo) GetDormantIndex() *dormant_index.Index {

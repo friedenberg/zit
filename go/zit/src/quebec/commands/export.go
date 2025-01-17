@@ -93,7 +93,7 @@ func (cmd Export) Run(dep command.Request) {
 	bw := bufio.NewWriter(wc)
 	defer localWorkingCopy.MustFlush(bw)
 
-	printer := localWorkingCopy.MakePrinterBoxArchive(bw, localWorkingCopy.GetConfig().PrintOptions.PrintTime)
+	printer := localWorkingCopy.MakePrinterBoxArchive(bw, localWorkingCopy.GetConfig().GetCLIConfig().PrintOptions.PrintTime)
 
 	var sk *sku.Transacted
 	var hasMore bool

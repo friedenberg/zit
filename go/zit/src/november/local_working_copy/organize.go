@@ -12,7 +12,7 @@ func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 	qg *query.Group,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
-		e.GetConfig().PrintOptions,
+		e.GetConfig().GetCLIConfig().PrintOptions,
 		qg,
 		e.SkuFormatBoxCheckedOutNoColor(),
 		e.GetStore().GetAbbrStore().GetAbbr(),
@@ -29,7 +29,7 @@ func (e *Repo) LockAndCommitOrganizeResults(
 	}
 
 	if changeResults, err = organize_text.ChangesFromResults(
-		e.GetConfig().PrintOptions,
+		e.GetConfig().GetCLIConfig().PrintOptions,
 		results,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Config = e.GetConfig()
 	oo.Abbr = e.GetStore().GetAbbrStore().GetAbbr()
 
-	if !e.GetConfig().DryRun {
+	if !e.GetConfig().GetCLIConfig().DryRun {
 		return
 	}
 

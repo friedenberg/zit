@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -29,7 +29,7 @@ type Repo struct {
 
 	layout       env_repo.Env
 	fileEncoder  store_fs.FileEncoder
-	config       config.Compiled
+	config       env_config.Env
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
@@ -71,6 +71,7 @@ func MakeWithLayout(
 	repoLayout env_repo.Env,
 ) (repo *Repo) {
 	repo = &Repo{
+		config:         env_config.Make(),
 		Env:            repoLayout,
 		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
@@ -111,7 +112,7 @@ func (repo *Repo) initialize(
 	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
 	repo.sunrise = ids.NowTai()
 
-	repo.fileEncoder = store_fs.MakeFileEncoder(repo.layout, &repo.config)
+	repo.fileEncoder = store_fs.MakeFileEncoder(repo.layout, repo.config)
 
 	if err = repo.dormantIndex.Load(
 		repo.layout,
@@ -123,7 +124,7 @@ func (repo *Repo) initialize(
 	objectFormat := object_inventory_format.FormatForVersion(repo.layout.GetStoreVersion())
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
 		repo.GetEnv(),
-		repo.GetConfig().PrintOptions.WithPrintTai(true),
+		repo.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(true),
 	)
 
 	repo.blobStore = blob_store.Make(
@@ -230,7 +231,7 @@ func (repo *Repo) initialize(
 		TransactedNew:     ptl,
 		TransactedUpdated: ptl,
 		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
-			if !repo.config.PrintOptions.PrintUnchanged {
+			if !repo.config.GetCLIConfig().PrintOptions.PrintUnchanged {
 				return
 			}
 
@@ -267,7 +268,7 @@ func (u *Repo) Flush() (err error) {
 }
 
 func (u *Repo) PrintMatchedDormantIfNecessary() {
-	if !u.GetConfig().PrintOptions.PrintMatchedDormant {
+	if !u.GetConfig().GetCLIConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}
 

@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 )
 
 const DefaultTimeout = 2e9
@@ -36,7 +36,7 @@ type checkedOutWithItem struct {
 }
 
 type Store struct {
-	config            *config.Compiled
+	config            env_config.Env
 	externalStoreInfo external_store.Supplies
 	typ               ids.Type
 	browser           browser_items.BrowserProxy
@@ -60,7 +60,7 @@ type Store struct {
 }
 
 func Make(
-	k *config.Compiled,
+	k env_config.Env,
 	s env_repo.Env,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*sku.CheckedOut],
 ) *Store {

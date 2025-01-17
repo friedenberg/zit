@@ -32,7 +32,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 		"serve",
 	}
 
-	if remote.GetConfig().Verbose {
+	if remote.GetConfig().GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 
@@ -62,7 +62,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 		"serve",
 	}
 
-	if remote.GetConfig().Verbose {
+	if remote.GetConfig().GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 

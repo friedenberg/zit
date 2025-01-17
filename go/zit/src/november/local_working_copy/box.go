@@ -49,7 +49,7 @@ func (u *Repo) StringFormatWriterSkuBoxCheckedOut(
 func (u *Repo) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
-	options := u.config.PrintOptions.WithPrintShas(false)
+	options := u.config.GetCLIConfig().PrintOptions.WithPrintShas(false)
 	options.PrintTime = false
 	options.PrintShas = false
 	options.DescriptionInBox = false
@@ -64,7 +64,7 @@ func (u *Repo) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 func (u *Repo) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
-	options := u.config.PrintOptions.WithPrintShas(false)
+	options := u.config.GetCLIConfig().PrintOptions.WithPrintShas(false)
 	options.PrintTime = false
 	options.PrintShas = false
 	options.DescriptionInBox = false

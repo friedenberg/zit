@@ -19,12 +19,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
 )
 
 type Store struct {
 	sunrise   ids.Tai
-	config    *config.Compiled
+	config    env_config.Env
 	dirLayout env_repo.Env
 
 	storeFS            *store_fs.Store
@@ -59,7 +59,7 @@ type UIDelegate struct {
 }
 
 func (c *Store) Initialize(
-	k *config.Compiled,
+	k env_config.Env,
 	st env_repo.Env,
 	pmf object_inventory_format.Format,
 	t ids.Tai,
@@ -81,7 +81,7 @@ func (c *Store) Initialize(
 	c.inventoryList = sku.MakeList()
 
 	if c.Abbr, err = newIndexAbbr(
-		k.PrintOptions,
+		k.GetCLIConfig().PrintOptions,
 		c.dirLayout,
 		st.DirCache("Abbr"),
 	); err != nil {

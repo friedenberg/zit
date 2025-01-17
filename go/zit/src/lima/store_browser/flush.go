@@ -35,7 +35,7 @@ func (s *Store) flushUrls() (err error) {
 		}
 	}
 
-	if !s.config.DryRun {
+	if !s.config.GetCLIConfig().DryRun {
 		ctx := context.Background()
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
 		defer cancel()
