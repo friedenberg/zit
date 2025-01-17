@@ -276,7 +276,7 @@ func (e *page) Flush() (err error) {
 
 	var ft *os.File
 
-	if ft, err = e.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
+	if ft, err = e.repoLayout.GetDirLayout().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

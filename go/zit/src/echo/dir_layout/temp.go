@@ -7,13 +7,13 @@ import (
 )
 
 // TODO only call reset temp when actually not resetting temp
-func (s Layout) resetTempOnExit(ctx errors.Context) (err error) {
+func (s layout) resetTempOnExit(ctx errors.Context) (err error) {
 	errIn := ctx.Cause()
 
 	if errIn != nil || s.GetDebug().NoTempDirCleanup {
 		// ui.Err().Printf("temp dir: %q", s.TempLocal.BasePath)
 	} else {
-		if err = os.RemoveAll(s.TempLocal.BasePath); err != nil {
+		if err = os.RemoveAll(s.GetTempLocal().BasePath); err != nil {
 			err = errors.Wrapf(err, "failed to remove temp local")
 			return
 		}

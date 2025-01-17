@@ -28,7 +28,7 @@ func MakeBlobStoreFromLayout(
 		Config: dir_layout.MakeConfigFromImmutableBlobConfig(
 			s.GetConfig().GetBlobStoreImmutableConfig(),
 		),
-		tempFS: s.GetDirLayout().TempLocal,
+		tempFS: s.GetDirLayout().GetTempLocal(),
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {

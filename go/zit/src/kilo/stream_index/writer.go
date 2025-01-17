@@ -70,7 +70,7 @@ func (pw *writer) Flush() (err error) {
 
 		return pw.flushJustLatest()
 	} else {
-		if pw.File, err = pw.Page.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
+		if pw.File, err = pw.Page.repoLayout.GetDirLayout().GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

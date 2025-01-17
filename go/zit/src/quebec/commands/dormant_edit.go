@@ -105,7 +105,7 @@ func (c DormantEdit) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = u.GetRepoLayout().GetDirLayout().TempLocal.FileTemp(); err != nil {
+	if f, err = u.GetRepoLayout().GetDirLayout().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

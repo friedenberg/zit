@@ -11,11 +11,11 @@ type RelativePath interface {
 	Rel(string) string
 }
 
-func (s Layout) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
+func (s layout) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
 	return relativePathStringFormatWriter(s)
 }
 
-type relativePathStringFormatWriter Layout
+type relativePathStringFormatWriter layout
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,

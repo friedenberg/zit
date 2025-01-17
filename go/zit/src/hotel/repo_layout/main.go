@@ -57,9 +57,9 @@ func Make(
 	dp := &directoryV1{}
 
 	if err = dp.init(
-    s.GetStoreVersion(),
-    s.GetDirLayout().GetXDG(),
-  ); err != nil {
+		s.GetStoreVersion(),
+		s.GetDirLayout().GetXDG(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,7 +120,7 @@ func (s *Layout) setupStores() (err error) {
 		basePath:       s.basePath,
 		Config:         dir_layout.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreImmutableConfig()),
 		DirectoryPaths: s.DirectoryPaths,
-		TemporaryFS:    s.GetDirLayout().TempLocal,
+		TemporaryFS:    s.GetDirLayout().GetTempLocal(),
 	}
 
 	return

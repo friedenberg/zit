@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
@@ -17,7 +18,20 @@ const (
 	EnvBin = "BIN_ZIT"
 )
 
-type Layout struct {
+type Layout interface {
+	IsDryRun() bool
+	GetCwd() string
+	GetXDG() xdg.XDG
+	GetExecPath() string
+	GetTempLocal() TemporaryFS
+	MakeDir(ds ...string) (err error)
+	Rel(p string) (out string)
+	RelToCwdOrSame(p string) (p1 string)
+	MakeCommonEnv() map[string]string
+	MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string]
+}
+
+type layout struct {
 	errors.Context
 	beforeXDG
 	xdg.XDG
@@ -27,7 +41,7 @@ func MakeFromXDGDotenvPath(
 	context errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
-) Layout {
+) layout {
 	dotenv := xdg.Dotenv{
 		XDG: &xdg.XDG{},
 	}
@@ -60,7 +74,7 @@ func MakeFromXDGDotenvPath(
 func MakeDefault(
 	context errors.Context,
 	do debug.Options,
-) Layout {
+) layout {
 	var home string
 
 	{
@@ -78,7 +92,7 @@ func MakeDefaultAndInitialize(
 	context errors.Context,
 	do debug.Options,
 	overrideXDG bool,
-) Layout {
+) layout {
 	var home string
 
 	{
@@ -101,7 +115,7 @@ func MakeWithHome(
 	home string,
 	do debug.Options,
 	permitCwdXDGOverride bool,
-) (s Layout) {
+) (s layout) {
 	s.Context = context
 
 	xdg := xdg.XDG{
@@ -141,7 +155,7 @@ func MakeWithHomeAndInitialize(
 	home string,
 	do debug.Options,
 	cwdXDGOverride bool,
-) (s Layout) {
+) (s layout) {
 	s.Context = context
 
 	xdg := xdg.XDG{
@@ -180,7 +194,7 @@ func MakeWithXDG(
 	context errors.Context,
 	do debug.Options,
 	xdg xdg.XDG,
-) (s Layout) {
+) (s layout) {
 	s.Context = context
 
 	if err := s.beforeXDG.initialize(do); err != nil {
@@ -194,7 +208,7 @@ func MakeWithXDG(
 	return
 }
 
-func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
+func (layout *layout) initializeXDG(xdg xdg.XDG) (err error) {
 	layout.XDG = xdg
 
 	layout.TempLocal.BasePath = filepath.Join(
@@ -202,7 +216,7 @@ func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
 		fmt.Sprintf("tmp-%d", layout.GetPid()),
 	)
 
-	if err = layout.MakeDir(layout.TempLocal.BasePath); err != nil {
+	if err = layout.MakeDir(layout.GetTempLocal().BasePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,35 +224,39 @@ func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
 	return
 }
 
-func (h Layout) GetDebug() debug.Options {
+func (h layout) GetDebug() debug.Options {
 	return h.debug
 }
 
-func (h Layout) IsDryRun() bool {
+func (h layout) IsDryRun() bool {
 	return h.dryRun
 }
 
-func (h Layout) GetPid() int {
+func (h layout) GetPid() int {
 	return h.pid
 }
 
-func (h Layout) GetExecPath() string {
+func (h layout) GetExecPath() string {
 	return h.execPath
 }
 
-func (h Layout) GetCwd() string {
+func (h layout) GetCwd() string {
 	return h.cwd
 }
 
-func (h Layout) GetXDG() xdg.XDG {
+func (h layout) GetXDG() xdg.XDG {
 	return h.XDG
 }
 
-func (h *Layout) SetXDG(x xdg.XDG) {
+func (h *layout) SetXDG(x xdg.XDG) {
 	h.XDG = x
 }
 
-func (s Layout) AbsFromCwdOrSame(p string) (p1 string) {
+func (h layout) GetTempLocal() TemporaryFS {
+	return h.TempLocal
+}
+
+func (s layout) AbsFromCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Abs(p)
 	if err != nil {
@@ -248,7 +266,7 @@ func (s Layout) AbsFromCwdOrSame(p string) (p1 string) {
 	return
 }
 
-func (s Layout) RelToCwdOrSame(p string) (p1 string) {
+func (s layout) RelToCwdOrSame(p string) (p1 string) {
 	var err error
 
 	if p1, err = filepath.Rel(s.GetCwd(), p); err != nil {
@@ -258,7 +276,7 @@ func (s Layout) RelToCwdOrSame(p string) (p1 string) {
 	return
 }
 
-func (s Layout) Rel(
+func (s layout) Rel(
 	p string,
 ) (out string) {
 	out = p
@@ -272,7 +290,7 @@ func (s Layout) Rel(
 	return
 }
 
-func (h Layout) MakeCommonEnv() map[string]string {
+func (h layout) MakeCommonEnv() map[string]string {
 	return map[string]string{
 		"ZIT_BIN": h.GetExecPath(),
 		// TODO determine if ZIT_DIR is kept
@@ -280,7 +298,7 @@ func (h Layout) MakeCommonEnv() map[string]string {
 	}
 }
 
-func (s Layout) MakeDir(ds ...string) (err error) {
+func (s layout) MakeDir(ds ...string) (err error) {
 	for _, d := range ds {
 		if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
 			err = errors.Wrapf(err, "Dir: %q", d)

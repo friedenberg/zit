@@ -27,7 +27,7 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,
 		dir_layout.MakeConfigFromImmutableBlobConfig(&cmd.Config),
-		e.GetDirLayout().TempLocal,
+		e.GetDirLayout().GetTempLocal(),
 	)
 
 	return

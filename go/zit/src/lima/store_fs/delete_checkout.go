@@ -48,9 +48,9 @@ func (c DeleteCheckout) Run(
 		}
 
 		if pRel, pErr := filepath.Rel(
-      s.GetDirLayout().GetCwd(),
-      fd.String(),
-    ); pErr == nil {
+			s.GetDirLayout().GetCwd(),
+			fd.String(),
+		); pErr == nil {
 			path = pRel
 		}
 

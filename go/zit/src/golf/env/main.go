@@ -17,7 +17,6 @@ import (
 type Env interface {
 	errors.Context
 
-	GetContext() errors.Context
 	GetOptions() Options
 	GetIn() fd.Std
 	GetInFile() io.Reader
@@ -28,6 +27,7 @@ type Env interface {
 	GetErr() fd.Std
 	GetErrFile() interfaces.WriterAndStringWriter
 	GetCLIConfig() config_mutable_cli.Config
+
 	GetDirLayout() dir_layout.Layout
 
 	FormatOutputOptions() (o string_format_writer.OutputOptions)
@@ -74,13 +74,13 @@ func Make(
 	options Options,
 ) *env {
 	e := &env{
-		Context:  context,
+		Context:   context,
 		options:   options,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
 		cliConfig: kCli,
-		Layout:    dirLayout,
+		Layout:   dirLayout,
 	}
 
 	if options.UIFileIsStderr {
@@ -108,10 +108,6 @@ func Make(
 	}
 
 	return e
-}
-
-func (u env) GetContext() errors.Context {
-	return u.Context
 }
 
 func (u env) GetOptions() Options {

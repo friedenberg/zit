@@ -184,7 +184,7 @@ func (cmd *Organize) Run(dep command.Request) {
 		{
 			var err error
 
-			if f, err = localWorkingCopy.GetRepoLayout().GetDirLayout().TempLocal.FileTempWithTemplate(
+			if f, err = localWorkingCopy.GetRepoLayout().GetDirLayout().GetTempLocal().FileTempWithTemplate(
 				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
 				localWorkingCopy.CancelWithError(err)

@@ -71,7 +71,7 @@ func MakeWithLayout(
 	repoLayout repo_layout.Layout,
 ) (repo *Repo) {
 	repo = &Repo{
-		Env:           repoLayout,
+		Env:            repoLayout,
 		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}

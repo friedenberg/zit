@@ -28,7 +28,7 @@ type Page struct {
 	*probe_index
 	added, addedLatest *sku.List
 	hasChanges         bool
-	repoLayout    repo_layout.Layout
+	repoLayout         repo_layout.Layout
 	config             *config.Compiled
 	oids               map[string]struct{}
 }

@@ -42,7 +42,7 @@ func (s *Store) runDiff3(
 
 	var f *os.File
 
-	if f, err = s.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
+	if f, err = s.repoLayout.GetDirLayout().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

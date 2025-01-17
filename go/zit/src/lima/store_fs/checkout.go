@@ -223,7 +223,7 @@ func (s *Store) SetFilenameForTransacted(
 	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
-		if f, err = s.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
+		if f, err = s.repoLayout.GetDirLayout().GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

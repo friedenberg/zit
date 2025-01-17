@@ -31,7 +31,7 @@ type dirItems struct {
 	rootProcessed bool
 
 	interfaces.FileExtensionGetter
-	repoLayout             repo_layout.Layout
+	repoLayout            repo_layout.Layout
 	externalStoreSupplies external_store.Supplies
 
 	probablyCheckedOut      fsItemData
