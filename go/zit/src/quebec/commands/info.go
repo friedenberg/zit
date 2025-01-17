@@ -57,7 +57,7 @@ func (c Info) Run(dependencies command.Request) {
 			env.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
 
 		case "xdg":
-			ecksDeeGee := env.GetDirLayout().GetXDG()
+			ecksDeeGee := env.GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,

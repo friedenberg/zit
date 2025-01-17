@@ -28,8 +28,6 @@ type Env interface {
 	GetErrFile() interfaces.WriterAndStringWriter
 	GetCLIConfig() config_mutable_cli.Config
 
-	GetDirLayout() dir_layout.Layout
-
 	FormatOutputOptions() (o string_format_writer.OutputOptions)
 	FormatColorOptionsOut() (o string_format_writer.ColorOptions)
 	FormatColorOptionsErr() (o string_format_writer.ColorOptions)
@@ -37,6 +35,11 @@ type Env interface {
 		truncate string_format_writer.CliFormatTruncation,
 		co string_format_writer.ColorOptions,
 	) interfaces.StringFormatWriter[string_format_writer.Box]
+}
+
+type LocalEnv interface {
+	Env
+	dir_layout.Layout
 }
 
 type env struct {
@@ -80,7 +83,7 @@ func Make(
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
 		cliConfig: kCli,
-		Layout:   dirLayout,
+		Layout:    dirLayout,
 	}
 
 	if options.UIFileIsStderr {
@@ -148,8 +151,4 @@ func (u *env) GetErrFile() interfaces.WriterAndStringWriter {
 
 func (u *env) GetCLIConfig() config_mutable_cli.Config {
 	return u.cliConfig
-}
-
-func (u *env) GetDirLayout() dir_layout.Layout {
-	return u.Layout
 }

@@ -42,7 +42,7 @@ func (cmd RepoInfo) Run(dep command.Request) {
 			}
 
 		case "xdg":
-			ecksDeeGee := repo.GetDirLayout().GetXDG()
+			ecksDeeGee := repo.GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,

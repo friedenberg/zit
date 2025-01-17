@@ -22,12 +22,12 @@ func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
-	e env.Env,
+	e env.LocalEnv,
 ) (blobStore interfaces.BlobStore, err error) {
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,
 		dir_layout.MakeConfigFromImmutableBlobConfig(&cmd.Config),
-		e.GetDirLayout().GetTempLocal(),
+		e.GetTempLocal(),
 	)
 
 	return

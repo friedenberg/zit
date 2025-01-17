@@ -76,7 +76,7 @@ func (server Server) InitializeUnixSocket(
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := server.Repo.GetRepoLayout().GetDirLayout().GetXDG().State
+		dir := server.Repo.GetRepoLayout().GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)

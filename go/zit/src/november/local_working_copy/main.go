@@ -23,7 +23,7 @@ import (
 )
 
 type Repo struct {
-	env.Env
+	env.LocalEnv
 
 	sunrise ids.Tai
 
@@ -43,7 +43,7 @@ type Repo struct {
 }
 
 func Make(
-	env env.Env,
+	env env.LocalEnv,
 	options Options,
 ) *Repo {
 	layoutOptions := repo_layout.Options{
@@ -71,7 +71,7 @@ func MakeWithLayout(
 	repoLayout repo_layout.Layout,
 ) (repo *Repo) {
 	repo = &Repo{
-		Env:            repoLayout,
+		LocalEnv:       repoLayout,
 		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}

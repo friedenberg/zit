@@ -220,7 +220,7 @@ func makeTestTextFormat(
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			DirLayout: repoLayout.GetDirLayout(),
+			DirLayout: repoLayout,
 			BlobStore: repoLayout,
 		},
 	)

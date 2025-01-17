@@ -141,7 +141,7 @@ func (op Diff) Run(
 		strings.ToLower(local.GetGenre().GetGenreString()),
 	)
 
-	externalLabel := op.GetRepoLayout().GetDirLayout().Rel(externalFD.GetPath())
+	externalLabel := op.GetRepoLayout().Rel(externalFD.GetPath())
 
 	colorOptions := op.FormatColorOptionsOut()
 	colorString := "always"

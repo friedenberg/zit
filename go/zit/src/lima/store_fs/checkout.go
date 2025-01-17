@@ -216,14 +216,14 @@ func (s *Store) SetFilenameForTransacted(
 	sk *sku.Transacted,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	cwd := s.repoLayout.GetDirLayout().GetCwd()
+	cwd := s.repoLayout.GetCwd()
 
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
-		if f, err = s.repoLayout.GetDirLayout().GetTempLocal().FileTemp(); err != nil {
+		if f, err = s.repoLayout.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

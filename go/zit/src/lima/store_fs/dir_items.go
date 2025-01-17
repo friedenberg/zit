@@ -294,7 +294,7 @@ func (d *dirItems) getFDsForObjectIdString(
 	objectIdString string,
 ) (fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
-	dir := d.repoLayout.GetDirLayout().GetCwd()
+	dir := d.repoLayout.GetCwd()
 	pattern := filepath.Join(dir, fmt.Sprintf("%s*", objectIdString))
 
 	if err = d.walkDir(cache, dir, pattern); err != nil {
@@ -487,7 +487,7 @@ func (d *dirItems) addOneUntracked(
 	}
 
 	if err = result.ExternalObjectId.SetBlob(
-		d.repoLayout.GetDirLayout().Rel(f.GetPath()),
+		d.repoLayout.Rel(f.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

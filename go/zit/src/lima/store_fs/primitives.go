@@ -26,7 +26,7 @@ func (s *Store) HydrateExternalFromItem(
 
 	if err = item.WriteToSku(
 		external,
-		s.repoLayout.GetDirLayout(),
+		s.repoLayout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

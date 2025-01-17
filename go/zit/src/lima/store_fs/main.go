@@ -39,8 +39,8 @@ func Make(
 		repoLayout:     layout,
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
-		dir:            layout.GetDirLayout().GetCwd(),
-		dirItems:       makeObjectsWithDir(layout.GetDirLayout().GetCwd(), fileExtensions, layout),
+		dir:            layout.GetCwd(),
+		dirItems:       makeObjectsWithDir(layout.GetCwd(), fileExtensions, layout),
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
@@ -50,7 +50,7 @@ func Make(
 		objectFormatOptions: inventoryFormatOptions,
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				DirLayout: layout.GetDirLayout(),
+				DirLayout: layout,
 				BlobStore: layout,
 			},
 		),
@@ -216,7 +216,7 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 
 			if err = kfp.WriteToExternalObjectId(
 				&eoid,
-				s.repoLayout.GetDirLayout(),
+				s.repoLayout,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -254,7 +254,7 @@ func (s *Store) GetObjectIdsForDir(
 
 		if err = r.WriteToExternalObjectId(
 			&eoid,
-			s.repoLayout.GetDirLayout(),
+			s.repoLayout,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -304,7 +304,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 
 			if err = r.WriteToExternalObjectId(
 				&eoid,
-				s.repoLayout.GetDirLayout(),
+				s.repoLayout,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -426,7 +426,7 @@ func (s *Store) WriteFSItemToExternal(
 	switch mode {
 	case checkout_mode.BlobOnly:
 		before := item.Blob.String()
-		after := s.repoLayout.GetDirLayout().Rel(before)
+		after := s.repoLayout.Rel(before)
 
 		if err = external.ExternalObjectId.SetBlob(after); err != nil {
 			err = errors.Wrap(err)
@@ -462,7 +462,7 @@ func (s *Store) WriteFSItemToExternal(
 
 	if err = item.WriteToSku(
 		external,
-		s.repoLayout.GetDirLayout(),
+		s.repoLayout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

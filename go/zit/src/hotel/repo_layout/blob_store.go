@@ -28,7 +28,7 @@ func MakeBlobStoreFromLayout(
 		Config: dir_layout.MakeConfigFromImmutableBlobConfig(
 			s.GetConfig().GetBlobStoreImmutableConfig(),
 		),
-		tempFS: s.GetDirLayout().GetTempLocal(),
+		tempFS: s.GetTempLocal(),
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
@@ -149,7 +149,7 @@ func (s blobStore) blobReaderFrom(
 }
 
 func MakeCopyingBlobStore(
-	env env.Env,
+	env env.LocalEnv,
 	local, remote interfaces.BlobStore,
 ) CopyingBlobStore {
 	if local == nil {
@@ -157,14 +157,14 @@ func MakeCopyingBlobStore(
 	}
 
 	return CopyingBlobStore{
-		Env:    env,
-		local:  local,
-		remote: remote,
+		LocalEnv: env,
+		local:    local,
+		remote:   remote,
 	}
 }
 
 type CopyingBlobStore struct {
-	env.Env
+	env.LocalEnv
 	local, remote interfaces.BlobStore
 }
 
