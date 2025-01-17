@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func MakeConfigStore(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 ) Config {
 	return Config{
 		toml_v0: MakeBlobStore(

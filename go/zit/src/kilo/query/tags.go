@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -86,7 +86,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Tags) Load(s repo_layout.Layout) (err error) {
+func (sch *Tags) Load(s env_repo.Env) (err error) {
 	var f *os.File
 
 	p := s.FileTags()
@@ -114,7 +114,7 @@ func (sch *Tags) Load(s repo_layout.Layout) (err error) {
 }
 
 func (sch *Tags) Flush(
-	s repo_layout.Layout,
+	s env_repo.Env,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {

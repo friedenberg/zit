@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -31,7 +31,7 @@ type dirItems struct {
 	rootProcessed bool
 
 	interfaces.FileExtensionGetter
-	repoLayout            repo_layout.Layout
+	repoLayout            env_repo.Env
 	externalStoreSupplies external_store.Supplies
 
 	probablyCheckedOut      fsItemData
@@ -43,7 +43,7 @@ type dirItems struct {
 func makeObjectsWithDir(
 	p string,
 	fe interfaces.FileExtensionGetter,
-	fs_home repo_layout.Layout,
+	fs_home env_repo.Env,
 ) (d dirItems) {
 	d.root = p
 	d.FileExtensionGetter = fe

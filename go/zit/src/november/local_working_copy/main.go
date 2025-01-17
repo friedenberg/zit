@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
@@ -23,11 +23,11 @@ import (
 )
 
 type Repo struct {
-	env.LocalEnv
+	env_local.Env
 
 	sunrise ids.Tai
 
-	layout       repo_layout.Layout
+	layout       env_repo.Env
 	fileEncoder  store_fs.FileEncoder
 	config       config.Compiled
 	dormantIndex dormant_index.Index
@@ -43,19 +43,19 @@ type Repo struct {
 }
 
 func Make(
-	env env.LocalEnv,
+	env env_local.Env,
 	options Options,
 ) *Repo {
-	layoutOptions := repo_layout.Options{
+	layoutOptions := env_repo.Options{
 		BasePath: env.GetCLIConfig().BasePath,
 	}
 
-	var repoLayout repo_layout.Layout
+	var repoLayout env_repo.Env
 
 	{
 		var err error
 
-		if repoLayout, err = repo_layout.Make(
+		if repoLayout, err = env_repo.Make(
 			env,
 			layoutOptions,
 		); err != nil {
@@ -68,10 +68,10 @@ func Make(
 
 func MakeWithLayout(
 	options Options,
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 ) (repo *Repo) {
 	repo = &Repo{
-		LocalEnv:       repoLayout,
+		Env:            repoLayout,
 		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}

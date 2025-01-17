@@ -10,13 +10,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 func MakeBoxTransactedArchive(
-	env env.Env,
+	env env_ui.Env,
 	options options_print.V0,
 ) *BoxTransacted {
 	po := options.

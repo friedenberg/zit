@@ -5,13 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/tag_blobs"
 )
 
 type Tag struct {
-	dirLayout        repo_layout.Layout
+	dirLayout        env_repo.Env
 	luaVMPoolBuilder *lua.VMPoolBuilder
 	toml_v0          Store[tag_blobs.V0, *tag_blobs.V0]
 	toml_v1          Store[tag_blobs.TomlV1, *tag_blobs.TomlV1]
@@ -20,7 +20,7 @@ type Tag struct {
 }
 
 func MakeTagStore(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) Tag {
 	return Tag{

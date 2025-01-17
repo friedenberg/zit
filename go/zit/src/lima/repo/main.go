@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
@@ -12,7 +12,7 @@ import (
 // TODO explore permissions for who can read / write from the inventory list
 // store
 type Repo interface {
-	GetEnv() env.Env
+	GetEnv() env_ui.Env
 	GetStoreVersion() interfaces.StoreVersion
 	GetRepoType() repo_type.Type
 	GetBlobStore() interfaces.BlobStore

@@ -15,8 +15,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -29,7 +29,7 @@ func Make(
 	config sku.Config,
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
-	layout repo_layout.Layout,
+	layout env_repo.Env,
 	inventoryFormatOptions object_inventory_format.Options,
 	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
@@ -63,7 +63,7 @@ type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	metadataTextParser  object_metadata.TextParser
-	repoLayout          repo_layout.Layout
+	repoLayout          env_repo.Env
 	fileEncoder         FileEncoder
 	inlineTypeChecker   ids.InlineTypeChecker
 	fileExtensions      interfaces.FileExtensionGetter

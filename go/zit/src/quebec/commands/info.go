@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
 
 type Info struct {
@@ -27,16 +27,15 @@ func init() {
 func (c Info) SetFlagSet(f *flag.FlagSet) {}
 
 func (c Info) Run(dependencies command.Request) {
-	layout := env_dir.MakeDefault(
+	dir := env_dir.MakeDefault(
 		dependencies,
 		dependencies.Debug,
 	)
 
-	env := env.Make(
+	ui := env_ui.Make(
 		dependencies,
 		dependencies.Config,
-		layout,
-		env.Options{},
+		env_ui.Options{},
 	)
 
 	args := dependencies.Args()
@@ -48,23 +47,23 @@ func (c Info) Run(dependencies command.Request) {
 	for _, arg := range args {
 		switch strings.ToLower(arg) {
 		case "store-version":
-			env.GetUI().Print(c.Config.GetStoreVersion())
+			ui.GetUI().Print(c.Config.GetStoreVersion())
 
 		case "compression-type":
-			env.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
+			ui.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetCompressionType())
 
 		case "age-encryption":
-			env.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
+			ui.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetAgeEncryption())
 
 		case "xdg":
-			ecksDeeGee := env.GetXDG()
+			ecksDeeGee := dir.GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,
 			}
 
-			if _, err := dotenv.WriteTo(env.GetOutFile()); err != nil {
-				env.CancelWithError(err)
+			if _, err := dotenv.WriteTo(ui.GetOutFile()); err != nil {
+				ui.CancelWithError(err)
 			}
 		}
 	}

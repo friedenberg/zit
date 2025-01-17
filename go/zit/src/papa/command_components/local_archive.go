@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
@@ -20,7 +20,7 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c LocalArchive) MakeLocalArchive(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 ) repo.Repo {
 	repoType := repoLayout.GetConfig().GetRepoType()
 

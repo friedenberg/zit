@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
@@ -75,7 +76,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 		remote = cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 			req,
 			remoteArg,
-			env.Options{},
+			env_ui.Options{},
 		)
 
 	case repo.RemoteTypeStdioLocal:
@@ -94,7 +95,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 		remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
 			req,
 			remoteArg,
-			env.Options{},
+			env_ui.Options{},
 		)
 
 	default:
@@ -107,7 +108,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 func (cmd *Remote) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
-	options env.Options,
+	options env_ui.Options,
 ) repo.Repo {
 	repoLayout := cmd.MakeRepoLayout(req, false)
 
@@ -117,7 +118,7 @@ func (cmd *Remote) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
-	options env.Options,
+	options env_ui.Options,
 ) (remoteHTTP *remote_http.Client) {
 	remote := cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 		req,
@@ -153,7 +154,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 }
 
 func (cmd *Remote) MakeRemoteStdioSSH(
-	env env.LocalEnv,
+	env env_local.Env,
 	arg string,
 ) (remoteHTTP *remote_http.Client) {
 	remote := local_working_copy.Make(
@@ -180,7 +181,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 }
 
 func (cmd *Remote) MakeRemoteStdioLocal(
-	env env.LocalEnv,
+	env env_local.Env,
 	dir string,
 ) (remoteHTTP *remote_http.Client) {
 	remote := local_working_copy.Make(

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -27,7 +27,7 @@ type Json struct {
 func (j *Json) FromStringAndMetadata(
 	k string,
 	m *object_metadata.Metadata,
-	s repo_layout.Layout,
+	s env_repo.Env,
 ) (err error) {
 	var r sha.ReadCloser
 
@@ -59,12 +59,12 @@ func (j *Json) FromStringAndMetadata(
 
 func (j *Json) FromTransacted(
 	sk *sku.Transacted,
-	s repo_layout.Layout,
+	s env_repo.Env,
 ) (err error) {
 	return j.FromStringAndMetadata(sk.ObjectId.String(), sk.GetMetadata(), s)
 }
 
-func (j *Json) ToTransacted(sk *sku.Transacted, s repo_layout.Layout) (err error) {
+func (j *Json) ToTransacted(sk *sku.Transacted, s env_repo.Env) (err error) {
 	var w sha.WriteCloser
 
 	if w, err = s.BlobWriter(); err != nil {

@@ -1,10 +1,10 @@
 package repo
 
-import "code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+import "code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 
 type LocalRepo interface {
 	Repo
-	GetRepoLayout() repo_layout.Layout
+	GetRepoLayout() env_repo.Env
 }
 
 type LocalWorkingCopy interface {

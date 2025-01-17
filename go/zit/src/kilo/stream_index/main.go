@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/mike/config"
@@ -50,7 +50,7 @@ func init() {
 }
 
 type Index struct {
-	directoryLayout repo_layout.Layout
+	directoryLayout env_repo.Env
 	sunrise         ids.Tai
 	mutable_config  *config.Compiled
 	path            string
@@ -61,7 +61,7 @@ type Index struct {
 }
 
 func MakeIndex(
-	s repo_layout.Layout,
+	s env_repo.Env,
 	k *config.Compiled,
 	dir string,
 	sunrise ids.Tai,

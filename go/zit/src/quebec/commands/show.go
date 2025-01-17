@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -153,7 +153,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 }
 
 func (cmd Show) runWithArchive(
-	env env.Env,
+	env env_ui.Env,
 	archive repo.Repo,
 	// qg *query.Group,
 ) {

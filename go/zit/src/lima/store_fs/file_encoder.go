@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -24,14 +24,14 @@ type FileEncoder interface {
 type fileEncoder struct {
 	mode      int
 	perm      os.FileMode
-	dirLayout repo_layout.Layout
+	dirLayout env_repo.Env
 	ic        ids.InlineTypeChecker
 
 	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{

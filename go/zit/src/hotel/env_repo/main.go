@@ -1,0 +1,209 @@
+package env_repo
+
+import (
+	"os"
+	"path/filepath"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+)
+
+type Getter interface {
+	GetRepoLayout() Env
+}
+
+type Env struct {
+	env_local.Env
+
+	config config
+
+	basePath              string
+	readOnlyBlobStorePath string
+	lockSmith             interfaces.LockSmith
+
+	interfaces.DirectoryPaths
+
+	local, remote blobStore
+
+	CopyingBlobStore
+	ObjectStore
+}
+
+func Make(
+	env env_local.Env,
+	o Options,
+) (s Env, err error) {
+	s.Env = env
+
+	if o.BasePath == "" {
+		o.BasePath = os.Getenv(env_dir.EnvDir)
+	}
+
+	if o.BasePath == "" {
+		if o.BasePath, err = os.Getwd(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	s.basePath = o.BasePath
+	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
+
+	dp := &directoryV1{}
+
+	if err = dp.init(
+		s.GetStoreVersion(),
+		s.GetXDG(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s.DirectoryPaths = dp
+
+	// TODO add support for failing on pre-existing temp local
+	// if files.Exists(s.TempLocal.basePath) {
+	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
+	// 	return
+	// }
+
+	if !o.PermitNoZitDirectory {
+		if ok := files.Exists(s.DirZit()); !ok {
+			err = errors.Wrap(ErrNotInZitDir{})
+			return
+		}
+	}
+
+	s.lockSmith = file_lock.New(s.FileLock())
+
+	// TODO switch to useing MakeCommonEnv()
+	{
+		if err = os.Setenv(env_dir.EnvDir, s.basePath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = os.Setenv(
+			env_dir.EnvBin,
+			s.GetExecPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = s.loadImmutableConfig(); err != nil {
+	}
+
+	if err = s.setupStores(); err != nil {
+		errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Env) setupStores() (err error) {
+	if s.local, err = MakeBlobStoreFromLayout(*s); err != nil {
+		errors.Wrap(err)
+		return
+	}
+
+	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
+
+	s.ObjectStore = ObjectStore{
+		basePath:       s.basePath,
+		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreImmutableConfig()),
+		DirectoryPaths: s.DirectoryPaths,
+		TemporaryFS:    s.GetTempLocal(),
+	}
+
+	return
+}
+
+func (a Env) GetEnv() env_ui.Env {
+	return a.Env
+}
+
+func (a Env) SansObjectAge() (b Env) {
+	b = a
+
+	b.ObjectStore.Config = env_dir.MakeConfig(
+		nil,
+		a.ObjectStore.Config.GetCompressionType(),
+		a.ObjectStore.Config.GetLockInternalFiles(),
+	)
+
+	return
+}
+
+func (a Env) SansObjectCompression() (b Env) {
+	b = a
+
+	b.ObjectStore.Config = env_dir.MakeConfig(
+		a.ObjectStore.Config.GetAgeEncryption(),
+		immutable_config.CompressionTypeNone,
+		a.ObjectStore.Config.GetLockInternalFiles(),
+	)
+
+	return
+}
+
+func (s Env) GetConfig() immutable_config.Config {
+	return s.config.ImmutableConfig
+}
+
+func (s Env) GetLockSmith() interfaces.LockSmith {
+	return s.lockSmith
+}
+
+func stringSliceJoin(s string, vs []string) []string {
+	return append([]string{s}, vs...)
+}
+
+func (s Env) ResetCache() (err error) {
+	if err = files.SetAllowUserChangesRecursive(s.DirCache()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = os.RemoveAll(s.DirCache()); err != nil {
+		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
+		return
+	}
+
+	if err = s.MakeDir(s.DirCache()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.MakeDir(s.DirCacheObjects()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.MakeDir(s.DirCacheObjectPointers()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (h Env) DataFileStoreVersion() string {
+	return filepath.Join(h.GetXDG().Data, "version")
+}
+
+func (h Env) GetStoreVersion() interfaces.StoreVersion {
+	if h.config.ImmutableConfig == nil {
+		return immutable_config.CurrentStoreVersion
+	} else {
+		return h.config.ImmutableConfig.GetStoreVersion()
+	}
+}

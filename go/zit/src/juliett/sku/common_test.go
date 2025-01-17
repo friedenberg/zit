@@ -17,9 +17,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/test_object_metadata_io"
 )
 
@@ -190,7 +191,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 func makeTestFSHome(
 	t *testing.T,
 	contents map[string]string,
-) repo_layout.Layout {
+) env_repo.Env {
 	p := t.TempDir()
 
 	dirLayout := env_dir.MakeWithHome(
@@ -202,9 +203,9 @@ func makeTestFSHome(
 
 	var err error
 
-	f, err := repo_layout.Make(
-		env.MakeDefault(dirLayout),
-		repo_layout.Options{
+	f, err := env_repo.Make(
+		env_local.Make(env_ui.MakeDefault(), dirLayout),
+		env_repo.Options{
 			BasePath: p,
 		},
 	)
@@ -216,7 +217,7 @@ func makeTestFSHome(
 }
 
 func makeTestTextFormat(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{

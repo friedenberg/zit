@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/mike/config"
@@ -28,7 +28,7 @@ type Page struct {
 	*probe_index
 	added, addedLatest *sku.List
 	hasChanges         bool
-	repoLayout         repo_layout.Layout
+	repoLayout         env_repo.Env
 	config             *config.Compiled
 	oids               map[string]struct{}
 }

@@ -4,14 +4,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type BlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ] struct {
-	dirLayout repo_layout.Layout
+	dirLayout env_repo.Env
 	Format[A, APtr]
 	resetFunc func(APtr)
 }
@@ -20,7 +20,7 @@ func MakeBlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ](
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 	format Format[A, APtr],
 	resetFunc func(APtr),
 ) (s *BlobStore[A, APtr]) {

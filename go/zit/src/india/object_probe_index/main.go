@@ -4,10 +4,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
 
 type (
@@ -22,14 +22,14 @@ type (
 	pageInterface interface {
 		GetObjectProbeIndexPage() pageInterface
 		commonInterface
-		PrintAll(env.Env) error
+		PrintAll(env_ui.Env) error
 		errors.Flusher
 	}
 
 	Index interface {
 		GetObjectProbeIndex() Index
 		commonInterface
-		PrintAll(env.Env) error
+		PrintAll(env_ui.Env) error
 		errors.Flusher
 	}
 )
@@ -45,13 +45,13 @@ type object_probe_index struct {
 	pages [PageCount]page
 }
 
-func MakePermitDuplicates(s repo_layout.Layout, path string) (e *object_probe_index, err error) {
+func MakePermitDuplicates(s env_repo.Env, path string) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
 	err = e.initialize(rowEqualerComplete{}, s, path)
 	return
 }
 
-func MakeNoDuplicates(s repo_layout.Layout, path string) (e *object_probe_index, err error) {
+func MakeNoDuplicates(s env_repo.Env, path string) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
 	err = e.initialize(rowEqualerShaOnly{}, s, path)
 	return
@@ -59,7 +59,7 @@ func MakeNoDuplicates(s repo_layout.Layout, path string) (e *object_probe_index,
 
 func (e *object_probe_index) initialize(
 	equaler interfaces.Equaler1[*row],
-	s repo_layout.Layout,
+	s env_repo.Env,
 	path string,
 ) (err error) {
 	for i := range e.pages {
@@ -211,7 +211,7 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 	return wg.GetError()
 }
 
-func (e *object_probe_index) PrintAll(env env.Env) (err error) {
+func (e *object_probe_index) PrintAll(env env_ui.Env) (err error) {
 	for i := range e.pages {
 		p := &e.pages[i]
 

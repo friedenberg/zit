@@ -5,17 +5,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type RepoStore struct {
-	dirLayout           repo_layout.Layout
+	dirLayout           env_repo.Env
 	v0                  Store[repo_blobs.V0, *repo_blobs.V0]
 	toml_relay_local_v0 Store[repo_blobs.TomlRelayLocalV0, *repo_blobs.TomlRelayLocalV0]
 }
 
 func MakeRepoStore(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 ) RepoStore {
 	return RepoStore{
 		dirLayout: dirLayout,

@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
@@ -69,7 +69,7 @@ func (a *Compiled) GetMutableConfig() mutable_config_blobs.Blob {
 }
 
 func (c *Compiled) Initialize(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 	kcli config_mutable_cli.Config,
 	dormant *dormant_index.Index,
 	blobStore *blob_store.VersionedStores,

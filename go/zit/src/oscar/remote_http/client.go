@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -31,7 +31,7 @@ type Client struct {
 	// *local_working_copy.Repo
 }
 
-func (repo *Client) GetEnv() env.Env {
+func (repo *Client) GetEnv() env_ui.Env {
 	return repo.Repo.GetEnv()
 }
 

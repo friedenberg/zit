@@ -18,9 +18,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
@@ -30,7 +30,7 @@ import (
 type Store struct {
 	lock sync.Mutex
 
-	repoLayout repo_layout.Layout
+	repoLayout env_repo.Env
 	ls         interfaces.LockSmith
 	sv         interfaces.StoreVersion
 	of         interfaces.ObjectIOFactory
@@ -46,7 +46,7 @@ type Store struct {
 }
 
 func (s *Store) Initialize(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
 	blobStore blob_store.InventoryList,
@@ -82,7 +82,7 @@ func (s *Store) Initialize(
 	return
 }
 
-func (s *Store) GetEnv() env.Env {
+func (s *Store) GetEnv() env_ui.Env {
 	return s.GetRepoLayout()
 }
 
@@ -124,7 +124,7 @@ func (s *Store) GetTai() ids.Tai {
 	}
 }
 
-func (s *Store) GetRepoLayout() repo_layout.Layout {
+func (s *Store) GetRepoLayout() env_repo.Env {
 	return s.repoLayout
 }
 
@@ -319,7 +319,7 @@ func (s *Store) ImportInventoryList(
 			return
 		}
 
-		if _, err = repo_layout.CopyBlobIfNecessary(
+		if _, err = env_repo.CopyBlobIfNecessary(
 			s.GetRepoLayout().GetEnv(),
 			s.GetRepoLayout(),
 			bs,

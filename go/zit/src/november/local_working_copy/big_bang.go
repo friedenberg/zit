@@ -15,14 +15,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 func Genesis(
-	bb repo_layout.BigBang,
-	repoLayout repo_layout.Layout,
+	bb env_repo.BigBang,
+	repoLayout env_repo.Env,
 ) (repo *Repo) {
 	repo = MakeWithLayout(OptionsEmpty, repoLayout)
 
@@ -48,7 +48,7 @@ func Genesis(
 	return
 }
 
-func (repo *Repo) initDefaultTypeAndConfig(bb repo_layout.BigBang) (err error) {
+func (repo *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
 	if err = repo.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -77,7 +77,7 @@ func (repo *Repo) initDefaultTypeAndConfig(bb repo_layout.BigBang) (err error) {
 }
 
 func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
-	bb repo_layout.BigBang,
+	bb env_repo.BigBang,
 ) (defaultTypeObjectId ids.Type, err error) {
 	if bb.ExcludeDefaultType {
 		return
@@ -125,7 +125,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 }
 
 func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
-	bb repo_layout.BigBang,
+	bb env_repo.BigBang,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bb.ExcludeDefaultConfig {

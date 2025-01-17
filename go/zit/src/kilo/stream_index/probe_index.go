@@ -3,18 +3,18 @@ package stream_index
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 type probe_index struct {
-	directoryLayout repo_layout.Layout
+	directoryLayout env_repo.Env
 	object_probe_index.Index
 }
 
 func (s *probe_index) Initialize(
-	directoryLayout repo_layout.Layout,
+	directoryLayout env_repo.Env,
 ) (err error) {
 	s.directoryLayout = directoryLayout
 

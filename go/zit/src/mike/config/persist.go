@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
@@ -166,7 +166,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 }
 
 func (kc *Compiled) loadMutableConfig(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	var f *os.File
@@ -205,7 +205,7 @@ func (kc *Compiled) loadMutableConfig(
 }
 
 func (kc *Compiled) Flush(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -234,7 +234,7 @@ func (kc *Compiled) Flush(
 }
 
 func (kc *Compiled) flushMutableConfig(
-	s repo_layout.Layout,
+	s env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {

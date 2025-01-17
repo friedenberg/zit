@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -18,7 +18,7 @@ func init() {
 		"clone",
 		&Clone{
 			Genesis: command_components.Genesis{
-				BigBang: repo_layout.BigBang{
+				BigBang: env_repo.BigBang{
 					ExcludeDefaultType: true,
 				},
 			},

@@ -6,14 +6,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Genesis struct {
-	repo_layout.BigBang
+	env_repo.BigBang
 	LocalWorkingCopy
 	LocalArchive
 }
@@ -23,22 +24,21 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
-	layout := env_dir.MakeDefaultAndInitialize(
+	dir := env_dir.MakeDefaultAndInitialize(
 		dep,
 		dep.Config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
-	env := env.Make(
+	ui := env_ui.Make(
 		dep,
 		dep.Config,
-		layout,
-		env.Options{},
+		env_ui.Options{},
 	)
 
-	var repoLayout repo_layout.Layout
+	var repoLayout env_repo.Env
 
-	layoutOptions := repo_layout.Options{
+	layoutOptions := env_repo.Options{
 		BasePath:             dep.Config.BasePath,
 		PermitNoZitDirectory: true,
 	}
@@ -46,11 +46,11 @@ func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
 	{
 		var err error
 
-		if repoLayout, err = repo_layout.Make(
-			env,
+		if repoLayout, err = env_repo.Make(
+			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
-			env.CancelWithError(err)
+			ui.CancelWithError(err)
 		}
 	}
 

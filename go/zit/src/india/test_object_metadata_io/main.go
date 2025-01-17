@@ -9,19 +9,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 func Make(
 	t *test_logz.T,
 	contents map[string]string,
-) (f repo_layout.Layout) {
+) (f env_repo.Env) {
 	t = t.Skip(1)
 
 	p := t.TempDir()
 
-	dirLayout := env_dir.MakeWithHome(
+	dir := env_dir.MakeWithHome(
 		errors.MakeContextDefault(),
 		p,
 		debug.Options{},
@@ -30,9 +31,9 @@ func Make(
 
 	var err error
 
-	if f, err = repo_layout.Make(
-		env.MakeDefault(dirLayout),
-		repo_layout.Options{
+	if f, err = env_repo.Make(
+		env_local.Make(env_ui.MakeDefault(), dir),
+		env_repo.Options{
 			BasePath:             p,
 			PermitNoZitDirectory: true,
 		},

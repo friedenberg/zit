@@ -6,21 +6,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 func init() {
 	command.Register(
 		"init-archive",
 		&InitArchive{
-			BigBang: repo_layout.BigBang{},
+			BigBang: env_repo.BigBang{},
 		},
 	)
 }
 
 type InitArchive struct {
-	repo_layout.BigBang
+	env_repo.BigBang
 }
 
 func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
@@ -29,21 +30,20 @@ func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c InitArchive) Run(dependencies command.Request) {
-	layout := env_dir.MakeDefault(
+	dir := env_dir.MakeDefault(
 		dependencies,
 		dependencies.Debug,
 	)
 
-	env := env.Make(
+	ui := env_ui.Make(
 		dependencies,
 		dependencies.Config,
-		layout,
-		env.Options{},
+		env_ui.Options{},
 	)
 
-	var repoLayout repo_layout.Layout
+	var repoLayout env_repo.Env
 
-	layoutOptions := repo_layout.Options{
+	layoutOptions := env_repo.Options{
 		BasePath:             dependencies.Config.BasePath,
 		PermitNoZitDirectory: true,
 	}
@@ -51,11 +51,11 @@ func (c InitArchive) Run(dependencies command.Request) {
 	{
 		var err error
 
-		if repoLayout, err = repo_layout.Make(
-			env,
+		if repoLayout, err = env_repo.Make(
+			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
-			env.CancelWithError(err)
+			ui.CancelWithError(err)
 		}
 
 	}

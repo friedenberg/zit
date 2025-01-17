@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -101,7 +101,7 @@ func (cmd CatBlob) Run(
 	blobStore := cmd.MakeBlobStoreLocal(
 		dep,
 		dep.Config,
-		env.Options{},
+		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)
 

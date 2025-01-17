@@ -3,7 +3,7 @@ package blob_store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 )
 
@@ -13,7 +13,7 @@ type Type struct {
 }
 
 func MakeTypeStore(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 ) Type {
 	return Type{
 		toml_v0: MakeBlobStore(

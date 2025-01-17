@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -62,7 +62,7 @@ func (s *Store) GetZettelIdIndex() zettel_id_index.Index {
 	return s.zettelIdIndex
 }
 
-func (s *Store) GetDirectoryLayout() repo_layout.Layout {
+func (s *Store) GetDirectoryLayout() env_repo.Env {
 	return s.dirLayout
 }
 

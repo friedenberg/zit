@@ -4,7 +4,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -24,7 +24,7 @@ func (c Serve) Run(req command.Request) {
 
 	localWorkingCopy := c.MakeLocalWorkingCopyWithOptions(
 		req,
-		env.Options{
+		env_ui.Options{
 			UIFileIsStderr: true,
 		},
 		local_working_copy.OptionsEmpty,

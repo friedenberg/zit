@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
@@ -20,14 +20,14 @@ func (c LocalWorkingCopy) MakeLocalWorkingCopy(
 ) *local_working_copy.Repo {
 	return c.MakeLocalWorkingCopyWithOptions(
 		dep,
-		env.Options{},
+		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopyWithOptions(
 	dep command.Request,
-	envOptions env.Options,
+	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
 ) *local_working_copy.Repo {
 	env := cmd.MakeEnvWithOptions(dep, envOptions)
@@ -39,7 +39,7 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopyWithOptions(
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
-	options env.Options,
+	options env_ui.Options,
 ) (local *local_working_copy.Repo) {
 	env := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,

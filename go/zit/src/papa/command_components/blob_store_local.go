@@ -7,8 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
@@ -18,39 +19,38 @@ func (cmd *BlobStoreLocal) SetFlagSet(f *flag.FlagSet) {
 }
 
 type BlobStoreWithEnv struct {
-	env.Env
+	env_ui.Env
 	interfaces.BlobStore
 }
 
 func (c BlobStoreLocal) MakeBlobStoreLocal(
 	context errors.Context,
 	config config_mutable_cli.Config,
-	envOptions env.Options,
+	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {
-	layout := env_dir.MakeDefault(
+	dir := env_dir.MakeDefault(
 		context,
 		config.Debug,
 	)
 
-	env := env.Make(
+	ui := env_ui.Make(
 		context,
 		config,
-		layout,
 		envOptions,
 	)
 
-	layoutOptions := repo_layout.Options{
+	layoutOptions := env_repo.Options{
 		BasePath: config.BasePath,
 	}
 
-	var repoLayout repo_layout.Layout
+	var repoLayout env_repo.Env
 
 	{
 		var err error
 
-		if repoLayout, err = repo_layout.Make(
-			env,
+		if repoLayout, err = env_repo.Make(
+			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
 			context.CancelWithError(err)
@@ -58,7 +58,7 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 	}
 
 	return BlobStoreWithEnv{
-		Env:       env,
+		Env:       ui,
 		BlobStore: repoLayout,
 	}
 }

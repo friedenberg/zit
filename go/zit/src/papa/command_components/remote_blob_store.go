@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type RemoteBlobStore struct {
@@ -22,9 +22,9 @@ func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
-	e env.LocalEnv,
+	e env_local.Env,
 ) (blobStore interfaces.BlobStore, err error) {
-	blobStore = repo_layout.MakeBlobStore(
+	blobStore = env_repo.MakeBlobStore(
 		cmd.Blobs,
 		env_dir.MakeConfigFromImmutableBlobConfig(&cmd.Config),
 		e.GetTempLocal(),

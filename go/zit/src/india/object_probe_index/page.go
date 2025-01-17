@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type page struct {
@@ -21,14 +21,14 @@ type page struct {
 	f          *os.File
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
-	repoLayout repo_layout.Layout
+	repoLayout env_repo.Env
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	sha.PageId
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler1[*row],
-	s repo_layout.Layout,
+	s env_repo.Env,
 	pid sha.PageId,
 ) (err error) {
 	p.added = heap.Make(
@@ -234,7 +234,7 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 	return
 }
 
-func (e *page) PrintAll(env env.Env) (err error) {
+func (e *page) PrintAll(env env_ui.Env) (err error) {
 	e.Lock()
 	defer e.Unlock()
 

@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Repo) GetEnv() env.Env {
+func (u *Repo) GetEnv() env_ui.Env {
 	return u
 }
 
@@ -30,7 +30,7 @@ func (u *Repo) GetDormantIndex() *dormant_index.Index {
 	return &u.dormantIndex
 }
 
-func (u *Repo) GetRepoLayout() repo_layout.Layout {
+func (u *Repo) GetRepoLayout() env_repo.Env {
 	return u.layout
 }
 

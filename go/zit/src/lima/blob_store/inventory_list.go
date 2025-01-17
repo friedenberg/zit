@@ -7,22 +7,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 )
 
 type InventoryList struct {
-	dirLayout repo_layout.Layout
+	dirLayout env_repo.Env
 	boxFormat *box_format.BoxTransacted
 	v0        inventory_list_blobs.V0
 	v1        inventory_list_blobs.V1
 }
 
 func MakeInventoryStore(
-	dirLayout repo_layout.Layout,
+	dirLayout env_repo.Env,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
 ) InventoryList {

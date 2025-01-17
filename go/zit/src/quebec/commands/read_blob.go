@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -53,7 +53,7 @@ func (c ReadBlob) Run(dep command.Request) {
 }
 
 func (ReadBlob) readOneBlob(
-	repoLayout repo_layout.Layout,
+	repoLayout env_repo.Env,
 	entry readBlobEntry,
 ) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser

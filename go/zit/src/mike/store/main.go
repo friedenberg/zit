@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -25,7 +25,7 @@ import (
 type Store struct {
 	sunrise   ids.Tai
 	config    *config.Compiled
-	dirLayout repo_layout.Layout
+	dirLayout env_repo.Env
 
 	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
@@ -60,7 +60,7 @@ type UIDelegate struct {
 
 func (c *Store) Initialize(
 	k *config.Compiled,
-	st repo_layout.Layout,
+	st env_repo.Env,
 	pmf object_inventory_format.Format,
 	t ids.Tai,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -147,7 +147,7 @@ func (s *Store) SetExternalStores(
 			FuncPrimitiveQuery: s.GetStreamIndex().ReadPrimitiveQuery,
 		}
 
-		es.Layout = s.GetDirectoryLayout()
+		es.Env = s.GetDirectoryLayout()
 		es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
 
 		es.RepoId = k

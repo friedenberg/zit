@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -16,7 +16,7 @@ type JsonWithUrl struct {
 
 func MakeJsonTomlBookmark(
 	sk *sku.Transacted,
-	s repo_layout.Layout,
+	s env_repo.Env,
 	tabs []interface{},
 ) (j JsonWithUrl, err error) {
 	if err = j.FromTransacted(sk, s); err != nil {

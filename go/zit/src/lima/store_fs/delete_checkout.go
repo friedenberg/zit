@@ -9,14 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type DeleteCheckout struct{}
 
 func (c DeleteCheckout) Run(
 	dryRun bool,
-	s repo_layout.Layout,
+	s env_repo.Env,
 	p interfaces.FuncIter[*fd.FD],
 	fs interfaces.Iterable[*fd.FD],
 ) (err error) {
