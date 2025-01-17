@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
@@ -42,6 +43,7 @@ type Store struct {
 
 	streamIndex   *stream_index.Index
 	zettelIdIndex zettel_id_index.Index
+	dormantIndex  *dormant_index.Index
 
 	protoZettel  sku.Proto
 	queryBuilder *query.Builder
@@ -68,6 +70,7 @@ func (c *Store) Initialize(
 	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
 	blobStore *blob_store.VersionedStores,
+	dormantIndex *dormant_index.Index,
 ) (err error) {
 	c.config = k
 	c.dirLayout = st
@@ -77,6 +80,7 @@ func (c *Store) Initialize(
 	c.sunrise = t
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
+	c.dormantIndex = dormantIndex
 
 	c.inventoryList = sku.MakeList()
 
@@ -110,7 +114,7 @@ func (c *Store) Initialize(
 
 	if c.streamIndex, err = stream_index.MakeIndex(
 		c.GetDirectoryLayout(),
-		c.GetConfig(),
+		c.applyDormantAndRealizeTags,
 		c.GetDirectoryLayout().DirCacheObjects(),
 		c.sunrise,
 	); err != nil {

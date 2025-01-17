@@ -1,4 +1,4 @@
-package env_config
+package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -11,8 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-// TODO
-func (k *env) ApplyDormantAndRealizeTags(
+func (k *Store) applyDormantAndRealizeTags(
 	sk *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", sk)
@@ -66,12 +65,12 @@ func (k *env) ApplyDormantAndRealizeTags(
 		return
 	}
 
-	sk.SetDormant(k.dormant.ContainsSku(sk))
+	sk.SetDormant(k.dormantIndex.ContainsSku(sk))
 
 	return
 }
 
-func (k *env) addSuperTags(
+func (k *Store) addSuperTags(
 	sk *sku.Transacted,
 ) (err error) {
 	g := sk.GetGenre()
@@ -102,7 +101,7 @@ func (k *env) addSuperTags(
 
 		var ek *sku.Transacted
 
-		if ek, err = k.getTagOrRepoIdOrType(ex); err != nil {
+		if ek, err = k.config.GetTagOrRepoIdOrType(ex); err != nil {
 			err = errors.Wrapf(err, "Expanded: %q", ex)
 			return
 		}
@@ -141,7 +140,7 @@ func (k *env) addSuperTags(
 	return
 }
 
-func (k *env) addImplicitTags(
+func (k *Store) addImplicitTags(
 	sk *sku.Transacted,
 ) (err error) {
 	mp := &sk.Metadata
@@ -152,7 +151,7 @@ func (k *env) addImplicitTags(
 		p1.Type = tag_paths.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
-		implicitTags := k.getImplicitTags(e)
+		implicitTags := k.config.GetImplicitTags(e)
 
 		if implicitTags.Len() == 0 {
 			sk.Metadata.Cache.TagPaths.AddPathWithType(p1)
@@ -170,7 +169,7 @@ func (k *env) addImplicitTags(
 
 	mp.GetTags().EachPtr(addImplicitTags)
 
-	typKonfig := k.getApproximatedType(mp.GetType()).ApproximatedOrActual()
+	typKonfig := k.config.GetApproximatedType(mp.GetType()).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetTags().EachPtr(ie.AddPtr)

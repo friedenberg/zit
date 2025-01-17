@@ -88,7 +88,7 @@ func (pw *writer) flushBoth() (err error) {
 	ui.Log().Printf("flushing both: %s", pw.Path())
 
 	chain := quiter.MakeChain(
-		pw.config.ApplyDormantAndRealizeTags,
+		pw.preWrite,
 		pw.writeOne,
 	)
 
@@ -156,7 +156,7 @@ func (pw *writer) flushJustLatest() (err error) {
 	}
 
 	chain := quiter.MakeChain(
-		pw.config.ApplyDormantAndRealizeTags,
+		pw.preWrite,
 		pw.removeOldLatest,
 		pw.writeOne,
 	)

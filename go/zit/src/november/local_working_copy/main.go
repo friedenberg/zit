@@ -180,6 +180,7 @@ func (repo *Repo) initialize(
 		ofo,
 		boxFormatArchive,
 		repo.blobStore,
+		&repo.dormantIndex,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

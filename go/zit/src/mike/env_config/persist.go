@@ -58,11 +58,6 @@ func (kc *env) recompileTags() (err error) {
 				return
 			}
 
-			if err = kc.ApplyDormantAndRealizeTags(&ke.Transacted); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
 			return
 		},
 	); err != nil {
@@ -115,11 +110,6 @@ func (kc *env) recompileTypes(
 			isBinary := commonBlob.GetBinary()
 			if !isBinary {
 				inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
-			}
-
-			if err = kc.ApplyDormantAndRealizeTags(ct); err != nil {
-				err = errors.Wrap(err)
-				return
 			}
 
 			return

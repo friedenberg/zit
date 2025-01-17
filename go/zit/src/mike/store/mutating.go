@@ -165,7 +165,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if err = s.GetConfig().ApplyDormantAndRealizeTags(
+	if err = s.applyDormantAndRealizeTags(
 		child,
 	); err != nil {
 		err = errors.Wrap(err)

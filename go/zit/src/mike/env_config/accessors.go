@@ -50,7 +50,7 @@ func (kc *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc *compiled) getApproximatedType(
+func (kc *compiled) GetApproximatedType(
 	k interfaces.ObjectId,
 ) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
@@ -70,7 +70,7 @@ func (kc *compiled) getApproximatedType(
 	return
 }
 
-func (kc *compiled) getTagOrRepoIdOrType(
+func (kc *compiled) GetTagOrRepoIdOrType(
 	v string,
 ) (sk *sku.Transacted, err error) {
 	var k ids.ObjectId
@@ -194,7 +194,7 @@ func (c *compiled) getSortedTagsExpanded(
 	return
 }
 
-func (c *compiled) getImplicitTags(
+func (c *compiled) GetImplicitTags(
 	e *ids.Tag,
 ) ids.TagSet {
 	s, ok := c.ImplicitTags[e.String()]

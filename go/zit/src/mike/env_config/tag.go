@@ -111,7 +111,7 @@ func (k *compiled) AccumulateImplicitTags(
 				return
 			}
 
-			if err = k.getImplicitTags(&e1).Each(
+			if err = k.GetImplicitTags(&e1).Each(
 				func(e2 ids.Tag) (err error) {
 					return k.ImplicitTags.Set(e, e2)
 				},

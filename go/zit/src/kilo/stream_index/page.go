@@ -29,6 +29,7 @@ type Page struct {
 	added, addedLatest *sku.List
 	hasChanges         bool
 	repoLayout         env_repo.Env
+	preWrite           interfaces.FuncIter[*sku.Transacted]
 	config             env_config.Env
 	oids               map[string]struct{}
 }
@@ -42,7 +43,7 @@ func (pt *Page) initialize(
 	pt.PageId = pid
 	pt.added = sku.MakeList()
 	pt.addedLatest = sku.MakeList()
-	pt.config = i.mutable_config
+	pt.preWrite = i.preWrite
 	pt.probe_index = &i.probe_index
 	pt.oids = make(map[string]struct{})
 }
