@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
@@ -23,7 +23,7 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
-	layout := dir_layout.MakeDefaultAndInitialize(
+	layout := env_dir.MakeDefaultAndInitialize(
 		dep,
 		dep.Config.Debug,
 		cmd.OverrideXDGWithCwd,

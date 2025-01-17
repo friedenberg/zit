@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -71,8 +71,8 @@ func (cmd Export) Run(dep command.Request) {
 
 	var wc io.WriteCloser
 
-	o := dir_layout.WriteOptions{
-		Config: dir_layout.MakeConfig(
+	o := env_dir.WriteOptions{
+		Config: env_dir.MakeConfig(
 			&ag,
 			cmd.CompressionType,
 			false,
@@ -83,7 +83,7 @@ func (cmd Export) Run(dep command.Request) {
 	{
 		var err error
 
-		if wc, err = dir_layout.NewWriter(o); err != nil {
+		if wc, err = env_dir.NewWriter(o); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}

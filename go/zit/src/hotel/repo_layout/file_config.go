@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
@@ -52,7 +52,7 @@ func (s *Layout) loadImmutableConfig() (err error) {
 		return
 	}
 
-	s.config.BlobStoreImmutableConfig = dir_layout.MakeConfigFromImmutableBlobConfig(
+	s.config.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
 		s.config.ImmutableConfig.GetBlobStoreImmutableConfig(),
 	)
 
@@ -62,7 +62,7 @@ func (s *Layout) loadImmutableConfig() (err error) {
 type config struct {
 	ids.Type
 	ImmutableConfig          immutable_config.Config
-	BlobStoreImmutableConfig dir_layout.Config
+	BlobStoreImmutableConfig env_dir.Config
 }
 
 type metadata struct {
@@ -136,7 +136,7 @@ func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	c.BlobStoreImmutableConfig = dir_layout.MakeConfigFromImmutableBlobConfig(
+	c.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
 		c.ImmutableConfig.GetBlobStoreImmutableConfig(),
 	)
 

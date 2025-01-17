@@ -2,23 +2,23 @@ package repo_layout
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 )
 
 func (s Layout) ReadCloserCache(p string) (sha.ReadCloser, error) {
-	o := dir_layout.FileReadOptions{
+	o := env_dir.FileReadOptions{
 		// Config: s.Config.Blob,
 		Path: p,
 	}
 
-	return dir_layout.NewFileReader(o)
+	return env_dir.NewFileReader(o)
 }
 
 func (s Layout) WriteCloserCache(
 	p string,
 ) (w sha.WriteCloser, err error) {
-	return dir_layout.NewMover(
-		dir_layout.MoveOptions{
+	return env_dir.NewMover(
+		env_dir.MoveOptions{
 			// Config:      s.Config.Blob,
 			FinalPath:   p,
 			TemporaryFS: s.GetTempLocal(),

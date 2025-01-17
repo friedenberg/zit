@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
@@ -21,7 +21,7 @@ func Make(
 
 	p := t.TempDir()
 
-	dirLayout := dir_layout.MakeWithHome(
+	dirLayout := env_dir.MakeWithHome(
 		errors.MakeContextDefault(),
 		p,
 		debug.Options{},

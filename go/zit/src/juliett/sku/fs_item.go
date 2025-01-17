@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -28,7 +28,7 @@ type FSItem struct {
 
 func (ef *FSItem) WriteToSku(
 	external *Transacted,
-	dirLayout dir_layout.Layout,
+	dirLayout env_dir.Env,
 ) (err error) {
 	if err = ef.WriteToExternalObjectId(
 		&external.ExternalObjectId,
@@ -43,7 +43,7 @@ func (ef *FSItem) WriteToSku(
 
 func (ef *FSItem) WriteToExternalObjectId(
 	eoid *ids.ExternalObjectId,
-	dirLayout dir_layout.Layout,
+	dirLayout env_dir.Env,
 ) (err error) {
 	eoid.SetGenre(ef.ExternalObjectId.GetGenre())
 

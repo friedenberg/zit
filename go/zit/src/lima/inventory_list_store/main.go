@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -325,7 +325,7 @@ func (s *Store) ImportInventoryList(
 			bs,
 			sk.GetBlobSha(),
 		); err != nil {
-			if errors.Is(err, &dir_layout.ErrAlreadyExists{}) {
+			if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

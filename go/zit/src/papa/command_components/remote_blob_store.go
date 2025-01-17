@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
 )
@@ -26,7 +26,7 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 ) (blobStore interfaces.BlobStore, err error) {
 	blobStore = repo_layout.MakeBlobStore(
 		cmd.Blobs,
-		dir_layout.MakeConfigFromImmutableBlobConfig(&cmd.Config),
+		env_dir.MakeConfigFromImmutableBlobConfig(&cmd.Config),
 		e.GetTempLocal(),
 	)
 

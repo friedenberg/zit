@@ -1,7 +1,7 @@
 package command_components
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
@@ -19,7 +19,7 @@ func (cmd *Env) MakeEnvWithOptions(
 	req command.Request,
 	options env.Options,
 ) env.LocalEnv {
-	layout := dir_layout.MakeDefault(
+	layout := env_dir.MakeDefault(
 		req,
 		req.Config.Debug,
 	)
@@ -37,7 +37,7 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 	xdgDotenvPath string,
 	options env.Options,
 ) env.LocalEnv {
-	dirLayout := dir_layout.MakeFromXDGDotenvPath(
+	dirLayout := env_dir.MakeFromXDGDotenvPath(
 		req,
 		req.Config,
 		xdgDotenvPath,

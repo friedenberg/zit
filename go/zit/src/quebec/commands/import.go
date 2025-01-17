@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
@@ -56,8 +56,8 @@ func (cmd Import) Run(dep command.Request) {
 
 	// setup inventory list reader
 	{
-		o := dir_layout.FileReadOptions{
-			Config: dir_layout.MakeConfig(
+		o := env_dir.FileReadOptions{
+			Config: env_dir.MakeConfig(
 				cmd.Config.GetAgeEncryption(),
 				cmd.Config.GetCompressionType(),
 				false,
@@ -67,7 +67,7 @@ func (cmd Import) Run(dep command.Request) {
 
 		var err error
 
-		if rc, err = dir_layout.NewFileReader(o); err != nil {
+		if rc, err = env_dir.NewFileReader(o); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 

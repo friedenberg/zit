@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
@@ -28,7 +28,7 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 	envOptions env.Options,
 	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {
-	layout := dir_layout.MakeDefault(
+	layout := env_dir.MakeDefault(
 		context,
 		config.Debug,
 	)

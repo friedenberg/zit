@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
@@ -107,11 +107,11 @@ func (c WriteBlob) doOne(
 ) (sh interfaces.Sha, err error) {
 	var rc io.ReadCloser
 
-	o := dir_layout.FileReadOptions{
+	o := env_dir.FileReadOptions{
 		Path: p,
 	}
 
-	if rc, err = dir_layout.NewFileReader(o); err != nil {
+	if rc, err = env_dir.NewFileReader(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
@@ -39,7 +39,7 @@ type Env interface {
 
 type LocalEnv interface {
 	Env
-	dir_layout.Layout
+	env_dir.Env
 }
 
 type env struct {
@@ -52,7 +52,7 @@ type env struct {
 	out fd.Std
 	err fd.Std
 
-	dir_layout.Layout // not valid for remotes
+	env_dir.Env // not valid for remotes
 
 	debug *debug.Context
 
@@ -60,7 +60,7 @@ type env struct {
 }
 
 func MakeDefault(
-	layout dir_layout.Layout,
+	layout env_dir.Env,
 ) *env {
 	return Make(
 		errors.MakeContextDefault(),
@@ -73,7 +73,7 @@ func MakeDefault(
 func Make(
 	context errors.Context,
 	kCli config_mutable_cli.Config,
-	dirLayout dir_layout.Layout,
+	dirLayout env_dir.Env,
 	options Options,
 ) *env {
 	e := &env{
@@ -83,7 +83,7 @@ func Make(
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
 		cliConfig: kCli,
-		Layout:    dirLayout,
+		Env:    dirLayout,
 	}
 
 	if options.UIFileIsStderr {

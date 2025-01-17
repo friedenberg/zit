@@ -11,21 +11,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type blobStore struct {
-	dir_layout.Config
+	env_dir.Config
 	basePath string
-	tempFS   dir_layout.TemporaryFS
+	tempFS   env_dir.TemporaryFS
 }
 
 func MakeBlobStoreFromLayout(
 	s Layout,
 ) (bs blobStore, err error) {
 	bs = blobStore{
-		Config: dir_layout.MakeConfigFromImmutableBlobConfig(
+		Config: env_dir.MakeConfigFromImmutableBlobConfig(
 			s.GetConfig().GetBlobStoreImmutableConfig(),
 		),
 		tempFS: s.GetTempLocal(),
@@ -41,8 +41,8 @@ func MakeBlobStoreFromLayout(
 
 func MakeBlobStore(
 	basePath string,
-	config dir_layout.Config,
-	tempFS dir_layout.TemporaryFS,
+	config env_dir.Config,
+	tempFS env_dir.TemporaryFS,
 ) blobStore {
 	return blobStore{
 		Config:   config,
@@ -87,7 +87,7 @@ func (s blobStore) BlobReader(
 	}
 
 	if r, err = s.blobReaderFrom(sh, s.basePath); err != nil {
-		if !dir_layout.IsErrBlobMissing(err) {
+		if !env_dir.IsErrBlobMissing(err) {
 			err = errors.Wrap(err)
 		}
 
@@ -98,14 +98,14 @@ func (s blobStore) BlobReader(
 }
 
 func (s blobStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
-	mo := dir_layout.MoveOptions{
+	mo := env_dir.MoveOptions{
 		Config:                   s.Config,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
 		TemporaryFS:              s.tempFS,
 	}
 
-	if w, err = dir_layout.NewMover(mo); err != nil {
+	if w, err = env_dir.NewMover(mo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,17 +124,17 @@ func (s blobStore) blobReaderFrom(
 
 	p = id.Path(sh.GetShaLike(), p)
 
-	o := dir_layout.FileReadOptions{
+	o := env_dir.FileReadOptions{
 		Config: s.Config,
 		Path:   p,
 	}
 
-	if r, err = dir_layout.NewFileReader(o); err != nil {
+	if r, err = env_dir.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
 			shCopy.ResetWithShaLike(sh.GetShaLike())
 
-			err = dir_layout.ErrBlobMissing{
+			err = env_dir.ErrBlobMissing{
 				ShaGetter: shCopy,
 				Path:      p,
 			}
@@ -225,7 +225,7 @@ func CopyBlobIfNecessary(
 	blobSha := blobShaGetter.GetShaLike()
 
 	if dst.HasBlob(blobSha) || blobSha.IsNull() {
-		err = dir_layout.MakeErrAlreadyExists(
+		err = env_dir.MakeErrAlreadyExists(
 			blobSha,
 			"",
 		)

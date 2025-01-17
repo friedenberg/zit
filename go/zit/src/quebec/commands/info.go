@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
@@ -27,7 +27,7 @@ func init() {
 func (c Info) SetFlagSet(f *flag.FlagSet) {}
 
 func (c Info) Run(dependencies command.Request) {
-	layout := dir_layout.MakeDefault(
+	layout := env_dir.MakeDefault(
 		dependencies,
 		dependencies.Debug,
 	)

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
@@ -41,7 +41,7 @@ func Make(
 	s.LocalEnv = env
 
 	if o.BasePath == "" {
-		o.BasePath = os.Getenv(dir_layout.EnvDir)
+		o.BasePath = os.Getenv(env_dir.EnvDir)
 	}
 
 	if o.BasePath == "" {
@@ -83,13 +83,13 @@ func Make(
 
 	// TODO switch to useing MakeCommonEnv()
 	{
-		if err = os.Setenv(dir_layout.EnvDir, s.basePath); err != nil {
+		if err = os.Setenv(env_dir.EnvDir, s.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = os.Setenv(
-			dir_layout.EnvBin,
+			env_dir.EnvBin,
 			s.GetExecPath(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -118,7 +118,7 @@ func (s *Layout) setupStores() (err error) {
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
-		Config:         dir_layout.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreImmutableConfig()),
+		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreImmutableConfig()),
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetTempLocal(),
 	}
@@ -133,7 +133,7 @@ func (a Layout) GetEnv() env.Env {
 func (a Layout) SansObjectAge() (b Layout) {
 	b = a
 
-	b.ObjectStore.Config = dir_layout.MakeConfig(
+	b.ObjectStore.Config = env_dir.MakeConfig(
 		nil,
 		a.ObjectStore.Config.GetCompressionType(),
 		a.ObjectStore.Config.GetLockInternalFiles(),
@@ -145,7 +145,7 @@ func (a Layout) SansObjectAge() (b Layout) {
 func (a Layout) SansObjectCompression() (b Layout) {
 	b = a
 
-	b.ObjectStore.Config = dir_layout.MakeConfig(
+	b.ObjectStore.Config = env_dir.MakeConfig(
 		a.ObjectStore.Config.GetAgeEncryption(),
 		immutable_config.CompressionTypeNone,
 		a.ObjectStore.Config.GetLockInternalFiles(),

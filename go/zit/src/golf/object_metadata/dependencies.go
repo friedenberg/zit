@@ -12,14 +12,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 )
 
 type Dependencies struct {
-	DirLayout     dir_layout.Layout
+	DirLayout     env_dir.Env
 	BlobStore     interfaces.BlobStore
 	BlobFormatter script_config.RemoteScript
 }

@@ -5,15 +5,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 )
 
 type ObjectStore struct {
-	dir_layout.Config
+	env_dir.Config
 
 	basePath string
 	interfaces.DirectoryPaths
-	dir_layout.TemporaryFS
+	env_dir.TemporaryFS
 }
 
 func (s ObjectStore) objectReader(
@@ -29,12 +29,12 @@ func (s ObjectStore) objectReader(
 		return
 	}
 
-	o := dir_layout.FileReadOptions{
+	o := env_dir.FileReadOptions{
 		Config: s.Config,
 		Path:   id.Path(sh.GetShaLike(), p),
 	}
 
-	if rc, err = dir_layout.NewFileReader(o); err != nil {
+	if rc, err = env_dir.NewFileReader(o); err != nil {
 		err = errors.Wrapf(err, "Genre: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		err = errors.Wrapf(err, "Path: %s", o.Path)
@@ -56,14 +56,14 @@ func (s ObjectStore) objectWriter(
 		return
 	}
 
-	o := dir_layout.MoveOptions{
+	o := env_dir.MoveOptions{
 		Config:                   s.Config,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
 		TemporaryFS:              s.TemporaryFS,
 	}
 
-	if wc, err = dir_layout.NewMover(o); err != nil {
+	if wc, err = env_dir.NewMover(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

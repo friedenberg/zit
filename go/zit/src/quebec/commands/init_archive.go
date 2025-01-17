@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
@@ -29,7 +29,7 @@ func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c InitArchive) Run(dependencies command.Request) {
-	layout := dir_layout.MakeDefault(
+	layout := env_dir.MakeDefault(
 		dependencies,
 		dependencies.Debug,
 	)

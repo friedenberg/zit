@@ -3,7 +3,7 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/repo_layout"
@@ -17,7 +17,7 @@ func (cmd RepoLayout) MakeRepoLayout(
 	dep command.Request,
 	permitNoZitDirectory bool,
 ) repo_layout.Layout {
-	layout := dir_layout.MakeDefault(
+	layout := env_dir.MakeDefault(
 		dep,
 		dep.Config.Debug,
 	)
