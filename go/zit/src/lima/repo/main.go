@@ -13,6 +13,7 @@ import (
 // store
 type Repo interface {
 	GetEnv() *env.Env
+	GetStoreVersion() interfaces.StoreVersion
 	GetRepoType() repo_type.Type
 	GetBlobStore() interfaces.BlobStore
 	GetInventoryListStore() sku.InventoryListStore

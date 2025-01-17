@@ -35,8 +35,12 @@ func (repo *Client) GetEnv() *env.Env {
 	return repo.Repo.GetEnv()
 }
 
+func (u *Client) GetStoreVersion() interfaces.StoreVersion {
+	panic(todo.Implement())
+}
+
 func (repo *Client) GetRepoType() repo_type.Type {
-	return repo_type.TypeUnknown
+	panic(todo.Implement())
 }
 
 func (repo *Client) GetInventoryListStore() sku.InventoryListStore {

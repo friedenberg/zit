@@ -90,6 +90,10 @@ func (s *Store) GetRepoType() repo_type.Type {
 	return s.GetRepoLayout().GetConfig().GetRepoType()
 }
 
+func (u *Store) GetStoreVersion() interfaces.StoreVersion {
+	return u.GetRepoLayout().GetConfig().GetStoreVersion()
+}
+
 func (s *Store) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 	return wg.GetError()

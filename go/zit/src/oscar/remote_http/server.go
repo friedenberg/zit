@@ -25,6 +25,7 @@ import (
 )
 
 type Server struct {
+	// Repo repo.WorkingCopy
 	Repo *local_working_copy.Repo
 }
 
@@ -308,7 +309,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		ui.Log().Printf("blob requested: %q", sh)
 
 		if request.Method == "HEAD" {
-			if server.Repo.GetRepoLayout().HasBlob(sh) {
+			if server.Repo.GetBlobStore().HasBlob(sh) {
 				response.StatusCode = http.StatusNoContent
 			} else {
 				response.StatusCode = http.StatusNotFound
@@ -319,7 +320,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 			{
 				var err error
 
-				if rc, err = server.Repo.GetRepoLayout().BlobReader(sh); err != nil {
+				if rc, err = server.Repo.GetBlobStore().BlobReader(sh); err != nil {
 					response.Error(err)
 					return
 				}
@@ -334,7 +335,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		{
 			var err error
 
-			if wc, err = server.Repo.GetRepoLayout().BlobWriter(); err != nil {
+			if wc, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
 				response.Error(err)
 				return
 			}
@@ -420,7 +421,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		var hasMore bool
 
 		for {
-			server.Repo.ContinueOrPanicOnDone()
+			server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 			sk, hasMore = list.Pop()
 

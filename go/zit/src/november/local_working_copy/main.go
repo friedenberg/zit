@@ -2,6 +2,7 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -88,6 +89,10 @@ func MakeWithLayout(
 
 func (u *Repo) GetRepoType() repo_type.Type {
 	return u.GetRepoLayout().GetConfig().GetRepoType()
+}
+
+func (u *Repo) GetStoreVersion() interfaces.StoreVersion {
+	return u.GetRepoLayout().GetConfig().GetStoreVersion()
 }
 
 // TODO investigate removing unnecessary resets like from organize
