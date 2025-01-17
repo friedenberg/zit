@@ -79,7 +79,7 @@ func (c Exec) runBash(
 
 		var f *os.File
 
-		if f, err = u.GetRepoLayout().TempLocal.FileTemp(); err != nil {
+		if f, err = u.GetRepoLayout().GetDirLayout().TempLocal.FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

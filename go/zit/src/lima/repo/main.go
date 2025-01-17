@@ -12,7 +12,7 @@ import (
 // TODO explore permissions for who can read / write from the inventory list
 // store
 type Repo interface {
-	GetEnv() *env.Env
+	GetEnv() env.IEnv
 	GetStoreVersion() interfaces.StoreVersion
 	GetRepoType() repo_type.Type
 	GetBlobStore() interfaces.BlobStore

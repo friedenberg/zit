@@ -16,7 +16,7 @@ import (
 )
 
 func MakeBoxTransactedArchive(
-	env *env.Env,
+	env env.IEnv,
 	options options_print.V0,
 ) *BoxTransacted {
 	po := options.

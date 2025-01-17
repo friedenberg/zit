@@ -26,7 +26,7 @@ func (s *Store) HydrateExternalFromItem(
 
 	if err = item.WriteToSku(
 		external,
-		s.dirLayout.Layout,
+		s.repoLayout.GetDirLayout(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -134,7 +134,7 @@ func (s *Store) readOneExternalBlob(
 	{
 		var aw sha.WriteCloser
 
-		if aw, err = s.dirLayout.BlobWriter(); err != nil {
+		if aw, err = s.repoLayout.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

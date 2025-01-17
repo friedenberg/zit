@@ -21,7 +21,7 @@ func (s Layout) WriteCloserCache(
 		dir_layout.MoveOptions{
 			// Config:      s.Config.Blob,
 			FinalPath:   p,
-			TemporaryFS: s.TempLocal,
+			TemporaryFS: s.GetDirLayout().TempLocal,
 		},
 	)
 }

@@ -22,7 +22,7 @@ func MakeTextFormatter(
 }
 
 func MakeTextFormatterWithBlobFormatter(
-	dirLayout repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 	options checkout_options.TextFormatterOptions,
 	k ids.InlineTypeChecker,
 	formatter script_config.RemoteScript,
@@ -32,8 +32,8 @@ func MakeTextFormatterWithBlobFormatter(
 		k:       k,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				DirLayout:     dirLayout.Layout,
-				BlobStore:     dirLayout,
+				DirLayout:     repoLayout.GetDirLayout(),
+				BlobStore:     repoLayout,
 				BlobFormatter: formatter,
 			},
 		),

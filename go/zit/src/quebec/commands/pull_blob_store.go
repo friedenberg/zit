@@ -54,7 +54,7 @@ func (cmd *PullBlobStore) Run(
 		var err error
 
 		if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
-			localWorkingCopy.Env,
+			localWorkingCopy,
 		); err != nil {
 			dep.CancelWithError(err)
 		}

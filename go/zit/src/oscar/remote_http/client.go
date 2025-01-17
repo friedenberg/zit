@@ -31,7 +31,7 @@ type Client struct {
 	// *local_working_copy.Repo
 }
 
-func (repo *Client) GetEnv() *env.Env {
+func (repo *Client) GetEnv() env.IEnv {
 	return repo.Repo.GetEnv()
 }
 
@@ -66,7 +66,7 @@ func (client *Client) MakeInventoryList(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		client.GetEnv().Context,
+		client.GetEnv(),
 		"GET",
 		"/inventory_lists",
 		strings.NewReader(qg.String()),
@@ -167,7 +167,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			client.GetEnv().Context,
+			client.GetEnv(),
 			"POST",
 			"/inventory_lists",
 			b,
@@ -254,7 +254,7 @@ func (client *Client) WriteBlobToRemote(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		client.GetEnv().Context,
+		client.GetEnv(),
 		"POST",
 		"/blobs",
 		rc,

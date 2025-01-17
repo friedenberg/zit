@@ -31,7 +31,7 @@ type dirItems struct {
 	rootProcessed bool
 
 	interfaces.FileExtensionGetter
-	dirLayout             repo_layout.Layout
+	repoLayout             repo_layout.Layout
 	externalStoreSupplies external_store.Supplies
 
 	probablyCheckedOut      fsItemData
@@ -47,7 +47,7 @@ func makeObjectsWithDir(
 ) (d dirItems) {
 	d.root = p
 	d.FileExtensionGetter = fe
-	d.dirLayout = fs_home
+	d.repoLayout = fs_home
 	d.probablyCheckedOut = makeFSItemData()
 	d.definitelyNotCheckedOut = makeFSItemData()
 	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
@@ -148,7 +148,7 @@ func (d *dirItems) addPathAndDirEntry(
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPathAndDirEntry(p, de, d.dirLayout); err != nil {
+	if fdee, err = fd.MakeFromPathAndDirEntry(p, de, d.repoLayout); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -294,7 +294,7 @@ func (d *dirItems) getFDsForObjectIdString(
 	objectIdString string,
 ) (fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
-	dir := d.dirLayout.GetCwd()
+	dir := d.repoLayout.GetDirLayout().GetCwd()
 	pattern := filepath.Join(dir, fmt.Sprintf("%s*", objectIdString))
 
 	if err = d.walkDir(cache, dir, pattern); err != nil {
@@ -487,7 +487,7 @@ func (d *dirItems) addOneUntracked(
 	}
 
 	if err = result.ExternalObjectId.SetBlob(
-		d.dirLayout.Rel(f.GetPath()),
+		d.repoLayout.GetDirLayout().Rel(f.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

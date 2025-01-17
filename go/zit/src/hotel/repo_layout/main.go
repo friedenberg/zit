@@ -18,7 +18,7 @@ type Getter interface {
 }
 
 type Layout struct {
-	*env.Env
+	env.IEnv
 
 	config config
 
@@ -35,10 +35,10 @@ type Layout struct {
 }
 
 func Make(
-	env *env.Env,
+	env env.IEnv,
 	o Options,
 ) (s Layout, err error) {
-	s.Env = env
+	s.IEnv = env
 
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(dir_layout.EnvDir)
@@ -56,7 +56,10 @@ func Make(
 
 	dp := &directoryV1{}
 
-	if err = dp.init(s.GetStoreVersion(), s.GetXDG()); err != nil {
+	if err = dp.init(
+    s.GetStoreVersion(),
+    s.GetDirLayout().GetXDG(),
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,7 +90,7 @@ func Make(
 
 		if err = os.Setenv(
 			dir_layout.EnvBin,
-			s.GetExecPath(),
+			s.GetDirLayout().GetExecPath(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -111,7 +114,7 @@ func (s *Layout) setupStores() (err error) {
 		return
 	}
 
-	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
+	s.CopyingBlobStore = MakeCopyingBlobStore(s.IEnv, s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
@@ -123,8 +126,8 @@ func (s *Layout) setupStores() (err error) {
 	return
 }
 
-func (a Layout) GetEnv() *env.Env {
-	return a.Env
+func (a Layout) GetEnv() env.IEnv {
+	return a.IEnv
 }
 
 func (a Layout) SansObjectAge() (b Layout) {
@@ -174,17 +177,17 @@ func (s Layout) ResetCache() (err error) {
 		return
 	}
 
-	if err = s.MakeDir(s.DirCache()); err != nil {
+	if err = s.GetDirLayout().MakeDir(s.DirCache()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.MakeDir(s.DirCacheObjects()); err != nil {
+	if err = s.GetDirLayout().MakeDir(s.DirCacheObjects()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.MakeDir(s.DirCacheObjectPointers()); err != nil {
+	if err = s.GetDirLayout().MakeDir(s.DirCacheObjectPointers()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -193,7 +196,7 @@ func (s Layout) ResetCache() (err error) {
 }
 
 func (h Layout) DataFileStoreVersion() string {
-	return filepath.Join(h.GetXDG().Data, "version")
+	return filepath.Join(h.GetDirLayout().GetXDG().Data, "version")
 }
 
 func (h Layout) GetStoreVersion() interfaces.StoreVersion {

@@ -70,7 +70,7 @@ func (cmd Show) Run(req command.Request) {
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {
-		case repoLayout.Env.GetCLIConfig().Complete:
+		case repoLayout.GetCLIConfig().Complete:
 			cmd.CompleteWithRepo(req, cmd, localWorkingCopy, args...)
 
 		default:
@@ -88,7 +88,7 @@ func (cmd Show) Run(req command.Request) {
 			ui.Err().Print("ignoring arguments for archive repo")
 		}
 
-		cmd.runWithArchive(repoLayout.Env, archive)
+		cmd.runWithArchive(repoLayout, archive)
 	}
 }
 
@@ -153,7 +153,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 }
 
 func (cmd Show) runWithArchive(
-	env *env.Env,
+	env env.IEnv,
 	archive repo.Repo,
 	// qg *query.Group,
 ) {

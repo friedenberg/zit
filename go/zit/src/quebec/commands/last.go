@@ -78,7 +78,7 @@ func (c Last) runArchive(repoLayout repo_layout.Layout, archive repo.Repo) {
 	}
 
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		repoLayout.Env,
+		repoLayout,
 		options_print.V0{}.WithPrintTai(true),
 	)
 
@@ -190,7 +190,7 @@ func (c Last) runWithInventoryList(
 	)
 
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		repoLayout.Env,
+		repoLayout,
 		options_print.V0{}.WithPrintTai(true),
 	)
 

@@ -8,13 +8,39 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
+type IEnv interface {
+	errors.IContext
+
+	GetContext() errors.IContext
+	GetOptions() Options
+	GetIn() fd.Std
+	GetInFile() io.Reader
+	GetUI() fd.Std
+	GetUIFile() interfaces.WriterAndStringWriter
+	GetOut() fd.Std
+	GetOutFile() interfaces.WriterAndStringWriter
+	GetErr() fd.Std
+	GetErrFile() interfaces.WriterAndStringWriter
+	GetCLIConfig() config_mutable_cli.Config
+	GetDirLayout() dir_layout.Layout
+
+	FormatOutputOptions() (o string_format_writer.OutputOptions)
+	FormatColorOptionsOut() (o string_format_writer.ColorOptions)
+	FormatColorOptionsErr() (o string_format_writer.ColorOptions)
+	StringFormatWriterFields(
+		truncate string_format_writer.CliFormatTruncation,
+		co string_format_writer.ColorOptions,
+	) interfaces.StringFormatWriter[string_format_writer.Box]
+}
+
 type Env struct {
-	*errors.Context
+	errors.IContext
 
 	options Options
 
@@ -42,13 +68,13 @@ func MakeDefault(
 }
 
 func Make(
-	context *errors.Context,
+	context errors.IContext,
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 	options Options,
 ) *Env {
 	e := &Env{
-		Context:   context,
+		IContext:  context,
 		options:   options,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
@@ -82,6 +108,10 @@ func Make(
 	}
 
 	return e
+}
+
+func (u Env) GetContext() errors.IContext {
+	return u.IContext
 }
 
 func (u Env) GetOptions() Options {

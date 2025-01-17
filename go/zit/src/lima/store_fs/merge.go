@@ -226,7 +226,7 @@ func (s *Store) GenerateConflictMarker(
 ) (err error) {
 	var f *os.File
 
-	if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
+	if f, err = s.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -269,7 +269,7 @@ func (s *Store) GenerateConflictMarker(
 
 		if _, err = id.MakeDirIfNecessary(
 			h,
-			s.dirLayout.GetCwd(),
+			s.repoLayout.GetDirLayout().GetCwd(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

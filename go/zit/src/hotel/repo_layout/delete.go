@@ -8,7 +8,7 @@ import (
 )
 
 func (s Layout) DeleteAll(p string) (err error) {
-	if s.IsDryRun() {
+	if s.GetDirLayout().IsDryRun() {
 		return
 	}
 
@@ -28,7 +28,7 @@ func (s Layout) Delete(p string) (err error) {
 		return
 	}
 
-	if s.IsDryRun() {
+	if s.GetDirLayout().IsDryRun() {
 		return
 	}
 

@@ -18,12 +18,12 @@ func (cmd RepoLayout) MakeRepoLayout(
 	permitNoZitDirectory bool,
 ) repo_layout.Layout {
 	layout := dir_layout.MakeDefault(
-		dep.Context,
+		dep,
 		dep.Config.Debug,
 	)
 
 	env := env.Make(
-		dep.Context,
+		dep,
 		dep.Config,
 		layout,
 		env.Options{},

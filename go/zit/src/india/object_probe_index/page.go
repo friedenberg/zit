@@ -21,7 +21,7 @@ type page struct {
 	f          *os.File
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
-	dirLayout  repo_layout.Layout
+	repoLayout repo_layout.Layout
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	sha.PageId
 }
@@ -37,7 +37,7 @@ func (p *page) initialize(
 		rowResetter{},
 	)
 
-	p.dirLayout = s
+	p.repoLayout = s
 	p.PageId = pid
 
 	p.searchFunc = p.seekToFirstBinarySearch
@@ -234,7 +234,7 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 	return
 }
 
-func (e *page) PrintAll(env *env.Env) (err error) {
+func (e *page) PrintAll(env env.IEnv) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -276,7 +276,7 @@ func (e *page) Flush() (err error) {
 
 	var ft *os.File
 
-	if ft, err = e.dirLayout.TempLocal.FileTemp(); err != nil {
+	if ft, err = e.repoLayout.GetDirLayout().TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

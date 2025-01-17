@@ -18,7 +18,7 @@ func (client *Client) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if request, err = http.NewRequestWithContext(
-			client.GetEnv().Context,
+			client.GetEnv(),
 			"HEAD",
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
@@ -53,7 +53,7 @@ func (client *Client) BlobReader(
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		client.GetEnv().Context,
+		client.GetEnv(),
 		"GET",
 		"/blobs",
 		strings.NewReader(sh.GetShaLike().GetShaString()),

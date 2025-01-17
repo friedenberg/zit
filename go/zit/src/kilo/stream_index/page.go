@@ -28,7 +28,7 @@ type Page struct {
 	*probe_index
 	added, addedLatest *sku.List
 	hasChanges         bool
-	directoryLayout    repo_layout.Layout
+	repoLayout    repo_layout.Layout
 	config             *config.Compiled
 	oids               map[string]struct{}
 }
@@ -37,7 +37,7 @@ func (pt *Page) initialize(
 	pid PageId,
 	i *Index,
 ) {
-	pt.directoryLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
+	pt.repoLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
 	pt.sunrise = i.sunrise
 	pt.PageId = pid
 	pt.added = sku.MakeList()
@@ -160,7 +160,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = pt.directoryLayout.ReadCloserCache(pt.Path()); err != nil {
+	if r, err = pt.repoLayout.ReadCloserCache(pt.Path()); err != nil {
 		if errors.IsNotExist(err) {
 			r = io.NopCloser(bytes.NewReader(nil))
 			err = nil

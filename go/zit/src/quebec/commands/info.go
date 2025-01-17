@@ -28,12 +28,12 @@ func (c Info) SetFlagSet(f *flag.FlagSet) {}
 
 func (c Info) Run(dependencies command.Request) {
 	layout := dir_layout.MakeDefault(
-		dependencies.Context,
+		dependencies,
 		dependencies.Debug,
 	)
 
 	env := env.Make(
-		dependencies.Context,
+		dependencies,
 		dependencies.Config,
 		layout,
 		env.Options{},

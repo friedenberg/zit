@@ -28,7 +28,7 @@ func MakeBlobStoreFromLayout(
 		Config: dir_layout.MakeConfigFromImmutableBlobConfig(
 			s.GetConfig().GetBlobStoreImmutableConfig(),
 		),
-		tempFS: s.TempLocal,
+		tempFS: s.GetDirLayout().TempLocal,
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
@@ -149,7 +149,7 @@ func (s blobStore) blobReaderFrom(
 }
 
 func MakeCopyingBlobStore(
-	env *env.Env,
+	env env.IEnv,
 	local, remote interfaces.BlobStore,
 ) CopyingBlobStore {
 	if local == nil {
@@ -157,14 +157,14 @@ func MakeCopyingBlobStore(
 	}
 
 	return CopyingBlobStore{
-		Env:    env,
+		IEnv:    env,
 		local:  local,
 		remote: remote,
 	}
 }
 
 type CopyingBlobStore struct {
-	*env.Env
+	env.IEnv
 	local, remote interfaces.BlobStore
 }
 
@@ -197,7 +197,7 @@ func (s CopyingBlobStore) BlobReader(
 
 	var n int64
 
-	if n, err = CopyBlob(s.Env, s.local, s.remote, sh.GetShaLike()); err != nil {
+	if n, err = CopyBlob(s, s.local, s.remote, sh.GetShaLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -213,7 +213,7 @@ func (s CopyingBlobStore) BlobReader(
 }
 
 func CopyBlobIfNecessary(
-	env *env.Env,
+	env env.IEnv,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobShaGetter interfaces.ShaGetter,
@@ -238,7 +238,7 @@ func CopyBlobIfNecessary(
 
 // TODO make this honor context closure and abort early
 func CopyBlob(
-	env *env.Env,
+	env env.IEnv,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobSha interfaces.Sha,

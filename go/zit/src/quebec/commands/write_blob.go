@@ -46,7 +46,7 @@ func (cmd WriteBlob) Run(
 	dep command.Request,
 ) {
 	blobStore := cmd.MakeBlobStoreLocal(
-		dep.Context,
+		dep,
 		dep.Config,
 		env.Options{},
 		local_working_copy.OptionsEmpty,

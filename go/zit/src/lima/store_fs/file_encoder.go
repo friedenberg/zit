@@ -31,18 +31,18 @@ type fileEncoder struct {
 }
 
 func MakeFileEncoder(
-	dirLayout repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
 		mode:      os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
 		perm:      0o666,
-		dirLayout: dirLayout,
+		dirLayout: repoLayout,
 		ic:        ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				DirLayout: dirLayout.Layout,
-				BlobStore: dirLayout,
+				DirLayout: repoLayout.GetDirLayout(),
+				BlobStore: repoLayout,
 			},
 		),
 	}

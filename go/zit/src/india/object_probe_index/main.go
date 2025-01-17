@@ -22,14 +22,14 @@ type (
 	pageInterface interface {
 		GetObjectProbeIndexPage() pageInterface
 		commonInterface
-		PrintAll(*env.Env) error
+		PrintAll(env.IEnv) error
 		errors.Flusher
 	}
 
 	Index interface {
 		GetObjectProbeIndex() Index
 		commonInterface
-		PrintAll(*env.Env) error
+		PrintAll(env.IEnv) error
 		errors.Flusher
 	}
 )
@@ -211,7 +211,7 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 	return wg.GetError()
 }
 
-func (e *object_probe_index) PrintAll(env *env.Env) (err error) {
+func (e *object_probe_index) PrintAll(env env.IEnv) (err error) {
 	for i := range e.pages {
 		p := &e.pages[i]
 

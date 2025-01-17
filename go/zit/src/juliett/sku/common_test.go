@@ -216,12 +216,12 @@ func makeTestFSHome(
 }
 
 func makeTestTextFormat(
-	dirLayout repo_layout.Layout,
+	repoLayout repo_layout.Layout,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			DirLayout: dirLayout.Layout,
-			BlobStore: dirLayout,
+			DirLayout: repoLayout.GetDirLayout(),
+			BlobStore: repoLayout,
 		},
 	)
 }

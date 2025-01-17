@@ -11,7 +11,7 @@ func TestContextCancelled(t *testing.T) {
 	var must1, must2, after1 bool
 
 	if err := ctx.Run(
-		func(ctx *Context) {
+		func(ctx IContext) {
 			didPanic := false
 
 			defer func() {

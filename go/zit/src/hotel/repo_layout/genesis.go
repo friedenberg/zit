@@ -19,7 +19,7 @@ func (s *Layout) Genesis(bb BigBang) {
 	s.config.Type = bb.Type
 	s.config.ImmutableConfig = bb.Config
 
-	if err := s.MakeDir(
+	if err := s.GetDirLayout().MakeDir(
 		s.DirObjectId(),
 		s.DirCache(),
 		s.DirLostAndFound(),
@@ -40,7 +40,7 @@ func (s *Layout) Genesis(bb BigBang) {
 			}
 		}
 
-		if err := s.MakeDir(d); err != nil {
+		if err := s.GetDirLayout().MakeDir(d); err != nil {
 			s.CancelWithError(err)
 		}
 	}

@@ -24,13 +24,13 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
 	layout := dir_layout.MakeDefaultAndInitialize(
-		dep.Context,
+		dep,
 		dep.Config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	env := env.Make(
-		dep.Context,
+		dep,
 		dep.Config,
 		layout,
 		env.Options{},

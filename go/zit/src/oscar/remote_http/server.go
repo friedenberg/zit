@@ -43,7 +43,7 @@ func (server Server) InitializeListener(
 
 	case "tcp":
 		if listener, err = config.Listen(
-			server.Repo.GetEnv().Context,
+			server.Repo.GetEnv(),
 			network,
 			address,
 		); err != nil {
@@ -57,7 +57,7 @@ func (server Server) InitializeListener(
 
 	default:
 		if listener, err = config.Listen(
-			server.Repo.GetEnv().Context,
+			server.Repo.GetEnv(),
 			network,
 			address,
 		); err != nil {
@@ -76,7 +76,7 @@ func (server Server) InitializeUnixSocket(
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := server.Repo.GetRepoLayout().GetXDG().State
+		dir := server.Repo.GetRepoLayout().GetDirLayout().GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -89,7 +89,7 @@ func (server Server) InitializeUnixSocket(
 	ui.Log().Printf("starting unix domain server on socket: %q", sock.Path)
 
 	if sock.Listener, err = config.Listen(
-		server.Repo.GetEnv().Context,
+		server.Repo.GetEnv(),
 		"unix",
 		sock.Path,
 	); err != nil {
@@ -110,7 +110,7 @@ func (server Server) InitializeHTTP(
 	port int,
 ) (httpPort HTTPPort, err error) {
 	if httpPort.Listener, err = config.Listen(
-		server.Repo.GetEnv().Context,
+		server.Repo.GetEnv(),
 		"tcp",
 		fmt.Sprintf(":%d", port),
 	); err != nil {

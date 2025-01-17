@@ -94,7 +94,7 @@ func (cmd Import) Run(dep command.Request) {
 			var err error
 
 			if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
-				localWorkingCopy.Env,
+				localWorkingCopy,
 			); err != nil {
 				localWorkingCopy.CancelWithError(err)
 			}

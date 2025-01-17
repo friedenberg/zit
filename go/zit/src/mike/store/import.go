@@ -238,7 +238,7 @@ func (c Importer) ImportBlobIfNecessary(
 	var n int64
 
 	if n, err = repo_layout.CopyBlobIfNecessary(
-		c.GetDirectoryLayout().Env,
+		c.GetDirectoryLayout(),
 		c.GetDirectoryLayout(),
 		c.RemoteBlobStore,
 		blobSha,

@@ -47,19 +47,22 @@ func (c DeleteCheckout) Run(
 			continue
 		}
 
-		if pRel, pErr := filepath.Rel(s.GetCwd(), fd.String()); pErr == nil {
+		if pRel, pErr := filepath.Rel(
+      s.GetDirLayout().GetCwd(),
+      fd.String(),
+    ); pErr == nil {
 			path = pRel
 		}
 
 		func() {
-			if fd.IsDir() && fd.GetPath() != s.GetCwd() {
+			if fd.IsDir() && fd.GetPath() != s.GetDirLayout().GetCwd() {
 				dirs = append(dirs, fd.GetPath())
 				return
 			}
 
 			dir := filepath.Dir(path)
 
-			if dir == s.GetCwd() {
+			if dir == s.GetDirLayout().GetCwd() {
 				return
 			}
 

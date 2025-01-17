@@ -14,8 +14,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Repo) GetEnv() *env.Env {
-	return u.Env
+func (u *Repo) GetEnv() env.IEnv {
+	return u
 }
 
 func (u *Repo) GetTime() time.Time {

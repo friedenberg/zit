@@ -62,7 +62,7 @@ func (s *Store) Initialize(
 		clock:         clock,
 		object_format: pmf,
 		box: box_format.MakeBoxTransactedArchive(
-			repoLayout.Env,
+			repoLayout,
 			options_print.V0{}.WithPrintTai(true),
 		),
 		options:   op,
@@ -82,8 +82,8 @@ func (s *Store) Initialize(
 	return
 }
 
-func (s *Store) GetEnv() *env.Env {
-	return s.GetRepoLayout().Env
+func (s *Store) GetEnv() env.IEnv {
+	return s.GetRepoLayout()
 }
 
 func (s *Store) GetRepoType() repo_type.Type {

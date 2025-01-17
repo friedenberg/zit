@@ -52,7 +52,7 @@ func (cmd Diff) Run(dep command.Request) {
 		Repo: localWorkingCopy,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				DirLayout: localWorkingCopy.GetRepoLayout().Layout,
+				DirLayout: localWorkingCopy.GetRepoLayout().GetDirLayout(),
 				BlobStore: localWorkingCopy.GetRepoLayout(),
 			},
 		),

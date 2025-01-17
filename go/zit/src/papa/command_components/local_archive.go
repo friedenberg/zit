@@ -28,7 +28,7 @@ func (c LocalArchive) MakeLocalArchive(
 	case repo_type.TypeArchive:
 		objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
 		boxFormat := box_format.MakeBoxTransactedArchive(
-			repoLayout.Env,
+			repoLayout,
 			options_print.V0{}.WithPrintTai(true),
 		)
 

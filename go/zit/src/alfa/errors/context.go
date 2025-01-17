@@ -31,6 +31,40 @@ func (err errContextCancelledExpected) Is(target error) bool {
 	return ok
 }
 
+type IContext interface {
+	context.Context
+
+	Cause() error
+	Continue() bool
+	ContinueOrPanicOnDone()
+	SetCancelOnSIGINT()
+	SetCancelOnSIGHUP()
+	SetCancelOnSignals(signals ...os.Signal)
+	Run(f func(IContext)) error
+
+	// `After` runs a function after the context is complete (regardless of any
+	// errors). `After`s are run in the reverse order of when they are called, like
+	// defers but on a whole-program level.
+	After(f func() error)
+	AfterWithContext(f func(IContext) error)
+
+	// `Must` executes a function even if the context has been cancelled. If the
+	// function returns an error, `Must` cancels the context and offers a heartbeat to
+	// panic. It is meant for defers that must be executed, like closing files,
+	// flushing buffers, releasing locks.
+	Must(f func() error)
+	MustWithContext(f func(IContext) error)
+	MustClose(closer io.Closer)
+	MustFlush(flusher Flusher)
+	Cancel()
+
+	CancelWithError(err error)
+	CancelWithErrorAndFormat(err error, f string, values ...any)
+	CancelWithErrorf(f string, values ...any)
+	CancelWithBadRequestf(f string, values ...any)
+	CancelWithNotImplemented()
+}
+
 type Context struct {
 	context.Context
 	cancelFunc context.CancelCauseFunc
@@ -96,7 +130,7 @@ func (c *Context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(c.signals, signals...)
 }
 
-func (c *Context) Run(f func(*Context)) error {
+func (c *Context) Run(f func(IContext)) error {
 	go func() {
 		select {
 		case <-c.Done():
@@ -174,7 +208,7 @@ func (c *Context) After(f func() error) {
 }
 
 //go:noinline
-func (c *Context) AfterWithContext(f func(*Context) error) {
+func (c *Context) AfterWithContext(f func(IContext) error) {
 	c.after(1, func() error { return f(c) })
 }
 
@@ -190,7 +224,7 @@ func (c *Context) Must(f func() error) {
 	}
 }
 
-func (c *Context) MustWithContext(f func(*Context) error) {
+func (c *Context) MustWithContext(f func(IContext) error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(c); err != nil {

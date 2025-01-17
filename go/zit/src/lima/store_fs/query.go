@@ -237,7 +237,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 	for _, item := range item.Matching {
 		if err = item.WriteToSku(
 			co.GetSkuExternal(),
-			s.dirLayout.Layout,
+			s.repoLayout.GetDirLayout(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

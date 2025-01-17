@@ -163,7 +163,7 @@ func (c *FormatBlob) FormatFromStdin(
 
 	if wt, err = script_config.MakeWriterToWithStdin(
 		blobFormatter,
-		u.GetRepoLayout().MakeCommonEnv(),
+		u.GetRepoLayout().GetDirLayout().MakeCommonEnv(),
 		u.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)
