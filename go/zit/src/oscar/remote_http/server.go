@@ -25,23 +25,27 @@ import (
 )
 
 type Server struct {
-	*local_working_copy.Repo
+	Repo *local_working_copy.Repo
 }
 
-func (env Server) InitializeListener(
+func (server Server) InitializeListener(
 	network, address string,
 ) (listener net.Listener, err error) {
 	var config net.ListenConfig
 
 	switch network {
 	case "unix":
-		if listener, err = env.InitializeUnixSocket(config, address); err != nil {
+		if listener, err = server.InitializeUnixSocket(config, address); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case "tcp":
-		if listener, err = config.Listen(env.Context, network, address); err != nil {
+		if listener, err = config.Listen(
+			server.Repo.GetEnv().Context,
+			network,
+			address,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -51,7 +55,11 @@ func (env Server) InitializeListener(
 		ui.Log().Printf("starting HTTP server on port: %q", strconv.Itoa(addr.Port))
 
 	default:
-		if listener, err = config.Listen(env.Context, network, address); err != nil {
+		if listener, err = config.Listen(
+			server.Repo.GetEnv().Context,
+			network,
+			address,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -60,14 +68,14 @@ func (env Server) InitializeListener(
 	return
 }
 
-func (repo Server) InitializeUnixSocket(
+func (server Server) InitializeUnixSocket(
 	config net.ListenConfig,
 	path string,
 ) (sock repo.UnixSocket, err error) {
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := repo.GetRepoLayout().GetXDG().State
+		dir := server.Repo.GetRepoLayout().GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -79,7 +87,11 @@ func (repo Server) InitializeUnixSocket(
 
 	ui.Log().Printf("starting unix domain server on socket: %q", sock.Path)
 
-	if sock.Listener, err = config.Listen(repo.Context, "unix", sock.Path); err != nil {
+	if sock.Listener, err = config.Listen(
+		server.Repo.GetEnv().Context,
+		"unix",
+		sock.Path,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,12 +104,12 @@ type HTTPPort struct {
 	Port int
 }
 
-func (env Server) InitializeHTTP(
+func (server Server) InitializeHTTP(
 	config net.ListenConfig,
 	port int,
 ) (httpPort HTTPPort, err error) {
 	if httpPort.Listener, err = config.Listen(
-		env.Context,
+		server.Repo.GetEnv().Context,
 		"tcp",
 		fmt.Sprintf(":%d", port),
 	); err != nil {
@@ -112,11 +124,11 @@ func (env Server) InitializeHTTP(
 	return
 }
 
-func (env Server) Serve(listener net.Listener) (err error) {
-	httpServer := http.Server{Handler: env}
+func (server Server) Serve(listener net.Listener) (err error) {
+	httpServer := http.Server{Handler: server}
 
 	go func() {
-		<-env.Done()
+		<-server.Repo.GetEnv().Done()
 		ui.Log().Print("shutting down")
 
 		ctx, cancel := context.WithTimeoutCause(
@@ -144,16 +156,16 @@ func (env Server) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (repo Server) ServeStdio() (err error) {
+func (server Server) ServeStdio() (err error) {
 	// shuts down the server when the main context is complete (on SIGHUP / SIGINT).
-	repo.After(repo.GetIn().GetFile().Close)
-	repo.After(repo.GetOut().GetFile().Close)
+	server.Repo.GetEnv().After(server.Repo.GetEnv().GetIn().GetFile().Close)
+	server.Repo.GetEnv().After(server.Repo.GetEnv().GetOut().GetFile().Close)
 
-	br := bufio.NewReader(repo.GetIn().GetFile())
-	bw := bufio.NewWriter(repo.GetOut().GetFile())
+	br := bufio.NewReader(server.Repo.GetEnv().GetIn().GetFile())
+	bw := bufio.NewWriter(server.Repo.GetEnv().GetOut().GetFile())
 
 	for {
-		repo.ContinueOrPanicOnDone()
+		server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 		var request *http.Request
 
@@ -167,7 +179,7 @@ func (repo Server) ServeStdio() (err error) {
 			return
 		}
 
-		response := repo.ServeRequest(
+		response := server.ServeRequest(
 			Request{
 				MethodPath: MethodPath{
 					Method: request.Method,
@@ -243,14 +255,14 @@ func (r *Response) Error(err error) {
 	r.ErrorWithStatus(http.StatusInternalServerError, err)
 }
 
-func (local Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (server Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	request := Request{
 		MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 		Headers:    req.Header,
 		Body:       req.Body,
 	}
 
-	response := local.ServeRequest(request)
+	response := server.ServeRequest(request)
 
 	if response.StatusCode == 0 {
 		response.StatusCode = http.StatusOK
@@ -259,17 +271,17 @@ func (local Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(response.StatusCode)
 
 	if _, err := io.Copy(w, response.Body); err != nil {
-		local.CancelWithError(err)
+		server.Repo.GetEnv().CancelWithError(err)
 	}
 
 	if err := response.Body.Close(); err != nil {
-		local.CancelWithError(err)
+		server.Repo.GetEnv().CancelWithError(err)
 	}
 }
 
 // TODO add path multiplexing to handle versions
-func (local Server) ServeRequest(request Request) (response Response) {
-	defer local.ContinueOrPanicOnDone()
+func (server Server) ServeRequest(request Request) (response Response) {
+	defer server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
 
@@ -296,7 +308,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		ui.Log().Printf("blob requested: %q", sh)
 
 		if request.Method == "HEAD" {
-			if local.GetRepoLayout().HasBlob(sh) {
+			if server.Repo.GetRepoLayout().HasBlob(sh) {
 				response.StatusCode = http.StatusNoContent
 			} else {
 				response.StatusCode = http.StatusNotFound
@@ -307,7 +319,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 			{
 				var err error
 
-				if rc, err = local.GetRepoLayout().BlobReader(sh); err != nil {
+				if rc, err = server.Repo.GetRepoLayout().BlobReader(sh); err != nil {
 					response.Error(err)
 					return
 				}
@@ -322,7 +334,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		{
 			var err error
 
-			if wc, err = local.GetRepoLayout().BlobWriter(); err != nil {
+			if wc, err = server.Repo.GetRepoLayout().BlobWriter(); err != nil {
 				response.Error(err)
 				return
 			}
@@ -346,7 +358,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 
 		sh := wc.GetShaLike()
 
-		blobCopierDelegate := local.MakeBlobCopierDelegate()
+		blobCopierDelegate := server.Repo.MakeBlobCopierDelegate()
 
 		if err := blobCopierDelegate(
 			store.BlobCopyResult{
@@ -378,7 +390,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		{
 			var err error
 
-			if qg, err = local.MakeExternalQueryGroup(
+			if qg, err = server.Repo.MakeExternalQueryGroup(
 				query.BuilderOptions{},
 				sku.ExternalQueryOptions{},
 				qgString.String(),
@@ -393,7 +405,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		{
 			var err error
 
-			if list, err = local.MakeInventoryList(qg); err != nil {
+			if list, err = server.Repo.MakeInventoryList(qg); err != nil {
 				response.Error(err)
 				return
 			}
@@ -402,13 +414,13 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		// TODO make this more performant by returning a proper reader
 		b := bytes.NewBuffer(nil)
 
-		printer := local.MakePrinterBoxArchive(b, true)
+		printer := server.Repo.MakePrinterBoxArchive(b, true)
 
 		var sk *sku.Transacted
 		var hasMore bool
 
 		for {
-			local.ContinueOrPanicOnDone()
+			server.Repo.ContinueOrPanicOnDone()
 
 			sk, hasMore = list.Pop()
 
@@ -426,8 +438,8 @@ func (local Server) ServeRequest(request Request) (response Response) {
 
 	case MethodPath{"POST", "/inventory_lists"}:
 		// TODO get version from header?
-		bf := local.GetStore().GetInventoryListStore().FormatForVersion(
-			local.GetConfig().GetStoreVersion(),
+		bf := server.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+			server.Repo.GetConfig().GetStoreVersion(),
 		)
 
 		list := sku.MakeList()
@@ -445,7 +457,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 
 		// TODO make option to read from headers
 		importerOptions := store.ImporterOptions{
-			CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
+			CheckedOutPrinter: server.Repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 		}
 
 		if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
@@ -455,7 +467,7 @@ func (local Server) ServeRequest(request Request) (response Response) {
 		importerOptions.BlobCopierDelegate = func(
 			result store.BlobCopyResult,
 		) (err error) {
-			local.ContinueOrPanicOnDone()
+			server.Repo.ContinueOrPanicOnDone()
 
 			if result.N != -1 {
 				return
@@ -469,9 +481,9 @@ func (local Server) ServeRequest(request Request) (response Response) {
 			return
 		}
 
-		importer := local.MakeImporter(importerOptions)
+		importer := server.Repo.MakeImporter(importerOptions)
 
-		if err := local.ImportList(
+		if err := server.Repo.ImportList(
 			list,
 			importer,
 		); err != nil {
