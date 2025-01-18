@@ -83,7 +83,7 @@ func (client *Client) MakeInventoryList(
 	}
 
 	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-		client.Repo.GetConfig().GetStoreVersion(),
+		client.Repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()

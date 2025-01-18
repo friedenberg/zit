@@ -40,7 +40,7 @@ func (s *Store) tryRealize(
 
 	// modify pre commit hooks to support import
 	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
-		if s.config.IgnoreHookErrors {
+		if s.config.GetCLIConfig().IgnoreHookErrors {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -51,7 +51,7 @@ func (s *Store) tryRealize(
 	// TODO just just mutter == nil
 	if mutter == nil {
 		if err = s.tryNewHook(kinder, o); err != nil {
-			if s.config.IgnoreHookErrors {
+			if s.config.GetCLIConfig().IgnoreHookErrors {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

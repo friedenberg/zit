@@ -73,7 +73,7 @@ func (s *Store) ReadOneInto(
 		}
 
 	case genres.Config:
-		sk = &s.GetConfig().Sku
+		sk = s.GetConfig().GetSku()
 
 		if sk.GetTai().IsEmpty() {
 			ui.Err().Print("config tai is empty")

@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -40,22 +41,56 @@ func init() {
 }
 
 type (
-	Env  = *env
-	Env2 interface {
+	Env interface {
+		immutable_config.Config
+		interfaces.Config
+
 		ids.InlineTypeChecker
+		GetTypeExtension(string) string
 		GetCLIConfig() config_mutable_cli.Config
+		GetImmutableConfig() immutable_config.Config
+		GetMutableConfig() mutable_config_blobs.Blob
 		GetFileExtensions() interfaces.FileExtensionGetter
 		HasChanges() (ok bool)
 		GetChanges() (out []string)
+
+		GetTagOrRepoIdOrType(
+			v string,
+		) (sk *sku.Transacted, err error)
+		GetImplicitTags(*ids.Tag) ids.TagSet
+		GetApproximatedType(
+			k interfaces.ObjectId,
+		) (ct ApproximatedType)
+		GetSku() *sku.Transacted
+
+		AddTransacted(
+			child *sku.Transacted,
+			parent *sku.Transacted,
+			ak *blob_store.VersionedStores,
+		) (err error)
+
 		Flush(
 			dirLayout env_repo.Env,
 			blobStore *blob_store.VersionedStores,
 			printerHeader interfaces.FuncIter[string],
 		) (err error)
 	}
+
+	EnvMutable interface {
+		Env
+
+		Initialize(
+			dirLayout env_repo.Env,
+			kcli config_mutable_cli.Config,
+			dormant *dormant_index.Index,
+			blobStore *blob_store.VersionedStores,
+		) (err error)
+
+		Reset() error
+	}
 )
 
-func Make() Env {
+func Make() EnvMutable {
 	return &env{}
 }
 

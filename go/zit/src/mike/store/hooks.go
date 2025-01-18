@@ -165,7 +165,7 @@ func (s *Store) tryPreCommitHooks(
 	script := blob.GetStringLuaHooks()
 
 	hooks = append(hooks, hook{script: script, description: "type"})
-	hooks = append(hooks, hook{script: s.GetConfig().Hooks, description: "config-mutable"})
+	hooks = append(hooks, hook{script: s.GetConfig().GetCLIConfig().Hooks, description: "config-mutable"})
 
 	for _, h := range hooks {
 		if h.script == "" {

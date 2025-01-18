@@ -75,6 +75,7 @@ func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
 
 	oo.AddPrototypeAndOption(
 		"dry-run",
-		&organize_text.OptionCommentDryRun{MutableConfigDryRun: e.GetConfig()},
+		&organize_text.OptionCommentDryRun{
+      MutableConfigDryRun: e.GetConfig()},
 	)
 }

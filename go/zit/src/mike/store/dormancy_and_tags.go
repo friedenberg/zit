@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+// TODO extract into store_tags
 func (k *Store) applyDormantAndRealizeTags(
 	sk *sku.Transacted,
 ) (err error) {

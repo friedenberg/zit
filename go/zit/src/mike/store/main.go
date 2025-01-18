@@ -104,6 +104,7 @@ func (c *Store) Initialize(
 	}
 
 	if c.zettelIdIndex, err = zettel_id_index.MakeIndex(
+		// TODO
 		c.GetConfig(),
 		c.GetDirectoryLayout(),
 		c.GetDirectoryLayout(),
@@ -124,7 +125,7 @@ func (c *Store) Initialize(
 
 	c.protoZettel = sku.MakeProto(
 		k.GetMutableConfig().GetDefaults().GetType(),
-		k.DefaultTags,
+		k.GetMutableConfig().GetDefaults().GetTags(),
 	)
 
 	c.configBlobFormat = blob_store.MakeBlobFormat2(

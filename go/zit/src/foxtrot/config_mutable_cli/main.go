@@ -96,3 +96,7 @@ func (c Config) UsePrintTime() bool {
 func (c Config) UsePrintTags() bool {
 	return c.PrintOptions.PrintTagsAlways
 }
+
+func (c Config)	IsDryRun() bool {
+  return c.DryRun
+}

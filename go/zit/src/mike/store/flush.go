@@ -29,7 +29,7 @@ func (s *Store) FlushInventoryList(
 
 	if inventoryListSku, err = s.GetInventoryListStore().Create(
 		s.inventoryList,
-		s.GetConfig().Description,
+		s.GetConfig().GetCLIConfig().Description,
 	); err != nil {
 		if errors.Is(err, inventory_list_store.ErrEmpty) {
 			ui.Log().Printf("Bestandsaufnahme was empty")

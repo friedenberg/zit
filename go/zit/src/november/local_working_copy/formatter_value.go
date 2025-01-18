@@ -227,7 +227,10 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object":
-		fo := object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion())
+		fo := object_inventory_format.FormatForVersion(
+			u.GetConfig().GetImmutableConfig().GetStoreVersion(),
+		)
+
 		o := object_inventory_format.Options{
 			Tai: true,
 		}

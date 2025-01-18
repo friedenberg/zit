@@ -45,7 +45,7 @@ func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut
 		repo.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
-			ConfigDryRunReader: repo.GetConfig(),
+			ConfigDryRunReader: repo.GetConfig().GetCLIConfig(),
 		},
 	)
 

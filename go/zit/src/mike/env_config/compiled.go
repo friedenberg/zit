@@ -48,6 +48,10 @@ type compiled struct {
 	Repos sku.TransactedMutableSet
 }
 
+func (k *compiled) GetSku() *sku.Transacted {
+	return &k.Sku
+}
+
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
 	blobStore *blob_store.VersionedStores,

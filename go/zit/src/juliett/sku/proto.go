@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -13,11 +14,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 )
 
-func MakeProto(tipe ids.Type, tags ids.TagSet) (p Proto) {
+func MakeProto(tipe ids.Type, tags quiter.Slice[ids.Tag]) (p Proto) {
 	ui.TodoP1("modify konfig to keep etiketten set")
 
 	p.Metadata.Type = tipe
-	p.Metadata.SetTags(tags)
+	p.Metadata.SetTags(ids.MakeTagSet(tags...))
 
 	return
 }

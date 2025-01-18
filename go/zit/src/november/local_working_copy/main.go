@@ -29,7 +29,7 @@ type Repo struct {
 
 	layout       env_repo.Env
 	fileEncoder  store_fs.FileEncoder
-	config       env_config.Env
+	config       env_config.EnvMutable
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
@@ -155,7 +155,7 @@ func (repo *Repo) initialize(
 	if repo.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{
 			Expected: repo_type.TypeWorkingCopy,
-			Actual:   repo.GetConfig().GetRepoType(),
+			Actual:   repo.GetConfig().GetImmutableConfig().GetRepoType(),
 		}
 
 		return
@@ -186,16 +186,19 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	ui.Log().Printf("store version: %s", repo.GetConfig().GetStoreVersion())
+	ui.Log().Printf(
+		"store version: %s",
+		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
+	)
 
 	var sfs *store_fs.Store
 
-	k := repo.GetConfig()
+	config := repo.GetConfig()
 
 	if sfs, err = store_fs.Make(
-		k,
+		config,
 		repo.PrinterFDDeleted(),
-		k.GetFileExtensions(),
+		config.GetFileExtensions(),
 		repo.GetRepoLayout(),
 		ofo,
 		repo.fileEncoder,
@@ -210,7 +213,7 @@ func (repo *Repo) initialize(
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
-				k,
+				config,
 				repo.GetRepoLayout(),
 				repo.PrinterTransactedDeleted(),
 			),

@@ -28,8 +28,5 @@ func (cmd Reindex) Run(dep command.Request) {
 		local_working_copy.OptionsAllowConfigReadError,
 	)
 
-	localWorkingCopy.Must(localWorkingCopy.Lock)
-	localWorkingCopy.Must(localWorkingCopy.GetConfig().Reset)
-	localWorkingCopy.Must(localWorkingCopy.GetStore().Reindex)
-	localWorkingCopy.Must(localWorkingCopy.Unlock)
+	localWorkingCopy.Reindex()
 }
