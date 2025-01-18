@@ -40,6 +40,11 @@ func init() {
 }
 
 type (
+	immutable_config_private = immutable_config.Config
+	mutable_config_private   = mutable_config_blobs.Blob
+	cli                      = config_mutable_cli.Config
+	ApproximatedType         = blob_store.ApproximatedType
+
 	Env interface {
 		immutable_config.Config
 		interfaces.Config
@@ -97,7 +102,6 @@ type env struct {
 	cli
 	compiled
 	immutable_config_private
-	dormant *dormant_index.Index
 }
 
 func (a *env) GetCLIConfig() config_mutable_cli.Config {
