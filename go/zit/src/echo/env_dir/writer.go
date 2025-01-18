@@ -27,14 +27,18 @@ func NewWriter(o WriteOptions) (w *writer, err error) {
 
 	w.wBuf = bufio.NewWriter(o.Writer)
 
-	if w.wAge, err = o.GetAgeEncryption().Encrypt(w.wBuf); err != nil {
+	if w.wAge, err = o.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	w.hash = sha256.New()
 
-	w.wCompress = o.GetCompressionType().NewWriter(w.wAge)
+	if w.wCompress, err = o.GetBlobCompression().WrapWriter(w.wAge); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	w.tee = io.MultiWriter(w.hash, w.wCompress)
 
 	return

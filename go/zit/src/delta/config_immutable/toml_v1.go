@@ -24,7 +24,7 @@ func (k *TomlV1) GetImmutableConfig() Config {
 	return k
 }
 
-func (k *TomlV1) GetBlobStoreImmutableConfig() BlobStoreConfig {
+func (k *TomlV1) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
 	return &k.BlobStore
 }
 

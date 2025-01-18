@@ -22,8 +22,8 @@ func NewFileReader(o FileReadOptions) (r interfaces.ShaReadCloser, err error) {
 
 	fro := ReadOptions{
 		Config: MakeConfig(
-			o.GetAgeEncryption(),
-			o.GetCompressionType(),
+			o.GetBlobCompression(),
+			o.GetBlobEncryption(),
 			o.GetLockInternalFiles(),
 		),
 		Reader: ar.file,

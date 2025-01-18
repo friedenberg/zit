@@ -73,8 +73,8 @@ func (cmd Export) Run(dep command.Request) {
 
 	o := env_dir.WriteOptions{
 		Config: env_dir.MakeConfig(
+			&cmd.CompressionType,
 			&ag,
-			cmd.CompressionType,
 			false,
 		),
 		Writer: localWorkingCopy.GetUIFile(),

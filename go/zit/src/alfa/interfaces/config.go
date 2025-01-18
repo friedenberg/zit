@@ -1,9 +1,5 @@
 package interfaces
 
-type ImmutableConfigGetter interface {
-	GetImmutableConfig() ImmutableConfig
-}
-
 type ImmutableConfig interface {
 	GetStoreVersion() StoreVersion
 }

@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
+	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
@@ -135,8 +135,8 @@ func (a Env) SansObjectAge() (b Env) {
 	b = a
 
 	b.ObjectStore.Config = env_dir.MakeConfig(
+		a.ObjectStore.Config.GetBlobCompression(),
 		nil,
-		a.ObjectStore.Config.GetCompressionType(),
 		a.ObjectStore.Config.GetLockInternalFiles(),
 	)
 
@@ -145,10 +145,11 @@ func (a Env) SansObjectAge() (b Env) {
 
 func (a Env) SansObjectCompression() (b Env) {
 	b = a
+	compression := config_immutable.CompressionTypeNone
 
 	b.ObjectStore.Config = env_dir.MakeConfig(
-		a.ObjectStore.Config.GetAgeEncryption(),
-		config_immutable.CompressionTypeNone,
+		&compression,
+		a.ObjectStore.Config.GetBlobEncryption(),
 		a.ObjectStore.Config.GetLockInternalFiles(),
 	)
 

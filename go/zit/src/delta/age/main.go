@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"filippo.io/age"
 )
 
@@ -16,6 +17,10 @@ type (
 type Age struct {
 	// Recipients []Recipient `toml:"recipients,omitempty"`
 	Identities []*Identity `toml:"identities,omitempty"`
+}
+
+func (a *Age) GetBlobEncryption() interfaces.BlobEncryption {
+	return a
 }
 
 func (a *Age) String() string {
@@ -138,7 +143,7 @@ func (a *Age) GetRecipients() []age.Recipient {
 	return r
 }
 
-func (a *Age) Decrypt(src io.Reader) (out io.Reader, err error) {
+func (a *Age) WrapReader(src io.Reader) (out io.ReadCloser, err error) {
 	is := make([]age.Identity, len(a.Identities))
 
 	for i := range is {
@@ -147,20 +152,21 @@ func (a *Age) Decrypt(src io.Reader) (out io.Reader, err error) {
 
 	switch len(is) {
 	case 0:
-		out = src
-		return
+		// no-op
 
 	default:
-		if out, err = age.Decrypt(src, is...); err != nil {
+		if src, err = age.Decrypt(src, is...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
+	out = io.NopCloser(src)
+
 	return
 }
 
-func (a *Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
+func (a *Age) WrapWriter(dst io.Writer) (out io.WriteCloser, err error) {
 	r := a.GetRecipients()
 
 	switch len(r) {
@@ -176,8 +182,4 @@ func (a *Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
 	}
 
 	return
-}
-
-func (a *Age) Close() error {
-	return nil
 }

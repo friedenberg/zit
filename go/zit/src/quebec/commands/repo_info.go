@@ -3,6 +3,7 @@ package commands
 import (
 	"strings"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -34,10 +35,10 @@ func (cmd RepoInfo) Run(dep command.Request) {
 			repo.GetUI().Print(c.GetStoreVersion())
 
 		case "compression-type":
-			repo.GetUI().Print(c.GetBlobStoreImmutableConfig().GetCompressionType())
+			repo.GetUI().Print(c.GetBlobStoreImmutableConfig().GetBlobCompression())
 
 		case "age-encryption":
-			for _, i := range c.GetBlobStoreImmutableConfig().GetAgeEncryption().Identities {
+			for _, i := range c.GetBlobStoreImmutableConfig().GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 

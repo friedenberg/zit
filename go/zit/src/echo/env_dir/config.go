@@ -1,52 +1,58 @@
 package env_dir
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 )
 
 type Config struct {
-	age               *age.Age
-	compressionType   config_immutable.CompressionType
+	compression       interfaces.BlobCompression
+	encryption        interfaces.BlobEncryption
 	lockInternalFiles bool
 }
 
 func MakeConfigFromImmutableBlobConfig(
-	config config_immutable.BlobStoreConfig,
+	config interfaces.BlobStoreConfig,
 ) Config {
 	return MakeConfig(
-		config.GetAgeEncryption(),
-		config.GetCompressionType(),
+		config.GetBlobCompression(),
+		config.GetBlobEncryption(),
 		config.GetLockInternalFiles(),
 	)
 }
 
 func MakeConfig(
-	ag *age.Age,
-	compressionType config_immutable.CompressionType,
+	compression interfaces.BlobCompression,
+	encryption interfaces.BlobEncryption,
 	lockInternalFiles bool,
 ) Config {
-	if ag == nil {
-		ag = &age.Age{}
+	if encryption == nil {
+		encryption = &age.Age{}
+	}
+
+	if compression == nil {
+		c := config_immutable.CompressionTypeNone
+		compression = &c
 	}
 
 	return Config{
-		age:               ag,
-		compressionType:   compressionType,
+		compression:       compression,
+		encryption:        encryption,
 		lockInternalFiles: lockInternalFiles,
 	}
 }
 
-func (c Config) GetBlobStoreImmutableConfig() config_immutable.BlobStoreConfig {
-	return c
+func (c Config) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
+	return &c
 }
 
-func (c Config) GetAgeEncryption() *age.Age {
-	return c.age
+func (c *Config) GetBlobCompression() interfaces.BlobCompression {
+	return c.compression
 }
 
-func (c Config) GetCompressionType() config_immutable.CompressionType {
-	return c.compressionType
+func (c *Config) GetBlobEncryption() interfaces.BlobEncryption {
+	return c.encryption
 }
 
 func (c Config) GetLockInternalFiles() bool {

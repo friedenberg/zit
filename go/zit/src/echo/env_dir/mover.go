@@ -37,8 +37,8 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 
 	wo := WriteOptions{
 		Config: MakeConfig(
-			o.GetAgeEncryption(),
-			o.GetCompressionType(),
+			o.GetBlobCompression(),
+			o.GetBlobEncryption(),
 			o.GetLockInternalFiles(),
 		),
 		Writer: m.file,

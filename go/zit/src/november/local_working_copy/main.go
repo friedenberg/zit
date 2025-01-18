@@ -145,7 +145,7 @@ func (repo *Repo) initialize(
 			err = errors.Wrapf(
 				err,
 				"CompressionType: %q",
-				repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType(),
+				repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetBlobCompression(),
 			)
 			return
 		}

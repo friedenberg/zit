@@ -140,7 +140,12 @@ func (s blobStore) blobReaderFrom(
 				Path:      p,
 			}
 		} else {
-			err = errors.Wrapf(err, "Path: %q, Compression: %q", p, s.GetCompressionType())
+			err = errors.Wrapf(
+        err,
+        "Path: %q, Compression: %q",
+        p,
+        s.GetBlobCompression(),
+      )
 		}
 
 		return

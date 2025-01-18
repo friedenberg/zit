@@ -58,8 +58,8 @@ func (cmd Import) Run(dep command.Request) {
 	{
 		o := env_dir.FileReadOptions{
 			Config: env_dir.MakeConfig(
-				cmd.Config.GetAgeEncryption(),
-				cmd.Config.GetCompressionType(),
+				cmd.Config.GetBlobCompression(),
+				cmd.Config.GetBlobEncryption(),
 				false,
 			),
 			Path: cmd.InventoryList,

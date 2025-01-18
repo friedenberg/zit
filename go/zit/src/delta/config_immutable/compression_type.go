@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"github.com/DataDog/zstd"
 )
@@ -35,6 +36,10 @@ const (
 
 type CompressionType string
 
+func (ct *CompressionType) GetBlobCompression() interfaces.BlobCompression {
+	return ct
+}
+
 func (ct *CompressionType) SetFlagSet(f *flag.FlagSet) {
 	f.Var(ct, "compression-type", "")
 }
@@ -61,7 +66,7 @@ func (ct *CompressionType) Set(v string) (err error) {
 	return
 }
 
-func (ct CompressionType) NewReader(
+func (ct CompressionType) WrapReader(
 	r io.Reader,
 ) (out io.ReadCloser, err error) {
 	switch ct {
@@ -81,18 +86,18 @@ func (ct CompressionType) NewReader(
 	return
 }
 
-func (ct CompressionType) NewWriter(w io.Writer) io.WriteCloser {
+func (ct CompressionType) WrapWriter(w io.Writer) (io.WriteCloser, error) {
 	switch ct {
 	case CompressionTypeGzip:
-		return gzip.NewWriter(w)
+		return gzip.NewWriter(w), nil
 
 	case CompressionTypeZlib:
-		return zlib.NewWriter(w)
+		return zlib.NewWriter(w), nil
 
 	case CompressionTypeZstd:
-		return zstd.NewWriter(w)
+		return zstd.NewWriter(w), nil
 
 	default:
-		return files.NopWriteCloser{Writer: w}
+		return files.NopWriteCloser{Writer: w}, nil
 	}
 }

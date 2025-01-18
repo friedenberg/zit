@@ -1,10 +1,39 @@
 package interfaces
 
+import (
+	"flag"
+	"io"
+)
+
+type BlobIOMiddleware interface {
+	WrapReader(r io.Reader) (io.ReadCloser, error)
+	WrapWriter(w io.Writer) (io.WriteCloser, error)
+}
+
+type BlobCompression interface {
+	flag.Value
+	BlobIOMiddleware
+  GetBlobCompression() BlobCompression
+}
+
+type BlobEncryption interface {
+	flag.Value
+	BlobIOMiddleware
+  GetBlobEncryption() BlobEncryption
+}
+
 type BlobStore interface {
 	GetBlobStore() BlobStore
 	HasBlob(sh Sha) (ok bool)
 	BlobWriter() (w ShaWriteCloser, err error)
 	BlobReader(sh Sha) (r ShaReadCloser, err error)
+}
+
+type BlobStoreConfig interface {
+	GetBlobStoreImmutableConfig() BlobStoreConfig
+	GetBlobEncryption() BlobEncryption
+	GetBlobCompression() BlobCompression
+	GetLockInternalFiles() bool
 }
 
 // Blobs represent persisted files, like blobs in Git. Blobs are used by

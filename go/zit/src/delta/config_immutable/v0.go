@@ -37,11 +37,11 @@ func (k *V0) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (k V0) GetImmutableConfig() Config {
+func (k *V0) GetImmutableConfig() Config {
 	return k
 }
 
-func (k V0) GetBlobStoreImmutableConfig() BlobStoreConfig {
+func (k *V0) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
 	return k
 }
 
@@ -53,12 +53,16 @@ func (k V0) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (k V0) GetAgeEncryption() *age.Age {
+func (k *V0) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 
-func (k V0) GetCompressionType() CompressionType {
-	return k.CompressionType
+func (k *V0) GetBlobCompression() interfaces.BlobCompression {
+	return &k.CompressionType
+}
+
+func (k *V0) GetBlobEncryption() interfaces.BlobEncryption {
+	return k.GetAgeEncryption()
 }
 
 func (k V0) GetLockInternalFiles() bool {
