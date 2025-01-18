@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -172,7 +172,7 @@ func writeDefaultMutableConfig(
 	u *Repo,
 	dt ids.Type,
 ) (sh interfaces.Sha, tipe ids.Type, err error) {
-	defaultMutableConfig := mutable_config_blobs.Default(dt)
+	defaultMutableConfig := config_mutable_blobs.Default(dt)
 	tipe = defaultMutableConfig.Type
 
 	f := u.GetStore().GetConfigBlobFormat()

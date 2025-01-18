@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -151,7 +151,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-		immutable_config.CurrentStoreVersion,
+		config_immutable.CurrentStoreVersion,
 	)
 
 	b := bytes.NewBuffer(nil)

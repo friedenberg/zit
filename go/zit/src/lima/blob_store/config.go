@@ -7,14 +7,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
 type Config struct {
-	toml_v0 Store[mutable_config_blobs.V0, *mutable_config_blobs.V0]
-	toml_v1 Store[mutable_config_blobs.V1, *mutable_config_blobs.V1]
+	toml_v0 Store[config_mutable_blobs.V0, *config_mutable_blobs.V0]
+	toml_v1 Store[config_mutable_blobs.V1, *config_mutable_blobs.V1]
 }
 
 func MakeConfigStore(
@@ -24,26 +24,26 @@ func MakeConfigStore(
 		toml_v0: MakeBlobStore(
 			repoLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
+				MakeTextParserIgnoreTomlErrors[config_mutable_blobs.V0](
 					repoLayout,
 				),
-				ParsedBlobTomlFormatter[mutable_config_blobs.V0, *mutable_config_blobs.V0]{},
+				ParsedBlobTomlFormatter[config_mutable_blobs.V0, *config_mutable_blobs.V0]{},
 				repoLayout,
 			),
-			func(a *mutable_config_blobs.V0) {
+			func(a *config_mutable_blobs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
 			repoLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V1](
+				MakeTextParserIgnoreTomlErrors[config_mutable_blobs.V1](
 					repoLayout,
 				),
-				ParsedBlobTomlFormatter[mutable_config_blobs.V1, *mutable_config_blobs.V1]{},
+				ParsedBlobTomlFormatter[config_mutable_blobs.V1, *config_mutable_blobs.V1]{},
 				repoLayout,
 			),
-			func(a *mutable_config_blobs.V1) {
+			func(a *config_mutable_blobs.V1) {
 				a.Reset()
 			},
 		),
@@ -53,11 +53,11 @@ func MakeConfigStore(
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Sha,
-) (common mutable_config_blobs.Blob, n int64, err error) {
+) (common config_mutable_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", builtin_types.ConfigTypeTomlV0:
 		store := a.toml_v0
-		var blob *mutable_config_blobs.V0
+		var blob *config_mutable_blobs.V0
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -68,7 +68,7 @@ func (a Config) ParseTypedBlob(
 
 	case builtin_types.ConfigTypeTomlV1:
 		store := a.toml_v1
-		var blob *mutable_config_blobs.V1
+		var blob *config_mutable_blobs.V1
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -109,11 +109,11 @@ func (a Config) FormatTypedBlob(
 
 func (a Config) PutTypedBlob(
 	tipe interfaces.ObjectId,
-	common mutable_config_blobs.Blob,
+	common config_mutable_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
 	case "", builtin_types.ConfigTypeTomlV0:
-		if blob, ok := common.(*mutable_config_blobs.V0); !ok {
+		if blob, ok := common.(*config_mutable_blobs.V0); !ok {
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {
@@ -121,7 +121,7 @@ func (a Config) PutTypedBlob(
 		}
 
 	case builtin_types.ConfigTypeTomlV1:
-		if blob, ok := common.(*mutable_config_blobs.V1); !ok {
+		if blob, ok := common.(*config_mutable_blobs.V1); !ok {
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {

@@ -2,17 +2,17 @@ package env_dir
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 )
 
 type Config struct {
 	age               *age.Age
-	compressionType   immutable_config.CompressionType
+	compressionType   config_immutable.CompressionType
 	lockInternalFiles bool
 }
 
 func MakeConfigFromImmutableBlobConfig(
-	config immutable_config.BlobStoreConfig,
+	config config_immutable.BlobStoreConfig,
 ) Config {
 	return MakeConfig(
 		config.GetAgeEncryption(),
@@ -23,7 +23,7 @@ func MakeConfigFromImmutableBlobConfig(
 
 func MakeConfig(
 	ag *age.Age,
-	compressionType immutable_config.CompressionType,
+	compressionType config_immutable.CompressionType,
 	lockInternalFiles bool,
 ) Config {
 	if ag == nil {
@@ -37,7 +37,7 @@ func MakeConfig(
 	}
 }
 
-func (c Config) GetBlobStoreImmutableConfig() immutable_config.BlobStoreConfig {
+func (c Config) GetBlobStoreImmutableConfig() config_immutable.BlobStoreConfig {
 	return c
 }
 
@@ -45,7 +45,7 @@ func (c Config) GetAgeEncryption() *age.Age {
 	return c.age
 }
 
-func (c Config) GetCompressionType() immutable_config.CompressionType {
+func (c Config) GetCompressionType() config_immutable.CompressionType {
 	return c.compressionType
 }
 

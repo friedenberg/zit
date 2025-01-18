@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
@@ -148,14 +148,14 @@ func (a Env) SansObjectCompression() (b Env) {
 
 	b.ObjectStore.Config = env_dir.MakeConfig(
 		a.ObjectStore.Config.GetAgeEncryption(),
-		immutable_config.CompressionTypeNone,
+		config_immutable.CompressionTypeNone,
 		a.ObjectStore.Config.GetLockInternalFiles(),
 	)
 
 	return
 }
 
-func (s Env) GetConfig() immutable_config.Config {
+func (s Env) GetConfig() config_immutable.Config {
 	return s.config.ImmutableConfig
 }
 
@@ -202,7 +202,7 @@ func (h Env) DataFileStoreVersion() string {
 
 func (h Env) GetStoreVersion() interfaces.StoreVersion {
 	if h.config.ImmutableConfig == nil {
-		return immutable_config.CurrentStoreVersion
+		return config_immutable.CurrentStoreVersion
 	} else {
 		return h.config.ImmutableConfig.GetStoreVersion()
 	}

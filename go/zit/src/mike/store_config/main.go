@@ -11,11 +11,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
@@ -39,20 +39,20 @@ func init() {
 }
 
 type (
-	immutable_config_private = immutable_config.Config
-	mutable_config_private   = mutable_config_blobs.Blob
+	immutable_config_private = config_immutable.Config
+	mutable_config_private   = config_mutable_blobs.Blob
 	cli                      = config_mutable_cli.Config
 	ApproximatedType         = blob_store.ApproximatedType
 
 	Store interface {
-		immutable_config.Config
 		interfaces.Config
+		config_immutable.Config
 
 		ids.InlineTypeChecker
 		GetTypeExtension(string) string
 		GetCLIConfig() config_mutable_cli.Config
-		GetImmutableConfig() immutable_config.Config
-		GetMutableConfig() mutable_config_blobs.Blob
+		GetImmutableConfig() config_immutable.Config
+		GetMutableConfig() config_mutable_blobs.Blob
 		GetFileExtensions() interfaces.FileExtensionGetter
 		HasChanges() (ok bool)
 		GetChanges() (out []string)
@@ -93,21 +93,21 @@ type (
 )
 
 func Make() StoreMutable {
-	return &env{}
+	return &store{}
 }
 
-type env struct {
+type store struct {
 	cli
 	compiled
 	immutable_config_private
 }
 
-func (a *env) GetCLIConfig() config_mutable_cli.Config {
+func (a *store) GetCLIConfig() config_mutable_cli.Config {
 	return a.cli
 }
 
 func (a *compiled) Reset() error {
-	a.mutable_config_private = mutable_config_blobs.V1{}
+	a.mutable_config_private = config_mutable_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
 
@@ -124,11 +124,11 @@ func (a *compiled) Reset() error {
 	return nil
 }
 
-func (a *env) GetMutableConfig() mutable_config_blobs.Blob {
+func (a *store) GetMutableConfig() config_mutable_blobs.Blob {
 	return a.mutable_config_private
 }
 
-func (c *env) Initialize(
+func (c *store) Initialize(
 	dirLayout env_repo.Env,
 	kcli config_mutable_cli.Config,
 	blobStore *blob_store.VersionedStores,
@@ -160,33 +160,33 @@ func (c *env) Initialize(
 	return
 }
 
-func (kc *env) SetCli(k config_mutable_cli.Config) {
+func (kc *store) SetCli(k config_mutable_cli.Config) {
 	kc.cli = k
 }
 
-func (kc *env) SetCliFromCommander(k config_mutable_cli.Config) {
+func (kc *store) SetCliFromCommander(k config_mutable_cli.Config) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
 }
 
-func (k *env) IsDryRun() bool {
+func (k *store) IsDryRun() bool {
 	return k.DryRun
 }
 
-func (k *env) SetDryRun(v bool) {
+func (k *store) SetDryRun(v bool) {
 	k.DryRun = v
 }
 
-func (k *env) GetTypeStringFromExtension(t string) string {
+func (k *store) GetTypeStringFromExtension(t string) string {
 	return k.ExtensionsToTypes[t]
 }
 
-func (k *env) GetTypeExtension(v string) string {
+func (k *store) GetTypeExtension(v string) string {
 	return k.TypesToExtensions[v]
 }
 
-func (k *env) AddTransacted(
+func (k *store) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
 	ak *blob_store.VersionedStores,
@@ -265,7 +265,7 @@ func (k *env) AddTransacted(
 	return
 }
 
-func (kc *env) IsInlineType(k ids.Type) (isInline bool) {
+func (kc *store) IsInlineType(k ids.Type) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true

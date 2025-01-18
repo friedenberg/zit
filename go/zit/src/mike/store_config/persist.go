@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -19,11 +19,11 @@ import (
 )
 
 func init() {
-	gob.Register(mutable_config_blobs.V1{})
-	gob.Register(mutable_config_blobs.V0{})
+	gob.Register(config_mutable_blobs.V1{})
+	gob.Register(config_mutable_blobs.V0{})
 }
 
-func (kc *env) recompile(
+func (kc *store) recompile(
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	if err = kc.recompileTags(); err != nil {
@@ -39,7 +39,7 @@ func (kc *env) recompile(
 	return
 }
 
-func (kc *env) recompileTags() (err error) {
+func (kc *store) recompileTags() (err error) {
 	kc.DefaultTags = ids.MakeTagSet(kc.GetDefaults().GetTags()...)
 
 	kc.ImplicitTags = make(implicitTagMap)
@@ -68,7 +68,7 @@ func (kc *env) recompileTags() (err error) {
 	return
 }
 
-func (kc *env) recompileTypes(
+func (kc *store) recompileTypes(
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
@@ -121,7 +121,7 @@ func (kc *env) recompileTypes(
 	return
 }
 
-func (kc *env) HasChanges() (ok bool) {
+func (kc *store) HasChanges() (ok bool) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
@@ -134,7 +134,7 @@ func (kc *env) HasChanges() (ok bool) {
 	return
 }
 
-func (kc *env) GetChanges() (out []string) {
+func (kc *store) GetChanges() (out []string) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
@@ -155,7 +155,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *env) loadMutableConfig(
+func (kc *store) loadMutableConfig(
 	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
@@ -194,7 +194,7 @@ func (kc *env) loadMutableConfig(
 	return
 }
 
-func (kc *env) Flush(
+func (kc *store) Flush(
 	dirLayout env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
@@ -223,7 +223,7 @@ func (kc *env) Flush(
 	return
 }
 
-func (kc *env) flushMutableConfig(
+func (kc *store) flushMutableConfig(
 	s env_repo.Env,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],

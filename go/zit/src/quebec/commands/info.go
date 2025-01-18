@@ -4,7 +4,7 @@ import (
 	"flag"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -12,14 +12,14 @@ import (
 )
 
 type Info struct {
-	immutable_config.Config
+	config_immutable.Config
 }
 
 func init() {
 	command.Register(
 		"info",
 		&Info{
-			Config: immutable_config.Default(),
+			Config: config_immutable.Default(),
 		},
 	)
 }

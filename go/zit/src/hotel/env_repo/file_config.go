@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -61,7 +61,7 @@ func (s *Env) loadImmutableConfig() (err error) {
 
 type config struct {
 	ids.Type
-	ImmutableConfig          immutable_config.Config
+	ImmutableConfig          config_immutable.Config
 	BlobStoreImmutableConfig env_dir.Config
 }
 
@@ -105,7 +105,7 @@ func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
 func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 	switch c.Type.String() {
 	case builtin_types.ImmutableConfigV1:
-		c.ImmutableConfig = &immutable_config.TomlV1{}
+		c.ImmutableConfig = &config_immutable.TomlV1{}
 		td := toml.NewDecoder(r)
 
 		if err = td.Decode(c.ImmutableConfig); err != nil {
@@ -118,7 +118,7 @@ func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 	case "":
-		c.ImmutableConfig = &immutable_config.V0{}
+		c.ImmutableConfig = &config_immutable.V0{}
 
 		dec := gob.NewDecoder(r)
 

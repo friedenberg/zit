@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -20,7 +20,7 @@ func init() {
 	command.Register(
 		"export",
 		&Export{
-			CompressionType: immutable_config.CompressionTypeEmpty,
+			CompressionType: config_immutable.CompressionTypeEmpty,
 		},
 	)
 }
@@ -29,7 +29,7 @@ type Export struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 
 	AgeIdentity     age.Identity
-	CompressionType immutable_config.CompressionType
+	CompressionType config_immutable.CompressionType
 }
 
 func (cmd *Export) SetFlagSet(f *flag.FlagSet) {

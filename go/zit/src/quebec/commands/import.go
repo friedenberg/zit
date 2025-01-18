@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -18,7 +18,7 @@ func init() {
 	command.Register(
 		"import",
 		&Import{
-			StoreVersion: immutable_config.CurrentStoreVersion,
+			StoreVersion: config_immutable.CurrentStoreVersion,
 		},
 	)
 }
@@ -28,7 +28,7 @@ type Import struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteBlobStore
 
-	immutable_config.StoreVersion
+	config_immutable.StoreVersion
 	InventoryList string
 	PrintCopies   bool
 	sku.Proto

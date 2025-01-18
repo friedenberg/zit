@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -21,7 +21,7 @@ func (c *compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 
-func (kc *env) GetImmutableConfig() immutable_config.Config {
+func (kc *store) GetImmutableConfig() config_immutable.Config {
 	return kc.immutable_config_private
 }
 
@@ -207,6 +207,6 @@ func (c *compiled) GetImplicitTags(
 	return s
 }
 
-func (kc *env) Cli() config_mutable_cli.Config {
+func (kc *store) Cli() config_mutable_cli.Config {
 	return kc.cli
 }

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -140,7 +140,7 @@ func (c DormantEdit) readTempKonfigFile(
 
 	format := u.GetStore().GetConfigBlobFormat()
 
-	var k mutable_config_blobs.V0
+	var k config_mutable_blobs.V0
 
 	var aw interfaces.ShaWriteCloser
 

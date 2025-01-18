@@ -5,22 +5,22 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 )
 
 type directoryPaths interface {
 	interfaces.DirectoryPaths
-	init(sv immutable_config.StoreVersion, xdg xdg.XDG) error
+	init(sv config_immutable.StoreVersion, xdg xdg.XDG) error
 }
 
 type directoryV0 struct {
-	sv       immutable_config.StoreVersion
+	sv       config_immutable.StoreVersion
 	basePath string
 }
 
 func (c *directoryV0) init(
-	sv immutable_config.StoreVersion,
+	sv config_immutable.StoreVersion,
 	xdg xdg.XDG,
 ) (err error) {
 	c.sv = sv
