@@ -1,7 +1,6 @@
 package sha
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"hash"
 	"io"
@@ -137,53 +136,3 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 func (nrc nopReadCloser) GetShaLike() interfaces.Sha {
 	return &Sha{}
 }
-
-type nopBlobFactory struct{}
-
-func NopBlobFactory() interfaces.BlobIOFactory {
-	return nopBlobFactory{}
-}
-
-func (nopBlobFactory) BlobWriter() (WriteCloser, error) {
-	return MakeWriter(nil), nil
-}
-
-func (nopBlobFactory) BlobReader(s interfaces.Sha) (ReadCloser, error) {
-	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
-}
-
-// // TODO-P2 remove and replace with sha.writer
-// type nopWriter struct {
-// 	hash hash.Hash
-// }
-
-// func MakeNopWriter() (w *nopWriter) {
-// 	w = &nopWriter{
-// 		hash: sha256.New(),
-// 	}
-
-// 	return
-// }
-
-// func (w *nopWriter) ReadFrom(r io.Reader) (n int64, err error) {
-// 	if n, err = io.Copy(w.hash, r); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
-// func (w *nopWriter) Write(p []byte) (n int, err error) {
-// 	return w.hash.Write(p)
-// }
-
-// func (w *nopWriter) Close() (err error) {
-// 	return
-// }
-
-// func (w *nopWriter) GetShaLike() (s schnittstellen.ShaLike) {
-// 	s = FromHash(w.hash)
-
-// 	return
-// }

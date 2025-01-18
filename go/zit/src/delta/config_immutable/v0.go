@@ -41,7 +41,7 @@ func (k *V0) GetImmutableConfig() Config {
 	return k
 }
 
-func (k *V0) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
+func (k *V0) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return k
 }
 

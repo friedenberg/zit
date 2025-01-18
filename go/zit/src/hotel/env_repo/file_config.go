@@ -53,7 +53,7 @@ func (s *Env) loadImmutableConfig() (err error) {
 	}
 
 	s.config.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		s.config.ImmutableConfig.GetBlobStoreImmutableConfig(),
+		s.config.ImmutableConfig.GetBlobStoreConfigImmutable(),
 	)
 
 	return
@@ -137,7 +137,7 @@ func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	c.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		c.ImmutableConfig.GetBlobStoreImmutableConfig(),
+		c.ImmutableConfig.GetBlobStoreConfigImmutable(),
 	)
 
 	return

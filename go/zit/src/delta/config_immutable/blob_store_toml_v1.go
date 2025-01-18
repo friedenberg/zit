@@ -27,7 +27,7 @@ func (k *BlobStoreTomlV1) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&k.AgeEncryption, "age-identity", "add an age identity")
 }
 
-func (k *BlobStoreTomlV1) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
+func (k *BlobStoreTomlV1) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return k
 }
 

@@ -35,10 +35,10 @@ func (cmd RepoInfo) Run(dep command.Request) {
 			repo.GetUI().Print(c.GetStoreVersion())
 
 		case "compression-type":
-			repo.GetUI().Print(c.GetBlobStoreImmutableConfig().GetBlobCompression())
+			repo.GetUI().Print(c.GetBlobStoreConfigImmutable().GetBlobCompression())
 
 		case "age-encryption":
-			for _, i := range c.GetBlobStoreImmutableConfig().GetBlobEncryption().(*age.Age).Identities {
+			for _, i := range c.GetBlobStoreConfigImmutable().GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 

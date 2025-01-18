@@ -119,7 +119,7 @@ func (s *Env) setupStores() (err error) {
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
-		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreImmutableConfig()),
+		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreConfigImmutable()),
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetTempLocal(),
 	}

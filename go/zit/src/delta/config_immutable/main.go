@@ -12,11 +12,11 @@ type Config interface {
 	GetImmutableConfig() Config
 	GetStoreVersion() interfaces.StoreVersion
 	GetRepoType() repo_type.Type
-	GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig
+	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
 type BlobStoreConfig interface {
-	interfaces.BlobStoreConfig
+	interfaces.BlobStoreConfigImmutable
 	GetCompressionType() CompressionType
 	GetAgeEncryption() *age.Age
 	GetLockInternalFiles() bool

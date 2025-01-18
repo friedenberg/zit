@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func MakeConfigFromImmutableBlobConfig(
-	config interfaces.BlobStoreConfig,
+	config interfaces.BlobStoreConfigImmutable,
 ) Config {
 	return MakeConfig(
 		config.GetBlobCompression(),
@@ -43,7 +43,7 @@ func MakeConfig(
 	}
 }
 
-func (c Config) GetBlobStoreImmutableConfig() interfaces.BlobStoreConfig {
+func (c Config) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return &c
 }
 

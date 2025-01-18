@@ -13,13 +13,13 @@ type BlobIOMiddleware interface {
 type BlobCompression interface {
 	flag.Value
 	BlobIOMiddleware
-  GetBlobCompression() BlobCompression
+	GetBlobCompression() BlobCompression
 }
 
 type BlobEncryption interface {
 	flag.Value
 	BlobIOMiddleware
-  GetBlobEncryption() BlobEncryption
+	GetBlobEncryption() BlobEncryption
 }
 
 type BlobStore interface {
@@ -29,8 +29,8 @@ type BlobStore interface {
 	BlobReader(sh Sha) (r ShaReadCloser, err error)
 }
 
-type BlobStoreConfig interface {
-	GetBlobStoreImmutableConfig() BlobStoreConfig
+type BlobStoreConfigImmutable interface {
+	GetBlobStoreConfigImmutable() BlobStoreConfigImmutable
 	GetBlobEncryption() BlobEncryption
 	GetBlobCompression() BlobCompression
 	GetLockInternalFiles() bool
@@ -63,11 +63,6 @@ type (
 	] interface {
 		BlobGetter[V]
 		BlobPutter[V]
-	}
-
-	BlobIOFactory interface {
-		BlobReaderFactory
-		BlobWriterFactory
 	}
 
 	BlobReaderFactory interface {

@@ -50,10 +50,10 @@ func (c Info) Run(dependencies command.Request) {
 			ui.GetUI().Print(c.Config.GetStoreVersion())
 
 		case "compression-type":
-			ui.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetBlobCompression())
+			ui.GetUI().Print(c.Config.GetBlobStoreConfigImmutable().GetBlobCompression())
 
 		case "age-encryption":
-			ui.GetUI().Print(c.Config.GetBlobStoreImmutableConfig().GetBlobEncryption())
+			ui.GetUI().Print(c.Config.GetBlobStoreConfigImmutable().GetBlobEncryption())
 
 		case "xdg":
 			ecksDeeGee := dir.GetXDG()
