@@ -25,7 +25,7 @@ func MakeFromDirPath(
 func MakeFromPathAndDirEntry(
 	p string,
 	de fs.DirEntry,
-	awf interfaces.BlobWriterFactory,
+	awf interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("nil file desriptor")
@@ -54,7 +54,7 @@ func MakeFromPathAndDirEntry(
 
 func MakeFromPath(
 	p string,
-	awf interfaces.BlobWriterFactory,
+	awf interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("nil file desriptor")
@@ -88,7 +88,7 @@ func MakeFromPath(
 func MakeFromFileInfoWithDir(
 	fi os.FileInfo,
 	dir string,
-	awf interfaces.BlobWriterFactory,
+	awf interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	// TODO use pool
 	fd = &FD{}

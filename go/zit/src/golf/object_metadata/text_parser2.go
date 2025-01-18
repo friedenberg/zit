@@ -13,7 +13,7 @@ import (
 )
 
 type textParser2 struct {
-	interfaces.BlobWriterFactory
+	interfaces.BlobWriter
 	TextParserContext
 	Blob fd.FD
 }
@@ -91,7 +91,7 @@ func (f *textParser2) readTyp(
 			return
 		}
 
-		if err = f.Blob.SetWithBlobWriterFactory(desc, f); err != nil {
+		if err = f.Blob.SetWithBlobWriterFactory(desc, f.BlobWriter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

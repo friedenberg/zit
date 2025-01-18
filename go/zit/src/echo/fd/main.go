@@ -69,7 +69,7 @@ func (a *FD) Equals(b *FD) bool {
 
 func (fd *FD) SetWithBlobWriterFactory(
 	p string,
-	awf interfaces.BlobWriterFactory,
+	awf interfaces.BlobWriter,
 ) (err error) {
 	if p == "" {
 		err = errors.Errorf("empty path")

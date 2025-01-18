@@ -9,11 +9,11 @@ import (
 )
 
 type savedBlobFormatter struct {
-	arf interfaces.BlobReaderFactory
+	arf interfaces.BlobReader
 }
 
 func MakeSavedBlobFormatter(
-	blobReaderFactory interfaces.BlobReaderFactory,
+	blobReaderFactory interfaces.BlobReader,
 ) savedBlobFormatter {
 	return savedBlobFormatter{
 		arf: blobReaderFactory,

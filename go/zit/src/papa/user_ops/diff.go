@@ -217,7 +217,7 @@ func (c Diff) makeDo(
 
 func (c Diff) makeDoBlob(
 	w io.WriteCloser,
-	arf interfaces.BlobReaderFactory,
+	arf interfaces.BlobReader,
 	sh interfaces.Sha,
 ) errors.Func {
 	return func() (err error) {

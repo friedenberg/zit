@@ -21,7 +21,7 @@ func MakeBlobFormat2[
 ](
 	parser interfaces.Parser[O],
 	formatter interfaces.ParsedBlobFormatter[O],
-	arf interfaces.BlobReaderFactory,
+	arf interfaces.BlobReader,
 ) interfaces.Format[O] {
 	return format2[O]{
 		Parser:              parser,

@@ -22,11 +22,19 @@ type BlobEncryption interface {
 	GetBlobEncryption() BlobEncryption
 }
 
+type BlobReader interface {
+	BlobReader(Sha) (ShaReadCloser, error)
+}
+
+type BlobWriter interface {
+	BlobWriter() (ShaWriteCloser, error)
+}
+
 type BlobStore interface {
 	GetBlobStore() BlobStore
 	HasBlob(sh Sha) (ok bool)
-	BlobWriter() (w ShaWriteCloser, err error)
-	BlobReader(sh Sha) (r ShaReadCloser, err error)
+	BlobReader
+	BlobWriter
 }
 
 type BlobStoreConfigImmutable interface {
@@ -63,13 +71,5 @@ type (
 	] interface {
 		BlobGetter[V]
 		BlobPutter[V]
-	}
-
-	BlobReaderFactory interface {
-		BlobReader(Sha) (ShaReadCloser, error)
-	}
-
-	BlobWriterFactory interface {
-		BlobWriter() (ShaWriteCloser, error)
 	}
 )

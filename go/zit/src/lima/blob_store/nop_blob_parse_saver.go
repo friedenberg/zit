@@ -12,13 +12,13 @@ type nopBlobParseSaver[
 	O interfaces.Blob[O],
 	OPtr interfaces.BlobPtr[O],
 ] struct {
-	awf interfaces.BlobWriterFactory
+	awf interfaces.BlobWriter
 }
 
 func MakeNopBlobParseSaver[
 	O interfaces.Blob[O],
 	OPtr interfaces.BlobPtr[O],
-](awf interfaces.BlobWriterFactory,
+](awf interfaces.BlobWriter,
 ) nopBlobParseSaver[O, OPtr] {
 	return nopBlobParseSaver[O, OPtr]{
 		awf: awf,

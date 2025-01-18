@@ -13,14 +13,14 @@ type tomlBlobParseSaver[
 	O interfaces.Blob[O],
 	OPtr interfaces.BlobPtr[O],
 ] struct {
-	awf              interfaces.BlobWriterFactory
+	awf              interfaces.BlobWriter
 	ignoreTomlErrors bool
 }
 
 func MakeTomlBlobParseSaver[
 	O interfaces.Blob[O],
 	OPtr interfaces.BlobPtr[O],
-](awf interfaces.BlobWriterFactory,
+](awf interfaces.BlobWriter,
 ) tomlBlobParseSaver[O, OPtr] {
 	return tomlBlobParseSaver[O, OPtr]{
 		awf: awf,
@@ -30,7 +30,7 @@ func MakeTomlBlobParseSaver[
 func MakeTextParserIgnoreTomlErrors[
 	O interfaces.Blob[O],
 	OPtr interfaces.BlobPtr[O],
-](awf interfaces.BlobWriterFactory,
+](awf interfaces.BlobWriter,
 ) tomlBlobParseSaver[O, OPtr] {
 	return tomlBlobParseSaver[O, OPtr]{
 		awf:              awf,

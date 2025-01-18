@@ -12,7 +12,7 @@ import (
 )
 
 type textParser struct {
-	awf interfaces.BlobWriterFactory
+	awf interfaces.BlobWriter
 	af  script_config.RemoteScript
 }
 
@@ -43,7 +43,7 @@ func (f textParser) ParseMetadata(
 	}()
 
 	mp := &textParser2{
-		BlobWriterFactory: f.awf,
+		BlobWriter: f.awf,
 		TextParserContext: c,
 	}
 
