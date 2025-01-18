@@ -21,7 +21,7 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	mutable_config_private
+	mutable_config_blob
 
 	DefaultTags  ids.TagSet
 	Tags         interfaces.MutableSetLike[*tag]
@@ -63,25 +63,6 @@ func (k *compiled) setTransacted(
 		blobStore,
 		k.Sku.GetType(),
 		k.Sku.GetBlobSha(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (k *compiled) loadMutableConfigBlob(
-	blobStore *blob_store.VersionedStores,
-	mutableConfigType ids.Type,
-	blobSha interfaces.Sha,
-) (err error) {
-	// k.lock.Lock()
-	// defer k.lock.Unlock()
-
-	if k.mutable_config_private, _, err = blobStore.GetConfig().ParseTypedBlob(
-		mutableConfigType,
-		blobSha,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

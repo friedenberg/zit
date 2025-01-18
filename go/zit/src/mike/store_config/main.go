@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -40,7 +40,6 @@ func init() {
 
 type (
 	immutable_config_private = config_immutable.Config
-	mutable_config_private   = config_mutable_blobs.Blob
 	cli                      = config_mutable_cli.Config
 	ApproximatedType         = blob_store.ApproximatedType
 
@@ -107,7 +106,7 @@ func (a *store) GetCLIConfig() config_mutable_cli.Config {
 }
 
 func (a *compiled) Reset() error {
-	a.mutable_config_private = config_mutable_blobs.V1{}
+	a.Blob = config_mutable_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
 
@@ -125,7 +124,7 @@ func (a *compiled) Reset() error {
 }
 
 func (a *store) GetMutableConfig() config_mutable_blobs.Blob {
-	return a.mutable_config_private
+	return a.mutable_config_blob
 }
 
 func (c *store) Initialize(
