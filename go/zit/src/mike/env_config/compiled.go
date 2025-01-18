@@ -25,7 +25,7 @@ type (
 )
 
 type compiled struct {
-	lock sync.Locker
+	lock sync.Mutex
 
 	changes []string
 

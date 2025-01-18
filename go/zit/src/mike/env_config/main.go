@@ -3,7 +3,6 @@ package env_config
 import (
 	"encoding/gob"
 	"fmt"
-	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -62,7 +61,6 @@ type (
 			k interfaces.ObjectId,
 		) (ct ApproximatedType)
 		GetSku() *sku.Transacted
-
 	}
 
 	EnvMutable interface {
@@ -111,7 +109,6 @@ func (a *compiled) Reset() error {
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
 
-	a.lock = &sync.Mutex{}
 	a.Tags = collections_value.MakeMutableValueSet[*tag](nil)
 	a.InlineTypes = collections_value.MakeMutableValueSet[values.String](
 		nil,
