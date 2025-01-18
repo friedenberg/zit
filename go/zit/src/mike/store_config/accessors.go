@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (c *compiled) GetZettelFileExtension() string {
+func (c *store) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 

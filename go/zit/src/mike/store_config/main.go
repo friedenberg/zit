@@ -98,6 +98,7 @@ func Make() StoreMutable {
 type store struct {
 	cli
 	compiled
+	mutable_config_blob
 	immutable_config_private
 }
 
@@ -105,7 +106,7 @@ func (a *store) GetCLIConfig() config_mutable_cli.Config {
 	return a.cli
 }
 
-func (a *compiled) Reset() error {
+func (a *store) Reset() error {
 	a.Blob = config_mutable_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)

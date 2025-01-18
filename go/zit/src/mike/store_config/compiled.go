@@ -21,8 +21,6 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	mutable_config_blob
-
 	DefaultTags  ids.TagSet
 	Tags         interfaces.MutableSetLike[*tag]
 	ImplicitTags implicitTagMap
@@ -42,7 +40,7 @@ func (k *compiled) GetSku() *sku.Transacted {
 	return &k.Sku
 }
 
-func (k *compiled) setTransacted(
+func (k *store) setTransacted(
 	kt1 *sku.Transacted,
 	blobStore *blob_store.VersionedStores,
 ) (didChange bool, err error) {
