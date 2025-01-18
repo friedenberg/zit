@@ -5,20 +5,28 @@ import (
 	"io"
 )
 
-type BlobIOMiddleware interface {
+type ReadWrapper interface {
 	WrapReader(r io.Reader) (io.ReadCloser, error)
+}
+
+type WriteWrapper interface {
 	WrapWriter(w io.Writer) (io.WriteCloser, error)
+}
+
+type IOWrapper interface {
+	ReadWrapper
+	WriteWrapper
 }
 
 type BlobCompression interface {
 	flag.Value
-	BlobIOMiddleware
+	IOWrapper
 	GetBlobCompression() BlobCompression
 }
 
 type BlobEncryption interface {
 	flag.Value
-	BlobIOMiddleware
+	IOWrapper
 	GetBlobEncryption() BlobEncryption
 }
 
