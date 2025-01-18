@@ -20,12 +20,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
 type Store struct {
 	sunrise   ids.Tai
-	config    env_config.EnvMutable
+	config    store_config.StoreMutable
 	dirLayout env_repo.Env
 
 	storeFS            *store_fs.Store
@@ -61,7 +61,7 @@ type UIDelegate struct {
 }
 
 func (c *Store) Initialize(
-	config env_config.EnvMutable,
+	config store_config.StoreMutable,
 	envRepo env_repo.Env,
 	pmf object_inventory_format.Format,
 	sunrise ids.Tai,

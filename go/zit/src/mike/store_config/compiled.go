@@ -1,4 +1,4 @@
-package env_config
+package store_config
 
 import (
 	"fmt"

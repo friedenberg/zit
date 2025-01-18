@@ -1,4 +1,4 @@
-package env_config
+package store_config
 
 import (
 	"encoding/gob"
@@ -44,7 +44,7 @@ type (
 	cli                      = config_mutable_cli.Config
 	ApproximatedType         = blob_store.ApproximatedType
 
-	Env interface {
+	Store interface {
 		immutable_config.Config
 		interfaces.Config
 
@@ -67,8 +67,8 @@ type (
 		GetSku() *sku.Transacted
 	}
 
-	EnvMutable interface {
-		Env
+	StoreMutable interface {
+		Store
 
 		AddTransacted(
 			child *sku.Transacted,
@@ -92,7 +92,7 @@ type (
 	}
 )
 
-func Make() EnvMutable {
+func Make() StoreMutable {
 	return &env{}
 }
 

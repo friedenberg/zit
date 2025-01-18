@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
 type PageId = sha.PageId
@@ -30,7 +30,7 @@ type Page struct {
 	hasChanges         bool
 	repoLayout         env_repo.Env
 	preWrite           interfaces.FuncIter[*sku.Transacted]
-	config             env_config.Env
+	config             store_config.Store
 	oids               map[string]struct{}
 }
 

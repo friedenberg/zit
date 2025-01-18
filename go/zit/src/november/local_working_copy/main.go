@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/env_config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -29,7 +29,7 @@ type Repo struct {
 
 	layout       env_repo.Env
 	fileEncoder  store_fs.FileEncoder
-	config       env_config.EnvMutable
+	config       store_config.StoreMutable
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
@@ -71,7 +71,7 @@ func MakeWithLayout(
 	repoLayout env_repo.Env,
 ) (repo *Repo) {
 	repo = &Repo{
-		config:         env_config.Make(),
+		config:         store_config.Make(),
 		Env:            repoLayout,
 		layout:         repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
