@@ -137,7 +137,6 @@ func (repo *Repo) initialize(
 	if err = repo.config.Initialize(
 		repo.layout,
 		repo.GetCLIConfig(),
-		&repo.dormantIndex,
 		repo.blobStore,
 	); err != nil {
 		if options.GetAllowConfigReadError() {

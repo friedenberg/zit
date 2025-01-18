@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
 )
 
@@ -80,7 +79,6 @@ type (
 		Initialize(
 			dirLayout env_repo.Env,
 			kcli config_mutable_cli.Config,
-			dormant *dormant_index.Index,
 			blobStore *blob_store.VersionedStores,
 		) (err error)
 
@@ -133,13 +131,11 @@ func (a *env) GetMutableConfig() mutable_config_blobs.Blob {
 func (c *env) Initialize(
 	dirLayout env_repo.Env,
 	kcli config_mutable_cli.Config,
-	dormant *dormant_index.Index,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
 	c.immutable_config_private = dirLayout.GetConfig()
-	c.dormant = dormant
 
 	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
