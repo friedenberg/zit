@@ -25,7 +25,7 @@ import (
 
 type Store struct {
 	sunrise   ids.Tai
-	config    env_config.Env
+	config    env_config.EnvMutable
 	dirLayout env_repo.Env
 
 	storeFS            *store_fs.Store
@@ -61,33 +61,33 @@ type UIDelegate struct {
 }
 
 func (c *Store) Initialize(
-	k env_config.Env,
-	st env_repo.Env,
+	config env_config.EnvMutable,
+	envRepo env_repo.Env,
 	pmf object_inventory_format.Format,
-	t ids.Tai,
+	sunrise ids.Tai,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	qb *query.Builder,
+	queryBuilder *query.Builder,
 	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
 	blobStore *blob_store.VersionedStores,
 	dormantIndex *dormant_index.Index,
 ) (err error) {
-	c.config = k
-	c.dirLayout = st
+	c.config = config
+	c.dirLayout = envRepo
 	c.blobStore = blobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
-	c.sunrise = t
+	c.sunrise = sunrise
 	c.luaVMPoolBuilder = luaVMPoolBuilder
-	c.queryBuilder = qb
+	c.queryBuilder = queryBuilder
 	c.dormantIndex = dormantIndex
 
 	c.inventoryList = sku.MakeList()
 
 	if c.Abbr, err = newIndexAbbr(
-		k.GetCLIConfig().PrintOptions,
+		config.GetCLIConfig().PrintOptions,
 		c.dirLayout,
-		st.DirCache("Abbr"),
+		envRepo.DirCache("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
@@ -124,8 +124,8 @@ func (c *Store) Initialize(
 	}
 
 	c.protoZettel = sku.MakeProto(
-		k.GetMutableConfig().GetDefaults().GetType(),
-		k.GetMutableConfig().GetDefaults().GetTags(),
+		config.GetMutableConfig().GetDefaults().GetType(),
+		config.GetMutableConfig().GetDefaults().GetTags(),
 	)
 
 	c.configBlobFormat = blob_store.MakeBlobFormat2(

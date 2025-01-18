@@ -173,7 +173,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
-		if err = s.GetConfig().AddTransacted(
+		if err = s.config.AddTransacted(
 			child,
 			parent,
 			s.GetBlobStore(),

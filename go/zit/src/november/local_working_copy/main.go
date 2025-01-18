@@ -170,7 +170,7 @@ func (repo *Repo) initialize(
 	ofo := object_inventory_format.Options{Tai: true}
 
 	if err = repo.store.Initialize(
-		repo.GetConfig(),
+		repo.config,
 		repo.layout,
 		objectFormat,
 		repo.sunrise,

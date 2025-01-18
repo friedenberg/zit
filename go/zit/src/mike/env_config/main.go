@@ -63,21 +63,16 @@ type (
 		) (ct ApproximatedType)
 		GetSku() *sku.Transacted
 
+	}
+
+	EnvMutable interface {
+		Env
+
 		AddTransacted(
 			child *sku.Transacted,
 			parent *sku.Transacted,
 			ak *blob_store.VersionedStores,
 		) (err error)
-
-		Flush(
-			dirLayout env_repo.Env,
-			blobStore *blob_store.VersionedStores,
-			printerHeader interfaces.FuncIter[string],
-		) (err error)
-	}
-
-	EnvMutable interface {
-		Env
 
 		Initialize(
 			dirLayout env_repo.Env,
@@ -87,6 +82,12 @@ type (
 		) (err error)
 
 		Reset() error
+
+		Flush(
+			dirLayout env_repo.Env,
+			blobStore *blob_store.VersionedStores,
+			printerHeader interfaces.FuncIter[string],
+		) (err error)
 	}
 )
 
