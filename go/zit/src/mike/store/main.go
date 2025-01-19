@@ -139,25 +139,35 @@ func (c *Store) Initialize(
 	return
 }
 
+func (s *Store) MakeSupplies() (es external_store.Supplies) {
+	es.StoreFuncs = external_store.StoreFuncs{
+		FuncRealize:        s.tryRealize,
+		FuncCommit:         s.tryRealizeAndOrStore,
+		FuncReadOneInto:    s.GetStreamIndex().ReadOneObjectId,
+		FuncPrimitiveQuery: s.GetStreamIndex().ReadPrimitiveQuery,
+	}
+
+	es.Env = s.GetDirectoryLayout()
+	// es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
+
+	// es.RepoId = k
+	es.Clock = s.sunrise
+	es.BlobStore = s.blobStore
+
+	return
+}
+
 func (s *Store) SetExternalStores(
 	stores map[ids.RepoId]*external_store.Store,
 ) (err error) {
 	s.externalStores = stores
 
 	for k, es := range s.externalStores {
-		es.StoreFuncs = external_store.StoreFuncs{
-			FuncRealize:        s.tryRealize,
-			FuncCommit:         s.tryRealizeAndOrStore,
-			FuncReadOneInto:    s.GetStreamIndex().ReadOneObjectId,
-			FuncPrimitiveQuery: s.GetStreamIndex().ReadPrimitiveQuery,
-		}
+		supplies := s.MakeSupplies()
+		supplies.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
+		supplies.RepoId = k
 
-		es.Env = s.GetDirectoryLayout()
-		es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
-
-		es.RepoId = k
-		es.Clock = s.sunrise
-		es.BlobStore = s.blobStore
+		es.Supplies = supplies
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.storeFS = esfs
