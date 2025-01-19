@@ -19,14 +19,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_box"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
-type Repo struct {
-	env_local.Env
+type (
+	envLocal = env_local.Env
+	envBox   = env_box.Env
+)
 
-	EnvBox
+type Repo struct {
+	envLocal
+	envBox
 
 	sunrise ids.Tai
 
@@ -78,7 +83,7 @@ func MakeWithLayout(
 ) (repo *Repo) {
 	repo = &Repo{
 		config:         store_config.Make(),
-		Env:            repoLayout,
+		envLocal:       repoLayout,
 		envRepo:        repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}
@@ -184,7 +189,7 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	repo.EnvBox = MakeEnvBox(
+	repo.envBox = env_box.Make(
 		repo.envRepo,
 		repo.storeFS,
 		repo.storeAbbr,

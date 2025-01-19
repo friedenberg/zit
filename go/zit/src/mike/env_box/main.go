@@ -1,4 +1,4 @@
-package local_working_copy
+package env_box
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-type EnvBox interface {
+type Env interface {
 	StringFormatWriterSkuBoxTransacted(
 		po options_print.V0,
 		co string_format_writer.ColorOptions,
@@ -27,25 +27,25 @@ type EnvBox interface {
 	SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut
 }
 
-func MakeEnvBox(
-	env env_repo.Env,
+func Make(
+	envRepo env_repo.Env,
 	storeFS *store_fs.Store,
 	abbr sku.AbbrStore,
-) EnvBox {
-	return &env_box{
-		Env:     env,
+) Env {
+	return &env{
+		Env:     envRepo,
 		storeFS: storeFS,
 		abbr:    abbr,
 	}
 }
 
-type env_box struct {
+type env struct {
 	env_repo.Env
 	storeFS *store_fs.Store
 	abbr    sku.AbbrStore
 }
 
-func (u *env_box) StringFormatWriterSkuBoxTransacted(
+func (u *env) StringFormatWriterSkuBoxTransacted(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
@@ -67,7 +67,7 @@ func (u *env_box) StringFormatWriterSkuBoxTransacted(
 	)
 }
 
-func (u *env_box) StringFormatWriterSkuBoxCheckedOut(
+func (u *env) StringFormatWriterSkuBoxCheckedOut(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
@@ -84,7 +84,7 @@ func (u *env_box) StringFormatWriterSkuBoxCheckedOut(
 	)
 }
 
-func (u *env_box) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
+func (u *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.GetCLIConfig().PrintOptions.WithPrintShas(false)
@@ -99,7 +99,7 @@ func (u *env_box) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	)
 }
 
-func (u *env_box) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
+func (u *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.GetCLIConfig().PrintOptions.WithPrintShas(false)
