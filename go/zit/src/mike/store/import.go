@@ -25,6 +25,32 @@ type ImporterOptions struct {
 	CheckedOutPrinter   interfaces.FuncIter[*sku.CheckedOut]
 }
 
+func (store *Store) MakeImporter(
+	options ImporterOptions,
+	storeOptions sku.StoreOptions,
+) (importer Importer) {
+	importer = Importer{
+		Store:               store,
+		ExcludeObjects:      options.ExcludeObjects,
+		RemoteBlobStore:     options.RemoteBlobStore,
+		BlobCopierDelegate:  options.BlobCopierDelegate,
+		AllowMergeConflicts: options.AllowMergeConflicts,
+		ParentNegotiator:    options.ParentNegotiator,
+		CheckedOutPrinter:   options.CheckedOutPrinter,
+		StoreOptions:        storeOptions,
+	}
+
+	if importer.BlobCopierDelegate == nil &&
+		importer.RemoteBlobStore != nil &&
+		options.PrintCopies {
+		importer.BlobCopierDelegate = sku.MakeBlobCopierDelegate(
+			store.envRepo.GetUI(),
+		)
+	}
+
+	return
+}
+
 type Importer struct {
 	*Store
 	ExcludeObjects      bool

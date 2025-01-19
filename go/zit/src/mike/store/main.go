@@ -24,9 +24,9 @@ import (
 )
 
 type Store struct {
-	sunrise   ids.Tai
-	config    store_config.StoreMutable
-	dirLayout env_repo.Env
+	sunrise ids.Tai
+	config  store_config.StoreMutable
+	envRepo env_repo.Env
 
 	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
@@ -73,7 +73,7 @@ func (c *Store) Initialize(
 	dormantIndex *dormant_index.Index,
 ) (err error) {
 	c.config = config
-	c.dirLayout = envRepo
+	c.envRepo = envRepo
 	c.blobStore = blobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
@@ -86,7 +86,7 @@ func (c *Store) Initialize(
 
 	if c.Abbr, err = newIndexAbbr(
 		config.GetCLIConfig().PrintOptions,
-		c.dirLayout,
+		c.envRepo,
 		envRepo.DirCache("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")

@@ -488,7 +488,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		}
 
 		// TODO
-		importer := server.Repo.MakeImporter(
+		importer := server.Repo.GetStore().MakeImporter(
 			importerOptions,
 			sku.GetStoreOptionsRemoteTransfer(),
 		)
