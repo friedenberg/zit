@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 func init() {
@@ -41,7 +41,7 @@ func init() {
 type (
 	immutable_config_private = config_immutable.Config
 	cli                      = config_mutable_cli.Config
-	ApproximatedType         = blob_store.ApproximatedType
+	ApproximatedType         = typed_blob_store.ApproximatedType
 
 	Store interface {
 		interfaces.Config
@@ -72,20 +72,20 @@ type (
 		AddTransacted(
 			child *sku.Transacted,
 			parent *sku.Transacted,
-			ak *blob_store.VersionedStores,
+			ak *typed_blob_store.Store,
 		) (err error)
 
 		Initialize(
 			dirLayout env_repo.Env,
 			kcli config_mutable_cli.Config,
-			blobStore *blob_store.VersionedStores,
+			blobStore *typed_blob_store.Store,
 		) (err error)
 
 		Reset() error
 
 		Flush(
 			dirLayout env_repo.Env,
-			blobStore *blob_store.VersionedStores,
+			blobStore *typed_blob_store.Store,
 			printerHeader interfaces.FuncIter[string],
 		) (err error)
 	}
@@ -131,7 +131,7 @@ func (a *store) GetMutableConfig() config_mutable_blobs.Blob {
 func (c *store) Initialize(
 	dirLayout env_repo.Env,
 	kcli config_mutable_cli.Config,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
@@ -189,7 +189,7 @@ func (k *store) GetTypeExtension(v string) string {
 func (k *store) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
-	ak *blob_store.VersionedStores,
+	ak *typed_blob_store.Store,
 ) (err error) {
 	didChange := false
 

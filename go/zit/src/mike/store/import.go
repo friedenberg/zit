@@ -128,7 +128,7 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	if err = importer.GetBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
+	if err = importer.GetTypedBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
 		el,
 		func(sk *sku.Transacted) (err error) {
 			if _, err = importer.Import(

@@ -48,7 +48,7 @@ func (u *Repo) Unlock() (err error) {
 		ui.Log().Print("will flush konfig")
 		if err = u.config.Flush(
 			u.GetRepoLayout(),
-			u.GetStore().GetBlobStore(),
+			u.GetStore().GetTypedBlobStore(),
 			u.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)

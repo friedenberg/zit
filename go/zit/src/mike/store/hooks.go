@@ -31,7 +31,7 @@ func (s *Store) tryNewHook(
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+	if blob, _, err = s.GetTypedBlobStore().GetType().ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -39,7 +39,7 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
+	defer s.GetTypedBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 
@@ -91,7 +91,7 @@ func (s *Store) TryFormatHook(
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+	if blob, _, err = s.GetTypedBlobStore().GetType().ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -99,7 +99,7 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
+	defer s.GetTypedBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 
@@ -152,7 +152,7 @@ func (s *Store) tryPreCommitHooks(
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+	if blob, _, err = s.GetTypedBlobStore().GetType().ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -160,7 +160,7 @@ func (s *Store) tryPreCommitHooks(
 		return
 	}
 
-	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
+	defer s.GetTypedBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 

@@ -7,17 +7,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	blob_store.Type
+	typed_blob_store.Type
 }
 
 func MakeFormatterTypFormatterUTIGroups(
 	sr sku.OneReader,
-	typeBlobStore blob_store.Type,
+	typeBlobStore typed_blob_store.Type,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
 		OneReader: sr,

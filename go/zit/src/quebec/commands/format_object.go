@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -101,7 +101,7 @@ func (cmd *FormatObject) Run(dep command.Request) {
 		}
 	}
 
-	f := blob_store.MakeTextFormatterWithBlobFormatter(
+	f := typed_blob_store.MakeTextFormatterWithBlobFormatter(
 		localWorkingCopy.GetRepoLayout(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,

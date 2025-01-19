@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
@@ -33,7 +33,7 @@ type Repo struct {
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
-	blobStore         *blob_store.VersionedStores
+	blobStore         *typed_blob_store.Store
 	store             store.Store
 	externalStores    map[ids.RepoId]*external_store.Store
 
@@ -127,7 +127,7 @@ func (repo *Repo) initialize(
 		repo.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(true),
 	)
 
-	repo.blobStore = blob_store.Make(
+	repo.blobStore = typed_blob_store.Make(
 		repo.layout,
 		repo.MakeLuaVMPoolBuilder(),
 		objectFormat,

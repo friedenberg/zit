@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type compiled struct {
@@ -42,7 +42,7 @@ func (k *compiled) GetSku() *sku.Transacted {
 
 func (k *store) setTransacted(
 	kt1 *sku.Transacted,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return

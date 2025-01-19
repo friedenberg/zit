@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type (
@@ -75,7 +75,7 @@ type (
 		ids.RepoId
 		ids.TypeSet
 		ids.Clock
-		BlobStore *blob_store.VersionedStores
+		BlobStore *typed_blob_store.Store
 	}
 
 	StoreLike interface {

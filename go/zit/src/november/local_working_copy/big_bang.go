@@ -95,7 +95,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 
 	var sh interfaces.Sha
 
-	if sh, _, err = repo.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
+	if sh, _, err = repo.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
 		&defaultTypeBlob,
 	); err != nil {
 		err = errors.Wrap(err)

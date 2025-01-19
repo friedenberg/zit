@@ -24,7 +24,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type Store struct {
@@ -36,7 +36,7 @@ type Store struct {
 	of         interfaces.ObjectIOFactory
 	af         interfaces.BlobStore
 	clock      ids.Clock
-	blobStore  blob_store.InventoryList
+	blobStore  typed_blob_store.InventoryList
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -49,7 +49,7 @@ func (s *Store) Initialize(
 	repoLayout env_repo.Env,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
-	blobStore blob_store.InventoryList,
+	blobStore typed_blob_store.InventoryList,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 

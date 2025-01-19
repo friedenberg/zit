@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type mutable_config_blob struct {
@@ -13,7 +13,7 @@ type mutable_config_blob struct {
 }
 
 func (k *mutable_config_blob) loadMutableConfigBlob(
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 	mutableConfigType ids.Type,
 	blobSha interfaces.Sha,
 ) (err error) {

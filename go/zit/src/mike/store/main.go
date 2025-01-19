@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
@@ -30,7 +30,7 @@ type Store struct {
 
 	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
-	blobStore          *blob_store.VersionedStores
+	typedBlobStore     *typed_blob_store.Store
 	inventoryListStore inventory_list_store.Store
 	Abbr               AbbrStore
 
@@ -69,12 +69,12 @@ func (c *Store) Initialize(
 	queryBuilder *query.Builder,
 	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 	dormantIndex *dormant_index.Index,
 ) (err error) {
 	c.config = config
 	c.envRepo = envRepo
-	c.blobStore = blobStore
+	c.typedBlobStore = blobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
 	c.sunrise = sunrise
@@ -128,11 +128,11 @@ func (c *Store) Initialize(
 		config.GetMutableConfig().GetDefaults().GetTags(),
 	)
 
-	c.configBlobFormat = blob_store.MakeBlobFormat2(
-		blob_store.MakeTextParserIgnoreTomlErrors2[config_mutable_blobs.Blob](
+	c.configBlobFormat = typed_blob_store.MakeBlobFormat2(
+		typed_blob_store.MakeTextParserIgnoreTomlErrors2[config_mutable_blobs.Blob](
 			c.GetDirectoryLayout(),
 		),
-		blob_store.ParsedBlobTomlFormatter2[config_mutable_blobs.Blob]{},
+		typed_blob_store.ParsedBlobTomlFormatter2[config_mutable_blobs.Blob]{},
 		c.GetDirectoryLayout(),
 	)
 
@@ -152,7 +152,7 @@ func (s *Store) MakeSupplies() (es external_store.Supplies) {
 
 	// es.RepoId = k
 	es.Clock = s.sunrise
-	es.BlobStore = s.blobStore
+	es.BlobStore = s.typedBlobStore
 
 	return
 }

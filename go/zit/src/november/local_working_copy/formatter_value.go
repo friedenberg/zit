@@ -23,7 +23,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 // TODO switch to using fd.Std
@@ -213,7 +213,7 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "text":
-		fo := blob_store.MakeTextFormatter(
+		fo := typed_blob_store.MakeTextFormatter(
 			u.GetStore().GetDirectoryLayout(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
@@ -788,7 +788,7 @@ func (u *Repo) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	typeBlobStore := u.GetStore().GetBlobStore().GetType()
+	typeBlobStore := u.GetStore().GetTypedBlobStore().GetType()
 
 	if out == nil {
 		out = u.GetUIFile()

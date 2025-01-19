@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 }
 
 func (kc *store) recompile(
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 ) (err error) {
 	if err = kc.recompileTags(); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (kc *store) recompileTags() (err error) {
 }
 
 func (kc *store) recompileTypes(
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 ) (err error) {
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
@@ -157,7 +157,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 
 func (kc *store) loadMutableConfig(
 	dirLayout env_repo.Env,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 ) (err error) {
 	var f *os.File
 
@@ -196,7 +196,7 @@ func (kc *store) loadMutableConfig(
 
 func (kc *store) Flush(
 	dirLayout env_repo.Env,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !kc.HasChanges() || kc.DryRun {
@@ -225,7 +225,7 @@ func (kc *store) Flush(
 
 func (kc *store) flushMutableConfig(
 	s env_repo.Env,
-	blobStore *blob_store.VersionedStores,
+	blobStore *typed_blob_store.Store,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {

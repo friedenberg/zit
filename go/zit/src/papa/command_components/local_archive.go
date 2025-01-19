@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
@@ -32,7 +32,7 @@ func (c LocalArchive) MakeLocalArchive(
 			options_print.V0{}.WithPrintTai(true),
 		)
 
-		inventoryListBlobStore := blob_store.MakeInventoryStore(
+		inventoryListBlobStore := typed_blob_store.MakeInventoryStore(
 			repoLayout,
 			objectFormat,
 			boxFormat,

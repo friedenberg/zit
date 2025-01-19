@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
@@ -22,8 +22,8 @@ func (u *Store) GetBrowserStore() *external_store.Store {
 	return u.externalStores[*(ids.MustRepoId("browser"))]
 }
 
-func (s *Store) GetBlobStore() *blob_store.VersionedStores {
-	return s.blobStore
+func (s *Store) GetTypedBlobStore() *typed_blob_store.Store {
+	return s.typedBlobStore
 }
 
 func (s *Store) GetEnnui() object_probe_index.Index {

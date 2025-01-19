@@ -33,7 +33,7 @@ func (u *Repo) GetBlobFormatter(
 
 	var typeBlob type_blobs.Blob
 
-	if typeBlob, _, err = u.GetStore().GetBlobStore().GetType().ParseTypedBlob(
+	if typeBlob, _, err = u.GetStore().GetTypedBlobStore().GetType().ParseTypedBlob(
 		typeObject.GetType(),
 		typeObject.GetBlobSha(),
 	); err != nil {
@@ -41,7 +41,7 @@ func (u *Repo) GetBlobFormatter(
 		return
 	}
 
-	defer u.GetStore().GetBlobStore().GetType().PutTypedBlob(
+	defer u.GetStore().GetTypedBlobStore().GetType().PutTypedBlob(
 		typeObject.GetType(),
 		typeBlob,
 	)

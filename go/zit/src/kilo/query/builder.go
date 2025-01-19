@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 func MakeBuilder(
 	s env_repo.Env,
-	blob_store *blob_store.VersionedStores,
+	blob_store *typed_blob_store.Store,
 	object_probe_index sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
@@ -32,7 +32,7 @@ func MakeBuilder(
 
 type Builder struct {
 	dirLayout               env_repo.Env
-	blob_store              *blob_store.VersionedStores
+	blob_store              *typed_blob_store.Store
 	object_probe_index      sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId
