@@ -1,11 +1,11 @@
 package commands
 
 import (
+	"flag"
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -15,22 +15,35 @@ func init() {
 }
 
 type Serve struct {
-	command_components.LocalWorkingCopy
+	command_components.Env
+	command_components.RepoLayout
+	command_components.LocalArchive
 }
 
-func (c Serve) Run(req command.Request) {
+func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
+	cmd.RepoLayout.SetFlagSet(f)
+	cmd.LocalArchive.SetFlagSet(f)
+}
+
+func (cmd Serve) Run(req command.Request) {
 	args := req.Args()
 	req.SetCancelOnSIGHUP()
 
-	localWorkingCopy := c.MakeLocalWorkingCopyWithOptions(
+	envLocal := cmd.MakeEnvWithOptions(
 		req,
 		env_ui.Options{
 			UIFileIsStderr: true,
 		},
-		local_working_copy.OptionsEmpty,
 	)
 
-	server := remote_http.Server{Repo: localWorkingCopy}
+	envRepo := cmd.MakeRepoLayoutFromEnvLocal(envLocal)
+
+	repo := cmd.MakeLocalArchive(envRepo)
+
+	server := remote_http.Server{
+		EnvLocal: envLocal,
+		Repo:     repo,
+	}
 
 	// TODO switch network to be RemoteServeType
 	var network, address string
@@ -50,7 +63,7 @@ func (c Serve) Run(req command.Request) {
 
 	if network == "-" {
 		if err := server.ServeStdio(); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			envLocal.CancelWithError(err)
 		}
 	} else {
 		var listener net.Listener
@@ -59,14 +72,14 @@ func (c Serve) Run(req command.Request) {
 			var err error
 
 			if listener, err = server.InitializeListener(network, address); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				envLocal.CancelWithError(err)
 			}
 
-			defer localWorkingCopy.MustClose(listener)
+			defer envLocal.MustClose(listener)
 		}
 
 		if err := server.Serve(listener); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			envLocal.CancelWithError(err)
 		}
 	}
 }

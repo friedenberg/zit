@@ -41,14 +41,14 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 	xdgDotenvPath string,
 	options env_ui.Options,
 ) (local *local_working_copy.Repo) {
-	env := cmd.MakeEnvWithXDGLayoutAndOptions(
+	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
 		xdgDotenvPath,
 		options,
 	)
 
 	local = local_working_copy.Make(
-		env,
+		envLocal,
 		local_working_copy.OptionsEmpty,
 	)
 

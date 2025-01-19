@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -24,8 +25,8 @@ import (
 )
 
 type Server struct {
-	// Repo repo.LocalWorkingCopy
-	Repo *local_working_copy.Repo
+	EnvLocal env_local.Env
+	Repo     repo.Repo
 }
 
 func (server Server) InitializeListener(
@@ -75,7 +76,7 @@ func (server Server) InitializeUnixSocket(
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := server.Repo.GetXDG().State
+		dir := server.EnvLocal.GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -351,135 +352,158 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		// 	case MethodPath{"POST", "/object"}:
 
 	case MethodPath{"GET", "/inventory_lists"}:
-		var qgString strings.Builder
+		if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+			var qgString strings.Builder
 
-		if _, err := io.Copy(&qgString, request.Body); err != nil {
-			response.Error(err)
-			return
-		}
-
-		var qg *query.Group
-
-		{
-			var err error
-
-			if qg, err = server.Repo.MakeExternalQueryGroup(
-				query.BuilderOptions{},
-				sku.ExternalQueryOptions{},
-				qgString.String(),
-			); err != nil {
+			if _, err := io.Copy(&qgString, request.Body); err != nil {
 				response.Error(err)
 				return
 			}
-		}
 
-		var list *sku.List
+			var qg *query.Group
 
-		{
-			var err error
+			{
+				var err error
 
-			if list, err = server.Repo.MakeInventoryList(qg); err != nil {
-				response.Error(err)
-				return
-			}
-		}
-
-		// TODO make this more performant by returning a proper reader
-		b := bytes.NewBuffer(nil)
-
-		// TODO
-		printer := server.Repo.MakePrinterBoxArchive(b, true)
-
-		var sk *sku.Transacted
-		var hasMore bool
-
-		for {
-			server.Repo.GetEnv().ContinueOrPanicOnDone()
-
-			sk, hasMore = list.Pop()
-
-			if !hasMore {
-				break
+				if qg, err = repo.MakeExternalQueryGroup(
+					query.BuilderOptions{},
+					sku.ExternalQueryOptions{},
+					qgString.String(),
+				); err != nil {
+					response.Error(err)
+					return
+				}
 			}
 
-			if err := printer(sk); err != nil {
-				response.Error(err)
-				return
-			}
-		}
+			var list *sku.List
 
-		response.Body = io.NopCloser(b)
+			{
+				var err error
+
+				if list, err = repo.MakeInventoryList(qg); err != nil {
+					response.Error(err)
+					return
+				}
+			}
+
+			// TODO make this more performant by returning a proper reader
+			b := bytes.NewBuffer(nil)
+
+			// TODO
+			printer := repo.MakePrinterBoxArchive(b, true)
+
+			var sk *sku.Transacted
+			var hasMore bool
+
+			for {
+				server.Repo.GetEnv().ContinueOrPanicOnDone()
+
+				sk, hasMore = list.Pop()
+
+				if !hasMore {
+					break
+				}
+
+				if err := printer(sk); err != nil {
+					response.Error(err)
+					return
+				}
+			}
+
+			response.Body = io.NopCloser(b)
+		} else {
+		}
 
 	case MethodPath{"POST", "/inventory_lists"}:
 		// TODO get version from header?
 		// TODO
-		bf := server.Repo.GetInventoryListStore().FormatForVersion(
-			server.Repo.GetImmutableConfig().GetStoreVersion(),
-		)
-
-		list := sku.MakeList()
-
-		if err := inventory_list_blobs.ReadInventoryListBlob(
-			bf,
-			bufio.NewReader(request.Body),
-			list,
-		); err != nil {
-			response.Error(err)
-			return
-		}
-
-		b := bytes.NewBuffer(nil)
-
-		// TODO make option to read from headers
-		importerOptions := sku.ImporterOptions{
-			// TODO
-			CheckedOutPrinter: server.Repo.PrinterCheckedOutConflictsForRemoteTransfers(),
-		}
-
-		if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
-			importerOptions.AllowMergeConflicts = true
-		}
-
-		importerOptions.BlobCopierDelegate = func(
-			result sku.BlobCopyResult,
-		) (err error) {
-			server.Repo.GetEnv().ContinueOrPanicOnDone()
-
-			if result.N != -1 {
-				return
-			}
-
-			sh := sha.GetPool().Get()
-			sha.GetPool().Put(sh)
-			sh.ResetWithShaLike(result.GetBlobSha())
-			fmt.Fprintf(b, "%s\n", sh)
-
-			return
-		}
-
-		// TODO
-		importer := server.Repo.MakeImporter(
-			importerOptions,
-			sku.GetStoreOptionsRemoteTransfer(),
-		)
-
-		// TODO
-		if err := server.Repo.ImportList(
-			list,
-			importer,
-		); err != nil {
-			response.Error(err)
-			return
-		}
-
-		response.StatusCode = http.StatusCreated
-
-		if b.Len() > 0 {
-			response.Body = io.NopCloser(b)
+		if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+			response = server.writeInventoryListLocalWorkingCopy(repo, request)
+		} else {
+			response = server.writeInventoryListLocalArchive(request)
 		}
 
 	default:
 		response.StatusCode = http.StatusNotFound
+	}
+
+	return
+}
+
+func (server *Server) writeInventoryListLocalArchive(
+	request Request,
+) (response Response) {
+	server.Repo.GetEnv().GetUI().Print("would write")
+	return
+}
+
+func (server *Server) writeInventoryListLocalWorkingCopy(
+	repo *local_working_copy.Repo,
+	request Request,
+) (response Response) {
+	bf := server.Repo.GetInventoryListStore().FormatForVersion(
+		server.Repo.GetImmutableConfig().GetStoreVersion(),
+	)
+
+	list := sku.MakeList()
+
+	if err := inventory_list_blobs.ReadInventoryListBlob(
+		bf,
+		bufio.NewReader(request.Body),
+		list,
+	); err != nil {
+		response.Error(err)
+		return
+	}
+
+	b := bytes.NewBuffer(nil)
+
+	// TODO make option to read from headers
+	importerOptions := sku.ImporterOptions{
+		// TODO
+		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+	}
+
+	if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
+		importerOptions.AllowMergeConflicts = true
+	}
+
+	importerOptions.BlobCopierDelegate = func(
+		result sku.BlobCopyResult,
+	) (err error) {
+		server.Repo.GetEnv().ContinueOrPanicOnDone()
+
+		if result.N != -1 {
+			return
+		}
+
+		sh := sha.GetPool().Get()
+		sha.GetPool().Put(sh)
+		sh.ResetWithShaLike(result.GetBlobSha())
+		fmt.Fprintf(b, "%s\n", sh)
+
+		return
+	}
+
+	// TODO
+	importer := server.Repo.MakeImporter(
+		importerOptions,
+		sku.GetStoreOptionsRemoteTransfer(),
+	)
+
+	// TODO
+	if err := server.Repo.ImportList(
+		list,
+		importer,
+	); err != nil {
+		response.Error(err)
+		return
+	}
+
+	response.StatusCode = http.StatusCreated
+
+	if b.Len() > 0 {
+		response.Body = io.NopCloser(b)
 	}
 
 	return

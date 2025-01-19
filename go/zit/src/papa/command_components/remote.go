@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 )
 
@@ -43,12 +42,14 @@ func (cmd Remote) MakeArchive(
 
 	case repo.RemoteTypeStdioLocal:
 		remote = cmd.MakeRemoteStdioLocal(
+			req,
 			env,
 			remoteArg,
 		)
 
 	case repo.RemoteTypeStdioSSH:
 		remote = cmd.MakeRemoteStdioSSH(
+			req,
 			env,
 			remoteArg,
 		)
@@ -81,12 +82,14 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 
 	case repo.RemoteTypeStdioLocal:
 		remote = cmd.MakeRemoteStdioLocal(
+			req,
 			cmd.MakeEnv(req),
 			remoteArg,
 		)
 
 	case repo.RemoteTypeStdioSSH:
 		remote = cmd.MakeRemoteStdioSSH(
+			req,
 			cmd.MakeEnv(req),
 			remoteArg,
 		)
@@ -105,29 +108,24 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 	return
 }
 
-func (cmd *Remote) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
-	req command.Request,
-	xdgDotenvPath string,
-	options env_ui.Options,
-) repo.Repo {
-	repoLayout := cmd.MakeRepoLayout(req, false)
-
-	return cmd.MakeLocalArchive(repoLayout)
-}
-
 func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env_ui.Options,
 ) (remoteHTTP *remote_http.Client) {
-	remote := cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
 		xdgDotenvPath,
 		options,
 	)
 
+	envRepo := cmd.MakeRepoLayoutFromEnvLocal(envLocal)
+
+	remote := cmd.MakeLocalArchive(envRepo)
+
 	server := remote_http.Server{
-		Repo: remote,
+		EnvLocal: envLocal,
+		Repo:     remote,
 	}
 
 	remoteHTTP = &remote_http.Client{
@@ -154,13 +152,12 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 }
 
 func (cmd *Remote) MakeRemoteStdioSSH(
+	req command.Request,
 	env env_local.Env,
 	arg string,
 ) (remoteHTTP *remote_http.Client) {
-	remote := local_working_copy.Make(
-		env,
-		local_working_copy.OptionsEmpty,
-	)
+	repoLayout := cmd.MakeRepoLayout(req, false)
+	remote := cmd.MakeLocalArchive(repoLayout)
 
 	remoteHTTP = &remote_http.Client{
 		Repo: remote,
@@ -181,13 +178,12 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 }
 
 func (cmd *Remote) MakeRemoteStdioLocal(
+	req command.Request,
 	env env_local.Env,
 	dir string,
 ) (remoteHTTP *remote_http.Client) {
-	remote := local_working_copy.Make(
-		env,
-		local_working_copy.OptionsEmpty,
-	)
+	repoLayout := cmd.MakeRepoLayout(req, false)
+	remote := cmd.MakeLocalArchive(repoLayout)
 
 	remoteHTTP = &remote_http.Client{
 		Repo: remote,

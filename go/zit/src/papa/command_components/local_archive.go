@@ -20,20 +20,20 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c LocalArchive) MakeLocalArchive(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 ) repo.Repo {
-	repoType := repoLayout.GetConfig().GetRepoType()
+	repoType := envRepo.GetConfig().GetRepoType()
 
 	switch repoType {
 	case repo_type.TypeArchive:
-		objectFormat := object_inventory_format.FormatForVersion(repoLayout.GetStoreVersion())
+		objectFormat := object_inventory_format.FormatForVersion(envRepo.GetStoreVersion())
 		boxFormat := box_format.MakeBoxTransactedArchive(
-			repoLayout,
+			envRepo,
 			options_print.V0{}.WithPrintTai(true),
 		)
 
 		inventoryListBlobStore := typed_blob_store.MakeInventoryStore(
-			repoLayout,
+			envRepo,
 			objectFormat,
 			boxFormat,
 		)
@@ -41,12 +41,12 @@ func (c LocalArchive) MakeLocalArchive(
 		var inventoryListStore inventory_list_store.Store
 
 		if err := inventoryListStore.Initialize(
-			repoLayout,
+			envRepo,
 			objectFormat,
 			nil,
 			inventoryListBlobStore,
 		); err != nil {
-			repoLayout.CancelWithError(err)
+			envRepo.CancelWithError(err)
 		}
 
 		return &inventoryListStore
@@ -54,11 +54,11 @@ func (c LocalArchive) MakeLocalArchive(
 	case repo_type.TypeWorkingCopy:
 		return local_working_copy.MakeWithLayout(
 			local_working_copy.OptionsEmpty,
-			repoLayout,
+			envRepo,
 		)
 
 	default:
-		repoLayout.CancelWithErrorf("unsupported repo type: %q", repoType)
+		envRepo.CancelWithErrorf("unsupported repo type: %q", repoType)
 		return nil
 	}
 }

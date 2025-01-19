@@ -49,3 +49,26 @@ func (cmd RepoLayout) MakeRepoLayout(
 
 	return repoLayout
 }
+
+func (cmd RepoLayout) MakeRepoLayoutFromEnvLocal(
+	envLocal env_local.Env,
+) env_repo.Env {
+	var repoLayout env_repo.Env
+
+	layoutOptions := env_repo.Options{
+		BasePath: envLocal.GetCLIConfig().BasePath,
+	}
+
+	{
+		var err error
+
+		if repoLayout, err = env_repo.Make(
+			envLocal,
+			layoutOptions,
+		); err != nil {
+			envLocal.CancelWithError(err)
+		}
+	}
+
+	return repoLayout
+}
