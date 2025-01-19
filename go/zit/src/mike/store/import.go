@@ -68,7 +68,7 @@ type Importer interface {
 }
 
 type importer struct {
-	*Store
+	Store               *Store
 	excludeObjects      bool
 	remoteBlobStore     interfaces.BlobStore
 	blobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
@@ -128,7 +128,7 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	if err = importer.GetTypedBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
+	if err = importer.Store.GetTypedBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
 		el,
 		func(sk *sku.Transacted) (err error) {
 			if _, err = importer.Import(
@@ -177,7 +177,7 @@ func (importer importer) importLeafSku(
 		return
 	}
 
-	_, err = importer.GetStreamIndex().ReadOneObjectIdTai(
+	_, err = importer.Store.GetStreamIndex().ReadOneObjectIdTai(
 		co.GetSkuExternal().GetObjectId(),
 		co.GetSkuExternal().GetTai(),
 	)
@@ -193,12 +193,12 @@ func (importer importer) importLeafSku(
 	}
 
 	ui.TodoP4("cleanup")
-	if err = importer.ReadOneInto(
+	if err = importer.Store.ReadOneInto(
 		co.GetSkuExternal().GetObjectId(),
 		co.GetSku(),
 	); err != nil {
 		if collections.IsErrNotFound(err) {
-			if err = importer.Commit(
+			if err = importer.Store.Commit(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
@@ -219,7 +219,7 @@ func (importer importer) importLeafSku(
 	var commitOptions sku.CommitOptions
 
 	// TODO extra commit option setting into its own function
-	if commitOptions, err = importer.MergeCheckedOutIfNecessary(
+	if commitOptions, err = importer.Store.MergeCheckedOutIfNecessary(
 		co,
 		importer.parentNegotiator,
 		importer.allowMergeConflicts,
@@ -241,7 +241,7 @@ func (importer importer) importLeafSku(
 
 	commitOptions.Validate = false
 
-	if err = importer.Commit(
+	if err = importer.Store.Commit(
 		co.GetSkuExternal(),
 		commitOptions,
 	); err != nil {
@@ -268,7 +268,7 @@ func (c importer) ImportBlobIfNecessary(
 
 		n := int64(-1)
 
-		if c.GetDirectoryLayout().HasBlob(blobSha) {
+		if c.Store.GetDirectoryLayout().HasBlob(blobSha) {
 			n = -2
 		}
 
@@ -291,8 +291,8 @@ func (c importer) ImportBlobIfNecessary(
 	var n int64
 
 	if n, err = env_repo.CopyBlobIfNecessary(
-		c.GetDirectoryLayout(),
-		c.GetDirectoryLayout(),
+		c.Store.GetDirectoryLayout(),
+		c.Store.GetDirectoryLayout(),
 		c.remoteBlobStore,
 		blobSha,
 	); err != nil {
