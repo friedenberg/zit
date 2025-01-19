@@ -3,10 +3,9 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
-func (s *Store) GetObjectStore() external_store.ObjectStore {
+func (s *Store) GetObjectStore() sku.ObjectStore {
 	return s
 }
 

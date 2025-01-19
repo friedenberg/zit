@@ -12,19 +12,6 @@ import (
 )
 
 type (
-	FuncRealize     = func(sku.ExternalLike, *sku.Transacted, sku.CommitOptions) error
-	FuncCommit      = func(sku.ExternalLike, sku.CommitOptions) error
-	FuncReadOneInto = func(interfaces.ObjectId, *sku.Transacted) error
-
-	ObjectStore interface {
-		Commit(sku.ExternalLike, sku.CommitOptions) (err error)
-		ReadOneInto(interfaces.ObjectId, *sku.Transacted) (err error)
-		ReadPrimitiveQuery(
-			qg sku.PrimitiveQueryGroup,
-			w interfaces.FuncIter[*sku.Transacted],
-		) (err error)
-	}
-
 	QueryOptions struct {
 		ExcludeUntracked  bool
 		IncludeRecognized bool
@@ -71,7 +58,7 @@ type (
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {
-		ObjectStore
+		sku.ObjectStore
 		DirCache string
 		env_repo.Env
 		ids.RepoId

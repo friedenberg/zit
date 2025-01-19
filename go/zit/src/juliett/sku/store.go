@@ -2,18 +2,23 @@ package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
+	ObjectStore interface {
+		Commit(ExternalLike, CommitOptions) (err error)
+		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
+		ReadPrimitiveQuery(
+			qg PrimitiveQueryGroup,
+			w interfaces.FuncIter[*Transacted],
+		) (err error)
+	}
+
 	ExternalObjectId       = ids.ExternalObjectIdLike
 	ExternalObjectIdGetter = ids.ExternalObjectIdGetter
 
-	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
-	FuncCommit      = func(*Transacted, CommitOptions) error
-	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
 		k1 interfaces.ObjectId,
 		out *Transacted,
@@ -41,14 +46,6 @@ type (
 
 	ExternalStoreForQueryGetter interface {
 		GetExternalStoreForQuery(ids.RepoId) (ExternalStoreForQuery, bool)
-	}
-
-	ExternalLikePoolGetter interface {
-		GetExternalLikePool() interfaces.PoolValue[ExternalLike]
-	}
-
-	ExternalLikeResetter3Getter interface {
-		GetExternalLikeResetter3() interfaces.Resetter3[ExternalLike]
 	}
 
 	BlobStore[T any] interface {
