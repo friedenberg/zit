@@ -144,6 +144,26 @@ function clone_history_zettel_typ_etikett_stdio_local { # @test
 	try_add_new_after_clone
 }
 
+function clone_history_one_zettel_stdio_local { # @test
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	us="us"
+	set_xdg "$us"
+	run_clone_default_with \
+		-remote-type stdio-local \
+		"$(realpath them)" \
+		o/d+
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+	EOM
+}
+
 function clone_history_zettel_typ_etikett_stdio_ssh { # @test
 	skip
 	them="them"

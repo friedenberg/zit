@@ -468,6 +468,39 @@ function pull_history_default_no_conflict { # @test
 	try_add_new_after_pull
 }
 
+function pull_history_zettel_one_abbr { # @test
+	# TODO add support for abbreviations in remote transfers
+	skip
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	run_zit_init_disable_age
+	run_zit pull \
+		-include-blobs=false \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
+		o/u+
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
+
+	run_zit show one/uno+
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
+}
+
 function pull_history_zettels_no_conflict_no_blobs { # @test
 	them="them"
 	bootstrap "$them"

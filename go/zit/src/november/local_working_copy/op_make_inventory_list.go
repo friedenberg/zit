@@ -9,14 +9,14 @@ import (
 )
 
 func (u *Repo) MakeInventoryList(
-	qg *query.Group,
+	queryGroup *query.Group,
 ) (list *sku.List, err error) {
 	list = sku.MakeList()
 
 	var l sync.Mutex
 
 	if err = u.GetStore().QueryTransacted(
-		qg,
+		queryGroup,
 		func(sk *sku.Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
