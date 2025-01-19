@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_abbr"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -180,10 +181,9 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	if repo.storeAbbr, err = store.NewIndexAbbr(
+	if repo.storeAbbr, err = store_abbr.NewIndexAbbr(
 		config.GetCLIConfig().PrintOptions,
 		repo.envRepo,
-		repo.envRepo.DirCache("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return

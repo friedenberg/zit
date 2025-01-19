@@ -1,4 +1,4 @@
-package store
+package store_abbr
 
 import (
 	"bufio"
@@ -25,9 +25,9 @@ type indexAbbrEncodableTridexes struct {
 type indexAbbr struct {
 	options_print.V0
 
-	lock      sync.Locker
-	once      *sync.Once
-	dirLayout env_repo.Env
+	lock    sync.Locker
+	once    *sync.Once
+	envRepo env_repo.Env
 
 	path string
 
@@ -39,15 +39,14 @@ type indexAbbr struct {
 
 func NewIndexAbbr(
 	options options_print.V0,
-	dirLayout env_repo.Env,
-	p string,
+	envRepo env_repo.Env,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		V0:        options,
-		lock:      &sync.Mutex{},
-		once:      &sync.Once{},
-		path:      p,
-		dirLayout: dirLayout,
+		V0:      options,
+		lock:    &sync.Mutex{},
+		once:    &sync.Once{},
+		path:    envRepo.DirCache("Abbr"),
+		envRepo: envRepo,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
 				ObjectIds: tridex.Make(),
@@ -76,7 +75,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.dirLayout.WriteCloserCache(i.path); err != nil {
+	if w1, err = i.envRepo.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -110,7 +109,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.dirLayout.ReadCloserCache(i.path); err != nil {
+			if r1, err = i.envRepo.ReadCloserCache(i.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {

@@ -1,4 +1,4 @@
-package store
+package store_abbr
 
 import (
 	"fmt"
