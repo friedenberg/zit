@@ -30,6 +30,7 @@ type Importer struct {
 	ExcludeObjects      bool
 	RemoteBlobStore     interfaces.BlobStore
 	BlobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
+	StoreOptions        sku.StoreOptions
 	AllowMergeConflicts bool
 	sku.ParentNegotiator
 	CheckedOutPrinter interfaces.FuncIter[*sku.CheckedOut]
@@ -149,7 +150,7 @@ func (importer Importer) importLeafSku(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
-					StoreOptions:       sku.GetStoreOptionsImport(),
+					StoreOptions:       importer.StoreOptions,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
 				},

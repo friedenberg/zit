@@ -61,6 +61,13 @@ func GetStoreOptionsImport() StoreOptions {
 	}
 }
 
+func GetStoreOptionsRemoteTransfer() StoreOptions {
+	return GetStoreOptionsImport()
+	// return StoreOptions{
+	// 	AddToInventoryList: true,
+	// }
+}
+
 func GetStoreOptionsUpdate() StoreOptions {
 	return StoreOptions{
 		AddToInventoryList: true,

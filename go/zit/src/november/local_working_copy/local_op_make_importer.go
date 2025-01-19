@@ -7,6 +7,7 @@ import (
 
 func (repo *Repo) MakeImporter(
 	options store.ImporterOptions,
+	storeOptions sku.StoreOptions,
 ) (importer store.Importer) {
 	importer = store.Importer{
 		Store:               repo.GetStore(),
@@ -16,6 +17,7 @@ func (repo *Repo) MakeImporter(
 		AllowMergeConflicts: options.AllowMergeConflicts,
 		ParentNegotiator:    options.ParentNegotiator,
 		CheckedOutPrinter:   options.CheckedOutPrinter,
+    StoreOptions: storeOptions,
 	}
 
 	if importer.BlobCopierDelegate == nil &&

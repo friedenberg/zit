@@ -60,7 +60,10 @@ func (cmd *PullBlobStore) Run(
 		}
 	}
 
-	importer := localWorkingCopy.MakeImporter(importerOptions)
+	importer := localWorkingCopy.MakeImporter(
+		importerOptions,
+		sku.GetStoreOptionsRemoteTransfer(),
+	)
 
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,

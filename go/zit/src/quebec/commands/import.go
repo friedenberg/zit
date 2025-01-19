@@ -102,7 +102,10 @@ func (cmd Import) Run(dep command.Request) {
 	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies
-	importer := localWorkingCopy.MakeImporter(importerOptions)
+	importer := localWorkingCopy.MakeImporter(
+		importerOptions,
+		sku.GetStoreOptionsImport(),
+	)
 
 	if err := localWorkingCopy.ImportList(
 		list,

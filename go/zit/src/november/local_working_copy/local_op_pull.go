@@ -48,7 +48,10 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	}
 
 	importerOptions.PrintCopies = options.PrintCopies
-	importer := local.MakeImporter(importerOptions)
+	importer := local.MakeImporter(
+		importerOptions,
+		sku.GetStoreOptionsImport(),
+	)
 
 	if err = local.ImportList(
 		list,
