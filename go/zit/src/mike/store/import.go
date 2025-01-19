@@ -198,7 +198,7 @@ func (importer importer) importLeafSku(
 		co.GetSku(),
 	); err != nil {
 		if collections.IsErrNotFound(err) {
-			if err = importer.tryRealizeAndOrStore(
+			if err = importer.Commit(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
@@ -241,7 +241,7 @@ func (importer importer) importLeafSku(
 
 	commitOptions.Validate = false
 
-	if err = importer.tryRealizeAndOrStore(
+	if err = importer.Commit(
 		co.GetSkuExternal(),
 		commitOptions,
 	); err != nil {

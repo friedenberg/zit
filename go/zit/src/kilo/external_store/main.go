@@ -16,11 +16,13 @@ type (
 	FuncCommit      = func(sku.ExternalLike, sku.CommitOptions) error
 	FuncReadOneInto = func(interfaces.ObjectId, *sku.Transacted) error
 
-	StoreFuncs struct {
-		FuncRealize
-		FuncCommit
-		FuncReadOneInto
-		sku.FuncPrimitiveQuery
+	ObjectStore interface {
+		Commit(sku.ExternalLike, sku.CommitOptions) (err error)
+		ReadOneInto(interfaces.ObjectId, *sku.Transacted) (err error)
+		ReadPrimitiveQuery(
+			qg sku.PrimitiveQueryGroup,
+			w interfaces.FuncIter[*sku.Transacted],
+		) (err error)
 	}
 
 	QueryOptions struct {
@@ -69,7 +71,7 @@ type (
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {
-		StoreFuncs
+		ObjectStore
 		DirCache string
 		env_repo.Env
 		ids.RepoId

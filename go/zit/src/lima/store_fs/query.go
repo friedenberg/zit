@@ -80,7 +80,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			return
 		}
 
-		if err = s.externalStoreSupplies.FuncReadOneInto(
+		if err = s.externalStoreSupplies.ReadOneInto(
 			&oid,
 			co.GetSku(),
 		); err != nil {
@@ -326,7 +326,7 @@ func (s *Store) queryUntracked(
 		return
 	}
 
-	if err = s.externalStoreSupplies.FuncPrimitiveQuery(
+	if err = s.externalStoreSupplies.ReadPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			var recognizedBlob, recognizedObject *fsItemRecognized

@@ -57,7 +57,7 @@ func (s *Store) CreateOrUpdate(
 	storeOptions.Validate = true
 	storeOptions.ApplyProto = true
 
-	if err = s.tryRealizeAndOrStore(
+	if err = s.Commit(
 		in,
 		sku.CommitOptions{
 			StoreOptions: storeOptions,
@@ -103,7 +103,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 
 	t.SetBlobSha(sh)
 
-	if err = s.tryRealizeAndOrStore(
+	if err = s.Commit(
 		t,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
@@ -146,7 +146,7 @@ func (s *Store) RevertTo(
 
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err = s.tryRealizeAndOrStore(
+	if err = s.Commit(
 		mutter,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
@@ -172,7 +172,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.tryRealizeAndOrStore(
+	if err = s.Commit(
 		external,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsCreate()},
 	); err != nil {

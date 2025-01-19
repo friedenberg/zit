@@ -172,7 +172,7 @@ func (s *Store) shouldCheckOut(
 	mutter := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err := s.externalStoreSupplies.FuncReadOneInto(
+	if err := s.externalStoreSupplies.ReadOneInto(
 		cz.GetSku().GetObjectId(),
 		mutter,
 	); err == nil {

@@ -17,9 +17,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
@@ -140,12 +140,7 @@ func (c *Store) Initialize(
 }
 
 func (s *Store) MakeSupplies() (es external_store.Supplies) {
-	es.StoreFuncs = external_store.StoreFuncs{
-		FuncRealize:        s.tryRealize,
-		FuncCommit:         s.tryRealizeAndOrStore,
-		FuncReadOneInto:    s.GetStreamIndex().ReadOneObjectId,
-		FuncPrimitiveQuery: s.GetStreamIndex().ReadPrimitiveQuery,
-	}
+	es.ObjectStore = s
 
 	es.Env = s.GetDirectoryLayout()
 	// es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())

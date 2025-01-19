@@ -402,7 +402,7 @@ func (d *dirItems) processFDSet(
 			return
 		}
 
-		if err = d.externalStoreSupplies.FuncReadOneInto(
+		if err = d.externalStoreSupplies.ReadOneInto(
 			&oid,
 			recognized,
 		); err != nil {

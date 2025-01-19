@@ -17,7 +17,7 @@ import (
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
 // runs the new hook, validates the blob, then calculates the sha for the object
-func (s *Store) tryRealize(
+func (s *Store) tryPrecommit(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
@@ -74,7 +74,7 @@ func (s *Store) tryRealize(
 }
 
 // TODO add RealizeAndOrStore result
-func (s *Store) tryRealizeAndOrStore(
+func (s *Store) Commit(
 	el sku.ExternalLike,
 	o sku.CommitOptions,
 ) (err error) {
@@ -128,7 +128,7 @@ func (s *Store) tryRealizeAndOrStore(
 		child.Metadata.Cache.ParentTai = parent.GetTai()
 	}
 
-	if err = s.tryRealize(el, parent, o); err != nil {
+	if err = s.tryPrecommit(el, parent, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -333,7 +333,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 	}
 
-	if err = s.tryRealizeAndOrStore(
+	if err = s.Commit(
 		t,
 		sku.CommitOptions{
 			StoreOptions:       sku.GetStoreOptionsUpdate(),
@@ -545,7 +545,7 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = s.tryRealizeAndOrStore(sk, o); err != nil {
+	if err = s.Commit(sk, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
