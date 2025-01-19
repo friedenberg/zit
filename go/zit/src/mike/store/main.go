@@ -32,7 +32,7 @@ type Store struct {
 	externalStores     map[ids.RepoId]*external_store.Store
 	typedBlobStore     *typed_blob_store.Store
 	inventoryListStore inventory_list_store.Store
-	Abbr               AbbrStore
+	Abbr               sku.AbbrStore
 
 	inventoryList          *sku.List
 	options                object_inventory_format.Options
@@ -71,7 +71,7 @@ func (c *Store) Initialize(
 	box *box_format.BoxTransacted,
 	typedBlobStore *typed_blob_store.Store,
 	dormantIndex *dormant_index.Index,
-	abbrStore AbbrStore,
+	abbrStore sku.AbbrStore,
 ) (err error) {
 	c.config = config
 	c.envRepo = envRepo

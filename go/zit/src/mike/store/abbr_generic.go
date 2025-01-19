@@ -8,26 +8,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
-
-type AbbrStorePresenceGeneric[V any] interface {
-	Exists([3]string) error
-}
-
-type AbbrStoreGeneric[V any, VPtr interfaces.Ptr[V]] interface {
-	AbbrStorePresenceGeneric[V]
-	ExpandStringString(string) (string, error)
-	ExpandString(string) (VPtr, error)
-	Expand(VPtr) (VPtr, error)
-	Abbreviate(ids.Abbreviatable) (string, error)
-}
 
 type AbbrStoreMutableGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	Add(VPtr) error
 }
 
 type AbbrStoreCompleteGeneric[V any, VPtr interfaces.Ptr[V]] interface {
-	AbbrStoreGeneric[V, VPtr]
+	sku.AbbrStoreGeneric[V, VPtr]
 	AbbrStoreMutableGeneric[V, VPtr]
 }
 
@@ -35,7 +24,7 @@ type indexNoAbbr[
 	V interfaces.Stringer,
 	VPtr interfaces.SetterPtr[V],
 ] struct {
-	AbbrStoreGeneric[V, VPtr]
+	sku.AbbrStoreGeneric[V, VPtr]
 }
 
 func (ih indexNoAbbr[V, VPtr]) Abbreviate(h V) (v string, err error) {

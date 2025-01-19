@@ -1,12 +1,36 @@
 package sku
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
+	AbbrStorePresenceGeneric[V any] interface {
+		Exists([3]string) error
+	}
+
+	AbbrStoreGeneric[V any, VPtr interfaces.Ptr[V]] interface {
+		AbbrStorePresenceGeneric[V]
+		ExpandStringString(string) (string, error)
+		ExpandString(string) (VPtr, error)
+		Expand(VPtr) (VPtr, error)
+		Abbreviate(ids.Abbreviatable) (string, error)
+	}
+
+	AbbrStore interface {
+		ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
+		Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
+
+		AddObjectToAbbreviationStore(*Transacted) error
+		GetAbbr() ids.Abbr
+
+		errors.Flusher
+	}
+
 	ObjectStore interface {
 		Commit(ExternalLike, CommitOptions) (err error)
 		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)

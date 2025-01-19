@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 type EnvBox interface {
@@ -31,7 +30,7 @@ type EnvBox interface {
 func MakeEnvBox(
 	env env_repo.Env,
 	storeFS *store_fs.Store,
-	abbr store.AbbrStore,
+	abbr sku.AbbrStore,
 ) EnvBox {
 	return &env_box{
 		Env:     env,
@@ -43,7 +42,7 @@ func MakeEnvBox(
 type env_box struct {
 	env_repo.Env
 	storeFS *store_fs.Store
-	abbr    store.AbbrStore
+	abbr    sku.AbbrStore
 }
 
 func (u *env_box) StringFormatWriterSkuBoxTransacted(

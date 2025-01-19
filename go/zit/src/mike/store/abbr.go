@@ -17,17 +17,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-// TODO-P4 make generic to just ObjectIds
-type AbbrStore interface {
-	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
-	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
-
-	AddObjectToAbbreviationStore(*sku.Transacted) error
-	GetAbbr() ids.Abbr
-
-	errors.Flusher
-}
-
 type indexAbbrEncodableTridexes struct {
 	Shas     indexNotZettelId[sha.Sha, *sha.Sha]
 	ZettelId indexZettelId
@@ -200,13 +189,13 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 	return
 }
 
-func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
+func (i *indexAbbr) ZettelId() (asg sku.AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
 	asg = &i.indexAbbrEncodableTridexes.ZettelId
 
 	return
 }
 
-func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
+func (i *indexAbbr) Shas() (asg sku.AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	asg = &i.indexAbbrEncodableTridexes.Shas
 
 	return

@@ -35,7 +35,7 @@ type Repo struct {
 	config      store_config.StoreMutable
 
 	storeFS      *store_fs.Store
-	storeAbbr    store.AbbrStore
+	storeAbbr    sku.AbbrStore
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
@@ -159,7 +159,7 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	objectInventoryFormatOPtions := object_inventory_format.Options{Tai: true}
+	objectInventoryFormatOptions := object_inventory_format.Options{Tai: true}
 
 	config := repo.GetConfig()
 
@@ -168,7 +168,7 @@ func (repo *Repo) initialize(
 		repo.PrinterFDDeleted(),
 		config.GetFileExtensions(),
 		repo.GetRepoLayout(),
-		objectInventoryFormatOPtions,
+		objectInventoryFormatOptions,
 		repo.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -218,7 +218,7 @@ func (repo *Repo) initialize(
 		repo.envLua,
 		repo.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
-		objectInventoryFormatOPtions,
+		objectInventoryFormatOptions,
 		boxFormatArchive,
 		repo.typedBlobStore,
 		&repo.dormantIndex,

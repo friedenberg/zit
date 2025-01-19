@@ -54,7 +54,7 @@ func (s *Store) GetInventoryListStore() *inventory_list_store.Store {
 	return &s.inventoryListStore
 }
 
-func (s *Store) GetAbbrStore() AbbrStore {
+func (s *Store) GetAbbrStore() sku.AbbrStore {
 	return s.Abbr
 }
 
