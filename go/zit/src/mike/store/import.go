@@ -28,41 +28,67 @@ type ImporterOptions struct {
 func (store *Store) MakeImporter(
 	options ImporterOptions,
 	storeOptions sku.StoreOptions,
-) (importer Importer) {
-	importer = Importer{
+) Importer {
+	importer := &importer{
 		Store:               store,
-		ExcludeObjects:      options.ExcludeObjects,
-		RemoteBlobStore:     options.RemoteBlobStore,
-		BlobCopierDelegate:  options.BlobCopierDelegate,
-		AllowMergeConflicts: options.AllowMergeConflicts,
-		ParentNegotiator:    options.ParentNegotiator,
-		CheckedOutPrinter:   options.CheckedOutPrinter,
-		StoreOptions:        storeOptions,
+		excludeObjects:      options.ExcludeObjects,
+		remoteBlobStore:     options.RemoteBlobStore,
+		blobCopierDelegate:  options.BlobCopierDelegate,
+		allowMergeConflicts: options.AllowMergeConflicts,
+		parentNegotiator:    options.ParentNegotiator,
+		checkedOutPrinter:   options.CheckedOutPrinter,
+		storeOptions:        storeOptions,
 	}
 
-	if importer.BlobCopierDelegate == nil &&
-		importer.RemoteBlobStore != nil &&
+	if importer.blobCopierDelegate == nil &&
+		importer.remoteBlobStore != nil &&
 		options.PrintCopies {
-		importer.BlobCopierDelegate = sku.MakeBlobCopierDelegate(
+		importer.blobCopierDelegate = sku.MakeBlobCopierDelegate(
 			store.envRepo.GetUI(),
 		)
 	}
 
-	return
+	return importer
 }
 
-type Importer struct {
+type Importer interface {
+	GetCheckedOutPrinter() interfaces.FuncIter[*sku.CheckedOut]
+
+	SetCheckedOutPrinter(
+		p interfaces.FuncIter[*sku.CheckedOut],
+	)
+
+	ImportBlobIfNecessary(
+		sk *sku.Transacted,
+	) (err error)
+
+	Import(
+		external *sku.Transacted,
+	) (co *sku.CheckedOut, err error)
+}
+
+type importer struct {
 	*Store
-	ExcludeObjects      bool
-	RemoteBlobStore     interfaces.BlobStore
-	BlobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
-	StoreOptions        sku.StoreOptions
-	AllowMergeConflicts bool
-	sku.ParentNegotiator
-	CheckedOutPrinter interfaces.FuncIter[*sku.CheckedOut]
+	excludeObjects      bool
+	remoteBlobStore     interfaces.BlobStore
+	blobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
+	storeOptions        sku.StoreOptions
+	allowMergeConflicts bool
+	parentNegotiator    sku.ParentNegotiator
+	checkedOutPrinter   interfaces.FuncIter[*sku.CheckedOut]
 }
 
-func (importer Importer) Import(
+func (importer importer) GetCheckedOutPrinter() interfaces.FuncIter[*sku.CheckedOut] {
+	return importer.checkedOutPrinter
+}
+
+func (importer *importer) SetCheckedOutPrinter(
+	p interfaces.FuncIter[*sku.CheckedOut],
+) {
+	importer.checkedOutPrinter = p
+}
+
+func (importer importer) Import(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	if err = importer.ImportBlobIfNecessary(external); err != nil {
@@ -85,10 +111,10 @@ func (importer Importer) Import(
 	return
 }
 
-func (importer Importer) importInventoryList(
+func (importer importer) importInventoryList(
 	el *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	if importer.RemoteBlobStore == nil {
+	if importer.remoteBlobStore == nil {
 		err = errors.Errorf("RemoteBlobStore is nil")
 		return
 	}
@@ -129,10 +155,10 @@ func (importer Importer) importInventoryList(
 	return
 }
 
-func (importer Importer) importLeafSku(
+func (importer importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	if importer.ExcludeObjects {
+	if importer.excludeObjects {
 		return
 	}
 
@@ -176,7 +202,7 @@ func (importer Importer) importLeafSku(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
-					StoreOptions:       importer.StoreOptions,
+					StoreOptions:       importer.storeOptions,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
 				},
@@ -195,16 +221,16 @@ func (importer Importer) importLeafSku(
 	// TODO extra commit option setting into its own function
 	if commitOptions, err = importer.MergeCheckedOutIfNecessary(
 		co,
-		importer.ParentNegotiator,
-		importer.AllowMergeConflicts,
+		importer.parentNegotiator,
+		importer.allowMergeConflicts,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if co.GetState() == checked_out_state.Conflicted {
-		if !importer.AllowMergeConflicts {
-			if err = importer.CheckedOutPrinter(co); err != nil {
+		if !importer.allowMergeConflicts {
+			if err = importer.checkedOutPrinter(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -223,7 +249,7 @@ func (importer Importer) importLeafSku(
 		return
 	}
 
-	if err = importer.CheckedOutPrinter(co); err != nil {
+	if err = importer.checkedOutPrinter(co); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -231,12 +257,12 @@ func (importer Importer) importLeafSku(
 	return
 }
 
-func (c Importer) ImportBlobIfNecessary(
+func (c importer) ImportBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
 	blobSha := sk.GetBlobSha()
 
-	if c.RemoteBlobStore == nil {
+	if c.remoteBlobStore == nil {
 		// when this is a dumb HTTP remote, we expect local to push the missing
 		// objects to us after the import call
 
@@ -246,8 +272,8 @@ func (c Importer) ImportBlobIfNecessary(
 			n = -2
 		}
 
-		if c.BlobCopierDelegate != nil {
-			if err = c.BlobCopierDelegate(
+		if c.blobCopierDelegate != nil {
+			if err = c.blobCopierDelegate(
 				sku.BlobCopyResult{
 					Transacted: sk,
 					Sha:        blobSha,
@@ -267,7 +293,7 @@ func (c Importer) ImportBlobIfNecessary(
 	if n, err = env_repo.CopyBlobIfNecessary(
 		c.GetDirectoryLayout(),
 		c.GetDirectoryLayout(),
-		c.RemoteBlobStore,
+		c.remoteBlobStore,
 		blobSha,
 	); err != nil {
 		if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
@@ -280,8 +306,8 @@ func (c Importer) ImportBlobIfNecessary(
 		return
 	}
 
-	if c.BlobCopierDelegate != nil {
-		if err = c.BlobCopierDelegate(
+	if c.blobCopierDelegate != nil {
+		if err = c.blobCopierDelegate(
 			sku.BlobCopyResult{
 				Transacted: sk,
 				Sha:        blobSha,

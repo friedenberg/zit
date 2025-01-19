@@ -16,15 +16,17 @@ func (u *Repo) ImportList(
 
 	var hasConflicts bool
 
-	oldPrinter := importer.CheckedOutPrinter
+	oldPrinter := importer.GetCheckedOutPrinter()
 
-	importer.CheckedOutPrinter = func(co *sku.CheckedOut) (err error) {
-		if co.GetState() == checked_out_state.Conflicted {
-			hasConflicts = true
-		}
+	importer.SetCheckedOutPrinter(
+		func(co *sku.CheckedOut) (err error) {
+			if co.GetState() == checked_out_state.Conflicted {
+				hasConflicts = true
+			}
 
-		return oldPrinter(co)
-	}
+			return oldPrinter(co)
+		},
+	)
 
 	for {
 		sk, ok := list.Pop()
