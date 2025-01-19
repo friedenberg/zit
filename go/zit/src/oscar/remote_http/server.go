@@ -20,7 +20,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
@@ -443,7 +442,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 	case MethodPath{"POST", "/inventory_lists"}:
 		// TODO get version from header?
 		// TODO
-		bf := server.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+		bf := server.Repo.GetInventoryListStore().FormatForVersion(
 			server.Repo.GetImmutableConfig().GetStoreVersion(),
 		)
 
@@ -461,7 +460,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		b := bytes.NewBuffer(nil)
 
 		// TODO make option to read from headers
-		importerOptions := importer.ImporterOptions{
+		importerOptions := sku.ImporterOptions{
 			// TODO
 			CheckedOutPrinter: server.Repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 		}

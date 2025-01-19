@@ -97,6 +97,6 @@ func (c Config) UsePrintTags() bool {
 	return c.PrintOptions.PrintTagsAlways
 }
 
-func (c Config)	IsDryRun() bool {
-  return c.DryRun
+func (c Config) IsDryRun() bool {
+	return c.DryRun
 }

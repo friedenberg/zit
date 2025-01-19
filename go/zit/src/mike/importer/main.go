@@ -17,15 +17,7 @@ import (
 
 var ErrNeedsMerge = errors.NewNormal("needs merge")
 
-type ImporterOptions struct {
-	ExcludeObjects      bool
-	RemoteBlobStore     interfaces.BlobStore
-	PrintCopies         bool
-	AllowMergeConflicts bool
-	BlobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
-	ParentNegotiator    sku.ParentNegotiator
-	CheckedOutPrinter   interfaces.FuncIter[*sku.CheckedOut]
-}
+type ImporterOptions = sku.ImporterOptions
 
 func Make(
 	options ImporterOptions,
@@ -35,7 +27,7 @@ func Make(
 	indexObject sku.IndexObject,
 	storeExternalMergeCheckedOut external_store.MergeCheckedOut,
 	storeObject sku.ObjectStore,
-) Importer {
+) sku.Importer {
 	importer := &importer{
 		typedInventoryListBlobStore: typedInventoryListBlobStore,
 		indexObject:                 indexObject,
@@ -60,22 +52,6 @@ func Make(
 	}
 
 	return importer
-}
-
-type Importer interface {
-	GetCheckedOutPrinter() interfaces.FuncIter[*sku.CheckedOut]
-
-	SetCheckedOutPrinter(
-		p interfaces.FuncIter[*sku.CheckedOut],
-	)
-
-	ImportBlobIfNecessary(
-		sk *sku.Transacted,
-	) (err error)
-
-	Import(
-		external *sku.Transacted,
-	) (co *sku.CheckedOut, err error)
 }
 
 type importer struct {

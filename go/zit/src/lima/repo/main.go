@@ -16,6 +16,16 @@ type Repo interface {
 	GetImmutableConfig() config_immutable.Config
 	GetBlobStore() interfaces.BlobStore
 	GetInventoryListStore() sku.InventoryListStore
+
+	MakeImporter(
+		options sku.ImporterOptions,
+		storeOptions sku.StoreOptions,
+	) sku.Importer
+
+	ImportList(
+		list *sku.List,
+		i sku.Importer,
+	) (err error)
 }
 
 type WorkingCopy interface {

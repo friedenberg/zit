@@ -30,13 +30,13 @@ import (
 type Store struct {
 	lock sync.Mutex
 
-	repoLayout env_repo.Env
-	ls         interfaces.LockSmith
-	sv         interfaces.StoreVersion
-	of         interfaces.ObjectIOFactory
-	af         interfaces.BlobStore
-	clock      ids.Clock
-	blobStore  typed_blob_store.InventoryList
+	envRepo        env_repo.Env
+	ls             interfaces.LockSmith
+	sv             interfaces.StoreVersion
+	of             interfaces.ObjectIOFactory
+	af             interfaces.BlobStore
+	clock          ids.Clock
+	typedBlobStore typed_blob_store.InventoryList
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -49,12 +49,12 @@ func (s *Store) Initialize(
 	repoLayout env_repo.Env,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
-	blobStore typed_blob_store.InventoryList,
+	typedBlobStore typed_blob_store.InventoryList,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		repoLayout:    repoLayout,
+		envRepo:       repoLayout,
 		ls:            repoLayout.GetLockSmith(),
 		sv:            repoLayout.GetStoreVersion(),
 		of:            repoLayout.ObjectReaderWriterFactory(genres.InventoryList),
@@ -65,8 +65,8 @@ func (s *Store) Initialize(
 			repoLayout,
 			options_print.V0{}.WithPrintTai(true),
 		),
-		options:   op,
-		blobStore: blobStore,
+		options:        op,
+		typedBlobStore: typedBlobStore,
 	}
 
 	v := s.sv.GetInt()
@@ -88,6 +88,10 @@ func (s *Store) GetEnv() env_ui.Env {
 
 func (s *Store) GetImmutableConfig() config_immutable.Config {
 	return s.GetRepoLayout().GetConfig()
+}
+
+func (s *Store) GetObjectStore() sku.ObjectStore {
+	return s
 }
 
 func (s *Store) Flush() (err error) {
@@ -121,11 +125,11 @@ func (s *Store) GetTai() ids.Tai {
 }
 
 func (s *Store) GetRepoLayout() env_repo.Env {
-	return s.repoLayout
+	return s.envRepo
 }
 
 func (s *Store) GetBlobStore() interfaces.BlobStore {
-	return &s.repoLayout
+	return &s.envRepo
 }
 
 func (s *Store) GetInventoryListStore() sku.InventoryListStore {
@@ -194,14 +198,14 @@ func (s *Store) WriteInventoryListBlob(
 
 	var wc interfaces.ShaWriteCloser
 
-	if wc, err = s.repoLayout.BlobWriter(); err != nil {
+	if wc, err = s.envRepo.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.blobStore.WriteBlobToWriter(
+	if _, err = s.typedBlobStore.WriteBlobToWriter(
 		t.GetType(),
 		skus,
 		wc,
@@ -264,7 +268,7 @@ func (s *Store) WriteInventoryListObject(t *sku.Transacted) (err error) {
 
 	t.Metadata.Type = s.blobType
 
-	if _, err = s.blobStore.WriteObjectToWriter(
+	if _, err = s.typedBlobStore.WriteObjectToWriter(
 		t,
 		wc,
 	); err != nil {
@@ -408,7 +412,7 @@ func (s *Store) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if o, err = s.blobStore.ReadInventoryListObject(
+	if o, err = s.typedBlobStore.ReadInventoryListObject(
 		s.blobType,
 		or,
 	); err != nil {
@@ -432,7 +436,7 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = s.blobStore.StreamInventoryListBlobSkusFromReader(
+	if err = s.typedBlobStore.StreamInventoryListBlobSkusFromReader(
 		s.blobType,
 		rc,
 		f,
@@ -485,7 +489,7 @@ func (s *Store) ReadAllInventoryLists(
 ) (err error) {
 	var p string
 
-	if p, err = s.repoLayout.DirObjectGenre(
+	if p, err = s.envRepo.DirObjectGenre(
 		genres.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)

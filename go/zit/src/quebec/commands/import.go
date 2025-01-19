@@ -85,7 +85,7 @@ func (cmd Import) Run(dep command.Request) {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	importerOptions := importer.ImporterOptions{
+	importerOptions := sku.ImporterOptions{
 		CheckedOutPrinter: localWorkingCopy.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 

@@ -33,6 +33,16 @@ type InventoryListStore interface {
 	ReadAllInventoryLists(
 		f interfaces.FuncIter[*Transacted],
 	) (err error)
+
+	MakeImporter(
+		options ImporterOptions,
+		storeOptions StoreOptions,
+	) Importer
+
+	ImportList(
+		list *List,
+		i Importer,
+	) (err error)
 }
 
 type ListFormat interface {

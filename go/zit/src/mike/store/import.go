@@ -7,9 +7,9 @@ import (
 )
 
 func (store *Store) MakeImporter(
-	options importer.ImporterOptions,
+	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
-) importer.Importer {
+) sku.Importer {
 	importer := importer.Make(
 		options,
 		storeOptions,

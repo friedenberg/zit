@@ -43,6 +43,20 @@ func (client *Client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
+func (client *Client) MakeImporter(
+	options sku.ImporterOptions,
+	storeOptions sku.StoreOptions,
+) sku.Importer {
+	panic(todo.Implement())
+}
+
+func (client *Client) ImportList(
+	list *sku.List,
+	i sku.Importer,
+) (err error) {
+	return todo.Implement()
+}
+
 func (client *Client) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,

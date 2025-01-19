@@ -90,6 +90,32 @@ type (
 		// -2: no remote blob store and the blob exists locally
 		N int64
 	}
+
+	ImporterOptions struct {
+		ExcludeObjects      bool
+		RemoteBlobStore     interfaces.BlobStore
+		PrintCopies         bool
+		AllowMergeConflicts bool
+		BlobCopierDelegate  interfaces.FuncIter[BlobCopyResult]
+		ParentNegotiator    ParentNegotiator
+		CheckedOutPrinter   interfaces.FuncIter[*CheckedOut]
+	}
+
+	Importer interface {
+		GetCheckedOutPrinter() interfaces.FuncIter[*CheckedOut]
+
+		SetCheckedOutPrinter(
+			p interfaces.FuncIter[*CheckedOut],
+		)
+
+		ImportBlobIfNecessary(
+			sk *Transacted,
+		) (err error)
+
+		Import(
+			external *Transacted,
+		) (co *CheckedOut, err error)
+	}
 )
 
 func MakeBlobCopierDelegate(ui fd.Std) func(BlobCopyResult) error {
