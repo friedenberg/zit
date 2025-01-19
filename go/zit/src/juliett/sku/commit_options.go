@@ -62,10 +62,9 @@ func GetStoreOptionsImport() StoreOptions {
 }
 
 func GetStoreOptionsRemoteTransfer() StoreOptions {
-	return GetStoreOptionsImport()
-	// return StoreOptions{
-	// 	AddToInventoryList: true,
-	// }
+	return StoreOptions{
+		AddToInventoryList: true,
+	}
 }
 
 func GetStoreOptionsUpdate() StoreOptions {
