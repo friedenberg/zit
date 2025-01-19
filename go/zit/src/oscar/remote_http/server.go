@@ -444,7 +444,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		// TODO get version from header?
 		// TODO
 		bf := server.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-			server.Repo.GetStoreVersion(),
+			server.Repo.GetImmutableConfig().GetStoreVersion(),
 		)
 
 		list := sku.MakeList()

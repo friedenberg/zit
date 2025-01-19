@@ -9,7 +9,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
@@ -21,26 +20,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 type Client struct {
 	http.Client
-	// Repo repo.WorkingCopy
-	Repo *local_working_copy.Repo
-	// *local_working_copy.Repo
+	Repo repo.WorkingCopy
 }
 
 func (repo *Client) GetEnv() env_ui.Env {
 	return repo.Repo.GetEnv()
 }
 
-func (u *Client) GetStoreVersion() interfaces.StoreVersion {
-	panic(todo.Implement())
-}
-
-func (repo *Client) GetRepoType() repo_type.Type {
-	panic(todo.Implement())
+func (u *Client) GetImmutableConfig() config_immutable.Config {
+	return u.Repo.GetImmutableConfig()
 }
 
 func (repo *Client) GetInventoryListStore() sku.InventoryListStore {
@@ -82,8 +74,8 @@ func (client *Client) MakeInventoryList(
 		return
 	}
 
-	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
-		client.Repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
+	bf := client.Repo.GetInventoryListStore().FormatForVersion(
+		client.Repo.GetImmutableConfig().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -150,7 +142,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 
 	// TODO local / remote version negotiation
 
-	bf := client.Repo.GetStore().GetInventoryListStore().FormatForVersion(
+	bf := client.Repo.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
 	)
 

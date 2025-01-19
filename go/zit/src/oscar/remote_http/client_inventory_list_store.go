@@ -6,6 +6,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+func (client Client) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
+	return client.Repo.GetInventoryListStore().FormatForVersion(sv)
+}
+
 func (client Client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 	return todo.Implement()
 }

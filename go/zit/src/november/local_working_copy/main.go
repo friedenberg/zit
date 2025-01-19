@@ -2,9 +2,9 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
@@ -100,12 +100,8 @@ func MakeWithLayout(
 	return
 }
 
-func (u *Repo) GetRepoType() repo_type.Type {
-	return u.GetRepoLayout().GetConfig().GetRepoType()
-}
-
-func (u *Repo) GetStoreVersion() interfaces.StoreVersion {
-	return u.GetRepoLayout().GetConfig().GetStoreVersion()
+func (u *Repo) GetImmutableConfig() config_immutable.Config {
+	return u.GetRepoLayout().GetConfig()
 }
 
 // TODO investigate removing unnecessary resets like from organize

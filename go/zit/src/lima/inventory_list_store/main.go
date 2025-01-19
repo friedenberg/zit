@@ -7,10 +7,10 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -86,12 +86,8 @@ func (s *Store) GetEnv() env_ui.Env {
 	return s.GetRepoLayout()
 }
 
-func (s *Store) GetRepoType() repo_type.Type {
-	return s.GetRepoLayout().GetConfig().GetRepoType()
-}
-
-func (u *Store) GetStoreVersion() interfaces.StoreVersion {
-	return u.GetRepoLayout().GetConfig().GetStoreVersion()
+func (s *Store) GetImmutableConfig() config_immutable.Config {
+	return s.GetRepoLayout().GetConfig()
 }
 
 func (s *Store) Flush() (err error) {

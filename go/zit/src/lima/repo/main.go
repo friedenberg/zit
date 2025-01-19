@@ -2,7 +2,7 @@ package repo
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -13,8 +13,7 @@ import (
 // store
 type Repo interface {
 	GetEnv() env_ui.Env
-	GetStoreVersion() interfaces.StoreVersion
-	GetRepoType() repo_type.Type
+	GetImmutableConfig() config_immutable.Config
 	GetBlobStore() interfaces.BlobStore
 	GetInventoryListStore() sku.InventoryListStore
 }
