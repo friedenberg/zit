@@ -19,6 +19,7 @@ require (
 
 require (
 	code.linenisgreat.com/chrest v0.0.0-20250117135547-4340c86d1f59 // indirect
+	github.com/gorilla/mux v1.8.1 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 )

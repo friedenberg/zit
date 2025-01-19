@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"io"
 	"log"
 	"os"
 
@@ -37,6 +38,7 @@ func IsVerbose() bool {
 }
 
 type Printer interface {
+	io.Writer
 	GetPrinter() Printer
 	GetFile() *os.File
 	IsTty() bool

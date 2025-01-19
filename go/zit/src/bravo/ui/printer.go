@@ -35,6 +35,15 @@ func (p printer) GetPrinter() Printer {
 	return p
 }
 
+func (p printer) Write(b []byte) (n int, err error) {
+	if !p.on {
+		n = len(b)
+		return
+	}
+
+	return p.f.Write(b)
+}
+
 func (p printer) GetFile() *os.File {
 	return p.f
 }

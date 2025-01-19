@@ -18,10 +18,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
@@ -125,8 +125,30 @@ func (server Server) InitializeHTTP(
 	return
 }
 
+func (server Server) makeRouter(
+	makeHandler func(handler funcHandler) http.HandlerFunc,
+) http.Handler {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/blobs", makeHandler(server.handleBlobsHeadOrGet)).
+		Methods("HEAD", "GET")
+
+	router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
+		Methods("POST")
+
+	router.HandleFunc("/inventory_lists", makeHandler(server.handleGetInventoryList)).
+		Methods("GET")
+
+	router.HandleFunc("/inventory_lists", makeHandler(server.handlePostInventoryList)).
+		Methods("POST")
+
+	return router
+}
+
 func (server Server) Serve(listener net.Listener) (err error) {
-	httpServer := http.Server{Handler: server}
+	httpServer := http.Server{
+		Handler: server.makeRouter(server.makeHandler),
+	}
 
 	go func() {
 		<-server.Repo.GetEnv().Done()
@@ -157,7 +179,7 @@ func (server Server) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (server Server) ServeStdio() (err error) {
+func (server Server) ServeStdio() {
 	// shuts down the server when the main context is complete (on SIGHUP / SIGINT).
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetIn().GetFile().Close)
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetOut().GetFile().Close)
@@ -165,31 +187,65 @@ func (server Server) ServeStdio() (err error) {
 	br := bufio.NewReader(server.Repo.GetEnv().GetIn().GetFile())
 	bw := bufio.NewWriter(server.Repo.GetEnv().GetOut().GetFile())
 
+	handler := server.makeRouter(
+		func(handler funcHandler) http.HandlerFunc {
+			return server.makeHandlerWithRedirect(handler, bw)
+		},
+	)
+
 	for {
 		server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 		var request *http.Request
 
-		if request, err = http.ReadRequest(br); err != nil {
+		{
+			var err error
+
+			if request, err = http.ReadRequest(br); err != nil {
+				if errors.IsEOF(err) {
+					err = nil
+				} else {
+					server.EnvLocal.CancelWithError(err)
+				}
+
+				return
+			}
+		}
+
+		handler.ServeHTTP(nil, request)
+
+		if err := bw.Flush(); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				err = errors.Wrap(err)
+				server.EnvLocal.CancelWithError(err)
 			}
 
 			return
 		}
+	}
+}
 
-		response := server.ServeRequest(
-			Request{
-				MethodPath: MethodPath{
-					Method: request.Method,
-					Path:   request.URL.Path,
-				},
-				Headers: request.Header,
-				Body:    request.Body,
-			},
-		)
+type funcHandler func(Request) Response
+
+type handlerWrapper funcHandler
+
+func (server *Server) makeHandlerWithRedirect(
+	handler funcHandler,
+	out *bufio.Writer,
+) http.HandlerFunc {
+	return func(_ http.ResponseWriter, req *http.Request) {
+		request := Request{
+			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
+			Headers:    req.Header,
+			Body:       req.Body,
+		}
+
+		response := handler(request)
+
+		if response.StatusCode == 0 {
+			response.StatusCode = http.StatusOK
+		}
 
 		if response.StatusCode == 0 {
 			response.StatusCode = http.StatusOK
@@ -198,60 +254,55 @@ func (server Server) ServeStdio() (err error) {
 		responseModified := &http.Response{
 			// ContentLength:    -1,
 			TransferEncoding: []string{"chunked"},
-			ProtoMajor:       request.ProtoMajor,
-			ProtoMinor:       request.ProtoMinor,
-			Request:          request,
+			ProtoMajor:       req.ProtoMajor,
+			ProtoMinor:       req.ProtoMinor,
+			Request:          req,
 			StatusCode:       response.StatusCode,
 			Body:             response.Body,
 		}
 
-		if err = responseModified.Write(bw); err != nil {
+		if err := responseModified.Write(out); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				err = errors.Wrap(err)
+				server.EnvLocal.CancelWithError(err)
 			}
-
-			return
-		}
-
-		if err = bw.Flush(); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
 		}
 	}
 }
 
-func (server Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	request := Request{
-		MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
-		Headers:    req.Header,
-		Body:       req.Body,
-	}
+func (server *Server) makeHandler(
+	handler funcHandler,
+) http.HandlerFunc {
+	return func(responseWriter http.ResponseWriter, req *http.Request) {
+		request := Request{
+			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
+			Headers:    req.Header,
+			Body:       req.Body,
+		}
 
-	response := server.ServeRequest(request)
+		response := handler(request)
 
-	if response.StatusCode == 0 {
-		response.StatusCode = http.StatusOK
-	}
+		if response.StatusCode == 0 {
+			response.StatusCode = http.StatusOK
+		}
 
-	w.WriteHeader(response.StatusCode)
+		if response.StatusCode == 0 {
+			response.StatusCode = http.StatusOK
+		}
 
-	if _, err := io.Copy(w, response.Body); err != nil {
-		server.Repo.GetEnv().CancelWithError(err)
-	}
+		responseWriter.WriteHeader(response.StatusCode)
 
-	if err := response.Body.Close(); err != nil {
-		server.Repo.GetEnv().CancelWithError(err)
+		if _, err := io.Copy(responseWriter, response.Body); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				server.EnvLocal.CancelWithError(err)
+			}
+		}
 	}
 }
 
-// TODO add path multiplexing to handle versions
 func (server Server) ServeRequest(request Request) (response Response) {
 	defer server.Repo.GetEnv().ContinueOrPanicOnDone()
 
@@ -259,169 +310,16 @@ func (server Server) ServeRequest(request Request) (response Response) {
 
 	switch request.MethodPath {
 	case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
-		var shString strings.Builder
-
-		if _, err := io.Copy(&shString, request.Body); err != nil {
-			response.ErrorWithStatus(http.StatusBadRequest, err)
-			return
-		}
-
-		var sh *sha.Sha
-
-		{
-			var err error
-
-			if sh, err = sha.MakeSha(shString.String()); err != nil {
-				response.ErrorWithStatus(http.StatusBadRequest, err)
-				return
-			}
-		}
-
-		ui.Log().Printf("blob requested: %q", sh)
-
-		if request.Method == "HEAD" {
-			if server.Repo.GetBlobStore().HasBlob(sh) {
-				response.StatusCode = http.StatusNoContent
-			} else {
-				response.StatusCode = http.StatusNotFound
-			}
-		} else {
-			var rc sha.ReadCloser
-
-			{
-				var err error
-
-				if rc, err = server.Repo.GetBlobStore().BlobReader(sh); err != nil {
-					response.Error(err)
-					return
-				}
-			}
-
-			response.Body = rc
-		}
+		response = server.handleBlobsHeadOrGet(request)
 
 	case MethodPath{"POST", "/blobs"}:
-		var wc interfaces.ShaWriteCloser
-
-		{
-			var err error
-
-			if wc, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
-				response.Error(err)
-				return
-			}
-		}
-
-		var n int64
-
-		{
-			var err error
-
-			if n, err = io.Copy(wc, request.Body); err != nil {
-				response.Error(err)
-				return
-			}
-		}
-
-		if err := wc.Close(); err != nil {
-			response.Error(err)
-			return
-		}
-
-		sh := wc.GetShaLike()
-
-		blobCopierDelegate := sku.MakeBlobCopierDelegate(
-			server.Repo.GetEnv().GetUI(),
-		)
-
-		if err := blobCopierDelegate(
-			sku.BlobCopyResult{
-				Sha: sh,
-				N:   n,
-			},
-		); err != nil {
-			response.Error(err)
-			return
-		}
-
-		response.StatusCode = http.StatusCreated
-		response.Body = io.NopCloser(strings.NewReader(sh.GetShaString()))
-
-		// 	case MethodPath{"GET", "/object"}:
-
-		// 	case MethodPath{"POST", "/object"}:
+		response = server.handleBlobsPost(request)
 
 	case MethodPath{"GET", "/inventory_lists"}:
-		if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-			var qgString strings.Builder
-
-			if _, err := io.Copy(&qgString, request.Body); err != nil {
-				response.Error(err)
-				return
-			}
-
-			var qg *query.Group
-
-			{
-				var err error
-
-				if qg, err = repo.MakeExternalQueryGroup(
-					query.BuilderOptions{},
-					sku.ExternalQueryOptions{},
-					qgString.String(),
-				); err != nil {
-					response.Error(err)
-					return
-				}
-			}
-
-			var list *sku.List
-
-			{
-				var err error
-
-				if list, err = repo.MakeInventoryList(qg); err != nil {
-					response.Error(err)
-					return
-				}
-			}
-
-			// TODO make this more performant by returning a proper reader
-			b := bytes.NewBuffer(nil)
-
-			// TODO
-			printer := repo.MakePrinterBoxArchive(b, true)
-
-			var sk *sku.Transacted
-			var hasMore bool
-
-			for {
-				server.Repo.GetEnv().ContinueOrPanicOnDone()
-
-				sk, hasMore = list.Pop()
-
-				if !hasMore {
-					break
-				}
-
-				if err := printer(sk); err != nil {
-					response.Error(err)
-					return
-				}
-			}
-
-			response.Body = io.NopCloser(b)
-		} else {
-		}
+		response = server.handleGetInventoryList(request)
 
 	case MethodPath{"POST", "/inventory_lists"}:
-		// TODO get version from header?
-		// TODO
-		if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-			response = server.writeInventoryListLocalWorkingCopy(repo, request)
-		} else {
-			response = server.writeInventoryListLocalArchive(request)
-		}
+		response = server.handlePostInventoryList(request)
 
 	default:
 		response.StatusCode = http.StatusNotFound
@@ -430,80 +328,173 @@ func (server Server) ServeRequest(request Request) (response Response) {
 	return
 }
 
-func (server *Server) writeInventoryListLocalArchive(
-	request Request,
-) (response Response) {
-	server.Repo.GetEnv().GetUI().Print("would write")
+// case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
+func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) {
+	var shString strings.Builder
+
+	if _, err := io.Copy(&shString, request.Body); err != nil {
+		response.ErrorWithStatus(http.StatusBadRequest, err)
+		return
+	}
+
+	var sh *sha.Sha
+
+	{
+		var err error
+
+		if sh, err = sha.MakeSha(shString.String()); err != nil {
+			response.ErrorWithStatus(http.StatusBadRequest, err)
+			return
+		}
+	}
+
+	ui.Log().Printf("blob requested: %q", sh)
+
+	if request.Method == "HEAD" {
+		if server.Repo.GetBlobStore().HasBlob(sh) {
+			response.StatusCode = http.StatusNoContent
+		} else {
+			response.StatusCode = http.StatusNotFound
+		}
+	} else {
+		var rc sha.ReadCloser
+
+		{
+			var err error
+
+			if rc, err = server.Repo.GetBlobStore().BlobReader(sh); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		response.Body = rc
+	}
+
 	return
 }
 
-func (server *Server) writeInventoryListLocalWorkingCopy(
-	repo *local_working_copy.Repo,
-	request Request,
-) (response Response) {
-	bf := server.Repo.GetInventoryListStore().FormatForVersion(
-		server.Repo.GetImmutableConfig().GetStoreVersion(),
-	)
+func (server *Server) handleBlobsPost(request Request) (response Response) {
+	var wc interfaces.ShaWriteCloser
 
-	list := sku.MakeList()
+	{
+		var err error
 
-	if err := inventory_list_blobs.ReadInventoryListBlob(
-		bf,
-		bufio.NewReader(request.Body),
-		list,
-	); err != nil {
+		if wc, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	var n int64
+
+	{
+		var err error
+
+		if n, err = io.Copy(wc, request.Body); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	if err := wc.Close(); err != nil {
 		response.Error(err)
 		return
 	}
 
-	b := bytes.NewBuffer(nil)
+	sh := wc.GetShaLike()
 
-	// TODO make option to read from headers
-	importerOptions := sku.ImporterOptions{
-		// TODO
-		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
-	}
-
-	if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
-		importerOptions.AllowMergeConflicts = true
-	}
-
-	importerOptions.BlobCopierDelegate = func(
-		result sku.BlobCopyResult,
-	) (err error) {
-		server.Repo.GetEnv().ContinueOrPanicOnDone()
-
-		if result.N != -1 {
-			return
-		}
-
-		sh := sha.GetPool().Get()
-		sha.GetPool().Put(sh)
-		sh.ResetWithShaLike(result.GetBlobSha())
-		fmt.Fprintf(b, "%s\n", sh)
-
-		return
-	}
-
-	// TODO
-	importer := server.Repo.MakeImporter(
-		importerOptions,
-		sku.GetStoreOptionsRemoteTransfer(),
+	blobCopierDelegate := sku.MakeBlobCopierDelegate(
+		server.Repo.GetEnv().GetUI(),
 	)
 
-	// TODO
-	if err := server.Repo.ImportList(
-		list,
-		importer,
+	if err := blobCopierDelegate(
+		sku.BlobCopyResult{
+			Sha: sh,
+			N:   n,
+		},
 	); err != nil {
 		response.Error(err)
 		return
 	}
 
 	response.StatusCode = http.StatusCreated
+	response.Body = io.NopCloser(strings.NewReader(sh.GetShaString()))
 
-	if b.Len() > 0 {
+	return
+}
+
+func (server *Server) handleGetInventoryList(request Request) (response Response) {
+	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+		var qgString strings.Builder
+
+		if _, err := io.Copy(&qgString, request.Body); err != nil {
+			response.Error(err)
+			return
+		}
+
+		var qg *query.Group
+
+		{
+			var err error
+
+			if qg, err = repo.MakeExternalQueryGroup(
+				query.BuilderOptions{},
+				sku.ExternalQueryOptions{},
+				qgString.String(),
+			); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		var list *sku.List
+
+		{
+			var err error
+
+			if list, err = repo.MakeInventoryList(qg); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		// TODO make this more performant by returning a proper reader
+		b := bytes.NewBuffer(nil)
+
+		// TODO
+		printer := repo.MakePrinterBoxArchive(b, true)
+
+		var sk *sku.Transacted
+		var hasMore bool
+
+		for {
+			server.Repo.GetEnv().ContinueOrPanicOnDone()
+
+			sk, hasMore = list.Pop()
+
+			if !hasMore {
+				break
+			}
+
+			if err := printer(sk); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
 		response.Body = io.NopCloser(b)
+	} else {
+	}
+
+	return
+}
+
+func (server *Server) handlePostInventoryList(request Request) (response Response) {
+	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+		response = server.writeInventoryListLocalWorkingCopy(repo, request)
+	} else {
+		response = server.writeInventoryList(request)
 	}
 
 	return

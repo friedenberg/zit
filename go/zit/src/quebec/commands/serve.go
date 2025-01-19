@@ -62,9 +62,7 @@ func (cmd Serve) Run(req command.Request) {
 	}
 
 	if network == "-" {
-		if err := server.ServeStdio(); err != nil {
-			envLocal.CancelWithError(err)
-		}
+		server.ServeStdio()
 	} else {
 		var listener net.Listener
 

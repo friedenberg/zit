@@ -5,7 +5,6 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
-	export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -126,6 +125,7 @@ function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
+	export BATS_TEST_BODY=true
 
 	run_zit_init_disable_age
 	run_zit pull \
