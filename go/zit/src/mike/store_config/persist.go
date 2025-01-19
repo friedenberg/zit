@@ -157,7 +157,6 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 
 func (kc *store) loadMutableConfig(
 	dirLayout env_repo.Env,
-	blobStore *typed_blob_store.Store,
 ) (err error) {
 	var f *os.File
 
@@ -183,7 +182,6 @@ func (kc *store) loadMutableConfig(
 	}
 
 	if err = kc.loadMutableConfigBlob(
-		blobStore,
 		kc.Sku.GetType(),
 		kc.Sku.GetBlobSha(),
 	); err != nil {

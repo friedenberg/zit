@@ -34,7 +34,7 @@ func (u *Repo) makeQueryBuilder() *query.Builder {
 		u.GetRepoLayout(),
 		u.GetStore().GetTypedBlobStore(),
 		u.GetStore().GetStreamIndex(),
-		u.MakeLuaVMPoolBuilder(),
+		u.envLua.MakeLuaVMPoolBuilder(),
 		u,
 	)
 }

@@ -72,13 +72,11 @@ type (
 		AddTransacted(
 			child *sku.Transacted,
 			parent *sku.Transacted,
-			ak *typed_blob_store.Store,
 		) (err error)
 
 		Initialize(
 			dirLayout env_repo.Env,
 			kcli config_mutable_cli.Config,
-			blobStore *typed_blob_store.Store,
 		) (err error)
 
 		Reset() error
@@ -129,17 +127,18 @@ func (a *store) GetMutableConfig() config_mutable_blobs.Blob {
 }
 
 func (c *store) Initialize(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 	kcli config_mutable_cli.Config,
-	blobStore *typed_blob_store.Store,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
-	c.immutable_config_private = dirLayout.GetConfig()
+	c.immutable_config_private = envRepo.GetConfig()
+
+	c.typedConfigBlobStore = typed_blob_store.MakeConfigStore(envRepo)
 
 	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = c.loadMutableConfig(dirLayout, blobStore); err != nil {
+		if err = c.loadMutableConfig(envRepo); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
@@ -189,7 +188,6 @@ func (k *store) GetTypeExtension(v string) string {
 func (k *store) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
-	ak *typed_blob_store.Store,
 ) (err error) {
 	didChange := false
 
@@ -238,7 +236,7 @@ func (k *store) AddTransacted(
 		}
 
 	case genres.Config:
-		if didChange, err = k.setTransacted(child, ak); err != nil {
+		if didChange, err = k.setTransacted(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

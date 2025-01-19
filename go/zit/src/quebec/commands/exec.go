@@ -38,7 +38,7 @@ func (cmd Exec) Run(dep command.Request) {
 	{
 		var err error
 
-		if sk, err = localWorkingCopy.GetSkuFromString(k); err != nil {
+		if sk, err = localWorkingCopy.GetEnvLua().GetSkuFromString(k); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}

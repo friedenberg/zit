@@ -35,11 +35,11 @@ func (s *Store) MakeLuaVMPoolV1WithSku(
 	return
 }
 
-func (u *Store) MakeLuaVMPoolV1(
+func (store *Store) MakeLuaVMPoolV1(
 	self *sku.Transacted,
 	script string,
 ) (vp sku.LuaVMPoolV1, err error) {
-	b := u.luaVMPoolBuilder.Clone().
+	b := store.envLua.MakeLuaVMPoolBuilder().
 		WithScript(script).
 		WithApply(tag_blobs.MakeLuaSelfApplyV1(self))
 
@@ -55,11 +55,11 @@ func (u *Store) MakeLuaVMPoolV1(
 	return
 }
 
-func (u *Store) MakeLuaVMPoolWithReader(
+func (store *Store) MakeLuaVMPoolWithReader(
 	selbst *sku.Transacted,
 	r io.Reader,
 ) (vp sku.LuaVMPoolV1, err error) {
-	b := u.luaVMPoolBuilder.Clone().
+	b := store.envLua.MakeLuaVMPoolBuilder().
 		WithReader(r).
 		WithApply(tag_blobs.MakeLuaSelfApplyV1(selbst))
 

@@ -35,7 +35,7 @@ func Genesis(
 	}
 
 	repo.Must(repo.Reset)
-	repo.Must(repo.layout.ResetCache)
+	repo.Must(repo.envRepo.ResetCache)
 
 	if err := repo.initDefaultTypeAndConfig(bb); err != nil {
 		repo.CancelWithError(err)

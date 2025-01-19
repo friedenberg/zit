@@ -48,7 +48,7 @@ type indexAbbr struct {
 	hasChanges bool
 }
 
-func newIndexAbbr(
+func NewIndexAbbr(
 	options options_print.V0,
 	dirLayout env_repo.Env,
 	p string,

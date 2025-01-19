@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
@@ -17,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
+	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
@@ -38,7 +38,7 @@ type Store struct {
 	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
 	configBlobFormat       interfaces.Format[config_mutable_blobs.Blob]
-	luaVMPoolBuilder       *lua.VMPoolBuilder
+	envLua                 env_lua.Env
 	tagLock                sync.Mutex
 
 	streamIndex   *stream_index.Index
@@ -65,39 +65,33 @@ func (c *Store) Initialize(
 	envRepo env_repo.Env,
 	pmf object_inventory_format.Format,
 	sunrise ids.Tai,
-	luaVMPoolBuilder *lua.VMPoolBuilder,
+	envLua env_lua.Env,
 	queryBuilder *query.Builder,
 	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
-	blobStore *typed_blob_store.Store,
+	typedBlobStore *typed_blob_store.Store,
 	dormantIndex *dormant_index.Index,
+	abbrStore AbbrStore,
 ) (err error) {
 	c.config = config
 	c.envRepo = envRepo
-	c.typedBlobStore = blobStore
+	c.typedBlobStore = typedBlobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
 	c.sunrise = sunrise
-	c.luaVMPoolBuilder = luaVMPoolBuilder
+	c.envLua = envLua
 	c.queryBuilder = queryBuilder
 	c.dormantIndex = dormantIndex
 
 	c.inventoryList = sku.MakeList()
 
-	if c.Abbr, err = newIndexAbbr(
-		config.GetCLIConfig().PrintOptions,
-		c.envRepo,
-		envRepo.DirCache("Abbr"),
-	); err != nil {
-		err = errors.Wrapf(err, "failed to init abbr index")
-		return
-	}
+	c.Abbr = abbrStore
 
 	if err = c.inventoryListStore.Initialize(
 		c.GetDirectoryLayout(),
 		pmf,
 		c,
-		blobStore.GetInventoryList(),
+		typedBlobStore.GetInventoryList(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -15,31 +15,37 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
 type Repo struct {
 	env_local.Env
 
+	EnvBox
+
 	sunrise ids.Tai
 
-	layout       env_repo.Env
-	fileEncoder  store_fs.FileEncoder
-	config       store_config.StoreMutable
+	envRepo     env_repo.Env
+	fileEncoder store_fs.FileEncoder
+	config      store_config.StoreMutable
+
+	storeFS      *store_fs.Store
+	storeAbbr    store.AbbrStore
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
-	blobStore         *typed_blob_store.Store
+	typedBlobStore    *typed_blob_store.Store
 	store             store.Store
 	externalStores    map[ids.RepoId]*external_store.Store
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat *box_format.BoxTransacted
+	envLua env_lua.Env
 }
 
 func Make(
@@ -73,7 +79,7 @@ func MakeWithLayout(
 	repo = &Repo{
 		config:         store_config.Make(),
 		Env:            repoLayout,
-		layout:         repoLayout,
+		envRepo:        repoLayout,
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
@@ -112,32 +118,25 @@ func (repo *Repo) initialize(
 	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
 	repo.sunrise = ids.NowTai()
 
-	repo.fileEncoder = store_fs.MakeFileEncoder(repo.layout, repo.config)
+	repo.fileEncoder = store_fs.MakeFileEncoder(repo.envRepo, repo.config)
 
 	if err = repo.dormantIndex.Load(
-		repo.layout,
+		repo.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(repo.layout.GetStoreVersion())
+	objectFormat := object_inventory_format.FormatForVersion(repo.envRepo.GetStoreVersion())
+
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
 		repo.GetEnv(),
 		repo.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(true),
 	)
 
-	repo.blobStore = typed_blob_store.Make(
-		repo.layout,
-		repo.MakeLuaVMPoolBuilder(),
-		objectFormat,
-		boxFormatArchive,
-	)
-
 	if err = repo.config.Initialize(
-		repo.layout,
+		repo.envRepo,
 		repo.GetCLIConfig(),
-		repo.blobStore,
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil
@@ -145,7 +144,7 @@ func (repo *Repo) initialize(
 			err = errors.Wrapf(
 				err,
 				"CompressionType: %q",
-				repo.layout.GetConfig().GetBlobStoreConfigImmutable().GetBlobCompression(),
+				repo.envRepo.GetConfig().GetBlobStoreConfigImmutable().GetBlobCompression(),
 			)
 			return
 		}
@@ -160,26 +159,70 @@ func (repo *Repo) initialize(
 		return
 	}
 
+	objectInventoryFormatOPtions := object_inventory_format.Options{Tai: true}
+
+	config := repo.GetConfig()
+
+	if repo.storeFS, err = store_fs.Make(
+		config,
+		repo.PrinterFDDeleted(),
+		config.GetFileExtensions(),
+		repo.GetRepoLayout(),
+		objectInventoryFormatOPtions,
+		repo.fileEncoder,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if repo.storeAbbr, err = store.NewIndexAbbr(
+		config.GetCLIConfig().PrintOptions,
+		repo.envRepo,
+		repo.envRepo.DirCache("Abbr"),
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init abbr index")
+		return
+	}
+
+	repo.EnvBox = MakeEnvBox(
+		repo.envRepo,
+		repo.storeFS,
+		repo.storeAbbr,
+	)
+
+	repo.envLua = env_lua.Make(
+		repo.envRepo,
+		repo.GetStore(),
+		repo.SkuFormatBoxTransactedNoColor(),
+	)
+
 	// for _, rb := range u.GetConfig().Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
 	// 		errors.Wrap(err)
 	// 		return
 	// 	}
 	// }
-	ofo := object_inventory_format.Options{Tai: true}
+
+	repo.typedBlobStore = typed_blob_store.Make(
+		repo.envRepo,
+		repo.envLua,
+		objectFormat,
+		boxFormatArchive,
+	)
 
 	if err = repo.store.Initialize(
 		repo.config,
-		repo.layout,
+		repo.envRepo,
 		objectFormat,
 		repo.sunrise,
-		repo.MakeLuaVMPoolBuilder(),
+		repo.envLua,
 		repo.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
-		ofo,
+		objectInventoryFormatOPtions,
 		boxFormatArchive,
-		repo.blobStore,
+		repo.typedBlobStore,
 		&repo.dormantIndex,
+		repo.storeAbbr,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -190,25 +233,9 @@ func (repo *Repo) initialize(
 		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
-	var sfs *store_fs.Store
-
-	config := repo.GetConfig()
-
-	if sfs, err = store_fs.Make(
-		config,
-		repo.PrinterFDDeleted(),
-		config.GetFileExtensions(),
-		repo.GetRepoLayout(),
-		ofo,
-		repo.fileEncoder,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	repo.externalStores = map[ids.RepoId]*external_store.Store{
 		{}: {
-			StoreLike: sfs,
+			StoreLike: repo.storeFS,
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
@@ -248,8 +275,6 @@ func (repo *Repo) initialize(
 	repo.store.SetUIDelegate(lw)
 
 	repo.storesInitialized = true
-
-	repo.luaSkuFormat = repo.SkuFormatBoxTransactedNoColor()
 
 	return
 }

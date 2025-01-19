@@ -9,15 +9,15 @@ import (
 )
 
 type mutable_config_blob struct {
+	typedConfigBlobStore typed_blob_store.Config
 	config_mutable_blobs.Blob
 }
 
 func (k *mutable_config_blob) loadMutableConfigBlob(
-	blobStore *typed_blob_store.Store,
 	mutableConfigType ids.Type,
 	blobSha interfaces.Sha,
 ) (err error) {
-	if k.Blob, _, err = blobStore.GetConfig().ParseTypedBlob(
+	if k.Blob, _, err = k.typedConfigBlobStore.ParseTypedBlob(
 		mutableConfigType,
 		blobSha,
 	); err != nil {

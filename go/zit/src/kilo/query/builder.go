@@ -14,17 +14,17 @@ import (
 
 func MakeBuilder(
 	s env_repo.Env,
-	blob_store *typed_blob_store.Store,
-	object_probe_index sku.ObjectProbeIndex,
+	typedBlobStore *typed_blob_store.Store,
+	objectProbeIndex sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
-		dirLayout:          s,
-		blob_store:         blob_store,
-		object_probe_index: object_probe_index,
-		luaVMPoolBuilder:   luaVMPoolBuilder,
-		repoGetter:         repoGetter,
+		dirLayout:        s,
+		typedBlobStore:   typedBlobStore,
+		objectProbeIndex: objectProbeIndex,
+		luaVMPoolBuilder: luaVMPoolBuilder,
+		repoGetter:       repoGetter,
 	}
 
 	return
@@ -32,8 +32,8 @@ func MakeBuilder(
 
 type Builder struct {
 	dirLayout               env_repo.Env
-	blob_store              *typed_blob_store.Store
-	object_probe_index      sku.ObjectProbeIndex
+	typedBlobStore          *typed_blob_store.Store
+	objectProbeIndex        sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId

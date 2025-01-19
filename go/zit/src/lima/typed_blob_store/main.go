@@ -1,32 +1,32 @@
 package typed_blob_store
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 )
 
 type Store struct {
 	InventoryList InventoryList
 	Repo          RepoStore
-	Config        Config
+	// Config        Config
 	Type          Type
 	Tag           Tag
 }
 
 func Make(
 	envRepo env_repo.Env,
-	luaVMPoolBuilder *lua.VMPoolBuilder,
+	envLua env_lua.Env,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
 ) *Store {
 	return &Store{
 		InventoryList: MakeInventoryStore(envRepo, objectFormat, boxFormat),
-		Tag:           MakeTagStore(envRepo, luaVMPoolBuilder),
+		Tag:           MakeTagStore(envRepo, envLua),
 		Repo:          MakeRepoStore(envRepo),
-		Config:        MakeConfigStore(envRepo),
+		// Config:        MakeConfigStore(envRepo),
 		Type:          MakeTypeStore(envRepo),
 	}
 }
@@ -39,9 +39,9 @@ func (a *Store) GetType() Type {
 	return a.Type
 }
 
-func (a *Store) GetConfig() Config {
-	return a.Config
-}
+// func (a *Store) GetConfig() Config {
+// 	return a.Config
+// }
 
 func (a *Store) GetTag() Tag {
 	return a.Tag

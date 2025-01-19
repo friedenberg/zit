@@ -9,13 +9,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
+	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
 func (u *Repo) GetEnv() env_ui.Env {
 	return u
+}
+
+func (u *Repo) GetEnvLua() env_lua.Env {
+	return u.envLua
 }
 
 func (u *Repo) GetTime() time.Time {
@@ -31,7 +36,7 @@ func (u *Repo) GetDormantIndex() *dormant_index.Index {
 }
 
 func (u *Repo) GetRepoLayout() env_repo.Env {
-	return u.layout
+	return u.envRepo
 }
 
 func (u *Repo) GetBlobStore() interfaces.BlobStore {

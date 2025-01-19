@@ -8,24 +8,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/tag_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 )
 
 type Tag struct {
-	dirLayout        env_repo.Env
-	luaVMPoolBuilder *lua.VMPoolBuilder
-	toml_v0          TypedStore[tag_blobs.V0, *tag_blobs.V0]
-	toml_v1          TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
-	lua_v1           TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
-	lua_v2           TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
+	dirLayout env_repo.Env
+	envLua    env_lua.Env
+	toml_v0   TypedStore[tag_blobs.V0, *tag_blobs.V0]
+	toml_v1   TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
+	lua_v1    TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
+	lua_v2    TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
 }
 
 func MakeTagStore(
 	dirLayout env_repo.Env,
-	luaVMPoolBuilder *lua.VMPoolBuilder,
+	envLua env_lua.Env,
 ) Tag {
 	return Tag{
-		dirLayout:        dirLayout,
-		luaVMPoolBuilder: luaVMPoolBuilder,
+		dirLayout: dirLayout,
+		envLua:    envLua,
 		toml_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
@@ -109,7 +110,7 @@ func (a Tag) GetTransactedWithBlob(
 			return
 		}
 
-		lb := a.luaVMPoolBuilder.Clone().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
 
 		var vmp *lua.VMPool
 
@@ -133,7 +134,7 @@ func (a Tag) GetTransactedWithBlob(
 
 		defer errors.DeferredCloser(&err, rc)
 
-		lb := a.luaVMPoolBuilder.Clone().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
 
 		var vmp *lua.VMPool
 
@@ -158,7 +159,7 @@ func (a Tag) GetTransactedWithBlob(
 
 		defer errors.DeferredCloser(&err, rc)
 
-		lb := a.luaVMPoolBuilder.Clone().WithApply(tag_blobs.MakeLuaSelfApplyV2(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV2(sk))
 
 		var vmp *lua.VMPool
 

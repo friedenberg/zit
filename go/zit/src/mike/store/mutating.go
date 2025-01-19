@@ -176,7 +176,6 @@ func (s *Store) Commit(
 		if err = s.config.AddTransacted(
 			child,
 			parent,
-			s.GetTypedBlobStore(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
