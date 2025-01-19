@@ -11,7 +11,6 @@ import (
 type Store struct {
 	InventoryList InventoryList
 	Repo          RepoStore
-	// Config        Config
 	Type          Type
 	Tag           Tag
 }
@@ -26,7 +25,6 @@ func Make(
 		InventoryList: MakeInventoryStore(envRepo, objectFormat, boxFormat),
 		Tag:           MakeTagStore(envRepo, envLua),
 		Repo:          MakeRepoStore(envRepo),
-		// Config:        MakeConfigStore(envRepo),
 		Type:          MakeTypeStore(envRepo),
 	}
 }
@@ -38,10 +36,6 @@ func (a *Store) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
 func (a *Store) GetType() Type {
 	return a.Type
 }
-
-// func (a *Store) GetConfig() Config {
-// 	return a.Config
-// }
 
 func (a *Store) GetTag() Tag {
 	return a.Tag
