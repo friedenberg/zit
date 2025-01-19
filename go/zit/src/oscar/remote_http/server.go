@@ -75,7 +75,7 @@ func (server Server) InitializeUnixSocket(
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := server.Repo.GetRepoLayout().GetXDG().State
+		dir := server.Repo.GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -224,35 +224,6 @@ func (server Server) ServeStdio() (err error) {
 			return
 		}
 	}
-
-	ui.Log().Print("shutdown complete")
-
-	return
-}
-
-type MethodPath struct {
-	Method string
-	Path   string
-}
-
-type Request struct {
-	MethodPath
-	Headers http.Header
-	Body    io.ReadCloser
-}
-
-type Response struct {
-	StatusCode int
-	Body       io.ReadCloser
-}
-
-func (r *Response) ErrorWithStatus(status int, err error) {
-	r.StatusCode = status
-	r.Body = io.NopCloser(strings.NewReader(err.Error()))
-}
-
-func (r *Response) Error(err error) {
-	r.ErrorWithStatus(http.StatusInternalServerError, err)
 }
 
 func (server Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -487,7 +458,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		}
 
 		// TODO
-		importer := server.Repo.GetStore().MakeImporter(
+		importer := server.Repo.MakeImporter(
 			importerOptions,
 			sku.GetStoreOptionsRemoteTransfer(),
 		)

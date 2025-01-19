@@ -24,7 +24,7 @@ import (
 
 type Client struct {
 	http.Client
-	Repo repo.WorkingCopy
+	Repo repo.Repo
 }
 
 func (repo *Client) GetEnv() env_ui.Env {

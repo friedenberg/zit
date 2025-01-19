@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
-	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
 type RoundTripperStdio struct {
@@ -20,7 +20,7 @@ type RoundTripperStdio struct {
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
-	remote *local_working_copy.Repo,
+	remote repo.Repo,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
 		err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 		"serve",
 	}
 
-	if remote.GetConfig().GetCLIConfig().Verbose {
+	if remote.GetEnv().GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 
@@ -47,7 +47,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithSSH(
-	remote *local_working_copy.Repo,
+	remote repo.Repo,
 	arg string,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("ssh"); err != nil {
@@ -62,7 +62,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 		"serve",
 	}
 
-	if remote.GetConfig().GetCLIConfig().Verbose {
+	if remote.GetEnv().GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 
@@ -77,7 +77,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 }
 
 func (roundTripper *RoundTripperStdio) initialize(
-	remote *local_working_copy.Repo,
+	remote repo.Repo,
 ) (err error) {
 	// roundTripper.Stderr = os.Stderr
 	var stderrReadCloser io.ReadCloser
@@ -91,7 +91,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			"remote",
-			remote.GetUI(),
+			remote.GetEnv().GetUI(),
 			stderrReadCloser,
 			false,
 		); err != nil {
@@ -119,7 +119,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 		return
 	}
 
-	remote.After(roundTripper.cancel)
+	remote.GetEnv().After(roundTripper.cancel)
 
 	return
 }
