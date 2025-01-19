@@ -88,7 +88,7 @@ func (c *Store) Initialize(
 	c.Abbr = abbrStore
 
 	if err = c.inventoryListStore.Initialize(
-		c.GetDirectoryLayout(),
+		c.GetEnvRepo(),
 		pmf,
 		c,
 		typedBlobStore.GetInventoryList(),
@@ -100,17 +100,17 @@ func (c *Store) Initialize(
 	if c.zettelIdIndex, err = zettel_id_index.MakeIndex(
 		// TODO
 		c.GetConfig(),
-		c.GetDirectoryLayout(),
-		c.GetDirectoryLayout(),
+		c.GetEnvRepo(),
+		c.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if c.streamIndex, err = stream_index.MakeIndex(
-		c.GetDirectoryLayout(),
+		c.GetEnvRepo(),
 		c.applyDormantAndRealizeTags,
-		c.GetDirectoryLayout().DirCacheObjects(),
+		c.GetEnvRepo().DirCacheObjects(),
 		c.sunrise,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -124,10 +124,10 @@ func (c *Store) Initialize(
 
 	c.configBlobFormat = typed_blob_store.MakeBlobFormat2(
 		typed_blob_store.MakeTextParserIgnoreTomlErrors2[config_mutable_blobs.Blob](
-			c.GetDirectoryLayout(),
+			c.GetEnvRepo(),
 		),
 		typed_blob_store.ParsedBlobTomlFormatter2[config_mutable_blobs.Blob]{},
-		c.GetDirectoryLayout(),
+		c.GetEnvRepo(),
 	)
 
 	return
@@ -136,7 +136,7 @@ func (c *Store) Initialize(
 func (s *Store) MakeSupplies() (es external_store.Supplies) {
 	es.ObjectStore = s
 
-	es.Env = s.GetDirectoryLayout()
+	es.Env = s.GetEnvRepo()
 	// es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
 
 	// es.RepoId = k
@@ -153,7 +153,7 @@ func (s *Store) SetExternalStores(
 
 	for k, es := range s.externalStores {
 		supplies := s.MakeSupplies()
-		supplies.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
+		supplies.DirCache = s.GetEnvRepo().DirCacheRepo(k.GetRepoIdString())
 		supplies.RepoId = k
 
 		es.Supplies = supplies

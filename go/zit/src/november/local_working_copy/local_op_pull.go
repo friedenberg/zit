@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
@@ -32,7 +32,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		return
 	}
 
-	importerOptions := store.ImporterOptions{
+	importerOptions := importer.ImporterOptions{
 		CheckedOutPrinter:   local.PrinterCheckedOutConflictsForRemoteTransfers(),
 		AllowMergeConflicts: options.AllowMergeConflicts,
 		ExcludeObjects:      !options.IncludeObjects,

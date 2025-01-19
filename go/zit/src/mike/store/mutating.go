@@ -82,7 +82,7 @@ func (s *Store) Commit(
 
 	ui.Log().Printf("%s -> %s", o, child)
 
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() &&
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() &&
 		(o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -45,7 +45,7 @@ func (cmd *PullBlobStore) Run(
 		query.MakeBuilderOptions(cmd),
 	)
 
-	importerOptions := store.ImporterOptions{
+	importerOptions := importer.ImporterOptions{
 		ExcludeObjects: true,
 		PrintCopies:    true,
 	}

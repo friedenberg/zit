@@ -19,7 +19,7 @@ func (s *Store) FlushInventoryList(
 		return
 	}
 
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
 		return
 	}
 
@@ -82,7 +82,7 @@ func (c *Store) Flush(
 
 	wg := errors.MakeWaitGroupParallel()
 
-	if c.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if c.GetEnvRepo().GetLockSmith().IsAcquired() {
 		gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.streamIndex.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)

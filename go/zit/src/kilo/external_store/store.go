@@ -356,3 +356,32 @@ func (s *Store) ReadCheckedOutFromTransacted(
 
 	return
 }
+
+func (s *Store) MergeCheckedOut(
+	co *sku.CheckedOut,
+	parentNegotiator sku.ParentNegotiator,
+	allowMergeConflicts bool,
+) (commitOptions sku.CommitOptions, err error) {
+	es, ok := s.StoreLike.(MergeCheckedOut)
+
+	if !ok {
+		err = makeErrUnsupportedOperation(s, &s)
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if commitOptions, err = es.MergeCheckedOut(
+		co,
+		parentNegotiator,
+		allowMergeConflicts,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

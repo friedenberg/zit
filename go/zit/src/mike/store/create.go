@@ -14,7 +14,7 @@ import (
 
 // TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "reindex",
 		}
@@ -27,7 +27,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.GetDirectoryLayout().ResetCache(); err != nil {
+	if err = s.GetEnvRepo().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,7 +74,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 	k interfaces.ObjectId,
 	sh interfaces.Sha,
 ) (t *sku.Transacted, err error) {
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
@@ -126,7 +126,7 @@ func (s *Store) RevertTo(
 		return
 	}
 
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "update many metadata",
 		}
@@ -164,7 +164,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	external := col.GetSkuExternal()
 	internal := external.GetSku()
 
-	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
+	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", internal.GetObjectId()),
 		}

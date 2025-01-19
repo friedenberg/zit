@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
@@ -461,7 +461,7 @@ func (server Server) ServeRequest(request Request) (response Response) {
 		b := bytes.NewBuffer(nil)
 
 		// TODO make option to read from headers
-		importerOptions := store.ImporterOptions{
+		importerOptions := importer.ImporterOptions{
 			// TODO
 			CheckedOutPrinter: server.Repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 		}

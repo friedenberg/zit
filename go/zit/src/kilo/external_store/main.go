@@ -55,6 +55,14 @@ type (
 		) (co *sku.CheckedOut, err error)
 	}
 
+	MergeCheckedOut interface {
+		MergeCheckedOut(
+			co *sku.CheckedOut,
+			parentNegotiator sku.ParentNegotiator,
+			allowMergeConflicts bool,
+		) (commitOptions sku.CommitOptions, err error)
+	}
+
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {

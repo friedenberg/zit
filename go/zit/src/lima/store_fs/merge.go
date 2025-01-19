@@ -18,6 +18,89 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+// TODO combine with other method in this file
+// Makes hard assumptions about the availability of the blobs associated with
+// the *sku.CheckedOut.
+func (s *Store) MergeCheckedOut(
+	co *sku.CheckedOut,
+	parentNegotiator sku.ParentNegotiator,
+	allowMergeConflicts bool,
+) (commitOptions sku.CommitOptions, err error) {
+	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
+
+	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
+		return
+	}
+
+	var conflicts checkout_mode.Mode
+
+	// TODO add checkout_mode.BlobOnly
+	if co.GetSku().Metadata.Sha().Equals(co.GetSkuExternal().Metadata.Sha()) {
+		commitOptions.StoreOptions = sku.StoreOptions{}
+		return
+	} else if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().Metadata) {
+		if !co.GetSku().Metadata.Tai.Less(co.GetSkuExternal().Metadata.Tai) {
+			// TODO implement retroactive change
+		}
+
+		return
+	} else if co.GetSku().Metadata.Blob.Equals(&co.GetSkuExternal().Metadata.Blob) {
+		conflicts = checkout_mode.MetadataOnly
+	} else {
+		conflicts = checkout_mode.MetadataAndBlob
+	}
+
+	// TODO write conflicts
+	switch conflicts {
+	case checkout_mode.BlobOnly:
+	case checkout_mode.MetadataOnly:
+	case checkout_mode.MetadataAndBlob:
+	default:
+	}
+
+	conflicted := sku.Conflicted{
+		CheckedOut: co,
+		Local:      co.GetSku(),
+		Remote:     co.GetSkuExternal(),
+	}
+
+	if err = conflicted.FindBestCommonAncestor(parentNegotiator); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var skuReplacement *sku.Transacted
+
+	// TODO pass mode / conflicts
+	if skuReplacement, err = s.MakeMergedTransacted(
+		conflicted,
+	); err != nil {
+		if sku.IsErrMergeConflict(err) {
+			err = nil
+
+			if !allowMergeConflicts {
+				if err = s.GenerateConflictMarker(
+					conflicted,
+					conflicted.CheckedOut,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			co.SetState(checked_out_state.Conflicted)
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), skuReplacement)
+
+	return
+}
+
 func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 	var original *sku.FSItem
 

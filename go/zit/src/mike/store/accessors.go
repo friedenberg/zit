@@ -62,7 +62,7 @@ func (s *Store) GetZettelIdIndex() zettel_id_index.Index {
 	return s.zettelIdIndex
 }
 
-func (s *Store) GetDirectoryLayout() env_repo.Env {
+func (s *Store) GetEnvRepo() env_repo.Env {
 	return s.envRepo
 }
 

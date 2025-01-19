@@ -5,20 +5,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 )
 
 func (u *Repo) ImportList(
 	list *sku.List,
-	importer store.Importer,
+	i importer.Importer,
 ) (err error) {
 	u.Must(u.Lock)
 
 	var hasConflicts bool
 
-	oldPrinter := importer.GetCheckedOutPrinter()
+	oldPrinter := i.GetCheckedOutPrinter()
 
-	importer.SetCheckedOutPrinter(
+	i.SetCheckedOutPrinter(
 		func(co *sku.CheckedOut) (err error) {
 			if co.GetState() == checked_out_state.Conflicted {
 				hasConflicts = true
@@ -35,7 +35,7 @@ func (u *Repo) ImportList(
 			break
 		}
 
-		if _, err = importer.Import(
+		if _, err = i.Import(
 			sk,
 		); err != nil {
 			if errors.Is(err, collections.ErrExists) {
@@ -50,7 +50,7 @@ func (u *Repo) ImportList(
 	u.Must(u.Unlock)
 
 	if hasConflicts {
-		err = store.ErrNeedsMerge
+		err = importer.ErrNeedsMerge
 	}
 
 	return

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
+	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -85,7 +85,7 @@ func (cmd Import) Run(dep command.Request) {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	importerOptions := store.ImporterOptions{
+	importerOptions := importer.ImporterOptions{
 		CheckedOutPrinter: localWorkingCopy.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
@@ -102,16 +102,16 @@ func (cmd Import) Run(dep command.Request) {
 	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies
-	importer := localWorkingCopy.MakeImporter(
+	i := localWorkingCopy.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
 	if err := localWorkingCopy.ImportList(
 		list,
-		importer,
+		i,
 	); err != nil {
-		if !errors.Is(err, store.ErrNeedsMerge) {
+		if !errors.Is(err, importer.ErrNeedsMerge) {
 			err = errors.Wrap(err)
 		}
 
