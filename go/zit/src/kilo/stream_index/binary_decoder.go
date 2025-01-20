@@ -34,8 +34,8 @@ var binaryFieldOrder = []keys.Binary{
 
 func makeBinary(s ids.Sigil) binaryDecoder {
 	return binaryDecoder{
-		PrimitiveQueryGroup: sku.MakePrimitiveQueryGroupWithSigils(s),
-		Sigil:               s,
+		queryGroup: sku.MakePrimitiveQueryGroupWithSigils(s),
+		sigil:      s,
 	}
 }
 
@@ -53,17 +53,18 @@ func makeBinaryWithQueryGroup(
 	}
 
 	return binaryDecoder{
-		PrimitiveQueryGroup: qg,
-		Sigil:               s,
+		queryGroup: qg,
+		sigil:      s,
 	}
 }
 
 type binaryDecoder struct {
 	bytes.Buffer
 	binaryField
-	ids.Sigil
-	sku.PrimitiveQueryGroup
-	io.LimitedReader
+
+	sigil         ids.Sigil
+	queryGroup    sku.PrimitiveQueryGroup
+	limitedReader io.LimitedReader
 }
 
 func (bf *binaryDecoder) readFormatExactly(
@@ -152,10 +153,10 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		contentLength64 := int64(bf.ContentLength)
 
-		bf.R = r
-		bf.N = contentLength64
+		bf.limitedReader.R = r
+		bf.limitedReader.N = contentLength64
 
-		n2, err = bf.readSigil(sk, &bf.LimitedReader)
+		n2, err = bf.readSigil(sk, &bf.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -163,7 +164,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		n2, err = bf.binaryField.ReadFrom(&bf.LimitedReader)
+		n2, err = bf.binaryField.ReadFrom(&bf.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -177,7 +178,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 		}
 
 		g := genres.Must(sk.Transacted)
-		q, ok := bf.Get(g)
+		q, ok := bf.queryGroup.Get(g)
 
 		// TODO-D4 use query to decide whether to read and inflate or skip
 		if ok {
@@ -210,14 +211,14 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		// TODO-D4 replace with buffered seeker
 		// discard the next record
-		if _, err = io.Copy(io.Discard, &bf.LimitedReader); err != nil {
+		if _, err = io.Copy(io.Discard, &bf.limitedReader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for bf.N > 0 {
-		n2, err = bf.binaryField.ReadFrom(&bf.LimitedReader)
+	for bf.limitedReader.N > 0 {
+		n2, err = bf.binaryField.ReadFrom(&bf.limitedReader)
 		n += n2
 
 		if err != nil {

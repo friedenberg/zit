@@ -473,9 +473,11 @@ func (i *Index) ReadPrimitiveQuery(
 			for !isDone() {
 				var err1 error
 
-				if err1 = p.CopyJustHistory(
+				if err1 = p.copyHistoryAndMaybeLatest(
 					qg,
 					w,
+					false,
+					false,
 				); err1 != nil {
 					if isDone() {
 						break

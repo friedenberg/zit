@@ -42,7 +42,7 @@ func (pw *writer) Flush() (err error) {
 
 	pw.ObjectIdShaMap = make(ObjectIdShaMap)
 	pw.binaryDecoder = makeBinary(ids.SigilHistory)
-	pw.binaryDecoder.Sigil = ids.SigilHistory
+	pw.binaryDecoder.sigil = ids.SigilHistory
 
 	path := pw.Path()
 

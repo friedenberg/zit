@@ -109,26 +109,19 @@ func (pt *Page) waitingToAddLen() int {
 	return pt.added.Len() + pt.addedLatest.Len()
 }
 
-func (pt *Page) CopyJustHistory(
-	s sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	return pt.copyHistoryAndMaybeLatest(s, w, false, false)
-}
-
 func (pt *Page) copyJustHistoryFrom(
-	r io.Reader,
-	s sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[skuWithRangeAndSigil],
+	reader io.Reader,
+	queryGroup sku.PrimitiveQueryGroup,
+	output interfaces.FuncIter[skuWithRangeAndSigil],
 ) (err error) {
-	dec := makeBinaryWithQueryGroup(s, ids.SigilHistory)
+	dec := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
 	var sk skuWithRangeAndSigil
 
 	for {
 		sk.Offset += sk.ContentLength
 		sk.Transacted = sku.GetTransactedPool().Get()
-		sk.ContentLength, err = dec.readFormatAndMatchSigil(r, &sk)
+		sk.ContentLength, err = dec.readFormatAndMatchSigil(reader, &sk)
 		if err != nil {
 			if errors.IsEOF(err) {
 				err = nil
@@ -139,7 +132,7 @@ func (pt *Page) copyJustHistoryFrom(
 			return
 		}
 
-		if err = w(sk); err != nil {
+		if err = output(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
