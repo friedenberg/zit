@@ -130,7 +130,7 @@ func (server Server) makeRouter(
 ) http.Handler {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/blobs", makeHandler(server.handleBlobsHeadOrGet)).
+	router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsHeadOrGet)).
 		Methods("HEAD", "GET")
 
 	router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
@@ -236,6 +236,7 @@ func (server *Server) makeHandlerWithRedirect(
 ) http.HandlerFunc {
 	return func(_ http.ResponseWriter, req *http.Request) {
 		request := Request{
+			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
 			Body:       req.Body,
@@ -276,6 +277,7 @@ func (server *Server) makeHandler(
 ) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
+			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
 			Body:       req.Body,
@@ -303,37 +305,11 @@ func (server *Server) makeHandler(
 	}
 }
 
-func (server Server) ServeRequest(request Request) (response Response) {
-	defer server.Repo.GetEnv().ContinueOrPanicOnDone()
-
-	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
-
-	switch request.MethodPath {
-	case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
-		response = server.handleBlobsHeadOrGet(request)
-
-	case MethodPath{"POST", "/blobs"}:
-		response = server.handleBlobsPost(request)
-
-	case MethodPath{"GET", "/inventory_lists"}:
-		response = server.handleGetInventoryList(request)
-
-	case MethodPath{"POST", "/inventory_lists"}:
-		response = server.handlePostInventoryList(request)
-
-	default:
-		response.StatusCode = http.StatusNotFound
-	}
-
-	return
-}
-
-// case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
 func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) {
-	var shString strings.Builder
+	shString := request.Vars()["sha"]
 
-	if _, err := io.Copy(&shString, request.Body); err != nil {
-		response.ErrorWithStatus(http.StatusBadRequest, err)
+	if shString == "" {
+		response.ErrorWithStatus(http.StatusBadRequest, errors.Errorf("empty sha"))
 		return
 	}
 
@@ -342,7 +318,7 @@ func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) 
 	{
 		var err error
 
-		if sh, err = sha.MakeSha(shString.String()); err != nil {
+		if sh, err = sha.MakeSha(shString); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}

@@ -4,6 +4,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 type MethodPath struct {
@@ -12,9 +14,14 @@ type MethodPath struct {
 }
 
 type Request struct {
+	request *http.Request
 	MethodPath
 	Headers http.Header
 	Body    io.ReadCloser
+}
+
+func (r Request) Vars() map[string]string {
+	return mux.Vars(r.request)
 }
 
 type Response struct {

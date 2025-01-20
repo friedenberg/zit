@@ -1,6 +1,7 @@
 package remote_http
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -55,8 +56,8 @@ func (client *Client) BlobReader(
 	if request, err = http.NewRequestWithContext(
 		client.GetEnv(),
 		"GET",
-		"/blobs",
-		strings.NewReader(sh.GetShaLike().GetShaString()),
+		fmt.Sprintf("/blobs/%s", sh.GetShaLike().GetShaString()),
+		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
