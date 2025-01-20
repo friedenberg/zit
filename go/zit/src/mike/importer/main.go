@@ -168,19 +168,21 @@ func (importer importer) importLeafSku(
 		return
 	}
 
-	_, err = importer.indexObject.ReadOneObjectIdTai(
-		co.GetSkuExternal().GetObjectId(),
-		co.GetSkuExternal().GetTai(),
-	)
+	if importer.indexObject != nil {
+		_, err = importer.indexObject.ReadOneObjectIdTai(
+			co.GetSkuExternal().GetObjectId(),
+			co.GetSkuExternal().GetTai(),
+		)
 
-	if err == nil {
-		err = collections.ErrExists
-		return
-	} else if collections.IsErrNotFound(err) {
-		err = nil
-	} else {
-		err = errors.Wrap(err)
-		return
+		if err == nil {
+			err = collections.ErrExists
+			return
+		} else if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	ui.TodoP4("cleanup")

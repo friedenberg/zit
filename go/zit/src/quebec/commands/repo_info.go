@@ -34,6 +34,9 @@ func (cmd RepoInfo) Run(dep command.Request) {
 		case "store-version":
 			repo.GetUI().Print(c.GetStoreVersion())
 
+		case "type":
+			repo.GetUI().Print(c.GetRepoType())
+
 		case "compression-type":
 			repo.GetUI().Print(c.GetBlobStoreConfigImmutable().GetBlobCompression())
 
