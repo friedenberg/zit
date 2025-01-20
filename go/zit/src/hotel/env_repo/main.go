@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 )
@@ -20,7 +21,8 @@ type Getter interface {
 
 type Env struct {
 	env_local.Env
-	storeConfigImmutable
+
+	config_immutable_io.ConfigLoaded
 
 	basePath              string
 	readOnlyBlobStorePath string
@@ -97,7 +99,11 @@ func Make(
 		}
 	}
 
-	if err = s.loadImmutableConfigFromFile(s.FileConfigPermanent()); err != nil {
+	r := config_immutable_io.Reader{
+		ConfigLoaded: &s.ConfigLoaded,
+	}
+
+	if err = r.ReadFromFile(s.FileConfigPermanent()); err != nil {
 		errors.Wrap(err)
 		return
 	}
@@ -120,7 +126,7 @@ func (s *Env) setupStores() (err error) {
 
 	s.ObjectStore = ObjectStore{
 		basePath:       s.basePath,
-		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.config.ImmutableConfig.GetBlobStoreConfigImmutable()),
+		Config:         env_dir.MakeConfigFromImmutableBlobConfig(s.ConfigLoaded.ImmutableConfig.GetBlobStoreConfigImmutable()),
 		DirectoryPaths: s.DirectoryPaths,
 		TemporaryFS:    s.GetTempLocal(),
 	}
@@ -158,7 +164,7 @@ func (a Env) SansObjectCompression() (b Env) {
 }
 
 func (s Env) GetConfig() config_immutable.Config {
-	return s.config.ImmutableConfig
+	return s.ConfigLoaded.ImmutableConfig
 }
 
 func (s Env) GetLockSmith() interfaces.LockSmith {
@@ -203,9 +209,9 @@ func (h Env) DataFileStoreVersion() string {
 }
 
 func (h Env) GetStoreVersion() interfaces.StoreVersion {
-	if h.config.ImmutableConfig == nil {
+	if h.ConfigLoaded.ImmutableConfig == nil {
 		return config_immutable.CurrentStoreVersion
 	} else {
-		return h.config.ImmutableConfig.GetStoreVersion()
+		return h.ConfigLoaded.ImmutableConfig.GetStoreVersion()
 	}
 }

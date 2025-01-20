@@ -21,11 +21,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type storeConfigImmutable struct {
-	config config
+type ConfigImmutableReader struct {
+	ConfigLoaded ConfigLoaded
 }
 
-func (s *storeConfigImmutable) loadImmutableConfigFromFile(p string) (err error) {
+func (s *ConfigImmutableReader) ReadFromFile(
+	p string,
+) (err error) {
 	var r io.Reader
 
 	{
@@ -46,7 +48,7 @@ func (s *storeConfigImmutable) loadImmutableConfigFromFile(p string) (err error)
 		}
 	}
 
-	if err = s.loadImmutableConfig(r); err != nil {
+	if _, err = s.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -54,32 +56,32 @@ func (s *storeConfigImmutable) loadImmutableConfigFromFile(p string) (err error)
 	return
 }
 
-func (s *storeConfigImmutable) loadImmutableConfig(r io.Reader) (err error) {
+func (s *ConfigImmutableReader) ReadFrom(r io.Reader) (n int64, err error) {
 	thr := triple_hyphen_io.Reader{
-		Metadata: metadata{config: &s.config},
-		Blob:     &s.config,
+		Metadata: metadata{ConfigLoaded: &s.ConfigLoaded},
+		Blob:     &s.ConfigLoaded,
 	}
 
-	if _, err = thr.ReadFrom(r); err != nil {
+	if n, err = thr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.config.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		s.config.ImmutableConfig.GetBlobStoreConfigImmutable(),
+	s.ConfigLoaded.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
+		s.ConfigLoaded.ImmutableConfig.GetBlobStoreConfigImmutable(),
 	)
 
 	return
 }
 
-type config struct {
+type ConfigLoaded struct {
 	ids.Type
 	ImmutableConfig          config_immutable.Config
 	BlobStoreImmutableConfig env_dir.Config
 }
 
 type metadata struct {
-	*config
+	*ConfigLoaded
 }
 
 func (m metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -115,7 +117,7 @@ func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
+func (c *ConfigLoaded) ReadFrom(r io.Reader) (n int64, err error) {
 	switch c.Type.String() {
 	case builtin_types.ImmutableConfigV1:
 		c.ImmutableConfig = &config_immutable.TomlV1{}
@@ -156,7 +158,7 @@ func (c *config) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (s *config) WriteTo(w io.Writer) (n int64, err error) {
+func (s *ConfigLoaded) WriteTo(w io.Writer) (n int64, err error) {
 	switch s.Type.String() {
 	case builtin_types.ImmutableConfigV1:
 		te := toml.NewEncoder(w)

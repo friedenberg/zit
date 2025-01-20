@@ -12,12 +12,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 )
 
 func (s *Env) Genesis(bb BigBang) {
-	s.config.Type = bb.Type
-	s.config.ImmutableConfig = bb.Config
+	s.ConfigLoaded.Type = bb.Type
+	s.ConfigLoaded.ImmutableConfig = bb.Config
 
 	if err := s.MakeDir(
 		s.DirObjectId(),
@@ -69,18 +69,15 @@ func (s *Env) Genesis(bb BigBang) {
 				defer s.MustClose(f)
 			}
 
-			thw := triple_hyphen_io.Writer{
-				Metadata: metadata{config: &s.config},
-				Blob:     &s.config,
-			}
+			writer := config_immutable_io.Writer{ConfigLoaded: &s.ConfigLoaded}
 
-			if _, err := thw.WriteTo(f); err != nil {
+			if _, err := writer.WriteTo(f); err != nil {
 				s.CancelWithError(err)
 			}
 		}
 	}
 
-	if s.config.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
+	if s.ConfigLoaded.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := s.readAndTransferLines(
 			bb.Yin,
 			filepath.Join(s.DirObjectId(), "Yin"),
