@@ -27,7 +27,7 @@ func MakeBlobStoreFromLayout(
 ) (bs blobStore, err error) {
 	bs = blobStore{
 		Config: env_dir.MakeConfigFromImmutableBlobConfig(
-			s.GetConfig().GetBlobStoreConfigImmutable(),
+			s.GetConfig().ImmutableConfig.GetBlobStoreConfigImmutable(),
 		),
 		tempFS: s.GetTempLocal(),
 	}

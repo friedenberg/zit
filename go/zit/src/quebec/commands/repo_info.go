@@ -20,7 +20,8 @@ type RepoInfo struct {
 func (cmd RepoInfo) Run(dep command.Request) {
 	args := dep.Args()
 	repo := cmd.MakeRepoLayout(dep, false)
-	c := repo.GetConfig()
+	configLoaded := repo.GetConfig()
+	c := configLoaded.ImmutableConfig
 
 	if len(args) == 0 {
 		args = []string{"store-version"}

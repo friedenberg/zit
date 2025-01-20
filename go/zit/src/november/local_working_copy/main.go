@@ -4,9 +4,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
@@ -100,7 +100,7 @@ func MakeWithLayout(
 	return
 }
 
-func (u *Repo) GetImmutableConfig() config_immutable.Config {
+func (u *Repo) GetImmutableConfig() config_immutable_io.ConfigLoaded {
 	return u.GetRepoLayout().GetConfig()
 }
 
@@ -146,7 +146,7 @@ func (repo *Repo) initialize(
 			err = errors.Wrapf(
 				err,
 				"CompressionType: %q",
-				repo.envRepo.GetConfig().GetBlobStoreConfigImmutable().GetBlobCompression(),
+				repo.envRepo.GetConfig().ImmutableConfig.GetBlobStoreConfigImmutable().GetBlobCompression(),
 			)
 			return
 		}

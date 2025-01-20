@@ -18,7 +18,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	request Request,
 ) (response Response) {
 	bf := server.Repo.GetInventoryListStore().FormatForVersion(
-		server.Repo.GetImmutableConfig().GetStoreVersion(),
+		server.Repo.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
 	)
 
 	list := sku.MakeList()

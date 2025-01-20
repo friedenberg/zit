@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
@@ -31,7 +32,7 @@ func (repo *Client) GetEnv() env_ui.Env {
 	return repo.Repo.GetEnv()
 }
 
-func (u *Client) GetImmutableConfig() config_immutable.Config {
+func (u *Client) GetImmutableConfig() config_immutable_io.ConfigLoaded {
 	return u.Repo.GetImmutableConfig()
 }
 
@@ -89,7 +90,7 @@ func (client *Client) MakeInventoryList(
 	}
 
 	bf := client.Repo.GetInventoryListStore().FormatForVersion(
-		client.Repo.GetImmutableConfig().GetStoreVersion(),
+		client.Repo.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
 	)
 
 	list = sku.MakeList()

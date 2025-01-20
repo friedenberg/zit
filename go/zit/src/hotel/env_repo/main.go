@@ -163,8 +163,8 @@ func (a Env) SansObjectCompression() (b Env) {
 	return
 }
 
-func (s Env) GetConfig() config_immutable.Config {
-	return s.ConfigLoaded.ImmutableConfig
+func (s Env) GetConfig() config_immutable_io.ConfigLoaded {
+	return s.ConfigLoaded
 }
 
 func (s Env) GetLockSmith() interfaces.LockSmith {
