@@ -20,8 +20,7 @@ type Getter interface {
 
 type Env struct {
 	env_local.Env
-
-	config config
+	storeConfigImmutable
 
 	basePath              string
 	readOnlyBlobStorePath string
@@ -98,7 +97,9 @@ func Make(
 		}
 	}
 
-	if err = s.loadImmutableConfig(); err != nil {
+	if err = s.loadImmutableConfigFromFile(s.FileConfigPermanent()); err != nil {
+		errors.Wrap(err)
+		return
 	}
 
 	if err = s.setupStores(); err != nil {

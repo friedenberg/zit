@@ -21,13 +21,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-func (s *Env) loadImmutableConfig() (err error) {
+type storeConfigImmutable struct {
+	config config
+}
+
+func (s *storeConfigImmutable) loadImmutableConfigFromFile(p string) (err error) {
 	var r io.Reader
 
 	{
 		var f *os.File
 
-		if f, err = files.OpenExclusiveReadOnly(s.FileConfigPermanent()); err != nil {
+		if f, err = files.OpenExclusiveReadOnly(p); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 				r = bytes.NewBuffer(nil)
@@ -42,6 +46,15 @@ func (s *Env) loadImmutableConfig() (err error) {
 		}
 	}
 
+	if err = s.loadImmutableConfig(r); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *storeConfigImmutable) loadImmutableConfig(r io.Reader) (err error) {
 	thr := triple_hyphen_io.Reader{
 		Metadata: metadata{config: &s.config},
 		Blob:     &s.config,

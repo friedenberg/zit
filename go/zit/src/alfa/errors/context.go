@@ -145,18 +145,10 @@ func (c *context) Run(f func(Context)) error {
 		defer c.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
-				var err error
-
-				{
-					var ok bool
-
-					if err, ok = r.(error); !ok {
-						panic(r)
-					}
-				}
-
-				if !Is(err, errContextCancelledExpected{}) {
-					panic(err)
+				if err, ok := r.(error); !ok {
+					panic(r)
+				} else {
+					c.cancel(err)
 				}
 			}
 		}()
