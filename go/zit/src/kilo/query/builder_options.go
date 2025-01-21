@@ -17,17 +17,28 @@ type DefaultGenresGetter interface {
 }
 
 type BuilderOptionGetter interface {
-	GetQueryBuilderOptions() BuilderOptions
+	GetQueryBuilderOptions() builderOptionsInterfaces
 }
 
-type BuilderOptions struct {
+type BuilderOptions interface {
+	Apply(*Builder) *Builder
+}
+
+type BuilderOptionDefaultGenre ids.Genre
+
+func (options BuilderOptionDefaultGenre) Apply(b *Builder) *Builder {
+	b = b.WithDefaultGenres(ids.Genre(options))
+	return b
+}
+
+type builderOptionsInterfaces struct {
 	QueryBuilderModifier
 	DefaultSigilGetter
 	DefaultGenresGetter
 }
 
-func MakeBuilderOptions(o any) BuilderOptions {
-	var options BuilderOptions
+func MakeBuilderOptions(o any) builderOptionsInterfaces {
+	var options builderOptionsInterfaces
 
 	if dgg, ok := o.(DefaultGenresGetter); ok {
 		options.DefaultGenresGetter = dgg
@@ -42,4 +53,20 @@ func MakeBuilderOptions(o any) BuilderOptions {
 	}
 
 	return options
+}
+
+func (options builderOptionsInterfaces) Apply(b *Builder) *Builder {
+	if options.DefaultGenresGetter != nil {
+		b = b.WithDefaultGenres(options.DefaultGenres())
+	}
+
+	if options.DefaultSigilGetter != nil {
+		b.WithDefaultSigil(options.DefaultSigil())
+	}
+
+	if options.QueryBuilderModifier != nil {
+		options.ModifyBuilder(b)
+	}
+
+	return b
 }

@@ -415,7 +415,7 @@ func (server *Server) handleGetInventoryList(request Request) (response Response
 			var err error
 
 			if qg, err = repo.MakeExternalQueryGroup(
-				query.BuilderOptions{},
+				nil,
 				sku.ExternalQueryOptions{},
 				qgString.String(),
 			); err != nil {

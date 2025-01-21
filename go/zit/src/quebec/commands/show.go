@@ -47,11 +47,7 @@ func (cmd *Show) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Show) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
-		genres.Zettel,
 		genres.Tag,
-		genres.Type,
-		genres.InventoryList,
-		genres.Repo,
 	)
 }
 
@@ -74,14 +70,14 @@ func (cmd Show) Run(req command.Request) {
 			cmd.CompleteWithRepo(req, cmd, localWorkingCopy, args...)
 
 		default:
-			qg := cmd.MakeQueryGroup(
+			queryGroup := cmd.MakeQueryGroup(
 				req,
 				query.MakeBuilderOptions(cmd),
 				localWorkingCopy,
 				args,
 			)
 
-			cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, qg)
+			cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, queryGroup)
 		}
 	} else {
 		if len(args) != 0 {

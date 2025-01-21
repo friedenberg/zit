@@ -14,9 +14,12 @@ teardown() {
 function complete_show { # @test
 	run_zit show -complete
 	assert_success
-	assert_output_unsorted --regexp - <<-EOM
-		one/dos.*Zettel: !md wow ok again
-		one/uno.*Zettel: !md wow the first
+	assert_output_unsorted --regexp - <<-'EOM'
+		tag-1.*Etikett
+		tag-2.*Etikett
+		tag-3.*Etikett
+		tag-4.*Etikett
+		tag.*Etikett
 	EOM
 }
 

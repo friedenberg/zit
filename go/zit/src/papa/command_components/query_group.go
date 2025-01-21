@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -59,15 +60,15 @@ func (c QueryGroup) CompleteWithRepo(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer local.MustClose(w)
 
-	qg := c.MakeQueryGroup(
+	queryGroup := c.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionDefaultGenre(ids.MakeGenre(genres.Tag)),
 		local,
 		args,
 	)
 
 	if err := local.GetStore().QueryTransacted(
-		qg,
+		queryGroup,
 		w.WriteOneTransacted,
 	); err != nil {
 		local.CancelWithError(err)

@@ -76,16 +76,8 @@ func (b *Builder) makeState() *buildState {
 }
 
 func (b *Builder) WithOptions(options BuilderOptions) *Builder {
-	if options.DefaultGenresGetter != nil {
-		b = b.WithDefaultGenres(options.DefaultGenres())
-	}
-
-	if options.DefaultSigilGetter != nil {
-		b.WithDefaultSigil(options.DefaultSigil())
-	}
-
-	if options.QueryBuilderModifier != nil {
-		options.ModifyBuilder(b)
+	if options != nil {
+		b = options.Apply(b)
 	}
 
 	return b
