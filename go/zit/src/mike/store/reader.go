@@ -44,30 +44,30 @@ func (s *Store) ReadOneObjectId(
 // TODO add support for cwd and sigil
 // TODO simplify
 func (s *Store) ReadOneInto(
-	k1 interfaces.ObjectId,
+	objectId interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
 	var sk *sku.Transacted
 
-	switch k1.GetGenre() {
+	switch objectId.GetGenre() {
 	case genres.Zettel:
-		var h *ids.ZettelId
+		var zettelId *ids.ZettelId
 
-		if h, err = s.GetAbbrStore().ZettelId().ExpandString(
-			k1.String(),
+		if zettelId, err = s.GetAbbrStore().ZettelId().ExpandString(
+			objectId.String(),
 		); err == nil {
-			k1 = h
+			objectId = zettelId
 		} else {
 			err = nil
 		}
 
-		if sk, err = s.ReadOneObjectId(h); err != nil {
+		if sk, err = s.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Type, genres.Tag, genres.Repo, genres.InventoryList:
-		if sk, err = s.ReadOneObjectId(k1); err != nil {
+		if sk, err = s.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -82,23 +82,23 @@ func (s *Store) ReadOneInto(
 	case genres.Blob:
 		var oid ids.ObjectId
 
-		if err = oid.SetWithIdLike(k1); err != nil {
-			err = collections.MakeErrNotFound(k1)
+		if err = oid.SetWithIdLike(objectId); err != nil {
+			err = collections.MakeErrNotFound(objectId)
 			return
 		}
 
-		if sk, err = s.ReadOneObjectId(k1); err != nil {
+		if sk, err = s.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		err = genres.MakeErrUnsupportedGenre(k1)
+		err = genres.MakeErrUnsupportedGenre(objectId)
 		return
 	}
 
 	if sk == nil {
-		err = collections.MakeErrNotFound(k1)
+		err = collections.MakeErrNotFound(objectId)
 		return
 	}
 

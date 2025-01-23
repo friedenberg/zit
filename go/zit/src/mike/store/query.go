@@ -40,6 +40,23 @@ func (s *Store) QueryTransacted(
 		return
 	}
 
+	var sk *sku.Transacted
+
+	switch {
+	case false:
+		if sk, err = e.ExecuteExactlyOne(); err != nil {
+			err = nil
+			break
+		}
+
+		if err = f(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	if err = e.ExecuteTransacted(f); err != nil {
 		err = errors.Wrap(err)
 		return
