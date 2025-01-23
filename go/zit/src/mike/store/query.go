@@ -43,8 +43,8 @@ func (s *Store) QueryTransacted(
 	var sk *sku.Transacted
 
 	switch {
-	case false:
-		if sk, err = e.ExecuteExactlyOne(); err != nil {
+	case true:
+		if sk, err = e.ExecuteExactlyOneExternal(); err != nil {
 			err = nil
 			break
 		}

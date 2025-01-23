@@ -7,13 +7,13 @@ import (
 )
 
 func (s *Store) ReadExternalLikeFromObjectId(
-	o sku.CommitOptions,
-	oid interfaces.Stringer,
+	commitOptions sku.CommitOptions,
+	objectId interfaces.Stringer,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
 	var results []*sku.FSItem
 
-	oidString := s.keyForObjectIdString(oid.String())
+	oidString := s.keyForObjectIdString(objectId.String())
 
 	if results, err = s.dirItems.getFDsForObjectIdString(
 		oidString,
@@ -33,7 +33,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 		err = errors.Errorf(
 			"more than one FSItem (%q) matches object id (%q).",
 			results,
-			oid,
+			objectId,
 		)
 
 		return
@@ -41,7 +41,11 @@ func (s *Store) ReadExternalLikeFromObjectId(
 
 	item := results[0]
 
-	if external, err = s.ReadExternalFromItem(o, item, internal); err != nil {
+	if external, err = s.ReadExternalFromItem(
+		commitOptions,
+		item,
+		internal,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

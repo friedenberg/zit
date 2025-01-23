@@ -54,11 +54,10 @@ func MakeExecutorWithExternalStore(
 	}
 }
 
-func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
-	var k ids.ObjectIdLike
-	var s ids.Sigil
+func (executor *Executor) ExecuteExactlyOneExternal() (sk *sku.Transacted, err error) {
+	var externalObjectId ids.ExternalObjectIdLike
 
-	if k, s, err = e.Group.GetExactlyOneObjectId(
+	if externalObjectId, _, err = executor.Group.GetExactlyOneExternalObjectId(
 		genres.Zettel,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -67,29 +66,59 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 
 	sk = sku.GetTransactedPool().Get()
 
-	switch id := k.(type) {
-	case *ids.ObjectId:
-		if err = e.ExecutionInfo.FuncReadOneInto(id, sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case *ids.ExternalObjectId:
-	}
-
-	if !s.IncludesExternal() {
-		return
-	}
-
 	var external sku.ExternalLike
 
-	if external, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(
+	if external, err = executor.ReadExternalLikeFromObjectId(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
 			},
 		},
-		k,
+		externalObjectId,
+		sk,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if external != nil {
+		sku.TransactedResetter.ResetWith(sk, external.GetSku())
+	}
+
+	return
+}
+
+func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
+	var objectId *ids.ObjectId
+	var sigil ids.Sigil
+
+	if objectId, sigil, err = executor.Group.GetExactlyOneObjectId(
+		genres.Zettel,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sk = sku.GetTransactedPool().Get()
+
+	if err = executor.ExecutionInfo.FuncReadOneInto(objectId, sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !sigil.IncludesExternal() {
+		return
+	}
+
+	var external sku.ExternalLike
+
+	if external, err = executor.ReadExternalLikeFromObjectId(
+		sku.CommitOptions{
+			StoreOptions: sku.StoreOptions{
+				UpdateTai: true,
+			},
+		},
+		objectId,
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)

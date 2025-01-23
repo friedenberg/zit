@@ -91,42 +91,101 @@ func (qg *Group) IsExactlyOneObjectId() bool {
 	return true
 }
 
-func (qg *Group) GetExactlyOneObjectId(
-	g genres.Genre,
-) (k ids.ObjectIdLike, s ids.Sigil, err error) {
-	if len(qg.OptimizedQueries) != 1 {
+func (queryGroup *Group) GetExactlyOneExternalObjectId(
+	genre genres.Genre,
+) (objectId ids.ExternalObjectIdLike, sigil ids.Sigil, err error) {
+	if len(queryGroup.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 genre query but got %d",
-			len(qg.OptimizedQueries),
+			len(queryGroup.OptimizedQueries),
 		)
 
 		return
 	}
 
-	q, ok := qg.OptimizedQueries[g]
+	query, ok := queryGroup.OptimizedQueries[genre]
 
 	if !ok {
-		err = errors.Errorf("expected to have genre %q", g)
+		err = errors.Errorf("expected to have genre %q", genre)
 		return
 	}
 
-	oids := q.ObjectIds
+	if query.Sigil.ContainsOneOf(ids.SigilHistory) {
+		err = errors.Errorf(
+			"sigil (%s) includes history, which may return multiple objects",
+			query.Sigil,
+		)
+
+		return
+	}
+
+	oids := query.ObjectIds
 	oidsLen := len(oids)
 
-	eoids := q.ExternalObjectIds
+	eoids := query.ExternalObjectIds
 	eoidsLen := len(eoids)
 
 	switch {
 	case eoidsLen == 1 && oidsLen == 0:
 		for _, k1 := range eoids {
-			k = k1.GetExternalObjectId()
+			objectId = k1.GetExternalObjectId()
 		}
 
-		s.Add(ids.SigilExternal)
+		sigil.Add(ids.SigilExternal)
 
+	default:
+		err = errors.Errorf(
+			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids",
+			oidsLen,
+			eoidsLen,
+		)
+
+		return
+	}
+
+	sigil = query.GetSigil()
+
+	return
+}
+
+func (queryGroup *Group) GetExactlyOneObjectId(
+	genre genres.Genre,
+) (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
+	if len(queryGroup.OptimizedQueries) != 1 {
+		err = errors.Errorf(
+			"expected exactly 1 genre query but got %d",
+			len(queryGroup.OptimizedQueries),
+		)
+
+		return
+	}
+
+	query, ok := queryGroup.OptimizedQueries[genre]
+
+	if !ok {
+		err = errors.Errorf("expected to have genre %q", genre)
+		return
+	}
+
+	if query.Sigil.ContainsOneOf(ids.SigilHistory) {
+		err = errors.Errorf(
+			"sigil (%s) includes history, which may return multiple objects",
+			query.Sigil,
+		)
+
+		return
+	}
+
+	oids := query.ObjectIds
+	oidsLen := len(oids)
+
+	eoids := query.ExternalObjectIds
+	eoidsLen := len(eoids)
+
+	switch {
 	case eoidsLen == 0 && oidsLen == 1:
 		for _, k1 := range oids {
-			k = k1.GetObjectId()
+			objectId = k1.GetObjectId()
 		}
 
 	default:
@@ -139,7 +198,7 @@ func (qg *Group) GetExactlyOneObjectId(
 		return
 	}
 
-	s = q.GetSigil()
+	sigil = query.GetSigil()
 
 	return
 }
