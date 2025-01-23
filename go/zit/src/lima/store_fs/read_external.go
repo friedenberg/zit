@@ -13,8 +13,10 @@ func (s *Store) ReadExternalLikeFromObjectId(
 ) (external sku.ExternalLike, err error) {
 	var results []*sku.FSItem
 
+	oidString := s.keyForObjectIdString(oid.String())
+
 	if results, err = s.dirItems.getFDsForObjectIdString(
-		oid.String(),
+		oidString,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

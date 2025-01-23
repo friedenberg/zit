@@ -139,16 +139,20 @@ func (d *dirItems) walkDir(
 
 func (d *dirItems) addPathAndDirEntry(
 	cache map[string]*sku.FSItem,
-	p string,
-	de fs.DirEntry,
+	path string,
+	dirEntry fs.DirEntry,
 ) (key string, fds *sku.FSItem, err error) {
-	if de.IsDir() {
+	if dirEntry.IsDir() {
 		return
 	}
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPathAndDirEntry(p, de, d.repoLayout); err != nil {
+	if fdee, err = fd.MakeFromPathAndDirEntry(
+		path,
+		dirEntry,
+		d.repoLayout,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,12 +173,19 @@ func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 		return
 	}
 
-	var ok bool
+	key = d.keyForObjectIdString(rel)
 
-	key, _, ok = strings.Cut(rel, ".")
+	return
+}
+
+func (d *dirItems) keyForObjectIdString(
+	oidString string,
+) (key string) {
+	var ok bool
+	key, _, ok = strings.Cut(oidString, ".")
 
 	if !ok {
-		key = rel
+		key = oidString
 	}
 
 	return
@@ -182,13 +193,13 @@ func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 
 func (d *dirItems) addFD(
 	cache map[string]*sku.FSItem,
-	f *fd.FD,
+	fileDescriptor *fd.FD,
 ) (key string, fds *sku.FSItem, err error) {
-	if f.IsDir() {
+	if fileDescriptor.IsDir() {
 		return
 	}
 
-	if key, err = d.keyForFD(f); err != nil {
+	if key, err = d.keyForFD(fileDescriptor); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -198,7 +209,7 @@ func (d *dirItems) addFD(
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
-		fds.Add(f)
+		fds.Add(fileDescriptor)
 	} else {
 		var ok bool
 		fds, ok = cache[key]
@@ -209,7 +220,7 @@ func (d *dirItems) addFD(
 			}
 		}
 
-		fds.Add(f)
+		fds.Add(fileDescriptor)
 		cache[key] = fds
 	}
 
