@@ -55,7 +55,7 @@ func MakeExecutorWithExternalStore(
 }
 
 func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
-	var k *ids.ObjectId
+	var k ids.ObjectIdLike
 	var s ids.Sigil
 
 	if k, s, err = e.Group.GetExactlyOneObjectId(
@@ -67,18 +67,23 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 
 	sk = sku.GetTransactedPool().Get()
 
-	if err = e.ExecutionInfo.FuncReadOneInto(k, sk); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch id := k.(type) {
+	case *ids.ObjectId:
+		if err = e.ExecutionInfo.FuncReadOneInto(id, sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case *ids.ExternalObjectId:
 	}
 
 	if !s.IncludesExternal() {
 		return
 	}
 
-	var ze sku.ExternalLike
+	var external sku.ExternalLike
 
-	if ze, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(
+	if external, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
@@ -91,8 +96,8 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 		return
 	}
 
-	if ze != nil {
-		sku.TransactedResetter.ResetWith(sk, ze.GetSku())
+	if external != nil {
+		sku.TransactedResetter.ResetWith(sk, external.GetSku())
 	}
 
 	return

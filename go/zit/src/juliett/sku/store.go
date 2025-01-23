@@ -55,7 +55,7 @@ type (
 	ExternalStoreReadExternalLikeFromObjectId interface {
 		ReadExternalLikeFromObjectId(
 			o CommitOptions,
-			k1 interfaces.ObjectId,
+			oid interfaces.Stringer,
 			t *Transacted,
 		) (e ExternalLike, err error)
 	}

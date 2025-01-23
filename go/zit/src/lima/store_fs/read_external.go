@@ -8,7 +8,7 @@ import (
 
 func (s *Store) ReadExternalLikeFromObjectId(
 	o sku.CommitOptions,
-	oid interfaces.ObjectId,
+	oid interfaces.Stringer,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
 	var results []*sku.FSItem

@@ -93,7 +93,7 @@ func (qg *Group) IsExactlyOneObjectId() bool {
 
 func (qg *Group) GetExactlyOneObjectId(
 	g genres.Genre,
-) (k *ids.ObjectId, s ids.Sigil, err error) {
+) (k ids.ObjectIdLike, s ids.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 genre query but got %d",
@@ -110,26 +110,36 @@ func (qg *Group) GetExactlyOneObjectId(
 		return
 	}
 
-	kn := q.ObjectIds
-	lk := len(kn)
+	oids := q.ObjectIds
+	oidsLen := len(oids)
 
-	if lk != 1 {
-		err = errors.Errorf("expected to exactly 1 object id but got %d", lk)
+	eoids := q.ExternalObjectIds
+	eoidsLen := len(eoids)
+
+	switch {
+	case eoidsLen == 1 && oidsLen == 0:
+		for _, k1 := range eoids {
+			k = k1.GetExternalObjectId()
+		}
+
+		s.Add(ids.SigilExternal)
+
+	case eoidsLen == 0 && oidsLen == 1:
+		for _, k1 := range oids {
+			k = k1.GetObjectId()
+		}
+
+	default:
+		err = errors.Errorf(
+			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids",
+			oidsLen,
+			eoidsLen,
+		)
+
 		return
 	}
 
 	s = q.GetSigil()
-
-	for _, k1 := range kn {
-		k = k1.GetObjectId()
-
-		// TODO
-		// if k1.External {
-		// 	s.Add(ids.SigilExternal)
-		// }
-
-		break
-	}
 
 	return
 }

@@ -135,7 +135,10 @@ build-go-binary:
 
 build-go: build-go-generate build-go-binary
 
-build: build-go
+build-nix:
+  nix build
+
+build: build-go build-nix
 
 #    ____ _               _
 #   / ___| |__   ___  ___| | __

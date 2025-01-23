@@ -43,7 +43,7 @@
             pname = "zit";
             version = "0.0.0";
             src = ./.;
-            vendorHash = "sha256-kBa31IFXDkb1o0SO8EIuhvkvHFVqvOD3Tdn1JtP43Qc=";
+            vendorHash = "sha256-k4Bfm67zwX+afLFEDIARlauk70pzXSTirczr/9/vgUw=";
           };
 
           devShells.default = pkgs.mkShell {
