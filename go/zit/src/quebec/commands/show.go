@@ -26,7 +26,7 @@ func init() {
 }
 
 type Show struct {
-	command_components.RepoLayout
+	command_components.EnvRepo
 	command_components.LocalArchive
 	command_components.QueryGroup
 
@@ -36,7 +36,7 @@ type Show struct {
 }
 
 func (cmd *Show) SetFlagSet(f *flag.FlagSet) {
-	cmd.RepoLayout.SetFlagSet(f)
+	cmd.EnvRepo.SetFlagSet(f)
 	cmd.LocalArchive.SetFlagSet(f)
 	cmd.QueryGroup.SetFlagSet(f)
 
@@ -58,7 +58,7 @@ func (cmd Show) DefaultGenres() ids.Genre {
 }
 
 func (cmd Show) Run(req command.Request) {
-	repoLayout := cmd.MakeRepoLayout(req, false)
+	repoLayout := cmd.MakeEnvRepo(req, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 

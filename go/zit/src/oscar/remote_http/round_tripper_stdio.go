@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
 
 type RoundTripperStdio struct {
@@ -20,7 +20,7 @@ type RoundTripperStdio struct {
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
-	remote repo.Repo,
+	envUI env_ui.Env,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
 		err = errors.Wrap(err)
@@ -32,13 +32,13 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 		"serve",
 	}
 
-	if remote.GetEnv().GetCLIConfig().Verbose {
+	if envUI.GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 
 	roundTripper.Args = append(roundTripper.Args, "-")
 
-	if err = roundTripper.initialize(remote); err != nil {
+	if err = roundTripper.initialize(envUI); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -47,7 +47,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithSSH(
-	remote repo.Repo,
+	envUI env_ui.Env,
 	arg string,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("ssh"); err != nil {
@@ -62,13 +62,13 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 		"serve",
 	}
 
-	if remote.GetEnv().GetCLIConfig().Verbose {
+	if envUI.GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 
 	roundTripper.Args = append(roundTripper.Args, "-")
 
-	if err = roundTripper.initialize(remote); err != nil {
+	if err = roundTripper.initialize(envUI); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -77,7 +77,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 }
 
 func (roundTripper *RoundTripperStdio) initialize(
-	remote repo.Repo,
+	envUI env_ui.Env,
 ) (err error) {
 	// roundTripper.Stderr = os.Stderr
 	var stderrReadCloser io.ReadCloser
@@ -91,7 +91,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			"remote",
-			remote.GetEnv().GetUI(),
+			envUI.GetUI(),
 			stderrReadCloser,
 			false,
 		); err != nil {
@@ -119,7 +119,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 		return
 	}
 
-	remote.GetEnv().After(roundTripper.cancel)
+	envUI.After(roundTripper.cancel)
 
 	return
 }

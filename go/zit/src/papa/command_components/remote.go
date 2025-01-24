@@ -3,7 +3,6 @@ package command_components
 import (
 	"flag"
 	"fmt"
-	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
@@ -14,7 +13,7 @@ import (
 
 type Remote struct {
 	Env
-	RepoLayout
+	EnvRepo
 	LocalWorkingCopy
 	LocalArchive
 
@@ -29,6 +28,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 func (cmd Remote) MakeArchive(
 	req command.Request,
 	remoteArg string,
+	local repo.Repo,
 ) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
 
@@ -45,6 +45,7 @@ func (cmd Remote) MakeArchive(
 			req,
 			env,
 			remoteArg,
+      local,
 		)
 
 	case repo.RemoteTypeStdioSSH:
@@ -52,6 +53,7 @@ func (cmd Remote) MakeArchive(
 			req,
 			env,
 			remoteArg,
+			local,
 		)
 
 	case repo.RemoteTypeSocketUnix:
@@ -59,6 +61,7 @@ func (cmd Remote) MakeArchive(
 			req,
 			remoteArg,
 			env.GetOptions(),
+			local,
 		)
 
 	default:
@@ -71,6 +74,7 @@ func (cmd Remote) MakeArchive(
 func (cmd Remote) MakeRemoteWorkingCopy(
 	req command.Request,
 	remoteArg string,
+	local repo.Repo,
 ) (remote repo.WorkingCopy) {
 	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
@@ -85,6 +89,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 			req,
 			cmd.MakeEnv(req),
 			remoteArg,
+      local,
 		)
 
 	case repo.RemoteTypeStdioSSH:
@@ -92,6 +97,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 			req,
 			cmd.MakeEnv(req),
 			remoteArg,
+			local,
 		)
 
 	case repo.RemoteTypeSocketUnix:
@@ -99,6 +105,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 			req,
 			remoteArg,
 			env_ui.Options{},
+			local,
 		)
 
 	default:
@@ -112,14 +119,15 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env_ui.Options,
-) (remoteHTTP *remote_http.Client) {
+	localRepo repo.Repo,
+) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
 		xdgDotenvPath,
 		options,
 	)
 
-	envRepo := cmd.MakeRepoLayoutFromEnvLocal(envLocal)
+	envRepo := cmd.MakeEnvRepoFromEnvLocal(envLocal)
 
 	remote := cmd.MakeLocalArchive(envRepo)
 
@@ -128,18 +136,10 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		Repo:     remote,
 	}
 
-	remoteHTTP = &remote_http.Client{
-		Repo: remote,
-	}
-
 	var httpRoundTripper remote_http.RoundTripperUnixSocket
 
 	if err := httpRoundTripper.Initialize(server); err != nil {
 		req.CancelWithError(err)
-	}
-
-	remoteHTTP.Client = http.Client{
-		Transport: &httpRoundTripper,
 	}
 
 	go func() {
@@ -148,6 +148,12 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		}
 	}()
 
+	remoteHTTP = remote_http.MakeClient(
+		envLocal,
+		&httpRoundTripper,
+		localRepo.GetInventoryListStore(),
+	)
+
 	return
 }
 
@@ -155,24 +161,24 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	req command.Request,
 	env env_local.Env,
 	arg string,
-) (remoteHTTP *remote_http.Client) {
-	repoLayout := cmd.MakeRepoLayout(req, false)
-	remote := cmd.MakeLocalArchive(repoLayout)
-
-	remoteHTTP = &remote_http.Client{
-		Repo: remote,
-	}
+	local repo.Repo,
+) (remoteHTTP repo.WorkingCopy) {
+	repoLayout := cmd.MakeEnvRepo(req, false)
 
 	var httpRoundTripper remote_http.RoundTripperStdio
 
 	if err := httpRoundTripper.InitializeWithSSH(
-		remote,
+		repoLayout,
 		arg,
 	); err != nil {
 		env.CancelWithError(err)
 	}
 
-	remoteHTTP.Client.Transport = &httpRoundTripper
+	remoteHTTP = remote_http.MakeClient(
+		repoLayout,
+		&httpRoundTripper,
+		local.GetInventoryListStore(),
+	)
 
 	return
 }
@@ -181,23 +187,23 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	req command.Request,
 	env env_local.Env,
 	dir string,
-) (remoteHTTP *remote_http.Client) {
-	repoLayout := cmd.MakeRepoLayout(req, false)
-	remote := cmd.MakeLocalArchive(repoLayout)
-
-	remoteHTTP = &remote_http.Client{
-		Repo: remote,
-	}
+	localRepo repo.Repo,
+) (remoteHTTP repo.WorkingCopy) {
+	envRepo := cmd.MakeEnvRepo(req, false)
 
 	var httpRoundTripper remote_http.RoundTripperStdio
 
 	httpRoundTripper.Dir = dir
 
-	if err := httpRoundTripper.InitializeWithLocal(remote); err != nil {
+	if err := httpRoundTripper.InitializeWithLocal(envRepo); err != nil {
 		env.CancelWithError(err)
 	}
 
-	remoteHTTP.Client.Transport = &httpRoundTripper
+	remoteHTTP = remote_http.MakeClient(
+		env,
+		&httpRoundTripper,
+		localRepo.GetInventoryListStore(),
+	)
 
 	return
 }

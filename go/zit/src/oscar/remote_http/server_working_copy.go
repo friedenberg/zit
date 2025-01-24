@@ -61,13 +61,11 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		return
 	}
 
-	// TODO
 	importer := server.Repo.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsRemoteTransfer(),
 	)
 
-	// TODO
 	if err := server.Repo.ImportList(
 		list,
 		importer,

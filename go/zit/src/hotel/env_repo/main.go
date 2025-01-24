@@ -41,7 +41,6 @@ func Make(
 	o Options,
 ) (s Env, err error) {
 	s.Env = env
-
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(env_dir.EnvDir)
 	}
@@ -79,6 +78,11 @@ func Make(
 			err = errors.Wrap(ErrNotInZitDir{})
 			return
 		}
+	}
+
+	if err = s.MakeDirPerms(0o700, s.GetXDG().GetXDGPaths()...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	s.lockSmith = file_lock.New(s.FileLock())

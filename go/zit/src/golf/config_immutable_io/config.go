@@ -15,7 +15,7 @@ import (
 type ConfigLoaded struct {
 	ids.Type
 	ImmutableConfig          config_immutable.Config
-	BlobStoreImmutableConfig env_dir.Config
+	BlobStoreImmutableConfig env_dir.Config // TODO extricate from env_dir
 }
 
 func (c *ConfigLoaded) ReadFrom(r io.Reader) (n int64, err error) {

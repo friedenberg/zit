@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (client *Client) HasBlob(sh interfaces.Sha) (ok bool) {
+func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 	var request *http.Request
 
 	{
@@ -33,7 +33,7 @@ func (client *Client) HasBlob(sh interfaces.Sha) (ok bool) {
 	{
 		var err error
 
-		if response, err = client.Do(request); err != nil {
+		if response, err = client.http.Do(request); err != nil {
 			client.GetEnv().CancelWithError(err)
 		}
 	}
@@ -43,12 +43,12 @@ func (client *Client) HasBlob(sh interfaces.Sha) (ok bool) {
 	return
 }
 
-func (client *Client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (client *client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 	err = todo.Implement()
 	return
 }
 
-func (client *Client) BlobReader(
+func (client *client) BlobReader(
 	sh interfaces.Sha,
 ) (r interfaces.ShaReadCloser, err error) {
 	var request *http.Request
@@ -65,7 +65,7 @@ func (client *Client) BlobReader(
 
 	var response *http.Response
 
-	if response, err = client.Do(request); err != nil {
+	if response, err = client.http.Do(request); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

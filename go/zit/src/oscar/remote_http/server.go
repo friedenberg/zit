@@ -16,6 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -136,8 +138,14 @@ func (server Server) makeRouter(
 	router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
 		Methods("POST")
 
+	router.HandleFunc("/config-immutable", makeHandler(server.handleGetConfigImmutable)).
+		Methods("GET")
+
 	router.HandleFunc("/inventory_lists", makeHandler(server.handleGetInventoryList)).
 		Methods("GET")
+
+	router.HandleFunc("/inventory_lists/{tai}", makeHandler(server.handlePostInventoryList)).
+		Methods("POST")
 
 	router.HandleFunc("/inventory_lists", makeHandler(server.handlePostInventoryList)).
 		Methods("POST")
@@ -145,6 +153,7 @@ func (server Server) makeRouter(
 	return router
 }
 
+// TODO remove error return and use context
 func (server Server) Serve(listener net.Listener) (err error) {
 	httpServer := http.Server{
 		Handler: server.makeRouter(server.makeHandler),
@@ -467,11 +476,43 @@ func (server *Server) handleGetInventoryList(request Request) (response Response
 }
 
 func (server *Server) handlePostInventoryList(request Request) (response Response) {
+	taiString := request.Vars()["tai"]
+
+	var tai ids.Tai
+
+	if taiString != "" {
+		if err := tai.Set(taiString); err != nil {
+			response.ErrorWithStatus(http.StatusBadRequest, err)
+			return
+		}
+	}
+
 	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
 		response = server.writeInventoryListLocalWorkingCopy(repo, request)
 	} else {
 		response = server.writeInventoryList(request)
 	}
+
+	return
+}
+
+func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
+	config := server.Repo.GetImmutableConfig()
+	writer := config_immutable_io.Writer{
+		ConfigLoaded: &config_immutable_io.ConfigLoaded{
+			Type:            config.Type,
+			ImmutableConfig: config.ImmutableConfig,
+		},
+	}
+
+	var b bytes.Buffer
+
+	// TODO modify to not have to buffer
+	if _, err := writer.WriteTo(&b); err != nil {
+		server.EnvLocal.CancelWithError(err)
+	}
+
+	response.Body = io.NopCloser(&b)
 
 	return
 }

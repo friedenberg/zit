@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
-type RepoLayout struct{}
+type EnvRepo struct{}
 
-func (cmd *RepoLayout) SetFlagSet(f *flag.FlagSet) {}
+func (cmd *EnvRepo) SetFlagSet(f *flag.FlagSet) {}
 
-func (cmd RepoLayout) MakeRepoLayout(
+func (cmd EnvRepo) MakeEnvRepo(
 	dep command.Request,
 	permitNoZitDirectory bool,
 ) env_repo.Env {
@@ -50,7 +50,7 @@ func (cmd RepoLayout) MakeRepoLayout(
 	return repoLayout
 }
 
-func (cmd RepoLayout) MakeRepoLayoutFromEnvLocal(
+func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	envLocal env_local.Env,
 ) env_repo.Env {
 	var repoLayout env_repo.Env

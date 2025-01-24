@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -39,7 +40,7 @@ func (cmd Push) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	remoteArg := req.Args()[0]
-	remote := cmd.MakeArchive(req, remoteArg)
+	remote := cmd.MakeArchive(req, remoteArg, localWorkingCopy)
 
 	qg := cmd.MakeQueryGroup(
 		req,
@@ -48,9 +49,11 @@ func (cmd Push) Run(req command.Request) {
 		req.Args()[1:],
 	)
 
-	switch remote := remote.(type) {
-	case repo.WorkingCopy:
-		if err := remote.PullQueryGroupFromRemote(
+	repoType := remote.GetImmutableConfig().ImmutableConfig.GetRepoType()
+
+	switch repoType {
+	case repo_type.TypeWorkingCopy:
+		if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
 			localWorkingCopy,
 			qg,
 			cmd.WithPrintCopies(true),
@@ -58,7 +61,10 @@ func (cmd Push) Run(req command.Request) {
 			localWorkingCopy.CancelWithError(err)
 		}
 
-	case repo.Repo:
+	case repo_type.TypeArchive:
 		cmd.PushAllToArchive(req, localWorkingCopy, remote)
+
+	default:
+		req.CancelWithBadRequestf("unsupported repo type: %q", repoType)
 	}
 }

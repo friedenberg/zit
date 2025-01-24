@@ -23,42 +23,97 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
-type Client struct {
-	http.Client
-	Repo repo.Repo
-}
+func MakeClient(
+	envUI env_ui.Env,
+	transport http.RoundTripper,
+	localInventoryListStore sku.InventoryListStore,
+) *client {
+	client := &client{
+		envUI: envUI,
+		http: http.Client{
+			Transport: transport,
+		},
+		localInventoryListStore: localInventoryListStore,
+	}
 
-func (repo *Client) GetEnv() env_ui.Env {
-	return repo.Repo.GetEnv()
-}
+	client.Initialize()
 
-func (u *Client) GetImmutableConfig() config_immutable_io.ConfigLoaded {
-	return u.Repo.GetImmutableConfig()
-}
-
-func (repo *Client) GetInventoryListStore() sku.InventoryListStore {
-	return repo
-}
-
-func (client *Client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
-func (client *Client) MakeImporter(
+type client struct {
+	envUI                   env_ui.Env
+	configImmutable         config_immutable_io.ConfigLoaded
+	http                    http.Client
+	localInventoryListStore sku.InventoryListStore
+}
+
+func (client *client) Initialize() {
+	var request *http.Request
+
+	{
+		var err error
+
+		if request, err = http.NewRequestWithContext(
+			client.GetEnv(),
+			"GET",
+			"/config-immutable",
+			nil,
+		); err != nil {
+			client.envUI.CancelWithError(err)
+		}
+	}
+
+	var response *http.Response
+
+	{
+		var err error
+
+		if response, err = client.http.Do(request); err != nil {
+			client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
+		}
+	}
+
+	reader := config_immutable_io.Reader{
+		ConfigLoaded: &client.configImmutable,
+	}
+
+	if _, err := reader.ReadFrom(response.Body); err != nil {
+		client.envUI.CancelWithErrorAndFormat(err, "failed to read remote immutable config")
+	}
+}
+
+func (client *client) GetEnv() env_ui.Env {
+	return client.envUI
+}
+
+func (client *client) GetImmutableConfig() config_immutable_io.ConfigLoaded {
+	return client.configImmutable
+}
+
+func (client *client) GetInventoryListStore() sku.InventoryListStore {
+	return client
+}
+
+func (client *client) GetBlobStore() interfaces.BlobStore {
+	return client
+}
+
+func (client *client) MakeImporter(
 	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
 ) sku.Importer {
 	panic(todo.Implement())
 }
 
-func (client *Client) ImportList(
+func (client *client) ImportList(
 	list *sku.List,
 	i sku.Importer,
 ) (err error) {
 	return todo.Implement()
 }
 
-func (client *Client) MakeExternalQueryGroup(
+func (client *client) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
@@ -67,7 +122,7 @@ func (client *Client) MakeExternalQueryGroup(
 	return
 }
 
-func (client *Client) MakeInventoryList(
+func (client *client) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
 	var request *http.Request
@@ -84,13 +139,13 @@ func (client *Client) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = client.Do(request); err != nil {
+	if response, err = client.http.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
 
-	bf := client.Repo.GetInventoryListStore().FormatForVersion(
-		client.Repo.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
+	bf := client.GetInventoryListStore().FormatForVersion(
+		client.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -131,7 +186,7 @@ func (client *Client) MakeInventoryList(
 // 	return
 // }
 
-func (client *Client) PullQueryGroupFromRemote(
+func (client *client) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Group,
 	options repo.RemoteTransferOptions,
@@ -143,26 +198,27 @@ func (client *Client) PullQueryGroupFromRemote(
 	)
 }
 
-func (client *Client) pullQueryGroupFromWorkingCopy(
+func (client *client) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
-	qg *query.Group,
+	queryGroup *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
-	if list, err = remote.MakeInventoryList(qg); err != nil {
+	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO local / remote version negotiation
 
-	bf := client.Repo.GetInventoryListStore().FormatForVersion(
+	bf := client.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
 	)
 
 	b := bytes.NewBuffer(nil)
 
+	// TODO make a reader version of inventory lists to avoid allocation
 	if _, err = bf.WriteInventoryListBlob(list, b); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -187,7 +243,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
 		}
 
-		if response, err = client.Do(request); err != nil {
+		if response, err = client.http.Do(request); err != nil {
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
@@ -199,7 +255,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 		if _, err = io.Copy(&sb, response.Body); err != nil {
 		}
 
-		err = errors.Errorf("remote responded with error: %q", &sb)
+		err = errors.BadRequestf("remote responded with error: %q", &sb)
 		return
 	}
 
@@ -233,7 +289,7 @@ func (client *Client) pullQueryGroupFromWorkingCopy(
 	return
 }
 
-func (client *Client) WriteBlobToRemote(
+func (client *client) WriteBlobToRemote(
 	local repo.WorkingCopy,
 	expected *sha.Sha,
 ) (err error) {
@@ -274,7 +330,7 @@ func (client *Client) WriteBlobToRemote(
 
 	var response *http.Response
 
-	if response, err = client.Do(request); err != nil {
+	if response, err = client.http.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
@@ -304,7 +360,7 @@ func (client *Client) WriteBlobToRemote(
 	return
 }
 
-func (client *Client) ReadObjectHistory(
+func (client *client) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	err = todo.Implement()

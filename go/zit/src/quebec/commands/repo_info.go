@@ -14,12 +14,12 @@ func init() {
 }
 
 type RepoInfo struct {
-	command_components.RepoLayout
+	command_components.EnvRepo
 }
 
 func (cmd RepoInfo) Run(dep command.Request) {
 	args := dep.Args()
-	repo := cmd.MakeRepoLayout(dep, false)
+	repo := cmd.MakeEnvRepo(dep, false)
 	configLoaded := repo.GetConfig()
 	c := configLoaded.ImmutableConfig
 

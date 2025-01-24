@@ -15,7 +15,7 @@ func init() {
 }
 
 type CatBlobShas struct {
-	command_components.RepoLayout
+	command_components.EnvRepo
 }
 
 func (c CatBlobShas) CompletionGenres() ids.Genre {
@@ -25,7 +25,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 }
 
 func (c CatBlobShas) Run(dep command.Request) {
-	repoLayout := c.MakeRepoLayout(dep, false)
+	repoLayout := c.MakeEnvRepo(dep, false)
 
 	if err := repoLayout.ReadAllShasForGenre(
 		genres.Blob,

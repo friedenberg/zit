@@ -17,7 +17,7 @@ func init() {
 }
 
 type ReadBlob struct {
-	command_components.RepoLayout
+	command_components.EnvRepo
 }
 
 type readBlobEntry struct {
@@ -25,7 +25,7 @@ type readBlobEntry struct {
 }
 
 func (c ReadBlob) Run(dep command.Request) {
-	repoLayout := c.MakeRepoLayout(dep, false)
+	repoLayout := c.MakeEnvRepo(dep, false)
 
 	dec := json.NewDecoder(repoLayout.GetInFile())
 

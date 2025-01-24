@@ -72,7 +72,7 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 		env[left] = right
 	}
 
-	toInitialize := d.GetInitElements()
+	toInitialize := d.getInitElements()
 
 	for _, ie := range toInitialize {
 		if err = d.setDefaultOrEnvFromMap(
@@ -92,7 +92,7 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
 	bw := bufio.NewWriter(w)
 
-	toWrite := d.GetInitElements()
+	toWrite := d.getInitElements()
 	var n1 int
 
 	for _, e := range toWrite {

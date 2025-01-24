@@ -26,38 +26,13 @@ type xdgInitElement struct {
 	out        *string
 }
 
-func (x *XDG) GetInitElements() []xdgInitElement {
-	return []xdgInitElement{
-		{
-			standard:   "$HOME/.local/share",
-			overridden: "$HOME/local/share",
-			envKey:     "XDG_DATA_HOME",
-			out:        &x.Data,
-		},
-		{
-			standard:   "$HOME/.config",
-			overridden: "$HOME/config",
-			envKey:     "XDG_CONFIG_HOME",
-			out:        &x.Config,
-		},
-		{
-			standard:   "$HOME/.local/state",
-			overridden: "$HOME/local/state",
-			envKey:     "XDG_STATE_HOME",
-			out:        &x.State,
-		},
-		{
-			standard:   "$HOME/.cache",
-			overridden: "$HOME/cache",
-			envKey:     "XDG_CACHE_HOME",
-			out:        &x.Cache,
-		},
-		{
-			standard:   "$HOME/.local/runtime",
-			overridden: "$HOME/local/runtime",
-			envKey:     "XDG_RUNTIME_HOME",
-			out:        &x.Runtime,
-		},
+func (x XDG) GetXDGPaths() []string {
+	return []string{
+		x.Data,
+		x.Config,
+		x.State,
+		x.Cache,
+		x.Runtime,
 	}
 }
 
@@ -90,12 +65,11 @@ func (x *XDG) setDefaultOrEnv(
 }
 
 func (x *XDG) InitializeOverridden(
-	mkDir bool,
 	addedPath string,
 ) (err error) {
 	x.AddedPath = addedPath
 
-	toInitialize := x.GetInitElements()
+	toInitialize := x.getInitElements()
 
 	for _, ie := range toInitialize {
 		if *ie.out, err = x.setDefaultOrEnv(
@@ -105,25 +79,17 @@ func (x *XDG) InitializeOverridden(
 			err = errors.Wrap(err)
 			return
 		}
-
-		if mkDir {
-			if err = os.MkdirAll(*ie.out, 0o700); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
 	return
 }
 
 func (x *XDG) InitializeStandardFromEnv(
-	mkDir bool,
 	addedPath string,
 ) (err error) {
 	x.AddedPath = addedPath
 
-	toInitialize := x.GetInitElements()
+	toInitialize := x.getInitElements()
 
 	for _, ie := range toInitialize {
 		if *ie.out, err = x.setDefaultOrEnv(
@@ -132,13 +98,6 @@ func (x *XDG) InitializeStandardFromEnv(
 		); err != nil {
 			err = errors.Wrap(err)
 			return
-		}
-
-		if mkDir {
-			if err = os.MkdirAll(*ie.out, 0o700); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
 		}
 	}
 

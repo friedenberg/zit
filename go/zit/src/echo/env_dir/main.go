@@ -25,6 +25,7 @@ type Env interface {
 	GetExecPath() string
 	GetTempLocal() TemporaryFS
 	MakeDir(ds ...string) (err error)
+	MakeDirPerms(perms os.FileMode, ds ...string) (err error)
 	Rel(p string) (out string)
 	RelToCwdOrSame(p string) (p1 string)
 	MakeCommonEnv() map[string]string
@@ -132,11 +133,11 @@ func MakeWithHome(
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-		if err := xdg.InitializeOverridden(false, addedPath); err != nil {
+		if err := xdg.InitializeOverridden(addedPath); err != nil {
 			s.CancelWithError(err)
 		}
 	} else {
-		if err := xdg.InitializeStandardFromEnv(false, addedPath); err != nil {
+		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
 			s.CancelWithError(err)
 		}
 	}
@@ -172,11 +173,11 @@ func MakeWithHomeAndInitialize(
 	if cwdXDGOverride {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-		if err := xdg.InitializeOverridden(true, addedPath); err != nil {
+		if err := xdg.InitializeOverridden(addedPath); err != nil {
 			s.CancelWithError(err)
 		}
 	} else {
-		if err := xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
+		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
 			s.CancelWithError(err)
 		}
 	}
@@ -299,8 +300,12 @@ func (h env) MakeCommonEnv() map[string]string {
 }
 
 func (s env) MakeDir(ds ...string) (err error) {
+	return s.MakeDirPerms(0o755, ds...)
+}
+
+func (s env) MakeDirPerms(perms os.FileMode, ds ...string) (err error) {
 	for _, d := range ds {
-		if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
+		if err = os.MkdirAll(d, os.ModeDir|perms); err != nil {
 			err = errors.Wrapf(err, "Dir: %q", d)
 			return
 		}

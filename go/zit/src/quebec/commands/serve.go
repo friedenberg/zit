@@ -16,12 +16,12 @@ func init() {
 
 type Serve struct {
 	command_components.Env
-	command_components.RepoLayout
+	command_components.EnvRepo
 	command_components.LocalArchive
 }
 
 func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
-	cmd.RepoLayout.SetFlagSet(f)
+	cmd.EnvRepo.SetFlagSet(f)
 	cmd.LocalArchive.SetFlagSet(f)
 }
 
@@ -36,7 +36,7 @@ func (cmd Serve) Run(req command.Request) {
 		},
 	)
 
-	envRepo := cmd.MakeRepoLayoutFromEnvLocal(envLocal)
+	envRepo := cmd.MakeEnvRepoFromEnvLocal(envLocal)
 
 	repo := cmd.MakeLocalArchive(envRepo)
 

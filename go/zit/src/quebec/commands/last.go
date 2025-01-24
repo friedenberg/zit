@@ -31,7 +31,7 @@ func init() {
 }
 
 type Last struct {
-	command_components.RepoLayout
+	command_components.EnvRepo
 	command_components.LocalArchive
 
 	RepoId   ids.RepoId
@@ -41,7 +41,7 @@ type Last struct {
 }
 
 func (cmd *Last) SetFlagSet(f *flag.FlagSet) {
-	cmd.RepoLayout.SetFlagSet(f)
+	cmd.EnvRepo.SetFlagSet(f)
 	cmd.LocalArchive.SetFlagSet(f)
 
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
@@ -57,7 +57,7 @@ func (c Last) CompletionGenres() ids.Genre {
 }
 
 func (cmd Last) Run(dep command.Request) {
-	repoLayout := cmd.MakeRepoLayout(dep, false)
+	repoLayout := cmd.MakeEnvRepo(dep, false)
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 
