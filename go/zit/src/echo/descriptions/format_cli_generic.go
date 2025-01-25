@@ -32,8 +32,8 @@ func MakeCliFormatStringer(
 }
 
 func (f *formatCliStringer) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	k interfaces.Stringer,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	v := k.String()
 
@@ -42,5 +42,5 @@ func (f *formatCliStringer) WriteStringFormat(
 		v = v[:66] + "…"
 	}
 
-	return f.stringFormatWriter.WriteStringFormat(w, v)
+	return f.stringFormatWriter.WriteStringFormat(v, w)
 }

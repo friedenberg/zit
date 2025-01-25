@@ -36,8 +36,8 @@ func MakeCliFormatGeneric[T interfaces.Stringer](
 }
 
 func (f *formatCli[T]) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	k T,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
-	return f.formatCliStringer.WriteStringFormat(w, k)
+	return f.formatCliStringer.WriteStringFormat(k, w)
 }

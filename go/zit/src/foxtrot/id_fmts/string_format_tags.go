@@ -19,8 +19,8 @@ func MakeTagsReader() (f *tagsReader) {
 }
 
 func (f *tagsReader) ReadStringFormat(
-	rb *catgut.RingBuffer,
 	k ids.TagMutableSet,
+	rb *catgut.RingBuffer,
 ) (n int64, err error) {
 	flag := collections_ptr.MakeFlagCommasFromExisting(
 		collections_ptr.SetterPolicyAppend,

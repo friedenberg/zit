@@ -87,7 +87,7 @@ func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
 		repoLayout.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.WriteStringFormat(w, o)
+				return boxFormat.WriteStringFormat(o, w)
 			},
 		),
 	)

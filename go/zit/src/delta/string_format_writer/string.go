@@ -12,8 +12,8 @@ func MakeString[T ~string]() interfaces.StringFormatWriter[T] {
 }
 
 func (f *streeng[T]) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	e T,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var n1 int
 

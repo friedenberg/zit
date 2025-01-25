@@ -13,8 +13,8 @@ func MakeFunc[T any](
 type funk[T any] interfaces.FuncStringWriterFormat[T]
 
 func (f funk[T]) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	e T,
+	w interfaces.WriterAndStringWriter,
 ) (int64, error) {
 	return interfaces.FuncStringWriterFormat[T](f)(w, e)
 }

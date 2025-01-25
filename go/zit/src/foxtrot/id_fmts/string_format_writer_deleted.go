@@ -25,8 +25,8 @@ func MakeFDDeletedStringWriterFormat(
 }
 
 func (f *fdDeletedStringWriterFormat) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	fd *fd.FD,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -39,7 +39,7 @@ func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 		prefix = string_format_writer.StringWouldDelete
 	}
 
-	n2, err = f.rightAlignedWriter.WriteStringFormat(sw, prefix)
+	n2, err = f.rightAlignedWriter.WriteStringFormat(prefix, sw)
 	n += n2
 
 	if err != nil {
@@ -56,8 +56,8 @@ func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 	}
 
 	n2, err = f.fdStringFormatWriter.WriteStringFormat(
-		sw,
 		fd,
+		sw,
 	)
 	n += n2
 

@@ -51,8 +51,8 @@ func MakeCliFormatFields(
 }
 
 func (f *fieldsWriter) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	box Box,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var n1 int64
 	var n2 int

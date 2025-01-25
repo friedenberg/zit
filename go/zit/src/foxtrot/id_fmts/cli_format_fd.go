@@ -25,14 +25,14 @@ func MakeFDCliFormat(
 }
 
 func (f *fdCliFormat) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	k *fd.FD,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	// TODO-P2 add abbreviation
 
 	var n1 int64
 
-	n1, err = f.stringFormatWriter.WriteStringFormat(w, k.String())
+	n1, err = f.stringFormatWriter.WriteStringFormat(k.String(), w)
 	n += n1
 
 	if err != nil {

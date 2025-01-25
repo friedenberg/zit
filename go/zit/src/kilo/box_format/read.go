@@ -14,8 +14,8 @@ import (
 
 // TODO make this error for invalid input
 func (f *BoxTransacted) ReadStringFormat(
-	rs io.RuneScanner,
 	el *sku.Transacted,
+	rs io.RuneScanner,
 ) (n int64, err error) {
 	var ts box.Scanner
 	ts.Reset(rs)

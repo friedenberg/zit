@@ -76,8 +76,8 @@ func (av writer) write(a *Assignment) (err error) {
 		cursorExternal.Metadata.SetTags(mes)
 
 		if _, err = av.options.fmtBox.WriteStringFormat(
-			&sb,
 			cursor,
+			&sb,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

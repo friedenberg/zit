@@ -95,7 +95,7 @@ func (w *Writer) zettelToItem(
 	{
 		var sb strings.Builder
 
-		if _, err := w.organizeFmt.WriteStringFormat(&sb, z); err != nil {
+		if _, err := w.organizeFmt.WriteStringFormat(z, &sb); err != nil {
 			a = w.errorToItem(err)
 			return
 		}

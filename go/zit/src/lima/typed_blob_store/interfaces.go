@@ -32,5 +32,5 @@ type TypedStore[
 ] interface {
 	SaveBlobText(APtr) (interfaces.Sha, int64, error)
 	Format[A, APtr]
-	interfaces.BlobGetterPutter[APtr]
+	interfaces.BlobPool[APtr]
 }

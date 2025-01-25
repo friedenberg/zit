@@ -32,8 +32,8 @@ func MakeItemDeletedStringWriterFormat(
 }
 
 func (f *itemDeletedStringFormatWriter) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	o *sku.Transacted,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -46,7 +46,7 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		prefixOne = string_format_writer.StringWouldDelete
 	}
 
-	n2, err = f.rightAlignedWriter.WriteStringFormat(sw, prefixOne)
+	n2, err = f.rightAlignedWriter.WriteStringFormat(prefixOne, sw)
 	n += n2
 
 	if err != nil {
@@ -63,8 +63,8 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 	}
 
 	n2, err = f.fieldsFormatWriter.WriteStringFormat(
-		sw,
 		string_format_writer.Box{Contents: o.Metadata.Fields},
+		sw,
 	)
 	n += n2
 

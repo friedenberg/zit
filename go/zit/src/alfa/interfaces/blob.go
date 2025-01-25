@@ -87,7 +87,7 @@ type (
 		PutBlob(V)
 	}
 
-	BlobGetterPutter[
+	BlobPool[
 		V any,
 	] interface {
 		BlobGetter[V]

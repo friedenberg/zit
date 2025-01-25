@@ -22,7 +22,7 @@ func MakeDelim[T any](
 			ui.TodoP3("modify flushing behavior based on w1 being a TTY")
 			defer errors.DeferredFlusher(&err, w)
 
-			if _, err = f.WriteStringFormat(w, e); err != nil {
+			if _, err = f.WriteStringFormat(e, w); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

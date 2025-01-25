@@ -22,13 +22,13 @@ type indentedHeader struct {
 }
 
 func (f indentedHeader) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	v string,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	// n1 int
 	var n2 int64
 
-	n2, err = f.stringFormatWriter.WriteStringFormat(w, v)
+	n2, err = f.stringFormatWriter.WriteStringFormat(v, w)
 	n += n2
 
 	if err != nil {

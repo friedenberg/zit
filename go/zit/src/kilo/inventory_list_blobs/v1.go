@@ -35,7 +35,7 @@ func (s V1) WriteInventoryListBlob(
 			return
 		}
 
-		n1, err = s.Box.WriteStringFormat(bw, sk)
+		n1, err = s.Box.WriteStringFormat(sk, bw)
 		n += n1
 
 		if err != nil {
@@ -65,7 +65,7 @@ func (s V1) WriteInventoryListObject(
 	var n1 int64
 	var n2 int
 
-	n1, err = s.Box.WriteStringFormat(bw, o)
+	n1, err = s.Box.WriteStringFormat(o, bw)
 	n += n1
 
 	if err != nil {
@@ -91,7 +91,7 @@ func (s V1) ReadInventoryListObject(
 
 	r := bufio.NewReader(r1)
 
-	if n, err = s.Box.ReadStringFormat(r, o); err != nil {
+	if n, err = s.Box.ReadStringFormat(o, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,7 +108,7 @@ func (s V1) StreamInventoryListBlobSkus(
 	for {
 		o := sku.GetTransactedPool().Get()
 
-		if _, err = s.Box.ReadStringFormat(r, o); err != nil {
+		if _, err = s.Box.ReadStringFormat(o, r); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break

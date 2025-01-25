@@ -15,8 +15,8 @@ func MakeRightAligned() interfaces.StringFormatWriter[string] {
 type rightAligned struct{}
 
 func (f rightAligned) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	v string,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	diff := LenStringMax + 1 - utf8.RuneCountInString(v)
 

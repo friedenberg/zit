@@ -46,7 +46,10 @@ type textFormatter struct {
 	object_metadata.TextFormatterFamily
 }
 
-func (tf textFormatter) WriteStringFormat(w io.Writer, z *sku.Transacted) (n int64, err error) {
+func (tf textFormatter) WriteStringFormat(
+	z *sku.Transacted,
+	w io.Writer,
+) (n int64, err error) {
 	s := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: z,
 		TextFormatterOptions:       tf.options,

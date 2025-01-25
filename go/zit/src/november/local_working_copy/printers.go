@@ -28,7 +28,7 @@ func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 		repo.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return sw.WriteStringFormat(w, o)
+				return sw.WriteStringFormat(o, w)
 			},
 		),
 	)
@@ -54,7 +54,7 @@ func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut
 		repo.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.CheckedOut) (n int64, err error) {
-				return sw.WriteStringFormat(w, o)
+				return sw.WriteStringFormat(o, w)
 			},
 		),
 	)
@@ -148,7 +148,7 @@ func (u *Repo) MakePrinterBoxArchive(
 		out,
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.WriteStringFormat(w, o)
+				return boxFormat.WriteStringFormat(o, w)
 			},
 		),
 	)

@@ -45,8 +45,8 @@ type BoxCheckedOut struct {
 }
 
 func (f *BoxCheckedOut) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	co *sku.CheckedOut,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var box string_format_writer.Box
 
@@ -98,7 +98,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 		)
 	}
 
-	if n, err = f.box.WriteStringFormat(sw, box); err != nil {
+	if n, err = f.box.WriteStringFormat(box, sw); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

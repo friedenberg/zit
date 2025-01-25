@@ -74,8 +74,8 @@ type BoxTransacted struct {
 }
 
 func (f *BoxTransacted) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	sk *sku.Transacted,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var box string_format_writer.Box
 
@@ -126,7 +126,7 @@ func (f *BoxTransacted) WriteStringFormat(
 		)
 	}
 
-	if n, err = f.box.WriteStringFormat(sw, box); err != nil {
+	if n, err = f.box.WriteStringFormat(box, sw); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -14,8 +14,8 @@ func MakeQuotedString[T ~string]() interfaces.StringFormatWriter[T] {
 }
 
 func (f *quoted_streeng[T]) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	e T,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var n1 int
 

@@ -25,16 +25,16 @@ type (
 	FuncWriter              func(io.Writer) (int64, error)
 	FuncWriterFormat[T any] func(io.Writer, T) (int64, error)
 
-	StringFormatReader[T any] interface {
-		ReadStringFormat(io.Reader, T) (int64, error)
-	}
+	// StringFormatReader[T any] interface {
+	// 	ReadStringFormat(T, io.Reader) (int64, error)
+	// }
 
 	StringFormatWriter[T any] interface {
-		WriteStringFormat(WriterAndStringWriter, T) (int64, error)
+		WriteStringFormat(T, WriterAndStringWriter) (int64, error)
 	}
 
 	StringFormatReadWriter[T any] interface {
-		StringFormatReader[T]
+    DecoderFrom[T]
 		StringFormatWriter[T]
 	}
 

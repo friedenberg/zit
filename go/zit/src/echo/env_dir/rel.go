@@ -18,8 +18,8 @@ func (s env) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[
 type relativePathStringFormatWriter env
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	p string,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var n1 int
 

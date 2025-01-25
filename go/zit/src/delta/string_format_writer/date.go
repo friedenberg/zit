@@ -30,8 +30,8 @@ func MakeDefaultDatePrefixFormatWriter[T any](
 }
 
 func (f *Date[T]) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	e T,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	d := f.GetTime().Format(f.Format)
 
@@ -55,7 +55,7 @@ func (f *Date[T]) WriteStringFormat(
 
 	var n2 int64
 
-	n2, err = f.StringFormatWriter.WriteStringFormat(w, e)
+	n2, err = f.StringFormatWriter.WriteStringFormat(e, w)
 	n += n2
 
 	if err != nil {

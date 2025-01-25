@@ -27,11 +27,11 @@ func MakeColor[T any](
 }
 
 func (f *color[T]) WriteStringFormat(
-	sw interfaces.WriterAndStringWriter,
 	e T,
+	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	if f.options.OffEntirely {
-		return f.stringFormatWriter.WriteStringFormat(sw, e)
+		return f.stringFormatWriter.WriteStringFormat(e, sw)
 	}
 
 	var n1 int
@@ -45,7 +45,7 @@ func (f *color[T]) WriteStringFormat(
 	}
 
 	var n2 int64
-	n2, err = f.stringFormatWriter.WriteStringFormat(sw, e)
+	n2, err = f.stringFormatWriter.WriteStringFormat(e, sw)
 	n += n2
 
 	if err != nil {

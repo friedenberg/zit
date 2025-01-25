@@ -124,7 +124,7 @@ func (ar *reader) readOneHeading(
 
 	reader := id_fmts.MakeTagsReader()
 
-	if _, err = reader.ReadStringFormat(rb, currentTags); err != nil {
+	if _, err = reader.ReadStringFormat(currentTags, rb); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -280,8 +280,8 @@ func (ar *reader) readOneObj(
 	z.tipe = t
 
 	if _, err = ar.options.fmtBox.ReadStringFormat(
-		catgut.MakeRingBufferRuneScanner(r),
 		z.GetSkuExternal(),
+		catgut.MakeRingBufferRuneScanner(r),
 	); err != nil {
 		err = ErrorRead{
 			error:  err,

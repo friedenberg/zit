@@ -18,8 +18,8 @@ type bracketWrapped[T any] struct {
 }
 
 func (f bracketWrapped[T]) WriteStringFormat(
-	w interfaces.WriterAndStringWriter,
 	e T,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -34,7 +34,7 @@ func (f bracketWrapped[T]) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.stringFormatWriter.WriteStringFormat(w, e)
+	n2, err = f.stringFormatWriter.WriteStringFormat(e, w)
 	n += int64(n2)
 
 	if err != nil {
