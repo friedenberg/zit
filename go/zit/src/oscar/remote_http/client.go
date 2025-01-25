@@ -74,11 +74,12 @@ func (client *client) Initialize() {
 		}
 	}
 
-	reader := config_immutable_io.Reader{
-		ConfigLoaded: &client.configImmutable,
-	}
+	decoder := config_immutable_io.Coder{}
 
-	if _, err := reader.ReadFrom(response.Body); err != nil {
+	if _, err := decoder.DecodeFrom(
+		&client.configImmutable,
+		response.Body,
+	); err != nil {
 		client.envUI.CancelWithErrorAndFormat(err, "failed to read remote immutable config")
 	}
 }

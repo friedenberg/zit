@@ -103,13 +103,16 @@ func Make(
 		}
 	}
 
-	r := config_immutable_io.Reader{
-		ConfigLoaded: &s.ConfigLoaded,
-	}
+	{
+		decoder := config_immutable_io.Coder{}
 
-	if err = r.ReadFromFile(s.FileConfigPermanent()); err != nil {
-		errors.Wrap(err)
-		return
+		if err = decoder.DecodeFromFile(
+			&s.ConfigLoaded,
+			s.FileConfigPermanent(),
+		); err != nil {
+			errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = s.setupStores(); err != nil {

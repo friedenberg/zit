@@ -6,17 +6,18 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
 
-type Reader struct {
+type Decoder[O any] struct {
 	RequireMetadata bool // TODO-P4 add delimiter
-	Metadata, Blob  io.ReaderFrom
+	Metadata, Blob  interfaces.DecoderFrom[O]
 }
 
-func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
+func (mr *Decoder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.readMetadataFrom(&r)
+	n1, err = mr.readMetadataFrom(object, &r)
 	n += n1
 
 	if err != nil {
@@ -24,7 +25,7 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = mr.Blob.ReadFrom(bufio.NewReader(r))
+	n1, err = mr.Blob.DecodeFrom(object, bufio.NewReader(r))
 	n += n1
 
 	if err != nil {
@@ -35,7 +36,10 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
+func (mr *Decoder[O]) readMetadataFrom(
+	object O,
+	r *io.Reader,
+) (n int64, err error) {
 	var state readerState
 	br := bufio.NewReader(*r)
 
@@ -49,7 +53,7 @@ func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
 		return
 	}
 
-	var object_metadata ohio.PipedReader
+	var metadataPipe ohio.PipedReader
 
 	isEOF := false
 
@@ -90,11 +94,11 @@ LINE_READ_LOOP:
 
 			state += 1
 
-			object_metadata = ohio.MakePipedReaderFrom(mr.Metadata)
+			metadataPipe = ohio.MakePipedDecoder(object, mr.Metadata)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
-				if _, err = object_metadata.Close(); err != nil {
+				if _, err = metadataPipe.Close(); err != nil {
 					err = errors.Wrapf(err, "metadata read failed")
 					return
 				}
@@ -103,7 +107,7 @@ LINE_READ_LOOP:
 				break
 			}
 
-			if _, err = object_metadata.Write([]byte(rawLine)); err != nil {
+			if _, err = metadataPipe.Write([]byte(rawLine)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

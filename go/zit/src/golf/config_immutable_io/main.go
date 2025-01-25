@@ -6,16 +6,22 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type Reader struct {
-	*ConfigLoaded
+var coders = map[string]interfaces.Coder[*ConfigLoaded]{
+	builtin_types.ImmutableConfigV1: blobV1Coder{},
+	"":                              blobV0Coder{},
 }
 
-func (s *Reader) ReadFromFile(
+type Coder struct{}
+
+func (coder Coder) DecodeFromFile(
+	object *ConfigLoaded,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -38,7 +44,7 @@ func (s *Reader) ReadFromFile(
 		}
 	}
 
-	if _, err = s.ReadFrom(r); err != nil {
+	if _, err = coder.DecodeFrom(object, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,20 +52,46 @@ func (s *Reader) ReadFromFile(
 	return
 }
 
-func (s *Reader) ReadFrom(r io.Reader) (n int64, err error) {
-	thr := triple_hyphen_io.Reader{
-		Metadata: metadata{ConfigLoaded: s.ConfigLoaded},
-		Blob:     s.ConfigLoaded,
+func (Coder) DecodeFrom(
+	object *ConfigLoaded,
+	r io.Reader,
+) (n int64, err error) {
+	thr := triple_hyphen_io.Decoder[*ConfigLoaded]{
+		Metadata: MetadataCoderWithType{},
+		Blob: BlobWithType[*ConfigLoaded]{
+			Type:   &object.Type,
+			Coders: coders,
+		},
 	}
 
-	if n, err = thr.ReadFrom(r); err != nil {
+	if n, err = thr.DecodeFrom(object, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.ConfigLoaded.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		s.ConfigLoaded.ImmutableConfig.GetBlobStoreConfigImmutable(),
+	object.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
+		object.ImmutableConfig.GetBlobStoreConfigImmutable(),
 	)
+
+	return
+}
+
+func (Coder) EncodeTo(
+	object *ConfigLoaded,
+	w io.Writer,
+) (n int64, err error) {
+	thw := triple_hyphen_io.Encoder[*ConfigLoaded]{
+		Metadata: MetadataCoderWithType{},
+		Blob: BlobWithType[*ConfigLoaded]{
+			Type:   &object.Type,
+			Coders: coders,
+		},
+	}
+
+	if n, err = thw.EncodeTo(object, w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

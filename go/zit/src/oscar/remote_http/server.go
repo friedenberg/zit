@@ -498,17 +498,17 @@ func (server *Server) handlePostInventoryList(request Request) (response Respons
 
 func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
 	config := server.Repo.GetImmutableConfig()
-	writer := config_immutable_io.Writer{
-		ConfigLoaded: &config_immutable_io.ConfigLoaded{
-			Type:            config.Type,
-			ImmutableConfig: config.ImmutableConfig,
-		},
+	configLoaded := &config_immutable_io.ConfigLoaded{
+		Type:            config.Type,
+		ImmutableConfig: config.ImmutableConfig,
 	}
+
+	encoder := config_immutable_io.Coder{}
 
 	var b bytes.Buffer
 
 	// TODO modify to not have to buffer
-	if _, err := writer.WriteTo(&b); err != nil {
+	if _, err := encoder.EncodeTo(configLoaded, &b); err != nil {
 		server.EnvLocal.CancelWithError(err)
 	}
 

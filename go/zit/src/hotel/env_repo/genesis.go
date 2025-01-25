@@ -69,9 +69,9 @@ func (s *Env) Genesis(bb BigBang) {
 				defer s.MustClose(f)
 			}
 
-			writer := config_immutable_io.Writer{ConfigLoaded: &s.ConfigLoaded}
+			encoder := config_immutable_io.Coder{}
 
-			if _, err := writer.WriteTo(f); err != nil {
+			if _, err := encoder.EncodeTo(&s.ConfigLoaded, f); err != nil {
 				s.CancelWithError(err)
 			}
 		}

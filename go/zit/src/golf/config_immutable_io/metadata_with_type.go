@@ -11,19 +11,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
-type metadata struct {
-	*ConfigLoaded
-}
+type MetadataCoderWithType struct{}
 
-func (m metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (m MetadataCoderWithType) DecodeFrom(
+	object *ConfigLoaded,
+	r1 io.Reader,
+) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
+	// TODO scan for type directly
 	if n, err = format.ReadLines(
 		r,
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": m.Type.Set,
+					"!": object.Type.Set,
 				},
 			),
 		),
@@ -35,9 +37,12 @@ func (m metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (m metadata) WriteTo(w io.Writer) (n int64, err error) {
+func (m MetadataCoderWithType) EncodeTo(
+  object *ConfigLoaded,
+  w io.Writer,
+) (n int64, err error) {
 	var n1 int
-	n1, err = fmt.Fprintf(w, "! %s\n", m.Type.StringSansOp())
+	n1, err = fmt.Fprintf(w, "! %s\n", object.Type.StringSansOp())
 	n += int64(n1)
 
 	if err != nil {

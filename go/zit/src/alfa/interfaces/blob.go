@@ -5,6 +5,19 @@ import (
 	"io"
 )
 
+type DecoderFrom[B any] interface {
+	DecodeFrom(B, io.Reader) (int64, error)
+}
+
+type EncoderTo[B any] interface {
+	EncodeTo(B, io.Writer) (int64, error)
+}
+
+type Coder[B any] interface {
+	DecoderFrom[B]
+	EncoderTo[B]
+}
+
 type ReadWrapper interface {
 	WrapReader(r io.Reader) (io.ReadCloser, error)
 }
