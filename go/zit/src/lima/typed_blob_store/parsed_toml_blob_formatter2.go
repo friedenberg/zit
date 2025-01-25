@@ -11,9 +11,9 @@ import (
 
 type ParsedBlobTomlFormatter2[O interfaces.Blob[O]] struct{}
 
-func (_ ParsedBlobTomlFormatter2[O]) FormatParsedBlob(
-	w1 io.Writer,
+func (ParsedBlobTomlFormatter2[O]) EncodeTo(
 	t O,
+	w1 io.Writer,
 ) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
