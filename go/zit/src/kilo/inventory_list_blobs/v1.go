@@ -99,6 +99,43 @@ func (s V1) ReadInventoryListObject(
 	return
 }
 
+type V1StreamCoder struct {
+	V1
+}
+
+func (coder V1StreamCoder) DecodeFrom(
+	output interfaces.FuncIter[*sku.Transacted],
+	reader io.Reader,
+) (n int64, err error) {
+	bufferedReader := bufio.NewReader(reader)
+
+	for {
+		o := sku.GetTransactedPool().Get()
+
+		if _, err = coder.Box.ReadStringFormat(o, bufferedReader); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		// if err = o.CalculateObjectShas(); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
+
+		if err = output(o); err != nil {
+			err = errors.Wrapf(err, "Object: %s", sku.String(o))
+			return
+		}
+	}
+
+	return
+}
+
 func (s V1) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],

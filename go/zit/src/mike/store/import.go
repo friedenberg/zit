@@ -14,7 +14,7 @@ func (store *Store) MakeImporter(
 		options,
 		storeOptions,
 		store.GetEnvRepo(),
-		store.GetTypedBlobStore().GetInventoryList(),
+		store.GetTypedBlobStore().InventoryList,
 		store.GetStreamIndex(),
 		store.externalStores[ids.RepoId{}],
 		store,

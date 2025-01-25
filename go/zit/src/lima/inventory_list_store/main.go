@@ -46,23 +46,21 @@ type Store struct {
 }
 
 func (s *Store) Initialize(
-	repoLayout env_repo.Env,
-	pmf object_inventory_format.Format,
+	envRepo env_repo.Env,
 	clock ids.Clock,
 	typedBlobStore typed_blob_store.InventoryList,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		envRepo:       repoLayout,
-		ls:            repoLayout.GetLockSmith(),
-		sv:            repoLayout.GetStoreVersion(),
-		of:            repoLayout.ObjectReaderWriterFactory(genres.InventoryList),
-		af:            repoLayout,
-		clock:         clock,
-		object_format: pmf,
+		envRepo: envRepo,
+		ls:      envRepo.GetLockSmith(),
+		sv:      envRepo.GetStoreVersion(),
+		of:      envRepo.ObjectReaderWriterFactory(genres.InventoryList),
+		af:      envRepo,
+		clock:   clock,
 		box: box_format.MakeBoxTransactedArchive(
-			repoLayout,
+			envRepo,
 			options_print.V0{}.WithPrintTai(true),
 		),
 		options:        op,
@@ -92,6 +90,10 @@ func (s *Store) GetImmutableConfig() config_immutable_io.ConfigLoaded {
 
 func (s *Store) GetObjectStore() sku.ObjectStore {
 	return s
+}
+
+func (s *Store) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+	return s.typedBlobStore
 }
 
 func (s *Store) Flush() (err error) {

@@ -788,7 +788,7 @@ func (u *Repo) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	typeBlobStore := u.GetStore().GetTypedBlobStore().GetType()
+	typeBlobStore := u.GetStore().GetTypedBlobStore().Type
 
 	if out == nil {
 		out = u.GetUIFile()

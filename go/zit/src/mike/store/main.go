@@ -30,7 +30,7 @@ type Store struct {
 
 	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
-	typedBlobStore     *typed_blob_store.Store
+	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.AbbrStore
 
@@ -69,7 +69,7 @@ func (c *Store) Initialize(
 	queryBuilder *query.Builder,
 	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
-	typedBlobStore *typed_blob_store.Store,
+	typedBlobStore typed_blob_store.Stores,
 	dormantIndex *dormant_index.Index,
 	abbrStore sku.AbbrStore,
 ) (err error) {
@@ -89,9 +89,8 @@ func (c *Store) Initialize(
 
 	if err = c.inventoryListStore.Initialize(
 		c.GetEnvRepo(),
-		pmf,
 		c,
-		typedBlobStore.GetInventoryList(),
+		typedBlobStore.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

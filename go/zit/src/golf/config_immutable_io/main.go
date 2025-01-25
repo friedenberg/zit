@@ -14,12 +14,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-var typedCoders = map[string]interfaces.Coder[*ConfigLoaded]{
+type typeWithConfigLoaded = *ids.TypeWithObject[*ConfigLoaded]
+
+var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
 	builtin_types.ImmutableConfigV1: blobV1Coder{},
 	"":                              blobV0Coder{},
 }
 
-var coder = triple_hyphen_io.Coder[*ConfigLoaded]{
+var coder = triple_hyphen_io.Coder[typeWithConfigLoaded]{
 	Metadata: ids.TypedMetadataCoder[*ConfigLoaded]{},
 	Blob:     ids.TypedCoders[*ConfigLoaded](typedCoders),
 }
@@ -59,26 +61,38 @@ func (coder Coder) DecodeFromFile(
 }
 
 func (Coder) DecodeFrom(
-	object *ConfigLoaded,
-	r io.Reader,
+	subject *ConfigLoaded,
+	reader io.Reader,
 ) (n int64, err error) {
-	if n, err = coder.DecodeFrom(object, r); err != nil {
+	if n, err = coder.DecodeFrom(
+		&ids.TypeWithObject[*ConfigLoaded]{
+			Type:   &subject.Type,
+			Object: subject,
+		},
+		reader,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	object.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		object.ImmutableConfig.GetBlobStoreConfigImmutable(),
+	subject.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
+		subject.ImmutableConfig.GetBlobStoreConfigImmutable(),
 	)
 
 	return
 }
 
 func (Coder) EncodeTo(
-	object *ConfigLoaded,
-	w io.Writer,
+	subject *ConfigLoaded,
+	writer io.Writer,
 ) (n int64, err error) {
-	if n, err = coder.EncodeTo(object, w); err != nil {
+	if n, err = coder.EncodeTo(
+		&ids.TypeWithObject[*ConfigLoaded]{
+			Type:   &subject.Type,
+			Object: subject,
+		},
+		writer,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -21,12 +21,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
 	localInventoryListStore sku.InventoryListStore,
+	typedBlobStore typed_blob_store.InventoryList,
 ) *client {
 	client := &client{
 		envUI: envUI,
@@ -34,6 +36,7 @@ func MakeClient(
 			Transport: transport,
 		},
 		localInventoryListStore: localInventoryListStore,
+		typedBlobStore:          typedBlobStore,
 	}
 
 	client.Initialize()
@@ -46,6 +49,7 @@ type client struct {
 	configImmutable         config_immutable_io.ConfigLoaded
 	http                    http.Client
 	localInventoryListStore sku.InventoryListStore
+	typedBlobStore          typed_blob_store.InventoryList
 }
 
 func (client *client) Initialize() {
@@ -94,6 +98,10 @@ func (client *client) GetImmutableConfig() config_immutable_io.ConfigLoaded {
 
 func (client *client) GetInventoryListStore() sku.InventoryListStore {
 	return client
+}
+
+func (client *client) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+	return client.typedBlobStore
 }
 
 func (client *client) GetBlobStore() interfaces.BlobStore {

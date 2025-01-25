@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
@@ -45,7 +44,7 @@ type Repo struct {
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
-	typedBlobStore    *typed_blob_store.Store
+	typedBlobStore    typed_blob_store.Stores
 	store             store.Store
 	externalStores    map[ids.RepoId]*external_store.Store
 
@@ -98,10 +97,6 @@ func MakeWithLayout(
 	repo.After(repo.Flush)
 
 	return
-}
-
-func (u *Repo) GetImmutableConfig() config_immutable_io.ConfigLoaded {
-	return u.GetRepoLayout().GetConfig()
 }
 
 // TODO investigate removing unnecessary resets like from organize
@@ -204,7 +199,7 @@ func (repo *Repo) initialize(
 	// 	}
 	// }
 
-	repo.typedBlobStore = typed_blob_store.Make(
+	repo.typedBlobStore = typed_blob_store.MakeStores(
 		repo.envRepo,
 		repo.envLua,
 		objectFormat,

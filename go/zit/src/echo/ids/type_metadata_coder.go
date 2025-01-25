@@ -11,30 +11,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
-type TypeSetter interface {
-	SetType(Type)
-}
+type TypedMetadataCoder[O any] struct{}
 
-type TypedMetadataCoder[O interface {
-	TypeGetter
-	TypeSetter
-}] struct{}
-
-func (m TypedMetadataCoder[O]) DecodeFrom(
-	object O,
-	r1 io.Reader,
+func (TypedMetadataCoder[O]) DecodeFrom(
+	subject *TypeWithObject[O],
+	reader io.Reader,
 ) (n int64, err error) {
-	r := bufio.NewReader(r1)
-
-	var t Type
+	bufferedReader := bufio.NewReader(reader)
 
 	// TODO scan for type directly
 	if n, err = format.ReadLines(
-		r,
+		bufferedReader,
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": t.Set,
+					"!": subject.Type.Set,
 				},
 			),
 		),
@@ -43,17 +34,15 @@ func (m TypedMetadataCoder[O]) DecodeFrom(
 		return
 	}
 
-	object.SetType(t)
-
 	return
 }
 
-func (m TypedMetadataCoder[O]) EncodeTo(
-	object O,
-	w io.Writer,
+func (TypedMetadataCoder[O]) EncodeTo(
+	subject *TypeWithObject[O],
+	writer io.Writer,
 ) (n int64, err error) {
 	var n1 int
-	n1, err = fmt.Fprintf(w, "! %s\n", object.GetType().StringSansOp())
+	n1, err = fmt.Fprintf(writer, "! %s\n", subject.Type.StringSansOp())
 	n += int64(n1)
 
 	if err != nil {

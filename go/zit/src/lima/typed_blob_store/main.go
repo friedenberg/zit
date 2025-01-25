@@ -8,20 +8,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 )
 
-type Store struct {
+type Stores struct {
 	InventoryList InventoryList
 	Repo          RepoStore
 	Type          Type
 	Tag           Tag
 }
 
-func Make(
+func MakeStores(
 	envRepo env_repo.Env,
 	envLua env_lua.Env,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
-) *Store {
-	return &Store{
+) Stores {
+	return Stores{
 		InventoryList: MakeInventoryStore(envRepo, objectFormat, boxFormat),
 		Tag:           MakeTagStore(envRepo, envLua),
 		Repo:          MakeRepoStore(envRepo),
@@ -29,18 +29,6 @@ func Make(
 	}
 }
 
-func (a *Store) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
+func (a Stores) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
 	return a.Type.toml_v1
-}
-
-func (a *Store) GetType() Type {
-	return a.Type
-}
-
-func (a *Store) GetTag() Tag {
-	return a.Tag
-}
-
-func (a *Store) GetInventoryList() InventoryList {
-	return a.InventoryList
 }

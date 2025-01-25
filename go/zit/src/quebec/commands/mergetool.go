@@ -103,7 +103,7 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 
 	br := bufio.NewReader(f)
 
-	bs := u.GetStore().GetTypedBlobStore().GetInventoryList()
+	bs := u.GetStore().GetTypedBlobStore().InventoryList
 
 	if err := tm.ReadConflictMarker(
 		func(f interfaces.FuncIter[*sku.Transacted]) (err error) {

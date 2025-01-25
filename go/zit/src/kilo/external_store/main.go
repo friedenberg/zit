@@ -73,7 +73,7 @@ type (
 		ids.RepoId
 		ids.TypeSet
 		ids.Clock
-		BlobStore *typed_blob_store.Store
+		BlobStore typed_blob_store.Stores
 	}
 
 	StoreLike interface {

@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
@@ -15,10 +16,12 @@ import (
 )
 
 type InventoryList struct {
-	dirLayout env_repo.Env
-	boxFormat *box_format.BoxTransacted
-	v0        inventory_list_blobs.V0
-	v1        inventory_list_blobs.V1
+	envRepo        env_repo.Env
+	objectFormat   object_inventory_format.Format
+	boxFormat      *box_format.BoxTransacted
+	v0             inventory_list_blobs.V0
+	v1             inventory_list_blobs.V1
+	streamDecoders map[string]interfaces.DecoderFrom[interfaces.FuncIter[*sku.Transacted]]
 }
 
 func MakeInventoryStore(
@@ -29,14 +32,24 @@ func MakeInventoryStore(
 	objectOptions := object_inventory_format.Options{Tai: true}
 
 	s := InventoryList{
-		dirLayout: dirLayout,
-		boxFormat: boxFormat,
+		envRepo:      dirLayout,
+		objectFormat: objectFormat,
+		boxFormat:    boxFormat,
 		v0: inventory_list_blobs.MakeV0(
 			objectFormat,
 			objectOptions,
 		),
 		v1: inventory_list_blobs.V1{
 			Box: boxFormat,
+		},
+	}
+
+	s.streamDecoders = map[string]interfaces.DecoderFrom[interfaces.FuncIter[*sku.Transacted]]{
+		"": inventory_list_blobs.V0StreamCoder{
+			V0: s.v0,
+		},
+		builtin_types.InventoryListTypeV1: inventory_list_blobs.V1StreamCoder{
+			V1: s.v1,
 		},
 	}
 
@@ -47,6 +60,14 @@ func (a InventoryList) GetCommonStore() sku.BlobStore[*sku.List] {
 	return a
 }
 
+func (a InventoryList) GetObjectFormat() object_inventory_format.Format {
+	return a.objectFormat
+}
+
+func (a InventoryList) GetBoxFormat() *box_format.BoxTransacted {
+	return a.boxFormat
+}
+
 func (a InventoryList) GetTransactedWithBlob(
 	tg sku.TransactedGetter,
 ) (twb sku.TransactedWithBlob[*sku.List], n int64, err error) {
@@ -55,7 +76,7 @@ func (a InventoryList) GetTransactedWithBlob(
 
 	var rc interfaces.ShaReadCloser
 
-	if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+	if rc, err = a.envRepo.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,25 +197,49 @@ func (a InventoryList) PutTransactedWithBlob(
 
 func (a InventoryList) StreamInventoryListBlobSkus(
 	tg sku.TransactedGetter,
-	f interfaces.FuncIter[*sku.Transacted],
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	sk := tg.GetSku()
 	tipe := sk.GetType()
 	blobSha := sk.GetBlobSha()
 
-	var rc interfaces.ShaReadCloser
+	var readCloser interfaces.ShaReadCloser
 
-	if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+	if readCloser, err = a.envRepo.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, rc)
+	defer errors.DeferredCloser(&err, readCloser)
 
 	if err = a.StreamInventoryListBlobSkusFromReader(
 		tipe,
-		rc,
-		f,
+		readCloser,
+		output,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (a InventoryList) DecodeStreamFrom(
+	output interfaces.FuncIter[*sku.Transacted],
+	reader io.Reader,
+) (err error) {
+	decoder := triple_hyphen_io.Decoder[*ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]]{
+		Metadata: ids.TypedMetadataCoder[interfaces.FuncIter[*sku.Transacted]]{},
+		Blob: ids.TypedDecodersWithoutType[interfaces.FuncIter[*sku.Transacted]](
+			a.streamDecoders,
+		),
+	}
+
+	if _, err = decoder.DecodeFrom(
+		&ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]{
+			Object: output,
+		},
+		reader,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -205,27 +250,22 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 
 func (a InventoryList) StreamInventoryListBlobSkusFromReader(
 	tipe ids.Type,
-	rf io.Reader,
-	f interfaces.FuncIter[*sku.Transacted],
+	reader io.Reader,
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	switch tipe.String() {
-	case "", builtin_types.InventoryListTypeV0:
-		if err = a.v0.StreamInventoryListBlobSkus(
-			rf,
-			f,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	decoder := ids.TypedDecodersWithoutType[interfaces.FuncIter[*sku.Transacted]](
+		a.streamDecoders,
+	)
 
-	case builtin_types.InventoryListTypeV1:
-		if err = a.v1.StreamInventoryListBlobSkus(
-			rf,
-			f,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if _, err = decoder.DecodeFrom(
+		&ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]{
+			Type:   &tipe,
+			Object: output,
+		},
+		reader,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

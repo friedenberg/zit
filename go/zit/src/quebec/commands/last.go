@@ -15,12 +15,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -171,7 +169,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	}
 }
 
-func (c Last) runWithInventoryList(
+func (cmd Last) runWithInventoryList(
 	repoLayout env_repo.Env,
 	archive repo.Repo,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -185,19 +183,8 @@ func (c Last) runWithInventoryList(
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(
-		repoLayout.GetStoreVersion(),
-	)
-
-	boxFormat := box_format.MakeBoxTransactedArchive(
+	inventoryListBlobStore := cmd.MakeTypedInventoryListBlobStore(
 		repoLayout,
-		options_print.V0{}.WithPrintTai(true),
-	)
-
-	inventoryListBlobStore := typed_blob_store.MakeInventoryStore(
-		repoLayout,
-		objectFormat,
-		boxFormat,
 	)
 
 	var twb sku.TransactedWithBlob[*sku.List]

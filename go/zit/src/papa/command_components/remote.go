@@ -152,6 +152,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		envLocal,
 		&httpRoundTripper,
 		localRepo.GetInventoryListStore(),
+		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
 	return
@@ -163,21 +164,22 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	arg string,
 	local repo.Repo,
 ) (remoteHTTP repo.WorkingCopy) {
-	repoLayout := cmd.MakeEnvRepo(req, false)
+	envRepo := cmd.MakeEnvRepo(req, false)
 
 	var httpRoundTripper remote_http.RoundTripperStdio
 
 	if err := httpRoundTripper.InitializeWithSSH(
-		repoLayout,
+		envRepo,
 		arg,
 	); err != nil {
 		env.CancelWithError(err)
 	}
 
 	remoteHTTP = remote_http.MakeClient(
-		repoLayout,
+		envRepo,
 		&httpRoundTripper,
 		local.GetInventoryListStore(),
+		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
 	return
@@ -203,6 +205,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 		env,
 		&httpRoundTripper,
 		localRepo.GetInventoryListStore(),
+		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
 	return

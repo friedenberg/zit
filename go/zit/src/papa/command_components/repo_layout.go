@@ -3,11 +3,15 @@ package command_components
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 type EnvRepo struct{}
@@ -71,4 +75,23 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	}
 
 	return repoLayout
+}
+
+func (EnvRepo) MakeTypedInventoryListBlobStore(
+	envRepo env_repo.Env,
+) typed_blob_store.InventoryList {
+	objectFormat := object_inventory_format.FormatForVersion(
+		envRepo.GetStoreVersion(),
+	)
+
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		envRepo,
+		options_print.V0{}.WithPrintTai(true),
+	)
+
+	return typed_blob_store.MakeInventoryStore(
+		envRepo,
+		objectFormat,
+		boxFormat,
+	)
 }

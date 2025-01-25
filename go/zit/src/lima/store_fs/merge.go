@@ -319,7 +319,7 @@ func (s *Store) GenerateConflictMarker(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	blobStore := s.externalStoreSupplies.BlobStore.GetInventoryList()
+	blobStore := s.externalStoreSupplies.BlobStore.InventoryList
 
 	if _, err = blobStore.WriteBlobToWriter(
 		builtin_types.DefaultOrPanic(genres.InventoryList),

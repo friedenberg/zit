@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 // TODO explore permissions for who can read / write from the inventory list
@@ -15,6 +16,7 @@ type Repo interface {
 	GetEnv() env_ui.Env
 	GetImmutableConfig() config_immutable_io.ConfigLoaded
 	GetBlobStore() interfaces.BlobStore
+	GetTypedInventoryListBlobStore() typed_blob_store.InventoryList
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(

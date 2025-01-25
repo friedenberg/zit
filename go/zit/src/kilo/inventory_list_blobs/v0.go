@@ -96,6 +96,37 @@ func (s V0) ReadInventoryListObject(
 	return
 }
 
+type V0StreamCoder struct {
+	V0
+}
+
+func (coder V0StreamCoder) DecodeFrom(
+	output interfaces.FuncIter[*sku.Transacted],
+	reader io.Reader,
+) (n int64, err error) {
+	dec := makeScanner(
+		reader,
+		coder.Format,
+		coder.Options,
+	)
+
+	for dec.Scan() {
+		sk := dec.GetTransacted()
+
+		if err = output(sk); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sk)
+			return
+		}
+	}
+
+	if err = dec.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s V0) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],

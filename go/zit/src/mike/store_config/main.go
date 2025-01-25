@@ -83,7 +83,7 @@ type (
 
 		Flush(
 			dirLayout env_repo.Env,
-			blobStore *typed_blob_store.Store,
+			blobStore typed_blob_store.Stores,
 			printerHeader interfaces.FuncIter[string],
 		) (err error)
 	}

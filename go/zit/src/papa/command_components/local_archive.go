@@ -4,17 +4,15 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
-	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
-type LocalArchive struct{}
+type LocalArchive struct {
+	EnvRepo
+}
 
 func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 }
@@ -26,23 +24,14 @@ func (c LocalArchive) MakeLocalArchive(
 
 	switch repoType {
 	case repo_type.TypeArchive:
-		objectFormat := object_inventory_format.FormatForVersion(envRepo.GetStoreVersion())
-		boxFormat := box_format.MakeBoxTransactedArchive(
+		inventoryListBlobStore := c.MakeTypedInventoryListBlobStore(
 			envRepo,
-			options_print.V0{}.WithPrintTai(true),
-		)
-
-		inventoryListBlobStore := typed_blob_store.MakeInventoryStore(
-			envRepo,
-			objectFormat,
-			boxFormat,
 		)
 
 		var inventoryListStore inventory_list_store.Store
 
 		if err := inventoryListStore.Initialize(
 			envRepo,
-			objectFormat,
 			nil,
 			inventoryListBlobStore,
 		); err != nil {

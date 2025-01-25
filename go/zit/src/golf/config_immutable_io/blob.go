@@ -12,13 +12,13 @@ import (
 type blobV1Coder struct{}
 
 func (blobV1Coder) DecodeFrom(
-	blob *ConfigLoaded,
+	subject typeWithConfigLoaded,
 	r io.Reader,
 ) (n int64, err error) {
-	blob.ImmutableConfig = &config_immutable.TomlV1{}
+	subject.Object.ImmutableConfig = &config_immutable.TomlV1{}
 	td := toml.NewDecoder(r)
 
-	if err = td.Decode(blob.ImmutableConfig); err != nil {
+	if err = td.Decode(subject.Object.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -31,12 +31,12 @@ func (blobV1Coder) DecodeFrom(
 }
 
 func (blobV1Coder) EncodeTo(
-	blob *ConfigLoaded,
+	subject typeWithConfigLoaded,
 	w io.Writer,
 ) (n int64, err error) {
 	te := toml.NewEncoder(w)
 
-	if err = te.Encode(blob.ImmutableConfig); err != nil {
+	if err = te.Encode(subject.Object.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -51,14 +51,14 @@ func (blobV1Coder) EncodeTo(
 type blobV0Coder struct{}
 
 func (blobV0Coder) DecodeFrom(
-	blob *ConfigLoaded,
+	subject typeWithConfigLoaded,
 	r io.Reader,
 ) (n int64, err error) {
-	blob.ImmutableConfig = &config_immutable.V0{}
+	subject.Object.ImmutableConfig = &config_immutable.V0{}
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(blob.ImmutableConfig); err != nil {
+	if err = dec.Decode(subject.Object.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -71,12 +71,12 @@ func (blobV0Coder) DecodeFrom(
 }
 
 func (blobV0Coder) EncodeTo(
-	blob *ConfigLoaded,
+	subject typeWithConfigLoaded,
 	w io.Writer,
 ) (n int64, err error) {
 	dec := gob.NewEncoder(w)
 
-	if err = dec.Encode(blob.ImmutableConfig); err != nil {
+	if err = dec.Encode(subject.Object.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

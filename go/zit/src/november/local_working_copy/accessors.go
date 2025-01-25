@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
@@ -12,12 +13,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
 
 func (u *Repo) GetEnv() env_ui.Env {
 	return u
+}
+
+func (u *Repo) GetImmutableConfig() config_immutable_io.ConfigLoaded {
+	return u.GetRepoLayout().GetConfig()
 }
 
 func (u *Repo) GetEnvLocal() env_local.Env {
@@ -42,6 +48,10 @@ func (u *Repo) GetDormantIndex() *dormant_index.Index {
 
 func (u *Repo) GetRepoLayout() env_repo.Env {
 	return u.envRepo
+}
+
+func (u *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+	return u.typedBlobStore.InventoryList
 }
 
 func (u *Repo) GetBlobStore() interfaces.BlobStore {

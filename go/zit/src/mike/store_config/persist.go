@@ -24,7 +24,7 @@ func init() {
 }
 
 func (kc *store) recompile(
-	blobStore *typed_blob_store.Store,
+	blobStore typed_blob_store.Stores,
 ) (err error) {
 	if err = kc.recompileTags(); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (kc *store) recompileTags() (err error) {
 }
 
 func (kc *store) recompileTypes(
-	blobStore *typed_blob_store.Store,
+	blobStore typed_blob_store.Stores,
 ) (err error) {
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
@@ -82,7 +82,7 @@ func (kc *store) recompileTypes(
 			tipe := ct.GetSku().GetType()
 			var commonBlob type_blobs.Blob
 
-			if commonBlob, _, err = blobStore.GetType().ParseTypedBlob(
+			if commonBlob, _, err = blobStore.Type.ParseTypedBlob(
 				tipe,
 				ct.GetBlobSha(),
 			); err != nil {
@@ -90,7 +90,7 @@ func (kc *store) recompileTypes(
 				return
 			}
 
-			defer blobStore.GetType().PutTypedBlob(tipe, commonBlob)
+			defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
 
 			if commonBlob == nil {
 				err = errors.Errorf("nil type blob for type: %q. Sku: %s", tipe, ct)
@@ -194,7 +194,7 @@ func (kc *store) loadMutableConfig(
 
 func (kc *store) Flush(
 	dirLayout env_repo.Env,
-	blobStore *typed_blob_store.Store,
+	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !kc.HasChanges() || kc.DryRun {
@@ -223,7 +223,7 @@ func (kc *store) Flush(
 
 func (kc *store) flushMutableConfig(
 	s env_repo.Env,
-	blobStore *typed_blob_store.Store,
+	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {

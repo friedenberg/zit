@@ -14,7 +14,7 @@ import (
 
 func MakeBuilder(
 	s env_repo.Env,
-	typedBlobStore *typed_blob_store.Store,
+	typedBlobStore typed_blob_store.Stores,
 	objectProbeIndex sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
@@ -32,7 +32,7 @@ func MakeBuilder(
 
 type Builder struct {
 	dirLayout               env_repo.Env
-	typedBlobStore          *typed_blob_store.Store
+	typedBlobStore          typed_blob_store.Stores
 	objectProbeIndex        sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId

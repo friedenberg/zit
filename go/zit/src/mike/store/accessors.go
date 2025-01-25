@@ -22,7 +22,7 @@ func (u *Store) GetBrowserStore() *external_store.Store {
 	return u.externalStores[*(ids.MustRepoId("browser"))]
 }
 
-func (s *Store) GetTypedBlobStore() *typed_blob_store.Store {
+func (s *Store) GetTypedBlobStore() typed_blob_store.Stores {
 	return s.typedBlobStore
 }
 

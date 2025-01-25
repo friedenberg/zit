@@ -437,7 +437,7 @@ func (b *buildState) makeTagOrLuaTag(
 ) (exp sku.Query, err error) {
 	exp = k
 
-	if b.builder.objectProbeIndex == nil || b.builder.typedBlobStore == nil {
+	if b.builder.objectProbeIndex == nil {
 		return
 	}
 
@@ -459,7 +459,7 @@ func (b *buildState) makeTagOrLuaTag(
 
 	var twb sku.TransactedWithBlob[tag_blobs.Blob]
 
-	if twb, _, err = b.builder.typedBlobStore.GetTag().GetTransactedWithBlob(
+	if twb, _, err = b.builder.typedBlobStore.Tag.GetTransactedWithBlob(
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)
