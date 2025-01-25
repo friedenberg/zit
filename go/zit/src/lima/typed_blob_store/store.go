@@ -49,7 +49,7 @@ func (s *BlobStore[A, APtr]) GetBlob(
 	a = APtr(&a1)
 	s.resetFunc(a)
 
-	if _, err = s.ParseBlob(rc, a); err != nil {
+	if _, err = s.DecodeFrom(a, rc); err != nil {
 		err = errors.Wrapf(err, "BlobReader: %q", rc)
 		return
 	}
@@ -80,7 +80,7 @@ func (h *BlobStore[A, APtr]) SaveBlobText(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if n, err = h.FormatParsedBlob(w, o); err != nil {
+	if n, err = h.EncodeTo(o, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

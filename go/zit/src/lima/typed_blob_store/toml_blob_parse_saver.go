@@ -38,9 +38,9 @@ func MakeTextParserIgnoreTomlErrors[
 	}
 }
 
-func (f tomlBlobParseSaver[O, OPtr]) ParseBlob(
-	r io.Reader,
+func (f tomlBlobParseSaver[O, OPtr]) DecodeFrom(
 	t OPtr,
+	r io.Reader,
 ) (n int64, err error) {
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)

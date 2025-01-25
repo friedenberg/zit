@@ -11,14 +11,9 @@ type (
 		ParseSaveBlob(io.Reader, T) (Sha, int64, error)
 	}
 
-	Parser[T any] interface {
-		ParseBlob(io.Reader, T) (int64, error)
-	}
-
 	Format[T any] interface {
 		SavedBlobFormatter
-		EncoderTo[T]
-		Parser[T]
+		Coder[T]
 	}
 
 	TypedBlobStore[T any] interface {

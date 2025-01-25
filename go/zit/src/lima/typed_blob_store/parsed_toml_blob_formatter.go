@@ -9,11 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
-type ParsedBlobTomlFormatter[O interfaces.Blob[O], OPtr interfaces.BlobPtr[O]] struct{}
+type ParsedBlobTomlFormatter[
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
+] struct{}
 
-func (_ ParsedBlobTomlFormatter[O, OPtr]) FormatParsedBlob(
-	w1 io.Writer,
+func (ParsedBlobTomlFormatter[O, OPtr]) EncodeTo(
 	t OPtr,
+	w1 io.Writer,
 ) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
