@@ -1,4 +1,4 @@
-package config_immutable_io
+package ids
 
 import (
 	"bufio"
@@ -11,13 +11,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
-type MetadataCoderWithType struct{}
+type TypeSetter interface {
+	SetType(Type)
+}
 
-func (m MetadataCoderWithType) DecodeFrom(
-	object *ConfigLoaded,
+type TypedMetadataCoder[O interface {
+	TypeGetter
+	TypeSetter
+}] struct{}
+
+func (m TypedMetadataCoder[O]) DecodeFrom(
+	object O,
 	r1 io.Reader,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
+
+	var t Type
 
 	// TODO scan for type directly
 	if n, err = format.ReadLines(
@@ -25,7 +34,7 @@ func (m MetadataCoderWithType) DecodeFrom(
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": object.Type.Set,
+					"!": t.Set,
 				},
 			),
 		),
@@ -34,15 +43,17 @@ func (m MetadataCoderWithType) DecodeFrom(
 		return
 	}
 
+	object.SetType(t)
+
 	return
 }
 
-func (m MetadataCoderWithType) EncodeTo(
-  object *ConfigLoaded,
-  w io.Writer,
+func (m TypedMetadataCoder[O]) EncodeTo(
+	object O,
+	w io.Writer,
 ) (n int64, err error) {
 	var n1 int
-	n1, err = fmt.Fprintf(w, "! %s\n", object.Type.StringSansOp())
+	n1, err = fmt.Fprintf(w, "! %s\n", object.GetType().StringSansOp())
 	n += int64(n1)
 
 	if err != nil {

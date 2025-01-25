@@ -9,13 +9,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-var coders = map[string]interfaces.Coder[*ConfigLoaded]{
+var typedCoders = map[string]interfaces.Coder[*ConfigLoaded]{
 	builtin_types.ImmutableConfigV1: blobV1Coder{},
 	"":                              blobV0Coder{},
+}
+
+var coder = triple_hyphen_io.Coder[*ConfigLoaded]{
+	Metadata: ids.TypedMetadataCoder[*ConfigLoaded]{},
+	Blob:     ids.TypedCoders[*ConfigLoaded](typedCoders),
 }
 
 type Coder struct{}
@@ -56,15 +62,7 @@ func (Coder) DecodeFrom(
 	object *ConfigLoaded,
 	r io.Reader,
 ) (n int64, err error) {
-	thr := triple_hyphen_io.Decoder[*ConfigLoaded]{
-		Metadata: MetadataCoderWithType{},
-		Blob: BlobWithType[*ConfigLoaded]{
-			Type:   &object.Type,
-			Coders: coders,
-		},
-	}
-
-	if n, err = thr.DecodeFrom(object, r); err != nil {
+	if n, err = coder.DecodeFrom(object, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -80,15 +78,7 @@ func (Coder) EncodeTo(
 	object *ConfigLoaded,
 	w io.Writer,
 ) (n int64, err error) {
-	thw := triple_hyphen_io.Encoder[*ConfigLoaded]{
-		Metadata: MetadataCoderWithType{},
-		Blob: BlobWithType[*ConfigLoaded]{
-			Type:   &object.Type,
-			Coders: coders,
-		},
-	}
-
-	if n, err = thw.EncodeTo(object, w); err != nil {
+	if n, err = coder.EncodeTo(object, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
