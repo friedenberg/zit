@@ -9,11 +9,11 @@ import (
 
 type quoted_streeng[T ~string] struct{}
 
-func MakeQuotedString[T ~string]() interfaces.StringFormatWriter[T] {
+func MakeQuotedString[T ~string]() interfaces.StringEncoderTo[T] {
 	return &quoted_streeng[T]{}
 }
 
-func (f *quoted_streeng[T]) WriteStringFormat(
+func (f *quoted_streeng[T]) EncodeStringTo(
 	e T,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

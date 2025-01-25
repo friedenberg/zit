@@ -8,13 +8,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func MakeRightAligned() interfaces.StringFormatWriter[string] {
+func MakeRightAligned() interfaces.StringEncoderTo[string] {
 	return &rightAligned{}
 }
 
 type rightAligned struct{}
 
-func (f rightAligned) WriteStringFormat(
+func (f rightAligned) EncodeStringTo(
 	v string,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

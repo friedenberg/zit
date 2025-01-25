@@ -44,7 +44,7 @@ func MakeBoxTransactedArchive(
 func MakeBoxTransacted(
 	co string_format_writer.ColorOptions,
 	options options_print.V0,
-	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
+	fieldsFormatWriter interfaces.StringEncoderTo[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath env_dir.RelativePath,
@@ -65,7 +65,7 @@ type BoxTransacted struct {
 	optionsColor string_format_writer.ColorOptions
 	optionsPrint options_print.V0
 
-	box          interfaces.StringFormatWriter[string_format_writer.Box]
+	box          interfaces.StringEncoderTo[string_format_writer.Box]
 	headerWriter string_format_writer.HeaderWriter[*sku.Transacted]
 
 	abbr             ids.Abbr
@@ -73,7 +73,7 @@ type BoxTransacted struct {
 	relativePath     env_dir.RelativePath
 }
 
-func (f *BoxTransacted) WriteStringFormat(
+func (f *BoxTransacted) EncodeStringTo(
 	sk *sku.Transacted,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -126,7 +126,7 @@ func (f *BoxTransacted) WriteStringFormat(
 		)
 	}
 
-	if n, err = f.box.WriteStringFormat(box, sw); err != nil {
+	if n, err = f.box.EncodeStringTo(box, sw); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -24,6 +24,6 @@ func (u *env) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
 func (u *env) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[string_format_writer.Box] {
+) interfaces.StringEncoderTo[string_format_writer.Box] {
 	return string_format_writer.MakeCliFormatFields(truncate, co)
 }

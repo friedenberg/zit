@@ -7,7 +7,7 @@ import (
 
 type formatCliStringer struct {
 	truncate           string_format_writer.CliFormatTruncation
-	stringFormatWriter interfaces.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringEncoderTo[string]
 }
 
 func MakeCliFormatStringer(
@@ -31,7 +31,7 @@ func MakeCliFormatStringer(
 	}
 }
 
-func (f *formatCliStringer) WriteStringFormat(
+func (f *formatCliStringer) EncodeStringTo(
 	k interfaces.Stringer,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -42,5 +42,5 @@ func (f *formatCliStringer) WriteStringFormat(
 		v = v[:66] + "…"
 	}
 
-	return f.stringFormatWriter.WriteStringFormat(v, w)
+	return f.stringFormatWriter.EncodeStringTo(v, w)
 }

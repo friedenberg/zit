@@ -56,7 +56,7 @@ func (cmd Clone) Run(req command.Request) {
 	remote := cmd.MakeRemoteWorkingCopy(
 		req,
 		req.Args()[0],
-    repoGeneric,
+		repoGeneric,
 	)
 
 	switch local := repoGeneric.(type) {

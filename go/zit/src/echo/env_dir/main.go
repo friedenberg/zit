@@ -29,7 +29,7 @@ type Env interface {
 	Rel(p string) (out string)
 	RelToCwdOrSame(p string) (p1 string)
 	MakeCommonEnv() map[string]string
-	MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string]
+	MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[string]
 }
 
 type env struct {

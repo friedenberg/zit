@@ -33,7 +33,7 @@ type Env interface {
 	StringFormatWriterFields(
 		truncate string_format_writer.CliFormatTruncation,
 		co string_format_writer.ColorOptions,
-	) interfaces.StringFormatWriter[string_format_writer.Box]
+	) interfaces.StringEncoderTo[string_format_writer.Box]
 }
 
 type env struct {

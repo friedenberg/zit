@@ -9,15 +9,15 @@ import (
 
 type itemDeletedStringFormatWriter struct {
 	interfaces.Config
-	rightAlignedWriter   interfaces.StringFormatWriter[string]
-	idStringFormatWriter interfaces.StringFormatWriter[string]
-	fieldsFormatWriter   interfaces.StringFormatWriter[string_format_writer.Box]
+	rightAlignedWriter   interfaces.StringEncoderTo[string]
+	idStringFormatWriter interfaces.StringEncoderTo[string]
+	fieldsFormatWriter   interfaces.StringEncoderTo[string_format_writer.Box]
 }
 
 func MakeItemDeletedStringWriterFormat(
 	config interfaces.Config,
 	co string_format_writer.ColorOptions,
-	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
+	fieldsFormatWriter interfaces.StringEncoderTo[string_format_writer.Box],
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
 		Config:             config,
@@ -31,7 +31,7 @@ func MakeItemDeletedStringWriterFormat(
 	}
 }
 
-func (f *itemDeletedStringFormatWriter) WriteStringFormat(
+func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 	o *sku.Transacted,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -46,7 +46,7 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		prefixOne = string_format_writer.StringWouldDelete
 	}
 
-	n2, err = f.rightAlignedWriter.WriteStringFormat(prefixOne, sw)
+	n2, err = f.rightAlignedWriter.EncodeStringTo(prefixOne, sw)
 	n += n2
 
 	if err != nil {
@@ -62,7 +62,7 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.fieldsFormatWriter.WriteStringFormat(
+	n2, err = f.fieldsFormatWriter.EncodeStringTo(
 		string_format_writer.Box{Contents: o.Metadata.Fields},
 		sw,
 	)

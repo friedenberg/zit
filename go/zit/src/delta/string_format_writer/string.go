@@ -7,11 +7,11 @@ import (
 
 type streeng[T ~string] struct{}
 
-func MakeString[T ~string]() interfaces.StringFormatWriter[T] {
+func MakeString[T ~string]() interfaces.StringEncoderTo[T] {
 	return &streeng[T]{}
 }
 
-func (f *streeng[T]) WriteStringFormat(
+func (f *streeng[T]) EncodeStringTo(
 	e T,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

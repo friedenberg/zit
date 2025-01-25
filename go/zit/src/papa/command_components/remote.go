@@ -45,7 +45,7 @@ func (cmd Remote) MakeArchive(
 			req,
 			env,
 			remoteArg,
-      local,
+			local,
 		)
 
 	case repo.RemoteTypeStdioSSH:
@@ -89,7 +89,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 			req,
 			cmd.MakeEnv(req),
 			remoteArg,
-      local,
+			local,
 		)
 
 	case repo.RemoteTypeStdioSSH:

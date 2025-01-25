@@ -15,21 +15,21 @@ type Clock interface {
 type Date[T any] struct {
 	Clock
 	Format string
-	interfaces.StringFormatWriter[T]
+	interfaces.StringEncoderTo[T]
 }
 
 func MakeDefaultDatePrefixFormatWriter[T any](
 	clock Clock,
-	f interfaces.StringFormatWriter[T],
-) interfaces.StringFormatWriter[T] {
+	f interfaces.StringEncoderTo[T],
+) interfaces.StringEncoderTo[T] {
 	return &Date[T]{
-		Clock:              clock,
-		Format:             StringFormatDateTime,
-		StringFormatWriter: f,
+		Clock:           clock,
+		Format:          StringFormatDateTime,
+		StringEncoderTo: f,
 	}
 }
 
-func (f *Date[T]) WriteStringFormat(
+func (f *Date[T]) EncodeStringTo(
 	e T,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -55,7 +55,7 @@ func (f *Date[T]) WriteStringFormat(
 
 	var n2 int64
 
-	n2, err = f.StringFormatWriter.WriteStringFormat(e, w)
+	n2, err = f.StringEncoderTo.EncodeStringTo(e, w)
 	n += n2
 
 	if err != nil {

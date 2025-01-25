@@ -9,13 +9,13 @@ import (
 
 type fdDeletedStringWriterFormat struct {
 	dryRun               bool
-	rightAlignedWriter   interfaces.StringFormatWriter[string]
-	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD]
+	rightAlignedWriter   interfaces.StringEncoderTo[string]
+	fdStringFormatWriter interfaces.StringEncoderTo[*fd.FD]
 }
 
 func MakeFDDeletedStringWriterFormat(
 	dryRun bool,
-	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
+	fdStringFormatWriter interfaces.StringEncoderTo[*fd.FD],
 ) *fdDeletedStringWriterFormat {
 	return &fdDeletedStringWriterFormat{
 		dryRun:               dryRun,
@@ -24,7 +24,7 @@ func MakeFDDeletedStringWriterFormat(
 	}
 }
 
-func (f *fdDeletedStringWriterFormat) WriteStringFormat(
+func (f *fdDeletedStringWriterFormat) EncodeStringTo(
 	fd *fd.FD,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -39,7 +39,7 @@ func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 		prefix = string_format_writer.StringWouldDelete
 	}
 
-	n2, err = f.rightAlignedWriter.WriteStringFormat(prefix, sw)
+	n2, err = f.rightAlignedWriter.EncodeStringTo(prefix, sw)
 	n += n2
 
 	if err != nil {
@@ -55,7 +55,7 @@ func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.fdStringFormatWriter.WriteStringFormat(
+	n2, err = f.fdStringFormatWriter.EncodeStringTo(
 		fd,
 		sw,
 	)

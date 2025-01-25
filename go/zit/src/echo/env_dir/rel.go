@@ -11,13 +11,13 @@ type RelativePath interface {
 	Rel(string) string
 }
 
-func (s env) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
+func (s env) MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[string] {
 	return relativePathStringFormatWriter(s)
 }
 
 type relativePathStringFormatWriter env
 
-func (f relativePathStringFormatWriter) WriteStringFormat(
+func (f relativePathStringFormatWriter) EncodeStringTo(
 	p string,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

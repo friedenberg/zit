@@ -46,7 +46,7 @@ type textFormatter struct {
 	object_metadata.TextFormatterFamily
 }
 
-func (tf textFormatter) WriteStringFormat(
+func (tf textFormatter) EncodeStringTo(
 	z *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {

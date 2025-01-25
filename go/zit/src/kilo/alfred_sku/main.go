@@ -15,14 +15,14 @@ import (
 type Writer struct {
 	alfredWriter alfred.Writer
 	abbr         ids.Abbr
-	organizeFmt  interfaces.StringFormatWriter[*sku.Transacted]
+	organizeFmt  interfaces.StringEncoderTo[*sku.Transacted]
 	alfred.ItemPool
 }
 
 func New(
 	out io.Writer,
 	abbr ids.Abbr,
-	organizeFmt interfaces.StringFormatWriter[*sku.Transacted],
+	organizeFmt interfaces.StringEncoderTo[*sku.Transacted],
 	aw alfred.Writer,
 	itemPool alfred.ItemPool,
 ) (w *Writer, err error) {

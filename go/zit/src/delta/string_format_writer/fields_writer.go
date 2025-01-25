@@ -50,7 +50,7 @@ func MakeCliFormatFields(
 	}
 }
 
-func (f *fieldsWriter) WriteStringFormat(
+func (f *fieldsWriter) EncodeStringTo(
 	box Box,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

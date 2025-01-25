@@ -86,7 +86,7 @@ func (u *Repo) MakeFormatFunc(
 		p := u.SkuFormatBoxTransactedNoColor()
 
 		f = func(tl *sku.Transacted) (err error) {
-			if _, err = p.WriteStringFormat(tl, out); err != nil {
+			if _, err = p.EncodeStringTo(tl, out); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -222,7 +222,7 @@ func (u *Repo) MakeFormatFunc(
 		)
 
 		f = func(tl *sku.Transacted) (err error) {
-			_, err = fo.WriteStringFormat(tl, out)
+			_, err = fo.EncodeStringTo(tl, out)
 			return
 		}
 
@@ -502,7 +502,7 @@ func (u *Repo) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			sb := &strings.Builder{}
 
-			if _, err = cliFmt.WriteStringFormat(o, sb); err != nil {
+			if _, err = cliFmt.EncodeStringTo(o, sb); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -556,7 +556,7 @@ func (u *Repo) MakeFormatFunc(
 
 			sb := &strings.Builder{}
 
-			if _, err = cliFmt.WriteStringFormat(o, sb); err != nil {
+			if _, err = cliFmt.EncodeStringTo(o, sb); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

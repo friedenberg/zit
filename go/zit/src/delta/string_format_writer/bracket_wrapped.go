@@ -6,18 +6,18 @@ import (
 )
 
 func MakeBracketWrapped[T any](
-	sfw interfaces.StringFormatWriter[T],
-) interfaces.StringFormatWriter[T] {
+	sfw interfaces.StringEncoderTo[T],
+) interfaces.StringEncoderTo[T] {
 	return &bracketWrapped[T]{
 		stringFormatWriter: sfw,
 	}
 }
 
 type bracketWrapped[T any] struct {
-	stringFormatWriter interfaces.StringFormatWriter[T]
+	stringFormatWriter interfaces.StringEncoderTo[T]
 }
 
-func (f bracketWrapped[T]) WriteStringFormat(
+func (f bracketWrapped[T]) EncodeStringTo(
 	e T,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -34,7 +34,7 @@ func (f bracketWrapped[T]) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.stringFormatWriter.WriteStringFormat(e, w)
+	n2, err = f.stringFormatWriter.EncodeStringTo(e, w)
 	n += int64(n2)
 
 	if err != nil {

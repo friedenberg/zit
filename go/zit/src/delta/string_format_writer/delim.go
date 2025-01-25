@@ -13,7 +13,7 @@ import (
 func MakeDelim[T any](
 	delim string,
 	w1 interfaces.WriterAndStringWriter,
-	f interfaces.StringFormatWriter[T],
+	f interfaces.StringEncoderTo[T],
 ) func(T) error {
 	w := bufio.NewWriter(w1)
 
@@ -22,7 +22,7 @@ func MakeDelim[T any](
 			ui.TodoP3("modify flushing behavior based on w1 being a TTY")
 			defer errors.DeferredFlusher(&err, w)
 
-			if _, err = f.WriteStringFormat(e, w); err != nil {
+			if _, err = f.EncodeStringTo(e, w); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

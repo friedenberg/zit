@@ -6,13 +6,13 @@ import (
 
 func MakeFunc[T any](
 	f interfaces.FuncStringWriterFormat[T],
-) interfaces.StringFormatWriter[T] {
+) interfaces.StringEncoderTo[T] {
 	return funk[T](f)
 }
 
 type funk[T any] interfaces.FuncStringWriterFormat[T]
 
-func (f funk[T]) WriteStringFormat(
+func (f funk[T]) EncodeStringTo(
 	e T,
 	w interfaces.WriterAndStringWriter,
 ) (int64, error) {

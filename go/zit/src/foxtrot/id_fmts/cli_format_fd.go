@@ -8,12 +8,12 @@ import (
 )
 
 type fdCliFormat struct {
-	stringFormatWriter interfaces.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringEncoderTo[string]
 }
 
 func MakeFDCliFormat(
 	co string_format_writer.ColorOptions,
-	relativePathStringFormatWriter interfaces.StringFormatWriter[string],
+	relativePathStringFormatWriter interfaces.StringEncoderTo[string],
 ) *fdCliFormat {
 	return &fdCliFormat{
 		stringFormatWriter: string_format_writer.MakeColor[string](
@@ -24,7 +24,7 @@ func MakeFDCliFormat(
 	}
 }
 
-func (f *fdCliFormat) WriteStringFormat(
+func (f *fdCliFormat) EncodeStringTo(
 	k *fd.FD,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
@@ -32,7 +32,7 @@ func (f *fdCliFormat) WriteStringFormat(
 
 	var n1 int64
 
-	n1, err = f.stringFormatWriter.WriteStringFormat(k.String(), w)
+	n1, err = f.stringFormatWriter.EncodeStringTo(k.String(), w)
 	n += n1
 
 	if err != nil {

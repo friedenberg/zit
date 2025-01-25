@@ -9,7 +9,7 @@ type stringFormatWriter struct{}
 
 var StringFormatWriterString stringFormatWriter
 
-func (stringFormatWriter) WriteStringFormat(
+func (stringFormatWriter) EncodeStringTo(
 	e *String,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {

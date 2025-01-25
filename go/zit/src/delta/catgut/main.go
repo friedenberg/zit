@@ -8,7 +8,7 @@ type (
 	}
 
 	StringFormatWriter[T any] interface {
-		interfaces.StringFormatWriter[T]
+		interfaces.StringEncoderTo[T]
 	}
 
 	StringFormatReadWriter[T any] interface {

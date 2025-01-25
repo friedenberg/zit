@@ -7,7 +7,7 @@ import (
 
 func MakeIndentedHeader(
 	o ColorOptions,
-) interfaces.StringFormatWriter[string] {
+) interfaces.StringEncoderTo[string] {
 	return &indentedHeader{
 		stringFormatWriter: MakeColor[string](
 			o,
@@ -18,17 +18,17 @@ func MakeIndentedHeader(
 }
 
 type indentedHeader struct {
-	stringFormatWriter interfaces.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringEncoderTo[string]
 }
 
-func (f indentedHeader) WriteStringFormat(
+func (f indentedHeader) EncodeStringTo(
 	v string,
 	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	// n1 int
 	var n2 int64
 
-	n2, err = f.stringFormatWriter.WriteStringFormat(v, w)
+	n2, err = f.stringFormatWriter.EncodeStringTo(v, w)
 	n += n2
 
 	if err != nil {
