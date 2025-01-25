@@ -224,7 +224,7 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 	return
 }
 
-func (a InventoryList) DecodeStreamFrom(
+func (a InventoryList) DecodeObjectStreamFrom(
 	output interfaces.FuncIter[*sku.Transacted],
 	reader io.Reader,
 ) (err error) {

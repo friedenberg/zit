@@ -1,6 +1,8 @@
 package remote_http
 
 import (
+	"net/http"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -41,7 +43,40 @@ func (client client) ReadAllSkus(
 }
 
 func (client client) ReadAllInventoryLists(
-	f interfaces.FuncIter[*sku.Transacted],
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return todo.Implement()
+	var request *http.Request
+
+	{
+		var err error
+
+		if request, err = http.NewRequestWithContext(
+			client.GetEnv(),
+			"GET",
+			"/inventory_lists",
+			nil,
+		); err != nil {
+			client.envUI.CancelWithError(err)
+		}
+	}
+
+	var response *http.Response
+
+	{
+		var err error
+
+		if response, err = client.http.Do(request); err != nil {
+			client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
+		}
+	}
+
+	if err = client.typedBlobStore.DecodeObjectStreamFrom(
+		output,
+		response.Body,
+	); err != nil {
+		client.envUI.CancelWithError(err)
+		return
+	}
+
+	return
 }
