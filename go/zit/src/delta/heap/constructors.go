@@ -7,7 +7,7 @@ import (
 )
 
 func Make[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler1[TPtr],
+	equaler interfaces.Equaler[TPtr],
 	lessor interfaces.Lessor3[TPtr],
 	resetter interfaces.Resetter2[T, TPtr],
 ) *Heap[T, TPtr] {
@@ -22,7 +22,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 }
 
 func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler1[TPtr],
+	equaler interfaces.Equaler[TPtr],
 	lessor interfaces.Lessor3[TPtr],
 	resetter interfaces.Resetter2[T, TPtr],
 	s []TPtr,
@@ -42,7 +42,7 @@ func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
 }
 
 func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler1[TPtr],
+	equaler interfaces.Equaler[TPtr],
 	lessor interfaces.Lessor3[TPtr],
 	resetter interfaces.Resetter2[T, TPtr],
 	s []TPtr,

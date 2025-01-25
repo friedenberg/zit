@@ -1,7 +1,6 @@
 package interfaces
 
 import (
-	"flag"
 	"iter"
 )
 
@@ -28,7 +27,6 @@ type SetLike[T any] interface {
 	Key(T) string
 	Get(string) (T, bool)
 	Contains(T) bool
-	EachKey(FuncIterKey) error
 	AllKeys() iter.Seq[string]
 
 	CloneSetLike() SetLike[T]
@@ -95,34 +93,10 @@ type Pool2[T Poolable[T], TPtr PoolablePtr[T]] interface {
 	PutMany(...TPtr) error
 }
 
-//  __     __    _              ____       _
-//  \ \   / /_ _| |_   _  ___  / ___|  ___| |_ ___
-//   \ \ / / _` | | | | |/ _ \ \___ \ / _ \ __/ __|
-//    \ V / (_| | | |_| |  __/  ___) |  __/ |_\__ \
-//     \_/ \__,_|_|\__,_|\___| |____/ \___|\__|___/
-//
-
 type Adder[E any] interface {
 	Add(E) error
 }
 
-type Cloner[E any] interface {
-	Clone() E
-}
-
 type AdderPtr[E any, EPtr Ptr[E]] interface {
 	AddPtr(EPtr) error
-}
-
-type AdderCustom[E any] interface {
-	AddCustomKey(E, func(E) string) error
-}
-
-type ValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
-	Strings() []string
-	SetLike[T]
-}
-
-type MutableValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
-	MutableSetLike[T]
 }

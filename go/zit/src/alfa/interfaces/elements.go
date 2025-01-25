@@ -14,11 +14,6 @@ type ValueLike interface {
 	Element
 }
 
-type ValuePtrLike interface {
-	ValueLike
-	Setter
-}
-
 type Value[T any] interface {
 	ValueLike
 	Equatable[T]
@@ -28,17 +23,6 @@ type ValuePtr[T any] interface {
 	ValueLike
 	// Value[T]
 	Ptr[T]
-}
-
-type Id[T any] interface {
-	Value[T]
-	GenreGetter
-}
-
-type IdPtr[T any] interface {
-	Id[T]
-	ValuePtr[T]
-	Resetable[T]
 }
 
 // TODO-P2 remove
@@ -51,20 +35,8 @@ type Lessor3[T any] interface {
 }
 
 // TODO-P2 rename
-type Lessor2[T any, TPtr Ptr[T]] interface {
-	Lessor3[T]
-	LessPtr(TPtr, TPtr) bool
-}
-
-// TODO-P2 rename
-type Equaler1[T any] interface {
+type Equaler[T any] interface {
 	Equals(T, T) bool
-}
-
-// TODO-P2 rename
-type Equaler[T any, TPtr Ptr[T]] interface {
-	Equaler1[T]
-	EqualsPtr(TPtr, TPtr) bool
 }
 
 type Resetter2[T any, TPtr Ptr[T]] interface {

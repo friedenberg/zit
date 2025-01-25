@@ -29,7 +29,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	h *Heap[T, TPtr],
 	r func() (TPtr, error),
 	w interfaces.FuncIter[TPtr],
-	equaler interfaces.Equaler1[TPtr],
+	equaler interfaces.Equaler[TPtr],
 	l interfaces.Lessor3[TPtr],
 	re interfaces.Resetter2[T, TPtr],
 ) (err error) {

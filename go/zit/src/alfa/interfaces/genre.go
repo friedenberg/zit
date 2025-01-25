@@ -6,12 +6,6 @@ type ObjectId interface {
 	Parts() [3]string
 }
 
-type ObjectIdWithRepoId interface {
-	GenreGetter
-	RepoIdGetter
-	Stringer
-}
-
 type RepoId interface {
 	Stringer
 	EqualsRepoId(RepoIdGetter) bool

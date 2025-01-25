@@ -5,11 +5,10 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
-type ParsedBlobTomlFormatter2[O interfaces.Blob[O]] struct{}
+type ParsedBlobTomlFormatter2[O any] struct{}
 
 func (ParsedBlobTomlFormatter2[O]) EncodeTo(
 	t O,

@@ -9,36 +9,37 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-type tomlBlobParseSaver[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+type tomlBlobDecoder[
+	O any,
+	OPtr interfaces.Ptr[O],
 ] struct {
 	awf              interfaces.BlobWriter
 	ignoreTomlErrors bool
 }
 
-func MakeTomlBlobParseSaver[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
-](awf interfaces.BlobWriter,
-) tomlBlobParseSaver[O, OPtr] {
-	return tomlBlobParseSaver[O, OPtr]{
-		awf: awf,
+func MakeTomlBlobDecoderSaver[
+	O any,
+	OPtr interfaces.Ptr[O],
+](
+	blobWriter interfaces.BlobWriter,
+) tomlBlobDecoder[O, OPtr] {
+	return tomlBlobDecoder[O, OPtr]{
+		awf: blobWriter,
 	}
 }
 
-func MakeTextParserIgnoreTomlErrors[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+func MakeTomlDecoderIgnoreTomlErrors[
+	O any,
+	OPtr interfaces.Ptr[O],
 ](awf interfaces.BlobWriter,
-) tomlBlobParseSaver[O, OPtr] {
-	return tomlBlobParseSaver[O, OPtr]{
+) tomlBlobDecoder[O, OPtr] {
+	return tomlBlobDecoder[O, OPtr]{
 		awf:              awf,
 		ignoreTomlErrors: true,
 	}
 }
 
-func (f tomlBlobParseSaver[O, OPtr]) DecodeFrom(
+func (f tomlBlobDecoder[O, OPtr]) DecodeFrom(
 	t OPtr,
 	r io.Reader,
 ) (n int64, err error) {

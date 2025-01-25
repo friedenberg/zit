@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func Elements[T any](s interfaces.Iterable[T]) (out []T) {
+func Elements[T any](s interfaces.Collection[T]) (out []T) {
 	if s == nil {
 		return
 	}
@@ -21,7 +21,7 @@ func Elements[T any](s interfaces.Iterable[T]) (out []T) {
 }
 
 func ElementsSorted[T any](
-	s interfaces.Iterable[T],
+	s interfaces.Collection[T],
 	sf func(T, T) bool,
 ) (out []T) {
 	if s == nil {

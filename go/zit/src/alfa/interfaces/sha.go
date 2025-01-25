@@ -24,7 +24,6 @@ type ShaGetter interface {
 // WriterAndStringWriter, but this forces just Writer
 type (
 	ShaReadCloser interface {
-		io.Seeker
 		io.WriterTo
 		io.ReadCloser
 		GetShaLike() Sha
@@ -33,7 +32,6 @@ type (
 	ShaWriteCloser interface {
 		io.ReaderFrom
 		io.WriteCloser
-		// io.WriterAt
 		GetShaLike() Sha
 	}
 )

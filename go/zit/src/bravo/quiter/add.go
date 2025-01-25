@@ -30,60 +30,6 @@ func AddClonePool[E any, EPtr interfaces.Ptr[E]](
 	return s.AddPtr(a)
 }
 
-func MakeAddClonePoolFunc[E any, EPtr interfaces.Ptr[E]](
-	s interfaces.AdderPtr[E, EPtr],
-	p interfaces.Pool[E, EPtr],
-	r interfaces.Resetter2[E, EPtr],
-) interfaces.FuncIter[EPtr] {
-	return MakeSyncSerializer(func(e EPtr) (err error) {
-		return AddClonePool(s, p, r, e)
-	})
-}
-
-func ExpandAndAddString[E any, EPtr interfaces.SetterPtr[E]](
-	c interfaces.Adder[E],
-	expander func(string) (string, error),
-	v string,
-) (err error) {
-	if expander != nil {
-		v1 := v
-
-		if v1, err = expander(v); err != nil {
-			err = nil
-			v1 = v
-		}
-
-		v = v1
-	}
-
-	if err = AddString[E, EPtr](c, v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-type AddGetKeyer[E interfaces.Lessor[E]] interface {
-	interfaces.Adder[E]
-	Get(string) (E, bool)
-	Key(E) string
-}
-
-func AddIfGreater[E interfaces.Lessor[E]](
-	c AddGetKeyer[E],
-	e E,
-) (ok bool) {
-	k := c.Key(e)
-	var old E
-
-	if old, ok = c.Get(k); !ok || old.Less(e) {
-		c.Add(e)
-	}
-
-	return
-}
-
 func AddOrReplaceIfGreater[T interface {
 	interfaces.Stringer
 	interfaces.ValueLike
@@ -104,26 +50,6 @@ func AddOrReplaceIfGreater[T interface {
 
 	if shouldAdd {
 		err = c.Add(b)
-	}
-
-	return
-}
-
-func AddStringPtr[E any, EPtr interfaces.SetterPtr[E]](
-	c interfaces.AdderPtr[E, EPtr],
-	p interfaces.Pool[E, EPtr],
-	v string,
-) (err error) {
-	e := p.Get()
-
-	if err = e.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = c.AddPtr(e); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

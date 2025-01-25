@@ -94,14 +94,6 @@ func (a Sigil) ContainsOneOf(b Sigil) bool {
 	return a&b != 0
 }
 
-func (a Sigil) GetSigil() interfaces.Sigil {
-	return a
-}
-
-func (a *Sigil) GetSigilPtr() *Sigil {
-	return a
-}
-
 func (a Sigil) IsLatestOrUnknown() bool {
 	return a == SigilLatest || a == SigilUnknown || a == SigilLatest|SigilUnknown
 }

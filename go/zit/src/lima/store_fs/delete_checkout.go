@@ -18,7 +18,7 @@ func (c DeleteCheckout) Run(
 	dryRun bool,
 	s env_repo.Env,
 	p interfaces.FuncIter[*fd.FD],
-	fs interfaces.Iterable[*fd.FD],
+	fs interfaces.Collection[*fd.FD],
 ) (err error) {
 	els := quiter.ElementsSorted(
 		fs,

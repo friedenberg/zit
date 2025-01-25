@@ -49,7 +49,7 @@ func (h *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
 	h.h.p = v
 }
 
-func (h *Heap[T, TPtr]) GetEqualer() interfaces.Equaler1[TPtr] {
+func (h *Heap[T, TPtr]) GetEqualer() interfaces.Equaler[TPtr] {
 	return h.h.equaler
 }
 

@@ -24,10 +24,10 @@ func MakeConfigStore(
 		toml_v0: MakeBlobStore(
 			repoLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[config_mutable_blobs.V0](
+				MakeTomlDecoderIgnoreTomlErrors[config_mutable_blobs.V0](
 					repoLayout,
 				),
-				ParsedBlobTomlFormatter[config_mutable_blobs.V0, *config_mutable_blobs.V0]{},
+				TomlBlobEncoder[config_mutable_blobs.V0, *config_mutable_blobs.V0]{},
 				repoLayout,
 			),
 			func(a *config_mutable_blobs.V0) {
@@ -37,10 +37,10 @@ func MakeConfigStore(
 		toml_v1: MakeBlobStore(
 			repoLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[config_mutable_blobs.V1](
+				MakeTomlDecoderIgnoreTomlErrors[config_mutable_blobs.V1](
 					repoLayout,
 				),
-				ParsedBlobTomlFormatter[config_mutable_blobs.V1, *config_mutable_blobs.V1]{},
+				TomlBlobEncoder[config_mutable_blobs.V1, *config_mutable_blobs.V1]{},
 				repoLayout,
 			),
 			func(a *config_mutable_blobs.V1) {

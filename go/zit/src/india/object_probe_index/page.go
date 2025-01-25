@@ -27,7 +27,7 @@ type page struct {
 }
 
 func (p *page) initialize(
-	equaler interfaces.Equaler1[*row],
+	equaler interfaces.Equaler[*row],
 	s env_repo.Env,
 	pid sha.PageId,
 ) (err error) {

@@ -10,7 +10,7 @@ import (
 )
 
 type Index interface {
-	interfaces.Flusher
+	errors.Flusher
 	CreateZettelId() (*ids.ZettelId, error)
 	interfaces.ResetterWithError
 	AddZettelId(interfaces.ObjectId) error

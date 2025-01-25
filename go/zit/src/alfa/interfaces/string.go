@@ -27,11 +27,6 @@ type StringerSetterPtr[T any] interface {
 	Ptr[T]
 }
 
-type StringLenner interface {
-	Stringer
-	Lenner
-}
-
 type Setter interface {
 	Set(string) error
 }

@@ -13,30 +13,30 @@ type Type struct {
 }
 
 func MakeTypeStore(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 ) Type {
 	return Type{
 		toml_v0: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[type_blobs.V0](
-					dirLayout,
+				MakeTomlDecoderIgnoreTomlErrors[type_blobs.V0](
+					envRepo,
 				),
-				ParsedBlobTomlFormatter[type_blobs.V0, *type_blobs.V0]{},
-				dirLayout,
+				TomlBlobEncoder[type_blobs.V0, *type_blobs.V0]{},
+				envRepo,
 			),
 			func(a *type_blobs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[type_blobs.TomlV1](
-					dirLayout,
+				MakeTomlDecoderIgnoreTomlErrors[type_blobs.TomlV1](
+					envRepo,
 				),
-				ParsedBlobTomlFormatter[type_blobs.TomlV1, *type_blobs.TomlV1]{},
-				dirLayout,
+				TomlBlobEncoder[type_blobs.TomlV1, *type_blobs.TomlV1]{},
+				envRepo,
 			),
 			func(a *type_blobs.TomlV1) {
 				a.Reset()

@@ -5,7 +5,7 @@ import (
 )
 
 type format2[
-	O interfaces.Blob[O],
+	O any,
 ] struct {
 	interfaces.DecoderFrom[O]
 	interfaces.SavedBlobFormatter
@@ -13,7 +13,7 @@ type format2[
 }
 
 func MakeBlobFormat2[
-	O interfaces.Blob[O],
+	O any,
 ](
 	decoder interfaces.DecoderFrom[O],
 	encoder interfaces.EncoderTo[O],

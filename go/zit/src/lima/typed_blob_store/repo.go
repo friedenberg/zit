@@ -22,10 +22,10 @@ func MakeRepoStore(
 		v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[repo_blobs.V0](
+				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.V0](
 					dirLayout,
 				),
-				ParsedBlobTomlFormatter[repo_blobs.V0, *repo_blobs.V0]{},
+				TomlBlobEncoder[repo_blobs.V0, *repo_blobs.V0]{},
 				dirLayout,
 			),
 			func(a *repo_blobs.V0) {
@@ -35,10 +35,10 @@ func MakeRepoStore(
 		toml_relay_local_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[repo_blobs.TomlRelayLocalV0](
+				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.TomlRelayLocalV0](
 					dirLayout,
 				),
-				ParsedBlobTomlFormatter[repo_blobs.TomlRelayLocalV0, *repo_blobs.TomlRelayLocalV0]{},
+				TomlBlobEncoder[repo_blobs.TomlRelayLocalV0, *repo_blobs.TomlRelayLocalV0]{},
 				dirLayout,
 			),
 			func(a *repo_blobs.TomlRelayLocalV0) {

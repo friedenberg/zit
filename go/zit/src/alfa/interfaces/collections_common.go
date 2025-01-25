@@ -2,8 +2,6 @@ package interfaces
 
 import (
 	"iter"
-
-	"golang.org/x/exp/constraints"
 )
 
 type (
@@ -22,19 +20,9 @@ type ContainsKeyer interface {
 	ContainsKey(string) bool
 }
 
-type StringAdder interface {
-	AddString(string) error
-}
-
 type Iterable[T any] interface {
 	Any() T
 	All() iter.Seq[T]
-	Lenner
-}
-
-type KeyedIterable[K constraints.Ordered, T any] interface {
-	Iterable[T]
-	AllPairs() iter.Seq2[K, T]
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {

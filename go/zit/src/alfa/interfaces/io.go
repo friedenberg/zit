@@ -17,6 +17,19 @@ type (
 )
 
 type (
+	ReadWrapper interface {
+		WrapReader(r io.Reader) (io.ReadCloser, error)
+	}
+
+	WriteWrapper interface {
+		WrapWriter(w io.Writer) (io.WriteCloser, error)
+	}
+
+	IOWrapper interface {
+		ReadWrapper
+		WriteWrapper
+	}
+
 	WriterAndStringWriter interface {
 		io.Writer
 		io.StringWriter

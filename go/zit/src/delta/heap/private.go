@@ -20,7 +20,7 @@ type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
 	Elements   []TPtr
 	lastPopped TPtr
 	p          interfaces.Pool[T, TPtr]
-	equaler    interfaces.Equaler1[TPtr]
+	equaler    interfaces.Equaler[TPtr]
 }
 
 func (h *heapPrivate[T, TPtr]) GetPool() interfaces.Pool[T, TPtr] {

@@ -9,15 +9,15 @@ import (
 )
 
 type nopBlobParseSaver[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+	O any,
+	OPtr interfaces.Ptr[O],
 ] struct {
 	awf interfaces.BlobWriter
 }
 
 func MakeNopBlobParseSaver[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+	O any,
+	OPtr interfaces.Ptr[O],
 ](awf interfaces.BlobWriter,
 ) nopBlobParseSaver[O, OPtr] {
 	return nopBlobParseSaver[O, OPtr]{

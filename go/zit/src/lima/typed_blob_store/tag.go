@@ -30,10 +30,10 @@ func MakeTagStore(
 		toml_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blobs.V0](
+				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.V0](
 					dirLayout,
 				),
-				ParsedBlobTomlFormatter[tag_blobs.V0, *tag_blobs.V0]{},
+				TomlBlobEncoder[tag_blobs.V0, *tag_blobs.V0]{},
 				dirLayout,
 			),
 			func(a *tag_blobs.V0) {
@@ -43,10 +43,10 @@ func MakeTagStore(
 		toml_v1: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blobs.TomlV1](
+				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.TomlV1](
 					dirLayout,
 				),
-				ParsedBlobTomlFormatter[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
+				TomlBlobEncoder[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
 				dirLayout,
 			),
 			func(a *tag_blobs.TomlV1) {

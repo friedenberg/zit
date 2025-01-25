@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
-type ParsedBlobTomlFormatter[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+type TomlBlobEncoder[
+	O any,
+	OPtr interfaces.Ptr[O],
 ] struct{}
 
-func (ParsedBlobTomlFormatter[O, OPtr]) EncodeTo(
+func (TomlBlobEncoder[O, OPtr]) EncodeTo(
 	t OPtr,
 	w1 io.Writer,
 ) (n int64, err error) {

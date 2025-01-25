@@ -8,8 +8,8 @@ import (
 )
 
 type format[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+	O any,
+	OPtr interfaces.Ptr[O],
 ] struct {
 	interfaces.DecoderFrom[OPtr]
 	interfaces.SavedBlobFormatter
@@ -17,17 +17,17 @@ type format[
 }
 
 func MakeBlobFormat[
-	O interfaces.Blob[O],
-	OPtr interfaces.BlobPtr[O],
+	O any,
+	OPtr interfaces.Ptr[O],
 ](
 	decoder interfaces.DecoderFrom[OPtr],
 	encoder interfaces.EncoderTo[OPtr],
-	arf interfaces.BlobReader,
+	blobReader interfaces.BlobReader,
 ) Format[O, OPtr] {
 	return format[O, OPtr]{
 		DecoderFrom:        decoder,
 		EncoderTo:          encoder,
-		SavedBlobFormatter: MakeSavedBlobFormatter(arf),
+		SavedBlobFormatter: MakeSavedBlobFormatter(blobReader),
 	}
 }
 

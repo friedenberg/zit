@@ -58,7 +58,7 @@ func MakeNoDuplicates(s env_repo.Env, path string) (e *object_probe_index, err e
 }
 
 func (e *object_probe_index) initialize(
-	equaler interfaces.Equaler1[*row],
+	equaler interfaces.Equaler[*row],
 	s env_repo.Env,
 	path string,
 ) (err error) {

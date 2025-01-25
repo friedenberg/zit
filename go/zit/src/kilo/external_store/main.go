@@ -1,6 +1,7 @@
 package external_store
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
@@ -78,7 +79,7 @@ type (
 	StoreLike interface {
 		Initialize(Supplies) error
 		QueryCheckedOut
-		interfaces.Flusher
+		errors.Flusher
 		sku.ExternalStoreForQuery
 	}
 

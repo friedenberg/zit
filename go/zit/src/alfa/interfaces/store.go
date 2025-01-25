@@ -7,10 +7,6 @@ type (
 		FormatSavedBlob(io.Writer, Sha) (int64, error)
 	}
 
-	ParseSaver[T any] interface {
-		ParseSaveBlob(io.Reader, T) (Sha, int64, error)
-	}
-
 	Format[T any] interface {
 		SavedBlobFormatter
 		Coder[T]

@@ -8,8 +8,8 @@ import (
 )
 
 type BlobStore[
-	A interfaces.Blob[A],
-	APtr interfaces.BlobPtr[A],
+	A any,
+	APtr interfaces.Ptr[A],
 ] struct {
 	dirLayout env_repo.Env
 	Format[A, APtr]
@@ -17,8 +17,8 @@ type BlobStore[
 }
 
 func MakeBlobStore[
-	A interfaces.Blob[A],
-	APtr interfaces.BlobPtr[A],
+	A any,
+	APtr interfaces.Ptr[A],
 ](
 	repoLayout env_repo.Env,
 	format Format[A, APtr],

@@ -12,9 +12,10 @@ type (
 )
 
 type TypedStore[
-	A interfaces.Blob[A],
-	APtr interfaces.BlobPtr[A],
+	A any,
+	APtr interfaces.Ptr[A],
 ] interface {
+	// TODO remove and replace with two-step process
 	SaveBlobText(APtr) (interfaces.Sha, int64, error)
 	Format[A, APtr]
 	interfaces.BlobPool[APtr]
