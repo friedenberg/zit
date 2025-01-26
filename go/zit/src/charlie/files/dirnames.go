@@ -1,12 +1,14 @@
 package files
 
 import (
+	"iter"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -19,19 +21,16 @@ func ReadDir(ps ...string) (dirEntries []os.DirEntry, err error) {
 	return
 }
 
-func ReadDirNames(ps ...string) (names []string, err error) {
-	var d *os.File
+func DirNames(p string) (slice quiter.Slice[string], err error) {
+	var names []os.DirEntry
 
-	if d, err = Open(path.Join(ps...)); err != nil {
+	if names, err = ReadDir(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, d)
-
-	if names, err = d.Readdirnames(0); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, n := range names {
+		slice.Append(path.Join(p, n.Name()))
 	}
 
 	return
@@ -56,6 +55,29 @@ func ReadDirNamesTo(
 	}
 
 	return
+}
+
+func DirNameWriterIgnoringHidden(
+	seq iter.Seq[quiter.ElementOrError[string]],
+) iter.Seq[quiter.ElementOrError[string]] {
+	return func(yield func(quiter.ElementOrError[string]) bool) {
+		for pathOrError := range seq {
+			if pathOrError.Error != nil {
+				yield(pathOrError)
+				return
+			}
+
+			b := filepath.Base(pathOrError.Element)
+
+			if strings.HasPrefix(b, ".") {
+				return
+			}
+
+			if !yield(pathOrError) {
+				return
+			}
+		}
+	}
 }
 
 func MakeDirNameWriterIgnoringHidden(
@@ -103,4 +125,39 @@ func ReadDirNamesLevel2(
 	}
 
 	return
+}
+
+func DirNamesLevel2(
+	p string,
+) iter.Seq[quiter.ElementOrError[string]] {
+	return func(yield func(quiter.ElementOrError[string]) bool) {
+		var topLevel quiter.Slice[string]
+
+		{
+			var err error
+
+			if topLevel, err = DirNames(p); err != nil {
+				yield(quiter.ElementOrError[string]{Error: errors.Wrap(err)})
+				return
+			}
+		}
+
+		for topLevelDir := range topLevel.All() {
+			var secondLevel quiter.Slice[string]
+			{
+				var err error
+
+				if secondLevel, err = DirNames(topLevelDir); err != nil {
+					yield(quiter.ElementOrError[string]{Error: errors.Wrap(err)})
+					return
+				}
+			}
+
+			for secondLevelDir := range secondLevel.All() {
+				if !yield(quiter.ElementOrError[string]{Element: secondLevelDir}) {
+					return
+				}
+			}
+		}
+	}
 }

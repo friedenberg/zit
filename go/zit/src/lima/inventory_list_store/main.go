@@ -2,11 +2,13 @@ package inventory_list_store
 
 import (
 	"fmt"
+	"iter"
 	"sort"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
@@ -360,7 +362,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 	var sh *sha.Sha
 
 	if sh, err = sha.MakeShaFromPath(p); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}
 
@@ -451,25 +453,19 @@ func (s *Store) StreamInventoryList(
 }
 
 func (s *Store) ReadLast() (max *sku.Transacted, err error) {
-	l := &sync.Mutex{}
-
 	var maxSku sku.Transacted
 
-	if err = s.ReadAllInventoryLists(
-		func(b *sku.Transacted) (err error) {
-			l.Lock()
-			defer l.Unlock()
-
-			if sku.TransactedLessor.LessPtr(&maxSku, b) {
-				sku.TransactedResetter.ResetWith(&maxSku, b)
-				return
-			}
-
+	for listOrError := range s.AllInventoryLists() {
+		if listOrError.Error != nil {
+			err = errors.Wrap(listOrError.Error)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		b := listOrError.Element
+
+		if sku.TransactedLessor.LessPtr(&maxSku, b) {
+			sku.TransactedResetter.ResetWith(&maxSku, b)
+		}
 	}
 
 	max = &maxSku
@@ -486,41 +482,53 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) ReadAllInventoryLists(
-	f interfaces.FuncIter[*sku.Transacted],
-) (err error) {
+func (s *Store) AllInventoryLists() iter.Seq[quiter.ElementOrError[*sku.Transacted]] {
 	var p string
 
-	if p, err = s.envRepo.DirObjectGenre(
-		genres.InventoryList,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if p, err = s.envRepo.DirObjectGenre(
+			genres.InventoryList,
+		); err != nil {
+			err = errors.Wrap(err)
+			return func(yield func(quiter.ElementOrError[*sku.Transacted]) bool) {
+				yield(quiter.ElementOrError[*sku.Transacted]{Error: err})
+			}
+		}
 	}
 
-	if err = files.ReadDirNamesLevel2(
-		func(p string) (err error) {
-			var o *sku.Transacted
-
-			if o, err = s.readOnePath(p); err != nil {
-				err = errors.Wrap(err)
-				return
+	return func(yield func(quiter.ElementOrError[*sku.Transacted]) bool) {
+		for pathOrError := range files.DirNamesLevel2(p) {
+			if pathOrError.Error != nil {
+				if !yield(
+					quiter.ElementOrError[*sku.Transacted]{Error: pathOrError.Error},
+				) {
+					return
+				}
 			}
 
-			if err = f(o); err != nil {
-				err = errors.Wrap(err)
-				return
+			var decodedList *sku.Transacted
+
+			{
+				var err error
+
+				if decodedList, err = s.readOnePath(
+					pathOrError.Element,
+				); err != nil {
+					if !yield(
+						quiter.ElementOrError[*sku.Transacted]{Error: errors.Wrap(err)},
+					) {
+						return
+					}
+				}
 			}
 
-			return
-		},
-		p,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+			if !yield(quiter.ElementOrError[*sku.Transacted]{Element: decodedList}) {
+				return
+			}
+		}
 	}
-
-	return
 }
 
 func (s *Store) ReadAllSorted(
@@ -528,15 +536,13 @@ func (s *Store) ReadAllSorted(
 ) (err error) {
 	var skus []*sku.Transacted
 
-	if err = s.ReadAllInventoryLists(
-		func(o *sku.Transacted) (err error) {
-			skus = append(skus, o)
-
+	for listOrError := range s.AllInventoryLists() {
+		if listOrError.Error != nil {
+			err = errors.Wrap(listOrError.Error)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		skus = append(skus, listOrError.Element)
 	}
 
 	sort.Slice(skus, func(i, j int) bool { return skus[i].Less(skus[j]) })
@@ -554,38 +560,38 @@ func (s *Store) ReadAllSorted(
 func (s *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
-	if err = s.ReadAllInventoryLists(
-		func(t *sku.Transacted) (err error) {
-			if err = f(t, t); err != nil {
-				err = errors.Wrapf(
-					err,
-					"InventoryList: %s",
-					t.GetObjectId(),
-				)
+	for listOrError := range s.AllInventoryLists() {
+		if listOrError.Error != nil {
+			err = errors.Wrap(listOrError.Error)
+			return
+		}
 
-				return
-			}
+		t := listOrError.Element
 
-			if err = s.StreamInventoryList(
-				t.GetBlobSha(),
-				func(sk *sku.Transacted) (err error) {
-					return f(t, sk)
-				},
-			); err != nil {
-				err = errors.Wrapf(
-					err,
-					"InventoryList: %s",
-					t.GetObjectId(),
-				)
-
-				return
-			}
+		if err = f(t, t); err != nil {
+			err = errors.Wrapf(
+				err,
+				"InventoryList: %s",
+				t.GetObjectId(),
+			)
 
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = s.StreamInventoryList(
+			t.GetBlobSha(),
+			func(sk *sku.Transacted) (err error) {
+				return f(t, sk)
+			},
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"InventoryList: %s",
+				t.GetObjectId(),
+			)
+
+			return
+		}
 	}
 
 	return

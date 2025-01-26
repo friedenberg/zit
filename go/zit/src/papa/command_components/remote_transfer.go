@@ -3,9 +3,7 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
@@ -26,19 +24,19 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 	remoteInventoryListStore := remote.GetInventoryListStore()
 	localInventoryListStore := local.GetInventoryListStore()
 
-	if err := remoteInventoryListStore.ReadAllInventoryLists(
-		func(sk *sku.Transacted) (err error) {
-			if err = localInventoryListStore.ImportInventoryList(
-				remote.GetBlobStore(),
-				sk,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for listOrError := range remoteInventoryListStore.AllInventoryLists() {
+		if listOrError.Error != nil {
+			req.CancelWithError(listOrError.Error)
 			return
-		},
-	); err != nil {
-		req.CancelWithError(err)
+		}
+
+		if err := localInventoryListStore.ImportInventoryList(
+			remote.GetBlobStore(),
+			listOrError.Element,
+		); err != nil {
+			req.CancelWithError(err)
+			return
+		}
+
 	}
 }

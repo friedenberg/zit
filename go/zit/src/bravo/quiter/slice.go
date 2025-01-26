@@ -35,3 +35,7 @@ func (s Slice[E]) All() iter.Seq[E] {
 		}
 	}
 }
+
+func (s *Slice[E]) Append(element ...E) {
+	*s = append(*s, element...)
+}

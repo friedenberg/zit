@@ -2,8 +2,10 @@ package sku
 
 import (
 	"io"
+	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 )
 
@@ -30,19 +32,9 @@ type InventoryListStore interface {
 	// 	f interfaces.FuncIter[*sku.Transacted],
 	// ) (err error)
 
-	ReadAllInventoryLists(
-		f interfaces.FuncIter[*Transacted],
-	) (err error)
-
-	MakeImporter(
-		options ImporterOptions,
-		storeOptions StoreOptions,
-	) Importer
-
-	ImportList(
-		list *List,
-		i Importer,
-	) (err error)
+	AllInventoryLists() iter.Seq[quiter.ElementOrError[*Transacted]]
+	MakeImporter(ImporterOptions, StoreOptions) Importer
+	ImportList(*List, Importer) error
 }
 
 type ListFormat interface {
