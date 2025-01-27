@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
@@ -106,18 +105,10 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 	bs := u.GetStore().GetTypedBlobStore().InventoryList
 
 	if err := tm.ReadConflictMarker(
-		func(f interfaces.FuncIter[*sku.Transacted]) (err error) {
-			if err = bs.StreamInventoryListBlobSkusFromReader(
-				builtin_types.DefaultOrPanic(genres.InventoryList),
-				br,
-				f,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
+		bs.IterInventoryListBlobSkusFromReader(
+			builtin_types.DefaultOrPanic(genres.InventoryList),
+			br,
+		),
 	); err != nil {
 		u.CancelWithError(err)
 	}

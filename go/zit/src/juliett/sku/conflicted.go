@@ -4,7 +4,6 @@ import (
 	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -156,34 +155,32 @@ func (tm *Conflicted) MergeTags() (err error) {
 }
 
 func (c *Conflicted) ReadConflictMarker(
-	iter func(interfaces.FuncIter[*Transacted]) error,
+	iter iter.Seq2[*Transacted, error],
 ) (err error) {
 	i := 0
 
-	if err = iter(
-		func(sk *Transacted) (err error) {
-			switch i {
-			case 0:
-				c.Local = sk
-
-			case 1:
-				c.Base = sk
-
-			case 2:
-				c.Remote = sk
-
-			default:
-				err = errors.Errorf("too many skus in conflict file")
-				return
-			}
-
-			i++
-
+	for sk, iterErr := range iter {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		switch i {
+		case 0:
+			c.Local = sk
+
+		case 1:
+			c.Base = sk
+
+		case 2:
+			c.Remote = sk
+
+		default:
+			err = errors.Errorf("too many skus in conflict file")
+			return
+		}
+
+		i++
 	}
 
 	// Conflicts can exist between objects without a base

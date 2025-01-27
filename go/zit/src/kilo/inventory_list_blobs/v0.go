@@ -153,3 +153,33 @@ func (s V0) StreamInventoryListBlobSkus(
 
 	return
 }
+
+type V0IterDecoder struct {
+	V0
+}
+
+func (coder V0IterDecoder) DecodeFrom(
+	yield func(*sku.Transacted) bool,
+	reader io.Reader,
+) (n int64, err error) {
+	dec := makeScanner(
+		reader,
+		coder.Format,
+		coder.Options,
+	)
+
+	for dec.Scan() {
+		sk := dec.GetTransacted()
+
+		if !yield(sk) {
+			return
+		}
+	}
+
+	if err = dec.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

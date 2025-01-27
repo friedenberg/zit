@@ -119,21 +119,22 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	if err = importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
+	iter := importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
 		el,
-		func(sk *sku.Transacted) (err error) {
-			if _, err = importer.Import(
-				sk,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	)
 
+	for sk, errIter := range iter {
+		if errIter != nil {
+			err = errors.Wrap(errIter)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if _, err = importer.Import(
+			sk,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if co, err = importer.importLeafSku(

@@ -2,6 +2,7 @@ package typed_blob_store
 
 import (
 	"io"
+	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -21,7 +22,7 @@ type InventoryList struct {
 	boxFormat      *box_format.BoxTransacted
 	v0             inventory_list_blobs.V0
 	v1             inventory_list_blobs.V1
-	streamDecoders map[string]interfaces.DecoderFrom[interfaces.FuncIter[*sku.Transacted]]
+	streamDecoders map[string]interfaces.DecoderFrom[func(*sku.Transacted) bool]
 }
 
 func MakeInventoryStore(
@@ -44,11 +45,11 @@ func MakeInventoryStore(
 		},
 	}
 
-	s.streamDecoders = map[string]interfaces.DecoderFrom[interfaces.FuncIter[*sku.Transacted]]{
-		"": inventory_list_blobs.V0StreamCoder{
+	s.streamDecoders = map[string]interfaces.DecoderFrom[func(*sku.Transacted) bool]{
+		"": inventory_list_blobs.V0IterDecoder{
 			V0: s.v0,
 		},
-		builtin_types.InventoryListTypeV1: inventory_list_blobs.V1StreamCoder{
+		builtin_types.InventoryListTypeV1: inventory_list_blobs.V1IterDecoder{
 			V1: s.v1,
 		},
 	}
@@ -195,80 +196,89 @@ func (a InventoryList) PutTransactedWithBlob(
 	return
 }
 
+type iterSku = func(*sku.Transacted) bool
+
 func (a InventoryList) StreamInventoryListBlobSkus(
 	tg sku.TransactedGetter,
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	sk := tg.GetSku()
-	tipe := sk.GetType()
-	blobSha := sk.GetBlobSha()
+) iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		sk := tg.GetSku()
+		tipe := sk.GetType()
+		blobSha := sk.GetBlobSha()
 
-	var readCloser interfaces.ShaReadCloser
+		var readCloser interfaces.ShaReadCloser
 
-	if readCloser, err = a.envRepo.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
+		{
+			var err error
+
+			if readCloser, err = a.envRepo.BlobReader(blobSha); err != nil {
+				yield(nil, errors.Wrap(err))
+				return
+			}
+		}
+
+		defer errors.DeferredYieldCloser(yield, readCloser)
+
+		iter := a.IterInventoryListBlobSkusFromReader(
+			tipe,
+			readCloser,
+		)
+
+		for sk, err := range iter {
+			if !yield(sk, err) {
+				return
+			}
+		}
 	}
-
-	defer errors.DeferredCloser(&err, readCloser)
-
-	if err = a.StreamInventoryListBlobSkusFromReader(
-		tipe,
-		readCloser,
-		output,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
-func (a InventoryList) DecodeObjectStreamFrom(
-	output interfaces.FuncIter[*sku.Transacted],
+func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
-) (err error) {
-	decoder := triple_hyphen_io.Decoder[*ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]]{
-		Metadata: ids.TypedMetadataCoder[interfaces.FuncIter[*sku.Transacted]]{},
-		Blob: ids.TypedDecodersWithoutType[interfaces.FuncIter[*sku.Transacted]](
-			a.streamDecoders,
-		),
-	}
+) iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		decoder := triple_hyphen_io.Decoder[*ids.TypeWithObject[iterSku]]{
+			Metadata: ids.TypedMetadataCoder[iterSku]{},
+			Blob: ids.TypedDecodersWithoutType[iterSku](
+				a.streamDecoders,
+			),
+		}
 
-	if _, err = decoder.DecodeFrom(
-		&ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]{
-			Object: output,
-		},
-		reader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if _, err := decoder.DecodeFrom(
+			&ids.TypeWithObject[iterSku]{
+				Object: func(sk *sku.Transacted) bool {
+					return yield(sk, nil)
+				},
+			},
+			reader,
+		); err != nil {
+			yield(nil, err)
+			return
+		}
 	}
-
-	return
 }
 
-func (a InventoryList) StreamInventoryListBlobSkusFromReader(
+func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	reader io.Reader,
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	decoder := ids.TypedDecodersWithoutType[interfaces.FuncIter[*sku.Transacted]](
-		a.streamDecoders,
-	)
+) iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		decoder := ids.TypedDecodersWithoutType[iterSku](
+			a.streamDecoders,
+		)
 
-	if _, err = decoder.DecodeFrom(
-		&ids.TypeWithObject[interfaces.FuncIter[*sku.Transacted]]{
-			Type:   &tipe,
-			Object: output,
-		},
-		reader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if _, err := decoder.DecodeFrom(
+			&ids.TypeWithObject[iterSku]{
+				Type: &tipe,
+				Object: func(sk *sku.Transacted) bool {
+					return yield(sk, nil)
+				},
+			},
+			reader,
+		); err != nil {
+			yield(nil, errors.Wrap(err))
+			return
+		}
 	}
-
-	return
 }
 
 func (a InventoryList) ReadInventoryListObject(

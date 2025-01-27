@@ -5,7 +5,6 @@ import (
 	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 )
 
@@ -18,10 +17,7 @@ type InventoryListStore interface {
 
 	ReadLast() (max *Transacted, err error)
 
-	StreamInventoryList(
-		blobSha interfaces.Sha,
-		f interfaces.FuncIter[*Transacted],
-	) (err error)
+	IterInventoryList(interfaces.Sha) iter.Seq2[*Transacted, error]
 
 	ReadAllSkus(
 		f func(besty, sk *Transacted) error,
@@ -32,7 +28,7 @@ type InventoryListStore interface {
 	// 	f interfaces.FuncIter[*sku.Transacted],
 	// ) (err error)
 
-	AllInventoryLists() iter.Seq[quiter.ElementOrError[*Transacted]]
+	IterAllInventoryLists() iter.Seq2[*Transacted, error]
 	MakeImporter(ImporterOptions, StoreOptions) Importer
 	ImportList(*List, Importer) error
 }

@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"iter"
 
 	"golang.org/x/xerrors"
 )
@@ -143,4 +144,12 @@ var errImplement = New("not implemented")
 //go:noinline
 func Implement() (err error) {
 	return WrapSkip(1, errImplement)
+}
+
+//go:noinline
+func IterWrapped[T any](err error) iter.Seq2[T, error] {
+	return func(yield func(T, error) bool) {
+		var t T
+		yield(t, WrapN(1, err))
+	}
 }

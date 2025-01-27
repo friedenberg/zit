@@ -168,3 +168,34 @@ func (s V1) StreamInventoryListBlobSkus(
 
 	return
 }
+
+type V1IterDecoder struct {
+	V1
+}
+
+func (coder V1IterDecoder) DecodeFrom(
+	yield func(*sku.Transacted) bool,
+	reader io.Reader,
+) (n int64, err error) {
+	bufferedReader := bufio.NewReader(reader)
+
+	for {
+		o := sku.GetTransactedPool().Get()
+
+		if _, err = coder.Box.ReadStringFormat(o, bufferedReader); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if !yield(o) {
+			return
+		}
+	}
+
+	return
+}

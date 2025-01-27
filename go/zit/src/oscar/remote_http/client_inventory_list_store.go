@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
@@ -31,11 +30,10 @@ func (client client) ReadLast() (max *sku.Transacted, err error) {
 	return nil, todo.Implement()
 }
 
-func (client client) StreamInventoryList(
+func (client client) IterInventoryList(
 	blobSha interfaces.Sha,
-	f interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	return todo.Implement()
+) iter.Seq2[*sku.Transacted, error] {
+	return nil
 }
 
 func (client client) ReadAllSkus(
@@ -44,48 +42,7 @@ func (client client) ReadAllSkus(
 	return todo.Implement()
 }
 
-func (client client) AllInventoryLists() iter.Seq[quiter.ElementOrError[*sku.Transacted]] {
-	// var request *http.Request
-
-	// {
-	// 	var err error
-
-	// 	if request, err = http.NewRequestWithContext(
-	// 		client.GetEnv(),
-	// 		"GET",
-	// 		"/inventory_lists",
-	// 		nil,
-	// 	); err != nil {
-	// 		client.envUI.CancelWithError(err)
-	// 		return nil
-	// 	}
-	// }
-
-	// var response *http.Response
-
-	// {
-	// 	var err error
-
-	// 	if response, err = client.http.Do(request); err != nil {
-	// 		client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
-	// 		return nil
-	// 	}
-	// }
-
-	// if err = client.typedBlobStore.DecodeObjectStreamFrom(
-	// 	output,
-	// 	response.Body,
-	// ); err != nil {
-	// 	client.envUI.CancelWithError(err)
-	// 	return
-	// }
-
-	return nil
-}
-
-func (client client) ReadAllInventoryLists(
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
+func (client client) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	var request *http.Request
 
 	{
@@ -98,6 +55,7 @@ func (client client) ReadAllInventoryLists(
 			nil,
 		); err != nil {
 			client.envUI.CancelWithError(err)
+			return nil
 		}
 	}
 
@@ -108,16 +66,9 @@ func (client client) ReadAllInventoryLists(
 
 		if response, err = client.http.Do(request); err != nil {
 			client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
+			return nil
 		}
 	}
 
-	if err = client.typedBlobStore.DecodeObjectStreamFrom(
-		output,
-		response.Body,
-	); err != nil {
-		client.envUI.CancelWithError(err)
-		return
-	}
-
-	return
+	return client.typedBlobStore.AllDecodedObjectsFromStream(response.Body)
 }

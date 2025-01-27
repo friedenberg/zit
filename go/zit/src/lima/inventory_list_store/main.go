@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
@@ -427,41 +426,43 @@ func (s *Store) ReadOneSha(
 	return
 }
 
-func (s *Store) StreamInventoryList(
+func (s *Store) IterInventoryList(
 	blobSha interfaces.Sha,
-	f interfaces.FuncIter[*sku.Transacted],
-) (err error) {
+) iter.Seq2[*sku.Transacted, error] {
 	var rc interfaces.ShaReadCloser
 
-	if rc, err = s.af.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if rc, err = s.af.BlobReader(blobSha); err != nil {
+			return errors.IterWrapped[*sku.Transacted](err)
+		}
 	}
 
-	defer errors.DeferredCloser(&err, rc)
+	return func(yield func(*sku.Transacted, error) bool) {
+		seq := s.typedBlobStore.IterInventoryListBlobSkusFromReader(
+			s.blobType,
+			rc,
+		)
 
-	if err = s.typedBlobStore.StreamInventoryListBlobSkusFromReader(
-		s.blobType,
-		rc,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		defer errors.DeferredYieldCloser(yield, rc)
+
+		for sk, err := range seq {
+			if !yield(sk, err) {
+				return
+			}
+		}
 	}
-
-	return
 }
 
 func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	var maxSku sku.Transacted
 
-	for listOrError := range s.AllInventoryLists() {
-		if listOrError.Error != nil {
-			err = errors.Wrap(listOrError.Error)
+	for b, iterErr := range s.IterAllInventoryLists() {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
 		}
-
-		b := listOrError.Element
 
 		if sku.TransactedLessor.LessPtr(&maxSku, b) {
 			sku.TransactedResetter.ResetWith(&maxSku, b)
@@ -482,7 +483,7 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) AllInventoryLists() iter.Seq[quiter.ElementOrError[*sku.Transacted]] {
+func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	var p string
 
 	{
@@ -491,19 +492,14 @@ func (s *Store) AllInventoryLists() iter.Seq[quiter.ElementOrError[*sku.Transact
 		if p, err = s.envRepo.DirObjectGenre(
 			genres.InventoryList,
 		); err != nil {
-			err = errors.Wrap(err)
-			return func(yield func(quiter.ElementOrError[*sku.Transacted]) bool) {
-				yield(quiter.ElementOrError[*sku.Transacted]{Error: err})
-			}
+			return errors.IterWrapped[*sku.Transacted](err)
 		}
 	}
 
-	return func(yield func(quiter.ElementOrError[*sku.Transacted]) bool) {
-		for pathOrError := range files.DirNamesLevel2(p) {
-			if pathOrError.Error != nil {
-				if !yield(
-					quiter.ElementOrError[*sku.Transacted]{Error: pathOrError.Error},
-				) {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for path, err := range files.DirNamesLevel2(p) {
+			if err != nil {
+				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
 			}
@@ -513,18 +509,14 @@ func (s *Store) AllInventoryLists() iter.Seq[quiter.ElementOrError[*sku.Transact
 			{
 				var err error
 
-				if decodedList, err = s.readOnePath(
-					pathOrError.Element,
-				); err != nil {
-					if !yield(
-						quiter.ElementOrError[*sku.Transacted]{Error: errors.Wrap(err)},
-					) {
+				if decodedList, err = s.readOnePath(path); err != nil {
+					if !yield(nil, errors.Wrap(err)) {
 						return
 					}
 				}
 			}
 
-			if !yield(quiter.ElementOrError[*sku.Transacted]{Element: decodedList}) {
+			if !yield(decodedList, nil) {
 				return
 			}
 		}
@@ -536,13 +528,13 @@ func (s *Store) ReadAllSorted(
 ) (err error) {
 	var skus []*sku.Transacted
 
-	for listOrError := range s.AllInventoryLists() {
-		if listOrError.Error != nil {
-			err = errors.Wrap(listOrError.Error)
+	for list, iterErr := range s.IterAllInventoryLists() {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
 		}
 
-		skus = append(skus, listOrError.Element)
+		skus = append(skus, list)
 	}
 
 	sort.Slice(skus, func(i, j int) bool { return skus[i].Less(skus[j]) })
@@ -560,13 +552,13 @@ func (s *Store) ReadAllSorted(
 func (s *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
-	for listOrError := range s.AllInventoryLists() {
-		if listOrError.Error != nil {
-			err = errors.Wrap(listOrError.Error)
+	for list, iterErr := range s.IterAllInventoryLists() {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
 		}
 
-		t := listOrError.Element
+		t := list
 
 		if err = f(t, t); err != nil {
 			err = errors.Wrapf(
@@ -578,19 +570,25 @@ func (s *Store) ReadAllSkus(
 			return
 		}
 
-		if err = s.StreamInventoryList(
+		iter := s.IterInventoryList(
 			t.GetBlobSha(),
-			func(sk *sku.Transacted) (err error) {
-				return f(t, sk)
-			},
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"InventoryList: %s",
-				t.GetObjectId(),
-			)
+		)
 
-			return
+		for sk, iterErr := range iter {
+			if iterErr != nil {
+				err = errors.Wrap(iterErr)
+				return
+			}
+
+			if err = f(t, sk); err != nil {
+				err = errors.Wrapf(
+					err,
+					"InventoryList: %s",
+					t.GetObjectId(),
+				)
+
+				return
+			}
 		}
 	}
 

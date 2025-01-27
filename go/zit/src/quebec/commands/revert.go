@@ -110,36 +110,28 @@ func (c Revert) runRevertFromLast(
 		return
 	}
 
-	if err = s.GetInventoryListStore().StreamInventoryList(
-		b.GetBlobSha(),
-		func(z *sku.Transacted) (err error) {
-			var cachedSku *sku.Transacted
+	for z, errIter := range s.GetInventoryListStore().IterInventoryList(b.GetBlobSha()) {
+		var cachedSku *sku.Transacted
 
-			if cachedSku, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
-				z.GetObjectId(),
-				z.GetTai(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer sku.GetTransactedPool().Put(cachedSku)
-
-			rt := store.RevertId{
-				ObjectId: cachedSku.GetObjectId(),
-				Tai:      cachedSku.Metadata.Cache.ParentTai,
-			}
-
-			if err = u.GetStore().RevertTo(rt); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if cachedSku, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+			z.GetObjectId(),
+			z.GetTai(),
+		); errIter != nil {
+			err = errors.Wrap(errIter)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		defer sku.GetTransactedPool().Put(cachedSku)
+
+		rt := store.RevertId{
+			ObjectId: cachedSku.GetObjectId(),
+			Tai:      cachedSku.Metadata.Cache.ParentTai,
+		}
+
+		if err = u.GetStore().RevertTo(rt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

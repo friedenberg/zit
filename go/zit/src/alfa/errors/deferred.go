@@ -18,6 +18,16 @@ func DeferredFlusher(
 	}
 }
 
+func DeferredYieldCloser[T any](
+	yield func(T, error) bool,
+	c io.Closer,
+) {
+	if err := c.Close(); err != nil {
+		var t T
+		yield(t, err)
+	}
+}
+
 func DeferredCloser(
 	err *error,
 	c io.Closer,
