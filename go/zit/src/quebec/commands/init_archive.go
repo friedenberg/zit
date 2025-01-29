@@ -29,22 +29,23 @@ func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
 	c.Config.RepoType = repo_type.TypeArchive
 }
 
-func (c InitArchive) Run(dependencies command.Request) {
-	dir := env_dir.MakeDefault(
-		dependencies,
-		dependencies.Debug,
+func (cmd InitArchive) Run(req command.Request) {
+	dir := env_dir.MakeDefaultAndInitialize(
+		req,
+		req.Config.Debug,
+		cmd.OverrideXDGWithCwd,
 	)
 
 	ui := env_ui.Make(
-		dependencies,
-		dependencies.Config,
+		req,
+		req.Config,
 		env_ui.Options{},
 	)
 
 	var repoLayout env_repo.Env
 
 	layoutOptions := env_repo.Options{
-		BasePath:             dependencies.Config.BasePath,
+		BasePath:             req.Config.BasePath,
 		PermitNoZitDirectory: true,
 	}
 
@@ -60,5 +61,5 @@ func (c InitArchive) Run(dependencies command.Request) {
 
 	}
 
-	repoLayout.Genesis(c.BigBang)
+	repoLayout.Genesis(cmd.BigBang)
 }
