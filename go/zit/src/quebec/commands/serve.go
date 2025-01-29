@@ -69,7 +69,10 @@ func (cmd Serve) Run(req command.Request) {
 		{
 			var err error
 
-			if listener, err = server.InitializeListener(network, address); err != nil {
+			if listener, err = server.InitializeListener(
+				network,
+				address,
+			); err != nil {
 				envLocal.CancelWithError(err)
 			}
 

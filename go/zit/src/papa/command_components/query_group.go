@@ -33,10 +33,10 @@ func (c QueryGroup) MakeQueryGroup(
 	options query.BuilderOptions,
 	repo repo.WorkingCopy,
 	args []string,
-) (qg *query.Group) {
+) (queryGroup *query.Group) {
 	var err error
 
-	if qg, err = repo.MakeExternalQueryGroup(
+	if queryGroup, err = repo.MakeExternalQueryGroup(
 		options,
 		c.ExternalQueryOptions,
 		args...,

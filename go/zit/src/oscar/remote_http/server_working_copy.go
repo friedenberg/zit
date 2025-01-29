@@ -7,29 +7,61 @@ import (
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
 func (server *Server) writeInventoryListLocalWorkingCopy(
 	repo *local_working_copy.Repo,
 	request Request,
+	listSku *sku.Transacted,
 ) (response Response) {
-	bf := server.Repo.GetInventoryListStore().FormatForVersion(
-		server.Repo.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
-	)
+	listSkuType := builtin_types.GetOrPanic(builtin_types.InventoryListTypeV1).Type
 
-	list := sku.MakeList()
+	blobStore := server.Repo.GetBlobStore()
 
-	if err := inventory_list_blobs.ReadInventoryListBlob(
-		bf,
-		bufio.NewReader(request.Body),
-		list,
-	); err != nil {
-		response.Error(err)
-		return
+	if listSku != nil {
+		if listSku.GetGenre() != genres.InventoryList {
+			response.Error(genres.MakeErrUnsupportedGenre(listSku.GetGenre()))
+			return
+		}
+
+		if blobStore.HasBlob(listSku.GetBlobSha()) {
+			response.StatusCode = http.StatusFound
+			return
+		}
+
+		listSkuType = listSku.GetType()
+	}
+
+	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+
+	var blobWriter sha.WriteCloser
+
+	{
+		var err error
+
+		if blobWriter, err = blobStore.BlobWriter(); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	var list *sku.List
+
+	{
+		var err error
+
+		if list, err = typedInventoryListStore.ReadInventoryListBlob(
+			listSkuType,
+			bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
+		); err != nil {
+			response.Error(err)
+			return
+		}
 	}
 
 	b := bytes.NewBuffer(nil)
@@ -53,10 +85,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			return
 		}
 
-		sh := sha.GetPool().Get()
-		sha.GetPool().Put(sh)
-		sh.ResetWithShaLike(result.GetBlobSha())
-		fmt.Fprintf(b, "%s\n", sh)
+		fmt.Fprintf(b, "%s\n", result.GetBlobSha())
 
 		return
 	}
@@ -75,10 +104,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	}
 
 	response.StatusCode = http.StatusCreated
-
-	if b.Len() > 0 {
-		response.Body = io.NopCloser(b)
-	}
+	response.Body = io.NopCloser(b)
 
 	return
 }

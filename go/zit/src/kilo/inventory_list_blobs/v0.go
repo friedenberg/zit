@@ -6,6 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
@@ -27,6 +29,10 @@ func MakeV0(
 
 func (v V0) GetListFormat() sku.ListFormat {
 	return v
+}
+
+func (v V0) GetType() ids.Type {
+	return ids.MustType(builtin_types.InventoryListTypeV0)
 }
 
 func (s V0) WriteInventoryListObject(

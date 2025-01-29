@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -42,26 +43,30 @@ func (cmd Push) Run(req command.Request) {
 	remoteArg := req.Args()[0]
 	remote := cmd.MakeArchive(req, remoteArg, localWorkingCopy)
 
-	qg := cmd.MakeQueryGroup(
-		req,
-		query.MakeBuilderOptions(cmd),
-		localWorkingCopy,
-		req.Args()[1:],
-	)
-
 	repoType := remote.GetImmutableConfig().ImmutableConfig.GetRepoType()
 
 	switch repoType {
 	case repo_type.TypeWorkingCopy:
+		queryGroup := cmd.MakeQueryGroup(
+			req,
+			query.MakeBuilderOptions(cmd),
+			localWorkingCopy,
+			req.Args()[1:],
+		)
+
 		if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
 			localWorkingCopy,
-			qg,
+			queryGroup,
 			cmd.WithPrintCopies(true),
 		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 
 	case repo_type.TypeArchive:
+		if args := req.Args()[1:]; len(args) > 0 {
+			ui.Err().Printf("remote is archive, ignore arguments: %q", req.Args()[1:])
+		}
+
 		cmd.PushAllToArchive(req, localWorkingCopy, remote)
 
 	default:

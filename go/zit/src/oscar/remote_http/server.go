@@ -8,7 +8,9 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
@@ -16,10 +18,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
@@ -31,6 +36,7 @@ type Server struct {
 	Repo     repo.Repo
 }
 
+// TODO switch to not return error
 func (server Server) InitializeListener(
 	network, address string,
 ) (listener net.Listener, err error) {
@@ -130,27 +136,64 @@ func (server Server) InitializeHTTP(
 func (server Server) makeRouter(
 	makeHandler func(handler funcHandler) http.HandlerFunc,
 ) http.Handler {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsHeadOrGet)).
-		Methods("HEAD", "GET")
-
-	router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
-		Methods("POST")
+	// TODO add errors/context middlerware for capturing errors and panics
+	router := mux.NewRouter().UseEncodedPath()
 
 	router.HandleFunc("/config-immutable", makeHandler(server.handleGetConfigImmutable)).
 		Methods("GET")
 
-	router.HandleFunc("/inventory_lists", makeHandler(server.handleGetInventoryList)).
+	{
+		router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsHeadOrGet)).
+			Methods("HEAD", "GET")
+
+		router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsPost)).
+			Methods("POST")
+
+		router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
+			Methods("POST")
+	}
+
+	router.HandleFunc("/query/{query}", makeHandler(server.handleGetQuery)).
 		Methods("GET")
 
-	router.HandleFunc("/inventory_lists/{tai}", makeHandler(server.handlePostInventoryList)).
-		Methods("POST")
+	{
+		router.HandleFunc("/inventory_lists", makeHandler(server.handleGetInventoryList)).
+			Methods("GET")
 
-	router.HandleFunc("/inventory_lists", makeHandler(server.handlePostInventoryList)).
-		Methods("POST")
+		router.HandleFunc("/inventory_lists", makeHandler(server.handlePostInventoryList)).
+			Methods("POST")
+
+		router.HandleFunc("/inventory_lists/{box}", makeHandler(server.handlePostInventoryList)).
+			Methods("POST")
+	}
+
+	router.Use(server.panicHandlingMiddleware)
 
 	return router
+}
+
+func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(responseWriter http.ResponseWriter, request *http.Request) {
+			defer func() {
+				if r := recover(); r != nil {
+					switch err := r.(type) {
+					default:
+						panic(err)
+
+					case error:
+						http.Error(
+							responseWriter,
+							fmt.Sprintf("%s: %s", err, debug.Stack()),
+							http.StatusInternalServerError,
+						)
+					}
+				}
+			}()
+
+			next.ServeHTTP(responseWriter, request)
+		},
+	)
 }
 
 // TODO remove error return and use context
@@ -193,24 +236,27 @@ func (server Server) ServeStdio() {
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetIn().GetFile().Close)
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetOut().GetFile().Close)
 
-	br := bufio.NewReader(server.Repo.GetEnv().GetIn().GetFile())
-	bw := bufio.NewWriter(server.Repo.GetEnv().GetOut().GetFile())
+	bufferedReader := bufio.NewReader(server.Repo.GetEnv().GetIn().GetFile())
+	bufferedWriter := bufio.NewWriter(server.Repo.GetEnv().GetOut().GetFile())
+
+	var responseWriter BufferedResponseWriter
 
 	handler := server.makeRouter(
 		func(handler funcHandler) http.HandlerFunc {
-			return server.makeHandlerWithRedirect(handler, bw)
+			return server.makeHandlerUsingBufferedWriter(handler, bufferedWriter)
 		},
 	)
 
 	for {
 		server.Repo.GetEnv().ContinueOrPanicOnDone()
+		responseWriter.Reset()
 
 		var request *http.Request
 
 		{
 			var err error
 
-			if request, err = http.ReadRequest(br); err != nil {
+			if request, err = http.ReadRequest(bufferedReader); err != nil {
 				if errors.IsEOF(err) {
 					err = nil
 				} else {
@@ -221,9 +267,21 @@ func (server Server) ServeStdio() {
 			}
 		}
 
-		handler.ServeHTTP(nil, request)
+		handler.ServeHTTP(&responseWriter, request)
 
-		if err := bw.Flush(); err != nil {
+		if err := request.Body.Close(); err != nil {
+			server.EnvLocal.CancelWithError(err)
+			return
+		}
+
+		if responseWriter.Dirty {
+			if err := responseWriter.WriteResponse(bufferedWriter); err != nil {
+				server.EnvLocal.CancelWithError(err)
+				return
+			}
+		}
+
+		if err := bufferedWriter.Flush(); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
@@ -239,11 +297,12 @@ type funcHandler func(Request) Response
 
 type handlerWrapper funcHandler
 
-func (server *Server) makeHandlerWithRedirect(
+// TODO switch to using responseWriter
+func (server *Server) makeHandlerUsingBufferedWriter(
 	handler funcHandler,
 	out *bufio.Writer,
 ) http.HandlerFunc {
-	return func(_ http.ResponseWriter, req *http.Request) {
+	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
@@ -360,12 +419,49 @@ func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) 
 }
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
-	var wc interfaces.ShaWriteCloser
+	shString := request.Vars()["sha"]
+	var result interfaces.Sha
+
+	if shString == "" {
+		response, result = server.copyBlob(request.Body)
+		response.Body = io.NopCloser(strings.NewReader(result.GetShaString()))
+		return
+	}
+
+	var sh sha.Sha
+
+	if err := sh.Set(shString); err != nil {
+		response.Error(err)
+		return
+	}
+
+	if server.Repo.GetBlobStore().HasBlob(&sh) {
+		response.StatusCode = http.StatusFound
+		return
+	}
+
+	response, result = server.copyBlob(request.Body)
+
+	if err := sh.AssertEqualsShaLike(result); err != nil {
+		response.Error(err)
+		return
+	}
+
+	response.StatusCode = http.StatusCreated
+	response.Body = io.NopCloser(strings.NewReader(result.GetShaString()))
+
+	return
+}
+
+func (server *Server) copyBlob(
+	reader io.ReadCloser,
+) (response Response, result interfaces.Sha) {
+	var writeCloser interfaces.ShaWriteCloser
 
 	{
 		var err error
 
-		if wc, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
+		if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
 			response.Error(err)
 			return
 		}
@@ -376,18 +472,18 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	{
 		var err error
 
-		if n, err = io.Copy(wc, request.Body); err != nil {
+		if n, err = io.Copy(writeCloser, reader); err != nil {
 			response.Error(err)
 			return
 		}
 	}
 
-	if err := wc.Close(); err != nil {
+	if err := writeCloser.Close(); err != nil {
 		response.Error(err)
 		return
 	}
 
-	sh := wc.GetShaLike()
+	result = writeCloser.GetShaLike()
 
 	blobCopierDelegate := sku.MakeBlobCopierDelegate(
 		server.Repo.GetEnv().GetUI(),
@@ -395,7 +491,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	if err := blobCopierDelegate(
 		sku.BlobCopyResult{
-			Sha: sh,
+			Sha: result,
 			N:   n,
 		},
 	); err != nil {
@@ -404,29 +500,34 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	}
 
 	response.StatusCode = http.StatusCreated
-	response.Body = io.NopCloser(strings.NewReader(sh.GetShaString()))
 
 	return
 }
 
-func (server *Server) handleGetInventoryList(request Request) (response Response) {
-	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		var qgString strings.Builder
+func (server *Server) handleGetQuery(request Request) (response Response) {
+	var queryGroupString string
 
-		if _, err := io.Copy(&qgString, request.Body); err != nil {
+	{
+		var err error
+
+		if queryGroupString, err = url.QueryUnescape(
+			request.Vars()["query"],
+		); err != nil {
 			response.Error(err)
 			return
 		}
+	}
 
-		var qg *query.Group
+	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+		var queryGroup *query.Group
 
 		{
 			var err error
 
-			if qg, err = repo.MakeExternalQueryGroup(
+			if queryGroup, err = repo.MakeExternalQueryGroup(
 				nil,
 				sku.ExternalQueryOptions{},
-				qgString.String(),
+				queryGroupString,
 			); err != nil {
 				response.Error(err)
 				return
@@ -438,7 +539,7 @@ func (server *Server) handleGetInventoryList(request Request) (response Response
 		{
 			var err error
 
-			if list, err = repo.MakeInventoryList(qg); err != nil {
+			if list, err = repo.MakeInventoryList(queryGroup); err != nil {
 				response.Error(err)
 				return
 			}
@@ -475,22 +576,97 @@ func (server *Server) handleGetInventoryList(request Request) (response Response
 	return
 }
 
-func (server *Server) handlePostInventoryList(request Request) (response Response) {
-	taiString := request.Vars()["tai"]
+func (server *Server) handleGetInventoryList(
+	request Request,
+) (response Response) {
+	inventoryListStore := server.Repo.GetInventoryListStore()
 
-	var tai ids.Tai
+	// TODO make this more performant by returning a proper reader
+	b := bytes.NewBuffer(nil)
 
-	if taiString != "" {
-		if err := tai.Set(taiString); err != nil {
-			response.ErrorWithStatus(http.StatusBadRequest, err)
+	boxFormat := box_format.MakeBoxTransactedArchive(
+		server.Repo.GetEnv(),
+		server.Repo.GetEnv().GetCLIConfig().PrintOptions.WithPrintTai(true),
+	)
+
+	printer := string_format_writer.MakeDelim(
+		"\n",
+		b,
+		string_format_writer.MakeFunc(
+			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+				return boxFormat.EncodeStringTo(o, w)
+			},
+		),
+	)
+
+	iter := inventoryListStore.IterAllInventoryLists()
+
+	for sk, err := range iter {
+		if err != nil {
+			response.Error(err)
+			return
+		}
+
+		server.Repo.GetEnv().ContinueOrPanicOnDone()
+
+		if err = printer(sk); err != nil {
+			response.Error(err)
 			return
 		}
 	}
 
+	response.Body = io.NopCloser(b)
+
+	return
+}
+
+func (server *Server) handlePostInventoryList(
+	request Request,
+) (response Response) {
+	boxString := request.Vars()["box"]
+
+	var sk *sku.Transacted
+
+	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+
+	if boxString != "" {
+
+		{
+			var err error
+
+			if boxString, err = url.QueryUnescape(request.Vars()["box"]); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		{
+			var err error
+
+			if sk, err = typedInventoryListStore.ReadInventoryListObject(
+				ids.MustType(builtin_types.InventoryListTypeV1),
+				strings.NewReader(boxString),
+			); err != nil {
+				response.Error(
+					errors.Errorf(
+						"failed to parse inventory list sku (%q): %w",
+						boxString,
+						err,
+					),
+				)
+
+				return
+			}
+		}
+
+		defer sku.GetTransactedPool().Put(sk)
+	}
+
+	// TODO parse box into sk
 	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		response = server.writeInventoryListLocalWorkingCopy(repo, request)
+		response = server.writeInventoryListLocalWorkingCopy(repo, request, sk)
 	} else {
-		response = server.writeInventoryList(request)
+		response = server.writeInventoryList(request, sk)
 	}
 
 	return

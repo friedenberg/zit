@@ -16,6 +16,7 @@ type Repo interface {
 	GetEnv() env_ui.Env
 	GetImmutableConfig() config_immutable_io.ConfigLoaded
 	GetBlobStore() interfaces.BlobStore
+	GetObjectStore() sku.ObjectStore
 	GetTypedInventoryListBlobStore() typed_blob_store.InventoryList
 	GetInventoryListStore() sku.InventoryListStore
 
@@ -24,6 +25,7 @@ type Repo interface {
 		storeOptions sku.StoreOptions,
 	) sku.Importer
 
+  // TODO switch to seq
 	ImportList(
 		list *sku.List,
 		i sku.Importer,

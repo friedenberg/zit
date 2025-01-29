@@ -4,8 +4,10 @@ import (
 	"io"
 	"iter"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type InventoryListStore interface {
@@ -34,6 +36,7 @@ type InventoryListStore interface {
 }
 
 type ListFormat interface {
+	GetType() ids.Type
 	GetListFormat() ListFormat
 	WriteInventoryListBlob(Collection, io.Writer) (int64, error)
 	WriteInventoryListObject(*Transacted, io.Writer) (int64, error)
@@ -68,4 +71,19 @@ func (resetterList) Reset(a *List) {
 
 func (resetterList) ResetWith(a, b *List) {
 	a.ResetWith(b)
+}
+
+func CollectList(seq iter.Seq2[*Transacted, error]) (list *List, err error) {
+	list = MakeList()
+
+	for sk, iterErr := range seq {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		list.Add(sk)
+	}
+
+	return
 }

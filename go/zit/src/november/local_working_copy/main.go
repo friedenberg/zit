@@ -251,24 +251,7 @@ func (repo *Repo) initialize(
 
 	ui.Log().Print("done initing checkout store")
 
-	ptl := repo.PrinterTransacted()
-
-	lw := store.UIDelegate{
-		TransactedNew:     ptl,
-		TransactedUpdated: ptl,
-		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
-			if !repo.config.GetCLIConfig().PrintOptions.PrintUnchanged {
-				return
-			}
-
-			return ptl(sk)
-		},
-		CheckedOutCheckedOut: repo.PrinterCheckedOut(
-			box_format.CheckedOutHeaderState{},
-		),
-	}
-
-	repo.store.SetUIDelegate(lw)
+	repo.store.SetUIDelegate(repo.GetUIStorePrinters())
 
 	repo.storesInitialized = true
 

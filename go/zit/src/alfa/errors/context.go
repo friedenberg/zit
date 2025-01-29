@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"runtime"
+	"runtime/debug"
 	"sync"
 	"syscall"
 
@@ -145,12 +147,19 @@ func (c *context) Run(f func(Context)) error {
 		defer c.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
-				if err, ok := r.(error); !ok {
+        // TODO capture panic stack trace and add to custom error objects
+				switch err := r.(type) {
+				default:
+					fmt.Printf("%s", debug.Stack())
 					panic(r)
-				} else {
+
+				case runtime.Error:
+					fmt.Printf("%s", debug.Stack())
+					panic(r)
+
+				case error:
 					c.cancel(err)
 				}
-				// fmt.Printf("%s", debug.Stack())
 			}
 		}()
 

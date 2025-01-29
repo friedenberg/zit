@@ -3,9 +3,9 @@ package remote_http
 import (
 	"bufio"
 	"bytes"
-	"io"
+	"fmt"
 	"net/http"
-	"strings"
+	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
@@ -108,6 +107,10 @@ func (client *client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
+func (client *client) GetObjectStore() sku.ObjectStore {
+	return nil
+}
+
 func (client *client) MakeImporter(
 	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
@@ -131,16 +134,17 @@ func (client *client) MakeExternalQueryGroup(
 	return
 }
 
-func (client *client) MakeInventoryList(
-	qg *query.Group,
+func (remote *client) MakeInventoryList(
+	queryGroup *query.Group,
 ) (list *sku.List, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
+		remote.GetEnv(),
 		"GET",
-		"/inventory_lists",
-		strings.NewReader(qg.String()),
+		// fmt.Sprintf("/query/%s", queryGroup.String()),
+		fmt.Sprintf("/query/%s", url.QueryEscape(queryGroup.String())),
+		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -148,19 +152,24 @@ func (client *client) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = client.http.Do(request); err != nil {
+	if response, err = remote.http.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
 
-	bf := client.GetInventoryListStore().FormatForVersion(
-		client.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
+	if err = ReadErrorFromBodyOnNot(response, 200); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	listFormat := remote.GetInventoryListStore().FormatForVersion(
+		remote.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
 
 	if err = inventory_list_blobs.ReadInventoryListBlob(
-		bf,
+		listFormat,
 		bufio.NewReader(response.Body),
 		list,
 	); err != nil {
@@ -197,38 +206,38 @@ func (client *client) MakeInventoryList(
 
 func (client *client) PullQueryGroupFromRemote(
 	remote repo.Repo,
-	qg *query.Group,
+	queryGroup *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	return client.pullQueryGroupFromWorkingCopy(
 		remote.(repo.WorkingCopy),
-		qg,
+		queryGroup,
 		options,
 	)
 }
 
-func (client *client) pullQueryGroupFromWorkingCopy(
-	remote repo.WorkingCopy,
+func (remote *client) pullQueryGroupFromWorkingCopy(
+	local repo.WorkingCopy,
 	queryGroup *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
-	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
+	if list, err = local.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO local / remote version negotiation
 
-	bf := client.GetInventoryListStore().FormatForVersion(
+	listFormat := remote.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
 	)
 
-	b := bytes.NewBuffer(nil)
+	buffer := bytes.NewBuffer(nil)
 
 	// TODO make a reader version of inventory lists to avoid allocation
-	if _, err = bf.WriteInventoryListBlob(list, b); err != nil {
+	if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -239,10 +248,10 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			client.GetEnv(),
+			remote.GetEnv(),
 			"POST",
 			"/inventory_lists",
-			b,
+			buffer,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -252,25 +261,20 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
 		}
 
-		if response, err = client.http.Do(request); err != nil {
+		if response, err = remote.http.Do(request); err != nil {
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
 	}
 
-	if response.StatusCode >= 300 {
-		var sb strings.Builder
-
-		if _, err = io.Copy(&sb, response.Body); err != nil {
-		}
-
-		err = errors.BadRequestf("remote responded with error: %q", &sb)
+	if err = ReadErrorFromBodyOnGreaterOrEqual(response, 300); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	br := bufio.NewReader(response.Body)
 
-	client.GetEnv().ContinueOrPanicOnDone()
+	remote.GetEnv().ContinueOrPanicOnDone()
 
 	var shas sha.Slice
 
@@ -286,7 +290,10 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	if options.IncludeBlobs {
 		for _, expected := range shas {
-			if err = client.WriteBlobToRemote(remote, expected); err != nil {
+			if err = remote.WriteBlobToRemote(
+				local.GetBlobStore(),
+				expected,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -294,77 +301,6 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	}
 
 	ui.Log().Print("done")
-
-	return
-}
-
-func (client *client) WriteBlobToRemote(
-	local repo.WorkingCopy,
-	expected *sha.Sha,
-) (err error) {
-	var actual sha.Sha
-
-	// Closed by the http client's transport (our roundtripper calling
-	// request.Write)
-	var rc interfaces.ShaReadCloser
-
-	if rc, err = local.GetBlobStore().BlobReader(
-		expected,
-	); err != nil {
-		if env_dir.IsErrBlobMissing(err) {
-			// TODO make an option to collect this error at the present it, and an
-			// option to fetch it from another remote store
-			ui.Err().Printf("Blob missing locally: %q", expected)
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	var request *http.Request
-
-	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
-		"POST",
-		"/blobs",
-		rc,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	request.TransferEncoding = []string{"chunked"}
-
-	var response *http.Response
-
-	if response, err = client.http.Do(request); err != nil {
-		err = errors.Errorf("failed to read response: %w", err)
-		return
-	}
-
-	var shString strings.Builder
-
-	if _, err = io.Copy(&shString, response.Body); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = response.Body.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = expected.AssertEqualsShaLike(&actual); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

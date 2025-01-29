@@ -7,75 +7,91 @@ import (
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 )
 
 func (server *Server) writeInventoryList(
 	request Request,
+	listSku *sku.Transacted,
 ) (response Response) {
-	bf := server.Repo.GetInventoryListStore().FormatForVersion(
-		server.Repo.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
-	)
-
-	list := sku.MakeList()
-
-	if err := inventory_list_blobs.ReadInventoryListBlob(
-		bf,
-		bufio.NewReader(request.Body),
-		list,
-	); err != nil {
-		response.Error(err)
+	if listSku.GetGenre() != genres.InventoryList {
+		response.Error(genres.MakeErrUnsupportedGenre(listSku.GetGenre()))
 		return
 	}
 
+	blobStore := server.Repo.GetBlobStore()
+
+	if blobStore.HasBlob(listSku.GetBlobSha()) {
+		response.StatusCode = http.StatusFound
+		return
+	}
+
+	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+
+	var blobWriter sha.WriteCloser
+
+	{
+		var err error
+
+		if blobWriter, err = blobStore.BlobWriter(); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	seq := typedInventoryListStore.IterInventoryListBlobSkusFromReader(
+		listSku.GetType(),
+		bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
+	)
+
 	b := bytes.NewBuffer(nil)
 
-	// TODO make option to read from headers
-	importerOptions := sku.ImporterOptions{
-		// TODO
-		// CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
-	}
-
-	if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
-		importerOptions.AllowMergeConflicts = true
-	}
-
-	importerOptions.BlobCopierDelegate = func(
-		result sku.BlobCopyResult,
-	) (err error) {
+	for sk, err := range seq {
 		server.Repo.GetEnv().ContinueOrPanicOnDone()
 
-		if result.N != -1 {
+		if err != nil {
+			response.Error(err)
 			return
+		}
+
+		blobSha := sk.GetBlobSha()
+
+		if blobStore.HasBlob(blobSha) {
+			continue
 		}
 
 		sh := sha.GetPool().Get()
 		sha.GetPool().Put(sh)
-		sh.ResetWithShaLike(result.GetBlobSha())
+		sh.ResetWithShaLike(blobSha)
 		fmt.Fprintf(b, "%s\n", sh)
-
-		return
 	}
 
-	importer := server.Repo.MakeImporter(
-		importerOptions,
-		sku.GetStoreOptionsRemoteTransfer(),
-	)
-
-	if err := server.Repo.ImportList(
-		list,
-		importer,
-	); err != nil {
+	if err := blobWriter.Close(); err != nil {
 		response.Error(err)
 		return
 	}
 
-	response.StatusCode = http.StatusCreated
+	expected := sha.Make(listSku.GetBlobSha())
+	actual := blobWriter.GetShaLike()
 
-	if b.Len() > 0 {
-		response.Body = io.NopCloser(b)
+	if err := expected.AssertEqualsShaLike(actual); err != nil {
+		response.Error(err)
+		return
+	}
+
+	// TODO make merge conflicts impossible
+
+	response.StatusCode = http.StatusCreated
+	response.Body = io.NopCloser(b)
+
+	if err := server.Repo.GetObjectStore().Commit(
+		listSku,
+		sku.CommitOptions{},
+	); err != nil {
+		response.Error(err)
+		return
 	}
 
 	return

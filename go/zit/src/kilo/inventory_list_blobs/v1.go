@@ -7,6 +7,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 )
@@ -17,6 +19,10 @@ type V1 struct {
 
 func (v V1) GetListFormat() sku.ListFormat {
 	return v
+}
+
+func (v V1) GetType() ids.Type {
+	return ids.MustType(builtin_types.InventoryListTypeV1)
 }
 
 func (s V1) WriteInventoryListBlob(
@@ -122,10 +128,10 @@ func (coder V1StreamCoder) DecodeFrom(
 			}
 		}
 
-		// if err = o.CalculateObjectShas(); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
+		if err = o.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = output(o); err != nil {
 			err = errors.Wrapf(err, "Object: %s", sku.String(o))
@@ -137,15 +143,15 @@ func (coder V1StreamCoder) DecodeFrom(
 }
 
 func (s V1) StreamInventoryListBlobSkus(
-	r1 io.Reader,
-	f interfaces.FuncIter[*sku.Transacted],
+	reader io.Reader,
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	r := bufio.NewReader(r1)
+	bufferedReader := bufio.NewReader(reader)
 
 	for {
-		o := sku.GetTransactedPool().Get()
+		object := sku.GetTransactedPool().Get()
 
-		if _, err = s.Box.ReadStringFormat(o, r); err != nil {
+		if _, err = s.Box.ReadStringFormat(object, bufferedReader); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
@@ -155,13 +161,13 @@ func (s V1) StreamInventoryListBlobSkus(
 			}
 		}
 
-		// if err = o.CalculateObjectShas(); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
+		if err = object.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-		if err = f(o); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku.String(o))
+		if err = output(object); err != nil {
+			err = errors.Wrapf(err, "Object: %s", sku.String(object))
 			return
 		}
 	}
@@ -180,9 +186,9 @@ func (coder V1IterDecoder) DecodeFrom(
 	bufferedReader := bufio.NewReader(reader)
 
 	for {
-		o := sku.GetTransactedPool().Get()
+		object := sku.GetTransactedPool().Get()
 
-		if _, err = coder.Box.ReadStringFormat(o, bufferedReader); err != nil {
+		if _, err = coder.Box.ReadStringFormat(object, bufferedReader); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
@@ -192,7 +198,12 @@ func (coder V1IterDecoder) DecodeFrom(
 			}
 		}
 
-		if !yield(o) {
+		if err = object.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if !yield(object) {
 			return
 		}
 	}

@@ -1,11 +1,18 @@
 package remote_http
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
 	"iter"
 	"net/http"
+	"strings"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -20,10 +27,97 @@ func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 }
 
 func (client client) ImportInventoryList(
-	bs interfaces.BlobStore,
-	t *sku.Transacted,
+	blobStore interfaces.BlobStore,
+	listSku *sku.Transacted,
 ) (err error) {
-	return todo.Implement()
+	listFormat := client.GetInventoryListStore().FormatForVersion(
+		config_immutable.CurrentStoreVersion,
+	)
+
+	buffer := bytes.NewBuffer(nil)
+
+	var list *sku.List
+
+	if list, err = sku.CollectList(
+		client.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
+			listSku.GetType(),
+			blobStore,
+			listSku.GetBlobSha(),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO make a reader version of inventory lists to avoid allocation
+	if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var sbListSkuBox strings.Builder
+
+	if _, err = client.typedBlobStore.WriteObjectToWriter(
+		listSku,
+		&sbListSkuBox,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var request *http.Request
+
+	if request, err = http.NewRequestWithContext(
+		client.GetEnv(),
+		"POST",
+		fmt.Sprintf("/inventory_lists/%s", strings.TrimSpace(sbListSkuBox.String())),
+		buffer,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO ensure that conflicts were addressed prior to importing
+	// if options.AllowMergeConflicts {
+	// 	request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
+	// }
+
+	var response *http.Response
+
+	if response, err = client.http.Do(request); err != nil {
+		err = errors.Errorf("failed to read response: %w", err)
+		return
+	}
+
+	if err = ReadErrorFromBodyOnNot(
+		response,
+		http.StatusCreated,
+		http.StatusFound,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var shas sha.Slice
+
+	if _, err = shas.ReadFrom(bufio.NewReader(response.Body)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, sh := range shas {
+		if err = client.WriteBlobToRemote(blobStore, sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = response.Body.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (client client) ReadLast() (max *sku.Transacted, err error) {

@@ -48,16 +48,7 @@ type Store struct {
 	protoZettel  sku.Proto
 	queryBuilder *query.Builder
 
-	ui UIDelegate
-}
-
-type UIDelegate struct {
-	TransactedNew       interfaces.FuncIter[*sku.Transacted]
-	TransactedUpdated   interfaces.FuncIter[*sku.Transacted]
-	TransactedUnchanged interfaces.FuncIter[*sku.Transacted]
-
-	CheckedOutCheckedOut interfaces.FuncIter[sku.SkuType]
-	CheckedOutChanged    interfaces.FuncIter[sku.SkuType]
+	ui sku.UIStorePrinters
 }
 
 func (c *Store) Initialize(
@@ -180,6 +171,7 @@ func (s *Store) ResetIndexes() (err error) {
 	return
 }
 
-func (s *Store) SetUIDelegate(ud UIDelegate) {
+func (s *Store) SetUIDelegate(ud sku.UIStorePrinters) {
 	s.ui = ud
+	s.inventoryListStore.SetUIDelegate(ud)
 }

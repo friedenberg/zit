@@ -27,23 +27,23 @@ import (
 )
 
 // TODO switch to using fd.Std
-func (u *Repo) MakeFormatFunc(
-	v string,
-	out interfaces.WriterAndStringWriter,
-) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	if out == nil {
-		out = u.GetUIFile()
+func (repo *Repo) MakeFormatFunc(
+	format string,
+	writer interfaces.WriterAndStringWriter,
+) (output interfaces.FuncIter[*sku.Transacted], err error) {
+	if writer == nil {
+		writer = repo.GetUIFile()
 	}
 
-	if strings.HasPrefix(v, "type.") {
-		return u.makeTypFormatter(strings.TrimPrefix(v, "type."), out)
+	if strings.HasPrefix(format, "type.") {
+		return repo.makeTypFormatter(strings.TrimPrefix(format, "type."), writer)
 	}
 
-	switch v {
+	switch format {
 	case "tags-path":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				tl.GetObjectId(),
 				&tl.Metadata.Cache.TagPaths,
 			); err != nil {
@@ -55,9 +55,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tags-path-with-types":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				tl.GetObjectId(),
 				&tl.Metadata.Cache.TagPaths,
 			); err != nil {
@@ -69,9 +69,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "query-path":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				tl.GetObjectId(),
 				tl.Metadata.Cache.QueryPath,
 			); err != nil {
@@ -83,15 +83,15 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "box":
-		p := u.SkuFormatBoxTransactedNoColor()
+		p := repo.SkuFormatBoxTransactedNoColor()
 
-		f = func(tl *sku.Transacted) (err error) {
-			if _, err = p.EncodeStringTo(tl, out); err != nil {
+		output = func(tl *sku.Transacted) (err error) {
+			if _, err = p.EncodeStringTo(tl, writer); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if _, err = fmt.Fprintln(out); err != nil {
+			if _, err = fmt.Fprintln(writer); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -100,9 +100,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "box-archive":
-		p := u.MakePrinterBoxArchive(out, u.GetConfig().GetCLIConfig().PrintOptions.PrintTime)
+		p := repo.MakePrinterBoxArchive(writer, repo.GetConfig().GetCLIConfig().PrintOptions.PrintTime)
 
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if err = p(tl); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -112,28 +112,28 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "sha":
-		f = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, tl.Metadata.Sha())
+		output = func(tl *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(writer, tl.Metadata.Sha())
 			return
 		}
 
 	case "sha-mutter":
-		f = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintf(out, "%s -> %s\n", tl.Metadata.Sha(), tl.Metadata.Mutter())
+		output = func(tl *sku.Transacted) (err error) {
+			_, err = fmt.Fprintf(writer, "%s -> %s\n", tl.Metadata.Sha(), tl.Metadata.Mutter())
 			return
 		}
 
 	case "tags-all":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			for _, es := range tl.Metadata.Cache.TagPaths.Paths {
-				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetObjectId(), es); err != nil {
+				if _, err = fmt.Fprintf(writer, "%s: %s\n", tl.GetObjectId(), es); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
 			for _, es := range tl.Metadata.Cache.TagPaths.All {
-				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Tag, es.Parents); err != nil {
+				if _, err = fmt.Fprintf(writer, "%s: %s -> %s\n", tl.GetObjectId(), es.Tag, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -143,12 +143,12 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tags-expanded":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadata().Cache.GetExpandedTags()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				quiter.StringCommaSeparated(esImp),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -159,12 +159,12 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tags-implicit":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadata().Cache.GetImplicitTags()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				quiter.StringCommaSeparated(esImp),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -175,9 +175,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tags":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				quiter.StringCommaSeparated(
 					tl.Metadata.GetTags(),
 				),
@@ -190,9 +190,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tags-newlines":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if err = tl.Metadata.GetTags().EachPtr(func(e *ids.Tag) (err error) {
-				_, err = fmt.Fprintln(out, e)
+				_, err = fmt.Fprintln(writer, e)
 				return
 			}); err != nil {
 				err = errors.Wrap(err)
@@ -203,8 +203,8 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "description":
-		f = func(tl *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, tl.GetMetadata().Description); err != nil {
+		output = func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(writer, tl.GetMetadata().Description); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -214,29 +214,29 @@ func (u *Repo) MakeFormatFunc(
 
 	case "text":
 		fo := typed_blob_store.MakeTextFormatter(
-			u.GetStore().GetEnvRepo(),
+			repo.GetStore().GetEnvRepo(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
-			u.GetConfig(),
+			repo.GetConfig(),
 		)
 
-		f = func(tl *sku.Transacted) (err error) {
-			_, err = fo.EncodeStringTo(tl, out)
+		output = func(tl *sku.Transacted) (err error) {
+			_, err = fo.EncodeStringTo(tl, writer)
 			return
 		}
 
 	case "object":
 		fo := object_inventory_format.FormatForVersion(
-			u.GetConfig().GetImmutableConfig().GetStoreVersion(),
+			repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 		)
 
 		o := object_inventory_format.Options{
 			Tai: true,
 		}
 
-		f = func(tl *sku.Transacted) (err error) {
-			if _, err = fo.FormatPersistentMetadata(out, tl, o); err != nil {
+		output = func(tl *sku.Transacted) (err error) {
+			if _, err = fo.FormatPersistentMetadata(writer, tl, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -245,9 +245,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id-parent-tai":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintf(
-				out,
+				writer,
 				"%s^@%s\n",
 				&tl.ObjectId,
 				tl.Metadata.Cache.ParentTai,
@@ -260,9 +260,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id-sha":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintf(
-				out,
+				writer,
 				"%s@%s\n",
 				&tl.ObjectId,
 				tl.GetObjectSha(),
@@ -275,7 +275,7 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id-blob-sha":
-		f = func(tl *sku.Transacted) (err error) {
+		output = func(tl *sku.Transacted) (err error) {
 			ui.TodoP3("convert into an option")
 
 			sh := tl.GetBlobSha()
@@ -285,7 +285,7 @@ func (u *Repo) MakeFormatFunc(
 			}
 
 			if _, err = fmt.Fprintf(
-				out,
+				writer,
 				"%s %s\n",
 				&tl.ObjectId,
 				sh,
@@ -298,9 +298,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id":
-		f = func(e *sku.Transacted) (err error) {
+		output = func(e *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				&e.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -311,9 +311,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id-abbreviated":
-		f = func(e *sku.Transacted) (err error) {
+		output = func(e *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
-				out,
+				writer,
 				&e.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -324,15 +324,15 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "object-id-tai":
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, e.StringObjectIdTai())
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(writer, e.StringObjectIdTai())
 			return
 		}
 
 	case "sku-metadata-sans-tai":
-		f = func(e *sku.Transacted) (err error) {
+		output = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
-				out,
+				writer,
 				sku_fmt.StringMetadataSansTai(e),
 			)
 			return
@@ -345,8 +345,8 @@ func (u *Repo) MakeFormatFunc(
 
 		errors.PanicIfError(err)
 
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fo.WriteMetadataTo(out, e)
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fo.WriteMetadataTo(writer, e)
 			return
 		}
 
@@ -357,27 +357,27 @@ func (u *Repo) MakeFormatFunc(
 
 		errors.PanicIfError(err)
 
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fo.WriteMetadataTo(out, e)
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fo.WriteMetadataTo(writer, e)
 			return
 		}
 
 	case "debug":
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintf(out, "%#v\n", e)
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintf(writer, "%#v\n", e)
 			return
 		}
 
 	case "log":
-		f = u.PrinterTransacted()
+		output = repo.PrinterTransacted()
 
 	case "json":
-		enc := json.NewEncoder(out)
+		enc := json.NewEncoder(writer)
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var j sku_fmt.Json
 
-			if err = j.FromTransacted(o, u.GetStore().GetEnvRepo()); err != nil {
+			if err = j.FromTransacted(o, repo.GetStore().GetEnvRepo()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -391,17 +391,17 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "toml-json":
-		enc := json.NewEncoder(out)
+		enc := json.NewEncoder(writer)
 
 		type tomlJson struct {
 			sku_fmt.Json
 			Blob map[string]interface{} `json:"blob"`
 		}
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var j tomlJson
 
-			if err = j.FromTransacted(o, u.GetStore().GetEnvRepo()); err != nil {
+			if err = j.FromTransacted(o, repo.GetStore().GetEnvRepo()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -428,7 +428,7 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "json-toml-bookmark":
-		enc := json.NewEncoder(out)
+		enc := json.NewEncoder(writer)
 
 		var resp client.ResponseWithParsedJSONBody
 
@@ -449,12 +449,12 @@ func (u *Repo) MakeFormatFunc(
 
 		tabs := resp.ParsedJSONBody.([]interface{})
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var j sku_fmt.JsonWithUrl
 
 			if j, err = sku_fmt.MakeJsonTomlBookmark(
 				o,
-				u.GetStore().GetEnvRepo(),
+				repo.GetStore().GetEnvRepo(),
 				tabs,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -470,16 +470,16 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "tai":
-		f = func(o *sku.Transacted) (err error) {
-			fmt.Fprintln(out, o.GetTai())
+		output = func(o *sku.Transacted) (err error) {
+			fmt.Fprintln(writer, o.GetTai())
 			return
 		}
 
 	case "blob":
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetEnvRepo().BlobReader(
+			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -488,7 +488,7 @@ func (u *Repo) MakeFormatFunc(
 
 			defer errors.DeferredCloser(&err, r)
 
-			if _, err = io.Copy(out, r); err != nil {
+			if _, err = io.Copy(writer, r); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -497,9 +497,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "text-sku-prefix":
-		cliFmt := u.SkuFormatBoxTransactedNoColor()
+		cliFmt := repo.SkuFormatBoxTransactedNoColor()
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			sb := &strings.Builder{}
 
 			if _, err = cliFmt.EncodeStringTo(o, sb); err != nil {
@@ -507,10 +507,10 @@ func (u *Repo) MakeFormatFunc(
 				return
 			}
 
-			if u.GetConfig().IsInlineType(o.GetType()) {
+			if repo.GetConfig().IsInlineType(o.GetType()) {
 				var r sha.ReadCloser
 
-				if r, err = u.GetStore().GetEnvRepo().BlobReader(
+				if r, err = repo.GetStore().GetEnvRepo().BlobReader(
 					o.GetBlobSha(),
 				); err != nil {
 					err = errors.Wrap(err)
@@ -522,7 +522,7 @@ func (u *Repo) MakeFormatFunc(
 				if _, err = delim_io.CopyWithPrefixOnDelim(
 					'\n',
 					sb.String(),
-					u.GetOut(),
+					repo.GetOut(),
 					r,
 					true,
 				); err != nil {
@@ -530,7 +530,7 @@ func (u *Repo) MakeFormatFunc(
 					return
 				}
 			} else {
-				if _, err = io.WriteString(out, sb.String()); err != nil {
+				if _, err = io.WriteString(writer, sb.String()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -540,12 +540,12 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "blob-sku-prefix":
-		cliFmt := u.SkuFormatBoxTransactedNoColor()
+		cliFmt := repo.SkuFormatBoxTransactedNoColor()
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetEnvRepo().BlobReader(
+			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -564,7 +564,7 @@ func (u *Repo) MakeFormatFunc(
 			if _, err = delim_io.CopyWithPrefixOnDelim(
 				'\n',
 				sb.String(),
-				u.GetOut(),
+				repo.GetOut(),
 				r,
 				true,
 			); err != nil {
@@ -576,40 +576,40 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "shas":
-		f = func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, &z.Metadata.Shas)
+		output = func(z *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(writer, &z.Metadata.Shas)
 			return
 		}
 
 	case "mutter-sha":
-		f = func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, z.Metadata.Mutter())
+		output = func(z *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(writer, z.Metadata.Mutter())
 			return
 		}
 
 	case "probe-shas":
-		f = func(z *sku.Transacted) (err error) {
+		output = func(z *sku.Transacted) (err error) {
 			sh1 := sha.FromStringContent(z.GetObjectId().String())
 			sh2 := sha.FromStringContent(z.GetObjectId().String() + z.GetTai().String())
 			defer sha.GetPool().Put(sh1)
 			defer sha.GetPool().Put(sh2)
-			_, err = fmt.Fprintln(out, z.GetObjectId(), sh1, sh2)
+			_, err = fmt.Fprintln(writer, z.GetObjectId(), sh1, sh2)
 			return
 		}
 
 	case "mutter":
-		p := u.PrinterTransacted()
+		p := repo.PrinterTransacted()
 
-		f = func(z *sku.Transacted) (err error) {
+		output = func(z *sku.Transacted) (err error) {
 			if z.Metadata.Mutter().IsNull() {
 				return
 			}
 
-			if z, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+			if z, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
 				z.GetObjectId(),
 				z.Metadata.Cache.ParentTai,
 			); err != nil {
-				fmt.Fprintln(out, err)
+				fmt.Fprintln(writer, err)
 				err = nil
 				return
 			}
@@ -618,9 +618,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list":
-		p := u.MakePrinterBoxArchive(u.GetUIFile(), true)
+		p := repo.MakePrinterBoxArchive(repo.GetUIFile(), true)
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -630,9 +630,9 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list-sans-tai":
-		p := u.MakePrinterBoxArchive(u.GetUIFile(), false)
+		p := repo.MakePrinterBoxArchive(repo.GetUIFile(), false)
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -642,8 +642,8 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "blob-sha":
-		f = func(o *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, o.GetBlobSha()); err != nil {
+		output = func(o *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(writer, o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -652,8 +652,8 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "type":
-		f = func(o *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, o.GetType().String()); err != nil {
+		output = func(o *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(writer, o.GetType().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -662,13 +662,13 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "verzeichnisse":
-		p := u.PrinterTransacted()
+		p := repo.PrinterTransacted()
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			sk := sku.GetTransactedPool().Get()
 			defer sku.GetTransactedPool().Put(sk)
 
-			if err = u.GetStore().GetStreamIndex().ReadOneObjectId(
+			if err = repo.GetStore().GetStreamIndex().ReadOneObjectId(
 				o.GetObjectId(),
 				sk,
 			); err != nil {
@@ -685,14 +685,14 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "json-blob":
-		e := json.NewEncoder(out)
+		e := json.NewEncoder(writer)
 
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetEnvRepo().BlobReader(
+			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -722,12 +722,12 @@ func (u *Repo) MakeFormatFunc(
 
 	case "toml":
 		ui.TodoP3("limit to only zettels supporting toml")
-		f = func(o *sku.Transacted) (err error) {
+		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetEnvRepo().BlobReader(
+			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -747,14 +747,14 @@ func (u *Repo) MakeFormatFunc(
 			a["description"] = o.Metadata.Description.String()
 			a["identifier"] = o.ObjectId.String()
 
-			e := toml.NewEncoder(out)
+			e := toml.NewEncoder(writer)
 
 			if err = e.Encode(&a); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if _, err = out.Write([]byte("\x00")); err != nil {
+			if _, err = writer.Write([]byte("\x00")); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -763,22 +763,22 @@ func (u *Repo) MakeFormatFunc(
 		}
 
 	case "debug-sku-metadata":
-		f = func(e *sku.Transacted) (err error) {
+		output = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
-				out,
+				writer,
 				sku.StringMetadataTai(e),
 			)
 			return
 		}
 
 	case "debug-sku":
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku.StringTaiGenreObjectIdShaBlob(e))
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(writer, sku.StringTaiGenreObjectIdShaBlob(e))
 			return
 		}
 
 	default:
-		err = MakeErrUnsupportedFormatterValue(v, genres.None)
+		err = MakeErrUnsupportedFormatterValue(format, genres.None)
 	}
 
 	return

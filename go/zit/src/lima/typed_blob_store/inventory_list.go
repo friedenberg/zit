@@ -94,7 +94,7 @@ func (a InventoryList) GetTransactedWithBlob(
 
 func (a InventoryList) GetTransactedWithBlobFromReader(
 	twb *sku.TransactedWithBlob[*sku.List],
-	r io.Reader,
+	reader io.Reader,
 ) (n int64, err error) {
 	tipe := twb.GetType()
 	twb.Blob = sku.MakeList()
@@ -103,7 +103,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 	case "", builtin_types.InventoryListTypeV0:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
 			a.v0,
-			r,
+			reader,
 			twb.Blob,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -113,7 +113,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 	case builtin_types.InventoryListTypeV1:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
 			a.v1,
-			r,
+			reader,
 			twb.Blob,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -199,10 +199,10 @@ func (a InventoryList) PutTransactedWithBlob(
 type iterSku = func(*sku.Transacted) bool
 
 func (a InventoryList) StreamInventoryListBlobSkus(
-	tg sku.TransactedGetter,
+	transactedGetter sku.TransactedGetter,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		sk := tg.GetSku()
+		sk := transactedGetter.GetSku()
 		tipe := sk.GetType()
 		blobSha := sk.GetBlobSha()
 
@@ -257,6 +257,44 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	}
 }
 
+func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
+	tipe ids.Type,
+	blobStore interfaces.BlobStore,
+	blobSha interfaces.Sha,
+) iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		var readCloser interfaces.ShaReadCloser
+
+		{
+			var err error
+
+			if readCloser, err = blobStore.BlobReader(blobSha); err != nil {
+				yield(nil, errors.Wrap(err))
+				return
+			}
+		}
+
+		defer errors.DeferredYieldCloser(yield, readCloser)
+
+		decoder := ids.TypedDecodersWithoutType[iterSku](
+			a.streamDecoders,
+		)
+
+		if _, err := decoder.DecodeFrom(
+			&ids.TypeWithObject[iterSku]{
+				Type: &tipe,
+				Object: func(sk *sku.Transacted) bool {
+					return yield(sk, nil)
+				},
+			},
+			readCloser,
+		); err != nil {
+			yield(nil, errors.Wrap(err))
+			return
+		}
+	}
+}
+
 func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	reader io.Reader,
@@ -283,12 +321,12 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 
 func (a InventoryList) ReadInventoryListObject(
 	tipe ids.Type,
-	r io.Reader,
+	reader io.Reader,
 ) (out *sku.Transacted, err error) {
 	switch tipe.String() {
 	case "", builtin_types.InventoryListTypeV0:
 		if _, out, err = a.v0.ReadInventoryListObject(
-			r,
+			reader,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -296,7 +334,7 @@ func (a InventoryList) ReadInventoryListObject(
 
 	case builtin_types.InventoryListTypeV1:
 		if err = a.v1.StreamInventoryListBlobSkus(
-			r,
+			reader,
 			func(sk *sku.Transacted) (err error) {
 				if out == nil {
 					out = sk.CloneTransacted()
@@ -311,6 +349,45 @@ func (a InventoryList) ReadInventoryListObject(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (a InventoryList) ReadInventoryListBlob(
+	tipe ids.Type,
+	reader io.Reader,
+) (list *sku.List, err error) {
+	list = sku.MakeList()
+
+	var listFormat sku.ListFormat
+
+	switch tipe.String() {
+	case "", builtin_types.InventoryListTypeV0:
+		listFormat = a.v0
+
+	case builtin_types.InventoryListTypeV1:
+		listFormat = a.v1
+	}
+
+	if err = listFormat.StreamInventoryListBlobSkus(
+		reader,
+		func(sk *sku.Transacted) (err error) {
+			if err = sk.CalculateObjectShas(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = list.Add(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

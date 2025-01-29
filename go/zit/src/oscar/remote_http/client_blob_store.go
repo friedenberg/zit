@@ -9,7 +9,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 )
 
 func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
@@ -82,6 +84,77 @@ func (client *client) BlobReader(
 	}
 
 	r = sha.MakeReadCloser(response.Body)
+
+	return
+}
+
+func (client *client) WriteBlobToRemote(
+	localBlobStore interfaces.BlobStore,
+	expected *sha.Sha,
+) (err error) {
+	var actual sha.Sha
+
+	// Closed by the http client's transport (our roundtripper calling
+	// request.Write)
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = localBlobStore.BlobReader(
+		expected,
+	); err != nil {
+		if env_dir.IsErrBlobMissing(err) {
+			// TODO make an option to collect this error at the present it, and an
+			// option to fetch it from another remote store
+			ui.Err().Printf("Blob missing locally: %q", expected)
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	var request *http.Request
+
+	if request, err = http.NewRequestWithContext(
+		client.GetEnv(),
+		"POST",
+		"/blobs",
+		rc,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	request.TransferEncoding = []string{"chunked"}
+
+	var response *http.Response
+
+	if response, err = client.http.Do(request); err != nil {
+		err = errors.Errorf("failed to read response: %w", err)
+		return
+	}
+
+	var shString strings.Builder
+
+	if _, err = io.Copy(&shString, response.Body); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = response.Body.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = expected.AssertEqualsShaLike(&actual); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

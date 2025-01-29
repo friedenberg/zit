@@ -7,8 +7,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (s *Store) Commit(el sku.ExternalLike, _ sku.CommitOptions) (err error) {
-	sk := el.GetSku()
+func (s *Store) Commit(
+	externalLike sku.ExternalLike,
+	_ sku.CommitOptions,
+) (err error) {
+	sk := externalLike.GetSku()
 
 	if sk.GetGenre() != genres.InventoryList {
 		err = genres.MakeErrUnsupportedGenre(sk.GetGenre())
@@ -16,6 +19,11 @@ func (s *Store) Commit(el sku.ExternalLike, _ sku.CommitOptions) (err error) {
 	}
 
 	if err = s.WriteInventoryListObject(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.ui.TransactedNew(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

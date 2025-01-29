@@ -174,9 +174,15 @@ function init_and_init { # @test
 	assert_failure
 	assert_output --partial '.zit/local/share/config-permanent: file exists'
 
-	run zit show :
+	run_zit show one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md tag] wow
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
+
+	run_zit show :
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 }

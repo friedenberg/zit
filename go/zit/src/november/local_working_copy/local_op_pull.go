@@ -21,12 +21,12 @@ func (local *Repo) PullQueryGroupFromRemote(
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
-	qg *query.Group,
+	queryGroup *query.Group,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
-	if list, err = remote.MakeInventoryList(qg); err != nil {
+	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

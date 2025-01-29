@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/mike/env_box"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
@@ -37,6 +38,14 @@ func (c LocalArchive) MakeLocalArchive(
 		); err != nil {
 			envRepo.CancelWithError(err)
 		}
+
+		envBox := env_box.Make(
+			envRepo,
+			nil,
+			nil,
+		)
+
+		inventoryListStore.SetUIDelegate(envBox.GetUIStorePrinters())
 
 		return &inventoryListStore
 

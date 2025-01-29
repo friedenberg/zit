@@ -34,7 +34,7 @@ func (cmd Remote) MakeArchive(
 
 	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		remote = cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 			req,
 			remoteArg,
 			env.GetOptions(),
@@ -78,7 +78,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 ) (remote repo.WorkingCopy) {
 	switch cmd.RemoteType {
 	case repo.RemoteTypeNativeDotenvXDG:
-		remote = cmd.LocalWorkingCopy.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 			req,
 			remoteArg,
 			env_ui.Options{},

@@ -8,19 +8,15 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/india/test_object_metadata_io"
 )
 
@@ -188,41 +184,14 @@ func TestEqualityNotSelf(t1 *testing.T) {
 	}
 }
 
-func makeTestFSHome(
-	t *testing.T,
-	contents map[string]string,
-) env_repo.Env {
-	p := t.TempDir()
-
-	dirLayout := env_dir.MakeWithHome(
-		errors.MakeContextDefault(),
-		p,
-		debug.Options{},
-		false,
-	)
-
-	var err error
-
-	f, err := env_repo.Make(
-		env_local.Make(env_ui.MakeDefault(), dirLayout),
-		env_repo.Options{
-			BasePath: p,
-		},
-	)
-	if err != nil {
-		t.Fatalf("failed to make dir_layout: %s", err)
-	}
-
-	return f
-}
-
 func makeTestTextFormat(
-	repoLayout env_repo.Env,
+	envDir env_dir.Env,
+	blobStore interfaces.BlobStore,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			DirLayout: repoLayout,
-			BlobStore: repoLayout,
+			EnvDir:    envDir,
+			BlobStore: blobStore,
 		},
 	)
 }
@@ -233,7 +202,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af),
+		makeTestTextFormat(af, af),
 		`---
 # the title
 - tag1
@@ -271,7 +240,7 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af),
+		makeTestTextFormat(af, af),
 		`---
 # the title
 # continues
@@ -310,7 +279,7 @@ func TestReadWithBlob(t1 *testing.T) {
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af),
+    makeTestTextFormat(af, af),
 		`---
 # the title
 - tag1

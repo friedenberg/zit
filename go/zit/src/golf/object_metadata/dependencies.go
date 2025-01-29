@@ -19,7 +19,7 @@ import (
 )
 
 type Dependencies struct {
-	DirLayout     env_dir.Env
+	EnvDir        env_dir.Env
 	BlobStore     interfaces.BlobStore
 	BlobFormatter script_config.RemoteScript
 }
@@ -158,7 +158,7 @@ func (f Dependencies) writePathType(
 	}
 
 	if ap != "" {
-		ap = f.DirLayout.RelToCwdOrSame(ap)
+		ap = f.EnvDir.RelToCwdOrSame(ap)
 	} else {
 		err = errors.Errorf("path not found in fields")
 		return
@@ -191,7 +191,7 @@ func (f Dependencies) writeBlob(
 
 		if wt, err = script_config.MakeWriterToWithStdin(
 			f.BlobFormatter,
-			f.DirLayout.MakeCommonEnv(),
+			f.EnvDir.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)

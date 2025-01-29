@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -90,11 +89,11 @@ func (cmd Show) Run(req command.Request) {
 
 func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	repo *local_working_copy.Repo,
-	qg *query.Group,
+	queryGroup *query.Group,
 ) {
 	var f interfaces.FuncIter[*sku.Transacted]
 
-	if cmd.Format == "" && qg.IsExactlyOneObjectId() {
+	if cmd.Format == "" && queryGroup.IsExactlyOneObjectId() {
 		cmd.Format = "text"
 	}
 
@@ -141,24 +140,24 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	}
 
 	if err := repo.GetStore().QueryTransacted(
-		qg,
+		queryGroup,
 		quiter.MakeSyncSerializer(f),
 	); err != nil {
 		repo.CancelWithError(err)
 	}
 }
 
+// TODO add support for query group
 func (cmd Show) runWithArchive(
 	env env_ui.Env,
 	archive repo.Repo,
-	// qg *query.Group,
 ) {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		env,
-		options_print.V0{}.WithPrintTai(true),
+		env.GetCLIConfig().PrintOptions,
 	)
 
-	f := string_format_writer.MakeDelim(
+	printer := string_format_writer.MakeDelim(
 		"\n",
 		env.GetUIFile(),
 		string_format_writer.MakeFunc(
@@ -172,7 +171,7 @@ func (cmd Show) runWithArchive(
 
 	if err := inventoryListStore.ReadAllSkus(
 		func(_, sk *sku.Transacted) (err error) {
-			if err = f(sk); err != nil {
+			if err = printer(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -1,7 +1,6 @@
 package inventory_list_store
 
 import (
-	"fmt"
 	"iter"
 	"sort"
 	"sync"
@@ -32,10 +31,10 @@ type Store struct {
 	lock sync.Mutex
 
 	envRepo        env_repo.Env
-	ls             interfaces.LockSmith
-	sv             interfaces.StoreVersion
-	of             interfaces.ObjectIOFactory
-	af             interfaces.BlobStore
+	lockSmith      interfaces.LockSmith
+	storeVersion   interfaces.StoreVersion
+	objectStore    interfaces.ObjectIOFactory
+	blobStore      interfaces.BlobStore
 	clock          ids.Clock
 	typedBlobStore typed_blob_store.InventoryList
 
@@ -44,6 +43,8 @@ type Store struct {
 	box           *box_format.BoxTransacted
 
 	blobType ids.Type
+
+	ui sku.UIStorePrinters
 }
 
 func (s *Store) Initialize(
@@ -54,12 +55,12 @@ func (s *Store) Initialize(
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		envRepo: envRepo,
-		ls:      envRepo.GetLockSmith(),
-		sv:      envRepo.GetStoreVersion(),
-		of:      envRepo.ObjectReaderWriterFactory(genres.InventoryList),
-		af:      envRepo,
-		clock:   clock,
+		envRepo:      envRepo,
+		lockSmith:    envRepo.GetLockSmith(),
+		storeVersion: envRepo.GetStoreVersion(),
+		objectStore:  envRepo.ObjectReaderWriterFactory(genres.InventoryList),
+		blobStore:    envRepo,
+		clock:        clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
 			options_print.V0{}.WithPrintTai(true),
@@ -68,7 +69,7 @@ func (s *Store) Initialize(
 		typedBlobStore: typedBlobStore,
 	}
 
-	v := s.sv.GetInt()
+	v := s.storeVersion.GetInt()
 
 	switch {
 	case v <= 6:
@@ -79,6 +80,10 @@ func (s *Store) Initialize(
 	}
 
 	return
+}
+
+func (s *Store) SetUIDelegate(ud sku.UIStorePrinters) {
+	s.ui = ud
 }
 
 func (s *Store) GetEnv() env_ui.Env {
@@ -147,7 +152,7 @@ func (s *Store) Create(
 		return
 	}
 
-	if !s.ls.IsAcquired() {
+	if !s.lockSmith.IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "create inventory list",
 		}
@@ -262,7 +267,7 @@ func (s *Store) WriteInventoryListObject(t *sku.Transacted) (err error) {
 
 	// TODO also write to inventory_list_log
 
-	if wc, err = s.of.ObjectWriter(); err != nil {
+	if wc, err = s.objectStore.ObjectWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -308,7 +313,7 @@ func (s *Store) ImportInventoryList(
 	list := sku.MakeList()
 
 	if err = inventory_list_blobs.ReadInventoryListBlob(
-		s.FormatForVersion(s.sv),
+		s.FormatForVersion(s.storeVersion),
 		rc,
 		list,
 	); err != nil {
@@ -408,7 +413,7 @@ func (s *Store) ReadOneSha(
 
 	var or sha.ReadCloser
 
-	if or, err = s.of.ObjectReader(&sh); err != nil {
+	if or, err = s.objectStore.ObjectReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -429,30 +434,11 @@ func (s *Store) ReadOneSha(
 func (s *Store) IterInventoryList(
 	blobSha interfaces.Sha,
 ) iter.Seq2[*sku.Transacted, error] {
-	var rc interfaces.ShaReadCloser
-
-	{
-		var err error
-
-		if rc, err = s.af.BlobReader(blobSha); err != nil {
-			return errors.IterWrapped[*sku.Transacted](err)
-		}
-	}
-
-	return func(yield func(*sku.Transacted, error) bool) {
-		seq := s.typedBlobStore.IterInventoryListBlobSkusFromReader(
-			s.blobType,
-			rc,
-		)
-
-		defer errors.DeferredYieldCloser(yield, rc)
-
-		for sk, err := range seq {
-			if !yield(sk, err) {
-				return
-			}
-		}
-	}
+	return s.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
+		s.blobType,
+		s.blobStore,
+		blobSha,
+	)
 }
 
 func (s *Store) ReadLast() (max *sku.Transacted, err error) {
@@ -471,32 +457,24 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 
 	max = &maxSku
 
-	if max.GetObjectSha().IsNull() {
-		panic(
-			fmt.Sprintf(
-				"did not find last inventory list: %#v",
-				max.GetMetadata(),
-			),
-		)
-	}
-
 	return
 }
 
 func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
-	var p string
-
-	{
-		var err error
-
-		if p, err = s.envRepo.DirObjectGenre(
-			genres.InventoryList,
-		); err != nil {
-			return errors.IterWrapped[*sku.Transacted](err)
-		}
-	}
-
 	return func(yield func(*sku.Transacted, error) bool) {
+		var p string
+
+		{
+			var err error
+
+			if p, err = s.envRepo.DirObjectGenre(
+				genres.InventoryList,
+			); err != nil {
+				yield(nil, errors.Wrap(err))
+				return
+			}
+		}
+
 		for path, err := range files.DirNamesLevel2(p) {
 			if err != nil {
 				if !yield(nil, errors.Wrap(err)) {

@@ -8,19 +8,19 @@ import (
 )
 
 func ReadInventoryListBlob(
-	vf sku.ListFormat,
-	r io.Reader,
-	a *sku.List,
+	listFormat sku.ListFormat,
+	reader io.Reader,
+	list *sku.List,
 ) (err error) {
-	if err = vf.StreamInventoryListBlobSkus(
-		r,
+	if err = listFormat.StreamInventoryListBlobSkus(
+		reader,
 		func(sk *sku.Transacted) (err error) {
 			if err = sk.CalculateObjectShas(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = a.Add(sk); err != nil {
+			if err = list.Add(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

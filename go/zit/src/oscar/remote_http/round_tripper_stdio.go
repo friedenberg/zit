@@ -30,6 +30,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	roundTripper.Args = []string{
 		"zit",
 		"serve",
+    "-print-time=false", // TODO switch to passing this from envUI.GetCLIConfig()
 	}
 
 	if envUI.GetCLIConfig().Verbose {

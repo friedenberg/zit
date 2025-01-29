@@ -89,7 +89,7 @@ func (cmd *New) Run(dep command.Request) {
 
 	f := object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			DirLayout: u.GetRepoLayout(),
+			EnvDir: u.GetRepoLayout(),
 			BlobStore: u.GetRepoLayout(),
 		},
 	)

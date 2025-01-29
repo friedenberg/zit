@@ -1,10 +1,12 @@
 package remote_http
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"github.com/gorilla/mux"
 )
 
@@ -29,11 +31,62 @@ type Response struct {
 	Body       io.ReadCloser
 }
 
-func (r *Response) ErrorWithStatus(status int, err error) {
-	r.StatusCode = status
-	r.Body = io.NopCloser(strings.NewReader(err.Error()))
+func (response *Response) ErrorWithStatus(status int, err error) {
+	response.StatusCode = status
+	response.Body = io.NopCloser(strings.NewReader(err.Error()))
 }
 
-func (r *Response) Error(err error) {
-	r.ErrorWithStatus(http.StatusInternalServerError, err)
+func (response *Response) Error(err error) {
+	response.ErrorWithStatus(http.StatusInternalServerError, err)
+}
+
+func ReadErrorFromBody(response *http.Response) (err error) {
+	var sb strings.Builder
+
+	if _, err = io.Copy(&sb, response.Body); err != nil {
+		err = errors.Errorf(
+			"failed to read error string from response (%d) body: %q",
+			response.StatusCode,
+			err,
+		)
+
+		return
+	}
+
+	err = errors.BadRequestf(
+		"remote responded to request (%q) with error (%d): %q",
+		fmt.Sprintf("%s %s", response.Request.Method, response.Request.URL),
+		response.StatusCode,
+		&sb,
+	)
+
+	return
+}
+
+func ReadErrorFromBodyOnGreaterOrEqual(
+	response *http.Response,
+	status int,
+) (err error) {
+	if response.StatusCode < status {
+		return
+	}
+
+	err = ReadErrorFromBody(response)
+
+	return
+}
+
+func ReadErrorFromBodyOnNot(
+	response *http.Response,
+	statuses ...int,
+) (err error) {
+	for _, status := range statuses {
+		if response.StatusCode == status {
+			return
+		}
+	}
+
+	err = ReadErrorFromBody(response)
+
+	return
 }

@@ -58,6 +58,10 @@ func (u *Repo) GetBlobStore() interfaces.BlobStore {
 	return u.GetRepoLayout()
 }
 
+func (repo *Repo) GetObjectStore() sku.ObjectStore {
+	return &repo.store
+}
+
 func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
 	return u.GetStore().GetInventoryListStore()
 }

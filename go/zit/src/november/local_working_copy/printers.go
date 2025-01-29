@@ -12,28 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 )
 
-func (repo *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	po := repo.config.GetCLIConfig().PrintOptions.
-		WithPrintShas(true).
-		WithExcludeFields(true)
-
-	sw := repo.StringFormatWriterSkuBoxTransacted(
-		po,
-		repo.FormatColorOptionsOut(),
-		string_format_writer.CliFormatTruncation66CharEllipsis,
-	)
-
-	return string_format_writer.MakeDelim(
-		"\n",
-		repo.GetUIFile(),
-		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return sw.EncodeStringTo(o, w)
-			},
-		),
-	)
-}
-
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 	po := repo.config.GetCLIConfig().PrintOptions.
@@ -94,27 +72,6 @@ func (u *Repo) PrinterHeader() interfaces.FuncIter[string] {
 	} else {
 		return func(v string) error { return ui.Log().Print(v) }
 	}
-}
-
-func (u *Repo) PrinterCheckedOut(
-	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
-) interfaces.FuncIter[*sku.CheckedOut] {
-	oo := u.FormatOutputOptions()
-	po := u.config.GetCLIConfig().PrintOptions.
-		WithPrintShas(true)
-
-	out := string_format_writer.MakeDelim(
-		"\n",
-		u.GetUIFile(),
-		u.StringFormatWriterSkuBoxCheckedOut(
-			po,
-			oo.ColorOptionsErr,
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-			box_format.CheckedOutHeaderState{},
-		),
-	)
-
-	return out
 }
 
 func (u *Repo) PrinterCheckedOutConflictsForRemoteTransfers() interfaces.FuncIter[*sku.CheckedOut] {

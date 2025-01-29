@@ -24,19 +24,18 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 	remoteInventoryListStore := remote.GetInventoryListStore()
 	localInventoryListStore := local.GetInventoryListStore()
 
-	for list, err := range remoteInventoryListStore.IterAllInventoryLists() {
+	for list, err := range localInventoryListStore.IterAllInventoryLists() {
 		if err != nil {
 			req.CancelWithError(err)
 			return
 		}
 
-		if err := localInventoryListStore.ImportInventoryList(
-			remote.GetBlobStore(),
+		if err := remoteInventoryListStore.ImportInventoryList(
+			local.GetBlobStore(),
 			list,
 		); err != nil {
 			req.CancelWithError(err)
 			return
 		}
-
 	}
 }
