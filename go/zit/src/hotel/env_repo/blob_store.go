@@ -3,6 +3,7 @@ package env_repo
 import (
 	"bytes"
 	"io"
+	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -56,6 +57,10 @@ func (s blobStore) GetBlobStore() interfaces.BlobStore {
 	return s
 }
 
+func (s blobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
+	return s
+}
+
 func (s blobStore) HasBlob(
 	sh interfaces.Sha,
 ) (ok bool) {
@@ -68,6 +73,31 @@ func (s blobStore) HasBlob(
 	ok = files.Exists(p)
 
 	return
+}
+
+func (s blobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+	return func(yield func(interfaces.Sha, error) bool) {
+		var sh sha.Sha
+
+		for path, err := range files.DirNamesLevel2(s.basePath) {
+			if err != nil {
+				if !yield(nil, err) {
+					return
+				}
+			}
+
+			if err = sh.SetFromPath(path); err != nil {
+				err = errors.Wrap(err)
+				if !yield(nil, err) {
+					return
+				}
+			}
+
+			if !yield(&sh, nil) {
+				return
+			}
+		}
+	}
 }
 
 func (s blobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
@@ -156,7 +186,8 @@ func (s blobStore) blobReaderFrom(
 
 func MakeCopyingBlobStore(
 	env env_local.Env,
-	local, remote interfaces.BlobStore,
+	local interfaces.LocalBlobStore,
+	remote interfaces.BlobStore,
 ) CopyingBlobStore {
 	if local == nil {
 		panic("nil local blob store")
@@ -171,10 +202,15 @@ func MakeCopyingBlobStore(
 
 type CopyingBlobStore struct {
 	env_local.Env
-	local, remote interfaces.BlobStore
+	local  interfaces.LocalBlobStore
+	remote interfaces.BlobStore
 }
 
 func (s CopyingBlobStore) GetBlobStore() interfaces.BlobStore {
+	return s
+}
+
+func (s CopyingBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
 	return s
 }
 
@@ -188,6 +224,10 @@ func (s CopyingBlobStore) HasBlob(sh interfaces.Sha) bool {
 	}
 
 	return false
+}
+
+func (s CopyingBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+	return s.local.AllBlobs()
 }
 
 func (s CopyingBlobStore) BlobWriter() (w sha.WriteCloser, err error) {

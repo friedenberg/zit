@@ -39,13 +39,13 @@ func (cmd Deinit) Run(dep command.Request) {
 		return
 	}
 
-	base := path.Join(localWorkingCopy.GetRepoLayout().Dir())
+	base := path.Join(localWorkingCopy.GetEnvRepo().Dir())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	if err := localWorkingCopy.GetRepoLayout().DeleteAll(base); err != nil {
+	if err := localWorkingCopy.GetEnvRepo().DeleteAll(base); err != nil {
 		localWorkingCopy.CancelWithError(err)
 	}
 }
@@ -54,7 +54,7 @@ func (c Deinit) getPermission(u *local_working_copy.Repo) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",
-		u.GetRepoLayout().Dir(),
+		u.GetEnvRepo().Dir(),
 	)
 
 	var answer rune

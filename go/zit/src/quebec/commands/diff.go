@@ -52,8 +52,8 @@ func (cmd Diff) Run(dep command.Request) {
 		Repo: localWorkingCopy,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir: localWorkingCopy.GetRepoLayout(),
-				BlobStore: localWorkingCopy.GetRepoLayout(),
+				EnvDir:    localWorkingCopy.GetEnvRepo(),
+				BlobStore: localWorkingCopy.GetEnvRepo(),
 			},
 		),
 	}

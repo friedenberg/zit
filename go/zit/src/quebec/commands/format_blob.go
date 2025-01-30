@@ -99,7 +99,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 	}
 
 	f := typed_blob_store.MakeTextFormatterWithBlobFormatter(
-		localWorkingCopy.GetRepoLayout(),
+		localWorkingCopy.GetEnvRepo(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
 		},
@@ -163,7 +163,7 @@ func (c *FormatBlob) FormatFromStdin(
 
 	if wt, err = script_config.MakeWriterToWithStdin(
 		blobFormatter,
-		u.GetRepoLayout().MakeCommonEnv(),
+		u.GetEnvRepo().MakeCommonEnv(),
 		u.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)

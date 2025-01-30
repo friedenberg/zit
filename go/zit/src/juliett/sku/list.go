@@ -52,7 +52,7 @@ type List = heap.Heap[Transacted, *Transacted]
 func MakeList() *List {
 	h := heap.Make(
 		transactedEqualer{},
-		transactedLessor{},
+		transactedLessorStable{},
 		transactedResetter{},
 	)
 

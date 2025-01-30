@@ -279,7 +279,7 @@ func TestReadWithBlob(t1 *testing.T) {
 
 	actual := readFormat(
 		t,
-    makeTestTextFormat(af, af),
+		makeTestTextFormat(af, af),
 		`---
 # the title
 - tag1

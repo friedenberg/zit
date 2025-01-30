@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+// TODO refactor this whole thing to be simpler and get rid of generics
 type AbbrStoreMutableGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	Add(VPtr) error
 }

@@ -20,7 +20,7 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 
 func (c LocalArchive) MakeLocalArchive(
 	envRepo env_repo.Env,
-) repo.Repo {
+) repo.LocalRepo {
 	repoType := envRepo.GetConfig().ImmutableConfig.GetRepoType()
 
 	switch repoType {

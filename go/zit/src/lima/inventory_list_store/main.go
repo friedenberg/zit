@@ -87,11 +87,11 @@ func (s *Store) SetUIDelegate(ud sku.UIStorePrinters) {
 }
 
 func (s *Store) GetEnv() env_ui.Env {
-	return s.GetRepoLayout()
+	return s.GetEnvRepo()
 }
 
 func (s *Store) GetImmutableConfig() config_immutable_io.ConfigLoaded {
-	return s.GetRepoLayout().GetConfig()
+	return s.GetEnvRepo().GetConfig()
 }
 
 func (s *Store) GetObjectStore() sku.ObjectStore {
@@ -132,7 +132,7 @@ func (s *Store) GetTai() ids.Tai {
 	}
 }
 
-func (s *Store) GetRepoLayout() env_repo.Env {
+func (s *Store) GetEnvRepo() env_repo.Env {
 	return s.envRepo
 }
 
@@ -328,8 +328,8 @@ func (s *Store) ImportInventoryList(
 		}
 
 		if _, err = env_repo.CopyBlobIfNecessary(
-			s.GetRepoLayout().GetEnv(),
-			s.GetRepoLayout(),
+			s.GetEnvRepo().GetEnv(),
+			s.GetEnvRepo(),
 			bs,
 			sk.GetBlobSha(),
 		); err != nil {

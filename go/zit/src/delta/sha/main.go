@@ -7,6 +7,7 @@ import (
 	"hash"
 	"io"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -164,6 +165,32 @@ func (s *Sha) SetParts(a, b string) (err error) {
 	return
 }
 
+func (s *Sha) SetFromPath(p string) (err error) {
+	tail := filepath.Base(p)
+	head := filepath.Base(filepath.Dir(p))
+
+	switch {
+	case tail == string(filepath.Separator) || head == string(filepath.Separator):
+		fallthrough
+
+	case tail == "." || head == ".":
+		err = errors.Errorf(
+			"path cannot be turned into a head/tail pair: '%s/%s'",
+			head,
+			tail,
+		)
+
+		return
+	}
+
+	if err = s.SetParts(head, tail); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Sha) ReadAtFrom(r io.ReaderAt, start int64) (n int64, err error) {
 	s.allocDataIfNecessary()
 
@@ -227,7 +254,7 @@ func (s *Sha) Set(v string) (err error) {
 	s.allocDataIfNecessary()
 
 	v1 := strings.TrimSpace(v)
-	v1 = strings.TrimPrefix(v, "@")
+	v1 = strings.TrimPrefix(v1, "@")
 
 	var b []byte
 

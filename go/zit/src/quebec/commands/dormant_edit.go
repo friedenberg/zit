@@ -105,7 +105,7 @@ func (c DormantEdit) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = u.GetRepoLayout().GetTempLocal().FileTemp(); err != nil {
+	if f, err = u.GetEnvRepo().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -144,7 +144,7 @@ func (c DormantEdit) readTempKonfigFile(
 
 	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.GetRepoLayout().BlobWriter(); err != nil {
+	if aw, err = u.GetEnvRepo().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

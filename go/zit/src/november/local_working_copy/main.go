@@ -164,7 +164,7 @@ func (repo *Repo) initialize(
 		config,
 		repo.PrinterFDDeleted(),
 		config.GetFileExtensions(),
-		repo.GetRepoLayout(),
+		repo.GetEnvRepo(),
 		objectInventoryFormatOptions,
 		repo.fileEncoder,
 	); err != nil {
@@ -236,7 +236,7 @@ func (repo *Repo) initialize(
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				config,
-				repo.GetRepoLayout(),
+				repo.GetEnvRepo(),
 				repo.PrinterTransactedDeleted(),
 			),
 		},

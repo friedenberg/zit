@@ -4,7 +4,7 @@ import "code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 
 type LocalRepo interface {
 	Repo
-	GetRepoLayout() env_repo.Env
+	GetEnvRepo() env_repo.Env // TODO rename to GetEnvRepo
 }
 
 type LocalWorkingCopy interface {

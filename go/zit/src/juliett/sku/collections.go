@@ -9,7 +9,7 @@ import (
 
 var (
 	TransactedSetEmpty TransactedSet
-	TransactedLessor   transactedLessor
+	TransactedLessor   transactedLessorStable
 	TransactedEqualer  transactedEqualer
 )
 

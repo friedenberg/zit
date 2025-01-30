@@ -31,7 +31,7 @@ func (u *Repo) MakeExternalQueryGroup(
 
 func (u *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
-		u.GetRepoLayout(),
+		u.GetEnvRepo(),
 		u.GetStore().GetTypedBlobStore(),
 		u.GetStore().GetStreamIndex(),
 		u.envLua.MakeLuaVMPoolBuilder(),

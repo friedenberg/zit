@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -30,6 +31,7 @@ func (client client) ImportInventoryList(
 	blobStore interfaces.BlobStore,
 	listSku *sku.Transacted,
 ) (err error) {
+	ui.Log().Printf("importing list: %s", sku.String(listSku))
 	listFormat := client.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
 	)
@@ -48,6 +50,8 @@ func (client client) ImportInventoryList(
 		err = errors.Wrap(err)
 		return
 	}
+
+	ui.Log().Printf("collected list (%d): %s", list.Len(), sku.String(listSku))
 
 	// TODO make a reader version of inventory lists to avoid allocation
 	if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
@@ -89,6 +93,8 @@ func (client client) ImportInventoryList(
 		return
 	}
 
+	ui.Log().Printf("sent list (%d): %s", list.Len(), sku.String(listSku))
+
 	if err = ReadErrorFromBodyOnNot(
 		response,
 		http.StatusCreated,
@@ -104,6 +110,8 @@ func (client client) ImportInventoryList(
 		err = errors.Wrap(err)
 		return
 	}
+
+	ui.Log().Printf("read missing blobs: %d", len(shas))
 
 	for _, sh := range shas {
 		if err = client.WriteBlobToRemote(blobStore, sh); err != nil {

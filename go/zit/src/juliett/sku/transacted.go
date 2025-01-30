@@ -253,13 +253,27 @@ func (o *Transacted) GetKey() string {
 	return ids.FormattedString(o.GetObjectId())
 }
 
-type transactedLessor struct{}
+type transactedLessorTaiOnly struct{}
 
-func (transactedLessor) Less(a, b *Transacted) bool {
+func (transactedLessorTaiOnly) Less(a, b *Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
-func (transactedLessor) LessPtr(a, b *Transacted) bool {
+func (transactedLessorTaiOnly) LessPtr(a, b *Transacted) bool {
+	return a.GetTai().Less(b.GetTai())
+}
+
+type transactedLessorStable struct{}
+
+func (transactedLessorStable) Less(a, b *Transacted) bool {
+	if result := a.GetTai().SortCompare(b.GetTai()); !result.Equal() {
+		return result.Less()
+	}
+
+	return a.GetObjectId().String() < b.GetObjectId().String()
+}
+
+func (transactedLessorStable) LessPtr(a, b *Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 

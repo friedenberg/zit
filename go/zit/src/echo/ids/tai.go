@@ -11,6 +11,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -311,6 +312,16 @@ func (t Tai) Equals(t1 Tai) bool {
 
 func (t Tai) Less(t1 Tai) bool {
 	return t.Before(t1)
+}
+
+func (t Tai) SortCompare(t1 Tai) quiter.SortCompare {
+	if t.Equals(t1) {
+		return quiter.SortCompareEqual
+	} else if t.Before(t1) {
+		return quiter.SortCompareLess
+	} else {
+		return quiter.SortCompareGreater
+	}
 }
 
 func MakeTaiRFC3339Value(t Tai) *TaiRFC3339Value {

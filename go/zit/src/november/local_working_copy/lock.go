@@ -47,7 +47,7 @@ func (u *Repo) Unlock() (err error) {
 
 		ui.Log().Print("will flush konfig")
 		if err = u.config.Flush(
-			u.GetRepoLayout(),
+			u.GetEnvRepo(),
 			u.GetStore().GetTypedBlobStore(),
 			u.PrinterHeader(),
 		); err != nil {
@@ -57,7 +57,7 @@ func (u *Repo) Unlock() (err error) {
 
 		ui.Log().Print("will flush dormant")
 		if err = u.dormantIndex.Flush(
-			u.GetRepoLayout(),
+			u.GetEnvRepo(),
 			u.PrinterHeader(),
 			u.config.GetCLIConfig().DryRun,
 		); err != nil {

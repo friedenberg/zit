@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -30,6 +32,24 @@ func (server *Server) writeInventoryList(
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
 
+	shas := tridex.Make()
+
+	{
+		count := 0
+
+		for sh, err := range server.Repo.GetEnvRepo().AllBlobs() {
+			if err != nil {
+				response.Error(err)
+				return
+			}
+
+			shas.Add(sh.String())
+			count++
+		}
+
+		ui.Log().Printf("have blobs: %d", count)
+	}
+
 	var blobWriter sha.WriteCloser
 
 	{
@@ -47,25 +67,33 @@ func (server *Server) writeInventoryList(
 	)
 
 	b := bytes.NewBuffer(nil)
+	{
+		count := 0
 
-	for sk, err := range seq {
-		server.Repo.GetEnv().ContinueOrPanicOnDone()
+		for sk, err := range seq {
+			server.Repo.GetEnv().ContinueOrPanicOnDone()
 
-		if err != nil {
-			response.Error(err)
-			return
+			if err != nil {
+				response.Error(err)
+				return
+			}
+
+			blobSha := sk.GetBlobSha()
+
+			if shas.ContainsExpansion(blobSha.String()) {
+				continue
+			}
+
+			ui.Log().Printf("missing blob: %s", blobSha)
+
+			sh := sha.GetPool().Get()
+			sha.GetPool().Put(sh)
+			sh.ResetWithShaLike(blobSha)
+			fmt.Fprintf(b, "%s\n", sh)
+			count++
 		}
 
-		blobSha := sk.GetBlobSha()
-
-		if blobStore.HasBlob(blobSha) {
-			continue
-		}
-
-		sh := sha.GetPool().Get()
-		sha.GetPool().Put(sh)
-		sh.ResetWithShaLike(blobSha)
-		fmt.Fprintf(b, "%s\n", sh)
+		ui.Log().Printf("missing blobs: %d", count)
 	}
 
 	if err := blobWriter.Close(); err != nil {
@@ -77,9 +105,13 @@ func (server *Server) writeInventoryList(
 	actual := blobWriter.GetShaLike()
 
 	if err := expected.AssertEqualsShaLike(actual); err != nil {
-		response.Error(err)
+		response.StatusCode = http.StatusFound
 		return
+		// response.ErrorWithStatus(http.StatusBadRequest, err)
+		// return
 	}
+
+	ui.Log().Printf("list sha matches: %s", expected)
 
 	// TODO make merge conflicts impossible
 

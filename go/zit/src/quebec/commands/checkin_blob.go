@@ -98,7 +98,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 		{
 			var err error
 
-			if ow, err = localWorkingCopy.GetRepoLayout().BlobWriter(); err != nil {
+			if ow, err = localWorkingCopy.GetEnvRepo().BlobWriter(); err != nil {
 				dep.CancelWithError(err)
 			}
 		}

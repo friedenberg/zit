@@ -101,7 +101,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		localWorkingCopy.GetRepoLayout().CancelWithErrorf("cannot organize and edit at the same time")
+		localWorkingCopy.GetEnvRepo().CancelWithErrorf("cannot organize and edit at the same time")
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -116,9 +116,9 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 
 			if f, err = localWorkingCopy.MakeFormatFunc(
 				c.Format,
-				localWorkingCopy.GetRepoLayout().GetUIFile(),
+				localWorkingCopy.GetEnvRepo().GetUIFile(),
 			); err != nil {
-				localWorkingCopy.GetRepoLayout().CancelWithError(err)
+				localWorkingCopy.GetEnvRepo().CancelWithError(err)
 			}
 		}
 	}
@@ -126,11 +126,11 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	f = quiter.MakeSyncSerializer(f)
 
 	if err := c.runWithInventoryList(
-		localWorkingCopy.GetRepoLayout(),
+		localWorkingCopy.GetEnvRepo(),
 		localWorkingCopy,
 		f,
 	); err != nil {
-		localWorkingCopy.GetRepoLayout().CancelWithError(err)
+		localWorkingCopy.GetEnvRepo().CancelWithError(err)
 	}
 
 	if c.Organize {
@@ -147,12 +147,12 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
-				localWorkingCopy.GetRepoLayout().CancelWithError(err)
+				localWorkingCopy.GetEnvRepo().CancelWithError(err)
 			}
 		}
 
 		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(results); err != nil {
-			localWorkingCopy.GetRepoLayout().CancelWithError(err)
+			localWorkingCopy.GetEnvRepo().CancelWithError(err)
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
@@ -164,7 +164,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 		}
 
 		if _, err := opCheckout.Run(skus); err != nil {
-			localWorkingCopy.GetRepoLayout().CancelWithError(err)
+			localWorkingCopy.GetEnvRepo().CancelWithError(err)
 		}
 	}
 }

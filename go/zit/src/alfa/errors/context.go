@@ -147,7 +147,7 @@ func (c *context) Run(f func(Context)) error {
 		defer c.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
-        // TODO capture panic stack trace and add to custom error objects
+				// TODO capture panic stack trace and add to custom error objects
 				switch err := r.(type) {
 				default:
 					fmt.Printf("%s", debug.Stack())

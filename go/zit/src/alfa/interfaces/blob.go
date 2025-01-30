@@ -1,5 +1,7 @@
 package interfaces
 
+import "iter"
+
 type (
 	BlobCompression interface {
 		CommandLineIOWrapper
@@ -24,6 +26,12 @@ type (
 		HasBlob(sh Sha) (ok bool)
 		BlobReader
 		BlobWriter
+	}
+
+	LocalBlobStore interface {
+		BlobStore
+		GetLocalBlobStore() LocalBlobStore
+		AllBlobs() iter.Seq2[Sha, error]
 	}
 
 	BlobStoreConfigImmutable interface {

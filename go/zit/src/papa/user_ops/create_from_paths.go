@@ -141,12 +141,12 @@ func (c CreateFromPaths) Run(
 	if err = toDelete.Each(
 		func(f *fd.FD) (err error) {
 			// TODO-P2 move to checkout store
-			if err = c.GetRepoLayout().Delete(f.GetPath()); err != nil {
+			if err = c.GetEnvRepo().Delete(f.GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.GetRepoLayout().RelToCwdOrSame(f.GetPath())
+			pathRel := c.GetEnvRepo().RelToCwdOrSame(f.GetPath())
 
 			// TODO-P2 move to printer
 			c.GetUI().Printf("[%s] (deleted)", pathRel)

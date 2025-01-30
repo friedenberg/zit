@@ -23,7 +23,7 @@ func (u *Repo) GetEnv() env_ui.Env {
 }
 
 func (u *Repo) GetImmutableConfig() config_immutable_io.ConfigLoaded {
-	return u.GetRepoLayout().GetConfig()
+	return u.GetEnvRepo().GetConfig()
 }
 
 func (u *Repo) GetEnvLocal() env_local.Env {
@@ -46,7 +46,7 @@ func (u *Repo) GetDormantIndex() *dormant_index.Index {
 	return &u.dormantIndex
 }
 
-func (u *Repo) GetRepoLayout() env_repo.Env {
+func (u *Repo) GetEnvRepo() env_repo.Env {
 	return u.envRepo
 }
 
@@ -55,7 +55,7 @@ func (u *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
 }
 
 func (u *Repo) GetBlobStore() interfaces.BlobStore {
-	return u.GetRepoLayout()
+	return u.GetEnvRepo()
 }
 
 func (repo *Repo) GetObjectStore() sku.ObjectStore {

@@ -33,7 +33,7 @@ import (
 
 type Server struct {
 	EnvLocal env_local.Env
-	Repo     repo.Repo
+	Repo     repo.LocalRepo
 }
 
 // TODO switch to not return error
@@ -167,9 +167,22 @@ func (server Server) makeRouter(
 			Methods("POST")
 	}
 
+	if server.Repo.GetEnv().GetCLIConfig().Verbose {
+		router.Use(server.loggerMiddleware)
+	}
+
 	router.Use(server.panicHandlingMiddleware)
 
 	return router
+}
+
+func (server *Server) loggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(responseWriter http.ResponseWriter, request *http.Request) {
+			ui.Log().Printf("serving request: %s %s", request.Method, request.URL.Path)
+			next.ServeHTTP(responseWriter, request)
+		},
+	)
 }
 
 func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {

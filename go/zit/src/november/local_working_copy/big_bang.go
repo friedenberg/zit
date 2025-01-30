@@ -27,7 +27,7 @@ func Genesis(
 	repo = MakeWithLayout(OptionsEmpty, repoLayout)
 
 	if err := repo.dormantIndex.Flush(
-		repo.GetRepoLayout(),
+		repo.GetEnvRepo(),
 		repo.PrinterHeader(),
 		repo.config.GetCLIConfig().DryRun,
 	); err != nil {
@@ -180,7 +180,7 @@ func writeDefaultMutableConfig(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetRepoLayout().BlobWriter(); err != nil {
+	if aw, err = u.GetEnvRepo().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

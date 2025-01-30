@@ -50,7 +50,7 @@ func Make(
 		objectFormatOptions: inventoryFormatOptions,
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				EnvDir: layout,
+				EnvDir:    layout,
 				BlobStore: layout,
 			},
 		),
