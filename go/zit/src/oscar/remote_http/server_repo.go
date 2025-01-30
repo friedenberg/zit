@@ -105,6 +105,12 @@ func (server *Server) writeInventoryList(
 	actual := blobWriter.GetShaLike()
 
 	if err := expected.AssertEqualsShaLike(actual); err != nil {
+		ui.Err().Printf(
+			"received list has different sha: expected: %s, actual: %s",
+			expected,
+			actual,
+		)
+
 		response.StatusCode = http.StatusFound
 		return
 		// response.ErrorWithStatus(http.StatusBadRequest, err)

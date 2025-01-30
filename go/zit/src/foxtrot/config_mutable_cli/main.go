@@ -2,6 +2,7 @@ package config_mutable_cli
 
 import (
 	"flag"
+	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
@@ -28,6 +29,11 @@ type Config struct {
 	ToolOptions                    options_tools.Options
 
 	descriptions.Description
+}
+
+func (c Config) GetCLIFlags() (flags []string) {
+	flags = append(flags, fmt.Sprintf("-print-time=%t", c.PrintOptions.PrintTime))
+	return
 }
 
 func (c *Config) SetFlagSet(f *flag.FlagSet) {

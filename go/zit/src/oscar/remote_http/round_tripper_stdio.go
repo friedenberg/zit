@@ -30,8 +30,12 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	roundTripper.Args = []string{
 		"zit",
 		"serve",
-		"-print-time=false", // TODO switch to passing this from envUI.GetCLIConfig()
 	}
+
+	roundTripper.Args = append(
+		roundTripper.Args,
+		envUI.GetCLIConfig().GetCLIFlags()...,
+	)
 
 	if envUI.GetCLIConfig().Verbose {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
