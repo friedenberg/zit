@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -31,24 +30,6 @@ func (server *Server) writeInventoryList(
 	}
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
-
-	shas := tridex.Make()
-
-	{
-		count := 0
-
-		for sh, err := range server.Repo.GetEnvRepo().AllBlobs() {
-			if err != nil {
-				response.Error(err)
-				return
-			}
-
-			shas.Add(sh.String())
-			count++
-		}
-
-		ui.Log().Printf("have blobs: %d", count)
-	}
 
 	var blobWriter sha.WriteCloser
 
@@ -80,7 +61,14 @@ func (server *Server) writeInventoryList(
 
 			blobSha := sk.GetBlobSha()
 
-			if shas.ContainsExpansion(blobSha.String()) {
+			var ok bool
+			ok, err = server.blobCache.HasBlob(blobSha)
+			if err != nil {
+				response.Error(err)
+				return
+			}
+
+			if ok {
 				continue
 			}
 

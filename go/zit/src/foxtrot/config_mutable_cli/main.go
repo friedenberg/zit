@@ -31,8 +31,15 @@ type Config struct {
 	descriptions.Description
 }
 
+// TODO add support for all flags
 func (c Config) GetCLIFlags() (flags []string) {
 	flags = append(flags, fmt.Sprintf("-print-time=%t", c.PrintOptions.PrintTime))
+	flags = append(flags, fmt.Sprintf("-print-colors=%t", c.PrintOptions.PrintColors))
+
+	if c.Verbose {
+		flags = append(flags, "-verbose")
+	}
+
 	return
 }
 

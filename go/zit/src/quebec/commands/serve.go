@@ -33,6 +33,7 @@ func (cmd Serve) Run(req command.Request) {
 		req,
 		env_ui.Options{
 			UIFileIsStderr: true,
+			IgnoreTtyState: true,
 		},
 	)
 

@@ -62,6 +62,7 @@ cmd_zit_def=(
   -print-unchanged=false
   -print-bestandsaufnahme=false
   -boxed-description=true
+  -print-colors=false
 )
 
 export cmd_zit_def

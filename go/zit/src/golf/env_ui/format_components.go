@@ -3,6 +3,7 @@ package env_ui
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 func (u *env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
@@ -11,13 +12,21 @@ func (u *env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
 	return
 }
 
+func (u *env) shouldUseColorOutput(fd fd.Std) bool {
+	if u.options.IgnoreTtyState {
+		return u.cliConfig.PrintOptions.PrintColors
+	} else {
+		return fd.IsTty() && u.cliConfig.PrintOptions.PrintColors
+	}
+}
+
 func (u *env) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetOut().IsTty() || !u.cliConfig.PrintOptions.PrintColors
+	o.OffEntirely = !u.shouldUseColorOutput(u.GetOut())
 	return
 }
 
 func (u *env) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.GetErr().IsTty() || !u.cliConfig.PrintOptions.PrintColors
+	o.OffEntirely = !u.shouldUseColorOutput(u.GetErr())
 	return
 }
 

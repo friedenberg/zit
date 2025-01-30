@@ -32,12 +32,18 @@ import (
 )
 
 type Server struct {
-	EnvLocal env_local.Env
-	Repo     repo.LocalRepo
+	EnvLocal  env_local.Env
+	Repo      repo.LocalRepo
+	blobCache serverBlobCache
+}
+
+func (server *Server) init() (err error) {
+	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetLocalBlobStore()
+	return
 }
 
 // TODO switch to not return error
-func (server Server) InitializeListener(
+func (server *Server) InitializeListener(
 	network, address string,
 ) (listener net.Listener, err error) {
 	var config net.ListenConfig
@@ -77,7 +83,7 @@ func (server Server) InitializeListener(
 	return
 }
 
-func (server Server) InitializeUnixSocket(
+func (server *Server) InitializeUnixSocket(
 	config net.ListenConfig,
 	path string,
 ) (sock repo.UnixSocket, err error) {
@@ -113,7 +119,7 @@ type HTTPPort struct {
 	Port int
 }
 
-func (server Server) InitializeHTTP(
+func (server *Server) InitializeHTTP(
 	config net.ListenConfig,
 	port int,
 ) (httpPort HTTPPort, err error) {
@@ -133,7 +139,7 @@ func (server Server) InitializeHTTP(
 	return
 }
 
-func (server Server) makeRouter(
+func (server *Server) makeRouter(
 	makeHandler func(handler funcHandler) http.HandlerFunc,
 ) http.Handler {
 	// TODO add errors/context middlerware for capturing errors and panics
@@ -210,7 +216,12 @@ func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {
 }
 
 // TODO remove error return and use context
-func (server Server) Serve(listener net.Listener) (err error) {
+func (server *Server) Serve(listener net.Listener) (err error) {
+	if err = server.init(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	httpServer := http.Server{
 		Handler: server.makeRouter(server.makeHandler),
 	}
@@ -244,7 +255,12 @@ func (server Server) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (server Server) ServeStdio() {
+func (server *Server) ServeStdio() {
+	if err := server.init(); err != nil {
+		server.EnvLocal.CancelWithError(err)
+		return
+	}
+
 	// shuts down the server when the main context is complete (on SIGHUP / SIGINT).
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetIn().GetFile().Close)
 	server.Repo.GetEnv().After(server.Repo.GetEnv().GetOut().GetFile().Close)

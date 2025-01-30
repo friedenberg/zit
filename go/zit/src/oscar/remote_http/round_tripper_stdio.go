@@ -37,10 +37,6 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 		envUI.GetCLIConfig().GetCLIFlags()...,
 	)
 
-	if envUI.GetCLIConfig().Verbose {
-		roundTripper.Args = append(roundTripper.Args, "-verbose")
-	}
-
 	roundTripper.Args = append(roundTripper.Args, "-")
 
 	if err = roundTripper.initialize(envUI); err != nil {

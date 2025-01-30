@@ -161,8 +161,12 @@ func (cmd Show) runWithArchive(
 		"\n",
 		env.GetUIFile(),
 		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.EncodeStringTo(o, w)
+			func(
+				writer interfaces.WriterAndStringWriter,
+				object *sku.Transacted,
+			) (n int64, err error) {
+				env.ContinueOrPanicOnDone()
+				return boxFormat.EncodeStringTo(object, writer)
 			},
 		),
 	)

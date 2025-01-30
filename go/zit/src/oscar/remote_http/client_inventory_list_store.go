@@ -27,6 +27,7 @@ func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 	return todo.Implement()
 }
 
+// TODO add progress bar
 func (client client) ImportInventoryList(
 	blobStore interfaces.BlobStore,
 	listSku *sku.Transacted,
@@ -40,6 +41,7 @@ func (client client) ImportInventoryList(
 
 	var list *sku.List
 
+  // TODO add support for "broken" inventory lists that have unstable sorts
 	if list, err = sku.CollectList(
 		client.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
 			listSku.GetType(),

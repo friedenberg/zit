@@ -6,4 +6,5 @@ type OptionsGetter interface {
 
 type Options struct {
 	UIFileIsStderr bool
+	IgnoreTtyState bool
 }
