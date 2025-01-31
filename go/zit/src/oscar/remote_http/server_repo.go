@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -48,6 +49,8 @@ func (server *Server) writeInventoryList(
 	)
 
 	b := bytes.NewBuffer(nil)
+	writtenNeededBlobs := tridex.Make()
+
 	{
 		count := 0
 
@@ -68,20 +71,20 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			if ok {
+			blobShaString := blobSha.String()
+
+			if ok || writtenNeededBlobs.ContainsExpansion(blobShaString) {
 				continue
 			}
 
 			ui.Log().Printf("missing blob: %s", blobSha)
 
-			sh := sha.GetPool().Get()
-			sha.GetPool().Put(sh)
-			sh.ResetWithShaLike(blobSha)
-			fmt.Fprintf(b, "%s\n", sh)
+			fmt.Fprintf(b, "%s\n", blobSha)
+			writtenNeededBlobs.Add(blobShaString)
 			count++
 		}
 
-		ui.Log().Printf("missing blobs: %d", count)
+		ui.Err().Printf("missing blobs: %d", count)
 	}
 
 	if err := blobWriter.Close(); err != nil {
@@ -99,8 +102,6 @@ func (server *Server) writeInventoryList(
 			actual,
 		)
 
-		response.StatusCode = http.StatusFound
-		return
 		// response.ErrorWithStatus(http.StatusBadRequest, err)
 		// return
 	}

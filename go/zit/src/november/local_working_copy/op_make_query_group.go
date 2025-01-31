@@ -1,22 +1,39 @@
 package local_working_copy
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Repo) MakeExternalQueryGroup(
+func (repo *Repo) MakeExternalQueryGroup(
 	metaBuilder query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
-) (qg *query.Group, err error) {
-	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
+) (queryGroup *query.Group, err error) {
+	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
-	if qg, err = b.BuildQueryGroupWithRepoId(
+	var workspaceConfig workspace_config_blobs.Blob
+
+	if workspaceConfig, err = repo.GetWorkspaceConfig(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if workspaceConfig != nil {
+		args = append(
+			args,
+			fmt.Sprintf("[%s]", workspaceConfig.GetDefaultQueryGroup()),
+		)
+	}
+
+	if queryGroup, err = builder.BuildQueryGroupWithRepoId(
 		externalQueryOptions,
 		args...,
 	); err != nil {
@@ -24,7 +41,7 @@ func (u *Repo) MakeExternalQueryGroup(
 		return
 	}
 
-	qg.ExternalQueryOptions = externalQueryOptions
+	queryGroup.ExternalQueryOptions = externalQueryOptions
 
 	return
 }

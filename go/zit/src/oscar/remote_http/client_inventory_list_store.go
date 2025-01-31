@@ -41,7 +41,7 @@ func (client client) ImportInventoryList(
 
 	var list *sku.List
 
-  // TODO add support for "broken" inventory lists that have unstable sorts
+	// TODO add support for "broken" inventory lists that have unstable sorts
 	if list, err = sku.CollectList(
 		client.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
 			listSku.GetType(),
@@ -113,7 +113,9 @@ func (client client) ImportInventoryList(
 		return
 	}
 
-	ui.Log().Printf("read missing blobs: %d", len(shas))
+	if len(shas) > 0 {
+		ui.Err().Printf("sending blobs: %d", len(shas))
+	}
 
 	for _, sh := range shas {
 		if err = client.WriteBlobToRemote(blobStore, sh); err != nil {

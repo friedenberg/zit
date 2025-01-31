@@ -15,10 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 )
 
-type Getter interface {
-	GetRepoLayout() Env
-}
-
 type Env struct {
 	env_local.Env
 

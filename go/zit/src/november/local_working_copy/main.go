@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
@@ -25,13 +26,15 @@ import (
 )
 
 type (
-	envLocal = env_local.Env
-	envBox   = env_box.Env
+	envLocal     = env_local.Env
+	envBox       = env_box.Env
+	envWorkspace = env_workspace.Env
 )
 
 type Repo struct {
 	envLocal
 	envBox
+	envWorkspace
 
 	sunrise ids.Tai
 
@@ -79,12 +82,12 @@ func Make(
 
 func MakeWithLayout(
 	options Options,
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 ) (repo *Repo) {
 	repo = &Repo{
 		config:         store_config.Make(),
-		envLocal:       repoLayout,
-		envRepo:        repoLayout,
+		envLocal:       envRepo,
+		envRepo:        envRepo,
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
@@ -146,6 +149,8 @@ func (repo *Repo) initialize(
 			return
 		}
 	}
+
+	repo.envWorkspace = env_workspace.Make(repo.envRepo)
 
 	if repo.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{

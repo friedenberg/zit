@@ -27,6 +27,8 @@ const (
 	ImmutableConfigV1 = "!toml-config-immutable-v1"
 
 	ZettelIdListTypeV0 = "!zettel_id_list-v0"
+
+	WorkspaceConfigTypeTomlV0 = "!toml-workspace_config-v0"
 )
 
 var (
@@ -64,6 +66,8 @@ func init() {
 	register(ImmutableConfigV1, genres.None, false)
 
 	register(ZettelIdListTypeV0, genres.None, false)
+
+	register(WorkspaceConfigTypeTomlV0, genres.None, false)
 }
 
 func register(tipeString string, g genres.Genre, isDefault bool) {
