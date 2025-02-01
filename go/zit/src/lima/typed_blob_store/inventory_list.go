@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -284,6 +285,10 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 			&ids.TypeWithObject[iterSku]{
 				Type: &tipe,
 				Object: func(sk *sku.Transacted) bool {
+					if !blobStore.HasBlob(sk.GetBlobSha()) {
+						ui.Err().Printf("Blob missing locally: %q", sku.String(sk))
+					}
+
 					return yield(sk, nil)
 				},
 			},

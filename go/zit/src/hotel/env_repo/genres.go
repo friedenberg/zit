@@ -3,6 +3,7 @@ package env_repo
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
@@ -30,7 +31,8 @@ func (s Env) ReadAllShas(
 		var sh *sha.Sha
 
 		if sh, err = sha.MakeShaFromPath(p); err != nil {
-			err = errors.Wrapf(err, "Path: %s", p)
+			ui.Err().Printf("invalid format: %q", p)
+			err = nil
 			return
 		}
 
