@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -20,14 +19,12 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	DefaultTags  ids.TagSet
 	Tags         interfaces.MutableSetLike[*tag]
 	ImplicitTags implicitTagMap
 
 	// Typen
 	ExtensionsToTypes map[string]string
 	TypesToExtensions map[string]string
-	DefaultType       sku.Transacted // deprecated
 	Types             sku.TransactedMutableSet
 	InlineTypes       interfaces.SetLike[values.String]
 

@@ -40,8 +40,6 @@ func (kc *store) recompile(
 }
 
 func (kc *store) recompileTags() (err error) {
-	kc.DefaultTags = ids.MakeTagSet(kc.GetDefaults().GetTags()...)
-
 	kc.ImplicitTags = make(implicitTagMap)
 
 	if err = kc.compiled.Tags.Each(

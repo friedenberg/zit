@@ -134,6 +134,11 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
+	if err = ReadErrorFromBodyOnNot(response, http.StatusCreated); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var shString strings.Builder
 
 	if _, err = io.Copy(&shString, response.Body); err != nil {

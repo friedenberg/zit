@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -19,12 +18,7 @@ func (repo *Repo) MakeExternalQueryGroup(
 ) (queryGroup *query.Group, err error) {
 	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
-	var workspaceConfig workspace_config_blobs.Blob
-
-	if workspaceConfig, err = repo.GetWorkspaceConfig(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	workspaceConfig := repo.GetWorkspaceConfig()
 
 	if workspaceConfig != nil {
 		args = append(

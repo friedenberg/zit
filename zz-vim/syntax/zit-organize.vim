@@ -3,7 +3,7 @@
 "   finish
 " endif
 
-let m = expand("<sfile>:h") . "/zit-metadatei.vim"
+let m = expand("<sfile>:h") . "/zit-metadata.vim"
 exec "source " . m
 
 " syn match zitSkuTagComponent '\w\+' contained

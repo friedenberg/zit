@@ -5,20 +5,20 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 )
 
-func MakeProto(tipe ids.Type, tags quiter.Slice[ids.Tag]) (p Proto) {
+func MakeProto(defaults config_mutable_blobs.Defaults) (p Proto) {
 	ui.TodoP1("modify konfig to keep etiketten set")
 
-	p.Metadata.Type = tipe
-	p.Metadata.SetTags(ids.MakeTagSet(tags...))
+	p.Metadata.Type = defaults.GetType()
+	p.Metadata.SetTags(ids.MakeTagSet(defaults.GetTags()...))
 
 	return
 }

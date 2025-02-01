@@ -452,8 +452,16 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	var result interfaces.Sha
 
 	if shString == "" {
-		response, result = server.copyBlob(request.Body)
+		var err error
+
+		if result, err = server.copyBlob(request.Body); err != nil {
+			response.Error(err)
+			return
+		}
+
+		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(strings.NewReader(result.GetShaString()))
+
 		return
 	}
 
@@ -469,7 +477,16 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		return
 	}
 
-	response, result = server.copyBlob(request.Body)
+	{
+		var err error
+
+		if result, err = server.copyBlob(request.Body); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	response.StatusCode = http.StatusCreated
 
 	if err := sh.AssertEqualsShaLike(result); err != nil {
 		response.Error(err)
@@ -484,31 +501,23 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
-) (response Response, result interfaces.Sha) {
+) (result interfaces.Sha, err error) {
 	var writeCloser interfaces.ShaWriteCloser
 
-	{
-		var err error
-
-		if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
-			response.Error(err)
-			return
-		}
+	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var n int64
 
-	{
-		var err error
-
-		if n, err = io.Copy(writeCloser, reader); err != nil {
-			response.Error(err)
-			return
-		}
+	if n, err = io.Copy(writeCloser, reader); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if err := writeCloser.Close(); err != nil {
-		response.Error(err)
+	if err = writeCloser.Close(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -518,17 +527,15 @@ func (server *Server) copyBlob(
 		server.Repo.GetEnv().GetUI(),
 	)
 
-	if err := blobCopierDelegate(
+	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
 			Sha: result,
 			N:   n,
 		},
 	); err != nil {
-		response.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
-
-	response.StatusCode = http.StatusCreated
 
 	return
 }

@@ -11,33 +11,33 @@ import (
 )
 
 type reader struct {
-	hash    hash.Hash
-	rAge    io.Reader
-	rExpand io.ReadCloser
-	tee     io.Reader
+	hash      hash.Hash
+	decrypter io.Reader
+	expander  io.ReadCloser
+	tee       io.Reader
 }
 
-func NewReader(o ReadOptions) (r *reader, err error) {
+func NewReader(options ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
-	if r.rAge, err = o.GetBlobEncryption().WrapReader(o.Reader); err != nil {
+	if r.decrypter, err = options.GetBlobEncryption().WrapReader(options.Reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if r.rExpand, err = o.GetBlobCompression().WrapReader(r.rAge); err != nil {
+	if r.expander, err = options.GetBlobCompression().WrapReader(r.decrypter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	r.hash = sha256.New()
-	r.tee = io.TeeReader(r.rExpand, r.hash)
+	r.tee = io.TeeReader(r.expander, r.hash)
 
 	return
 }
 
 func (r *reader) Seek(offset int64, whence int) (actual int64, err error) {
-	seeker, ok := r.rAge.(io.Seeker)
+	seeker, ok := r.decrypter.(io.Seeker)
 
 	if !ok {
 		err = errors.Errorf("seeking not supported")
@@ -56,7 +56,7 @@ func (r *reader) Read(p []byte) (n int, err error) {
 }
 
 func (r *reader) Close() (err error) {
-	if err = r.rExpand.Close(); err != nil {
+	if err = r.expander.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

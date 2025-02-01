@@ -1,7 +1,7 @@
 
-" if exists("b:current_syntax")
-"   finish
-" endif
+if exists("b:current_syntax")
+  finish
+endif
 
 if $BIN_ZIT == ""
   let $BIN_ZIT = "zit"
@@ -37,7 +37,7 @@ endif
 
 syn region zitAkte start=// end=// contains=@akte
 
-let m = expand("<sfile>:h") . "/zit-metadatei.vim"
+let m = expand("<sfile>:h") . "/zit-metadata.vim"
 exec "source " . m
 
-let b:current_syntax = 'zit-zettel'
+let b:current_syntax = 'zit-object'

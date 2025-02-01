@@ -1,40 +1,53 @@
 package env_dir
 
 import (
+	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 )
 
-func NewFileReader(o FileReadOptions) (r interfaces.ShaReadCloser, err error) {
-	ar := objectReader{}
+func NewFileReader(
+	options FileReadOptions,
+) (readCloser interfaces.ShaReadCloser, err error) {
+	objectReader := objectReader{}
 
-	if o.Path == "-" {
-		ar.file = os.Stdin
+	if options.Path == "-" {
+		objectReader.file = os.Stdin
 	} else {
-		if ar.file, err = files.Open(o.Path); err != nil {
+		if objectReader.file, err = files.Open(options.Path); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	fro := ReadOptions{
+	readOptions := ReadOptions{
 		Config: MakeConfig(
-			o.GetBlobCompression(),
-			o.GetBlobEncryption(),
-			o.GetLockInternalFiles(),
+			options.GetBlobCompression(),
+			options.GetBlobEncryption(),
+			options.GetLockInternalFiles(),
 		),
-		Reader: ar.file,
+		Reader: objectReader.file,
 	}
 
-	if ar.ShaReadCloser, err = NewReader(fro); err != nil {
-		err = errors.Wrap(err)
-		return
+	if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
+		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		readOptions.encryption = &age.Age{}
+
+		if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	r = ar
+	readCloser = objectReader
 
 	return
 }

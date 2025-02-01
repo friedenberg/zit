@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
@@ -24,9 +25,10 @@ import (
 )
 
 type Store struct {
-	sunrise ids.Tai
-	config  store_config.StoreMutable
-	envRepo env_repo.Env
+	sunrise      ids.Tai
+	config       store_config.StoreMutable
+	envRepo      env_repo.Env
+	envWorkspace env_workspace.Env
 
 	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
@@ -54,6 +56,7 @@ type Store struct {
 func (c *Store) Initialize(
 	config store_config.StoreMutable,
 	envRepo env_repo.Env,
+	envWorkspace env_workspace.Env,
 	pmf object_inventory_format.Format,
 	sunrise ids.Tai,
 	envLua env_lua.Env,
@@ -66,6 +69,7 @@ func (c *Store) Initialize(
 ) (err error) {
 	c.config = config
 	c.envRepo = envRepo
+	c.envWorkspace = envWorkspace
 	c.typedBlobStore = typedBlobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
@@ -108,8 +112,7 @@ func (c *Store) Initialize(
 	}
 
 	c.protoZettel = sku.MakeProto(
-		config.GetMutableConfig().GetDefaults().GetType(),
-		config.GetMutableConfig().GetDefaults().GetTags(),
+		c.envWorkspace.GetDefaults(),
 	)
 
 	c.configBlobFormat = typed_blob_store.MakeBlobFormat2(

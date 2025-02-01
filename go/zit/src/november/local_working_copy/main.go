@@ -150,7 +150,13 @@ func (repo *Repo) initialize(
 		}
 	}
 
-	repo.envWorkspace = env_workspace.Make(repo.envRepo)
+	if repo.envWorkspace, err = env_workspace.Make(
+		repo.envRepo,
+		repo.config.GetMutableConfig(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if repo.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{
@@ -214,6 +220,7 @@ func (repo *Repo) initialize(
 	if err = repo.store.Initialize(
 		repo.config,
 		repo.envRepo,
+		repo.envWorkspace,
 		objectFormat,
 		repo.sunrise,
 		repo.envLua,
