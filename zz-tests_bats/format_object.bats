@@ -15,6 +15,7 @@ teardown() {
 }
 
 function format_simple { # @test
+	run_zit_init_workspace
 	run_zit checkout !md:t
 	assert_success
 

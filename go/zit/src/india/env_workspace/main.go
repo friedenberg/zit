@@ -20,6 +20,7 @@ type Env interface {
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() config_mutable_blobs.Defaults
 	CreateWorkspace() (err error)
+	DeleteWorkspace() (err error)
 }
 
 func Make(
@@ -37,7 +38,7 @@ func Make(
 
 	if err = workspace_config_blobs.DecodeFromFile(
 		&object,
-		filepath.Join(out.GetCwd(), FileWorkspace),
+		out.GetWorkspacePath(),
 	); errors.IsNotExist(err) {
 		err = nil
 	} else if err != nil {
@@ -78,6 +79,10 @@ type env struct {
 	defaults      config_mutable_blobs.DefaultsV1
 }
 
+func (env *env) GetWorkspacePath() string {
+	return filepath.Join(env.GetCwd(), FileWorkspace)
+}
+
 func (env *env) InWorkspace() bool {
 	return env.blob != nil
 }
@@ -101,8 +106,19 @@ func (env *env) CreateWorkspace() (err error) {
 
 	if err = workspace_config_blobs.EncodeToFile(
 		&object,
-		filepath.Join(env.GetCwd(), FileWorkspace),
+		env.GetWorkspacePath(),
 	); errors.IsNotExist(err) {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (env *env) DeleteWorkspace() (err error) {
+	if err = env.Delete(env.GetWorkspacePath()); errors.IsNotExist(err) {
+		err = nil
+	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

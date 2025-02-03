@@ -104,9 +104,15 @@ function run_zit_init {
     "$@"
   assert_success
   assert_output - <<-EOM
-[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+[!md @$(get_type_blob_sha) !toml-type-v1]
 [konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
+
+  run_zit_init_workspace
+}
+
+function run_zit_init_workspace {
+  run_zit init-workspace
 }
 
 function get_konfig_sha() {
@@ -115,6 +121,10 @@ function get_konfig_sha() {
 
 function get_type_blob_sha() {
   echo -n "b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16"
+}
+
+run_find() {
+  run find . -maxdepth 2 ! -ipath './.xdg*' ! -iname '.zit-workspace'
 }
 
 function run_zit_init_disable_age {
@@ -134,4 +144,6 @@ EOM
   run_zit cat-blob "$(get_konfig_sha)"
   assert_success
   assert_output
+
+  run_zit init-workspace
 }

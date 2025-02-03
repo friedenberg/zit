@@ -8,6 +8,7 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
+	run_zit_init_workspace
 }
 
 teardown() {
@@ -27,7 +28,15 @@ function deinit_force() { # @test
 		not in a zit directory
 	EOM
 
+  # TODO determine why this zit init is not emitting the created objects
 	run_zit_init
+	assert_success
+	# assert_output - <<-EOM
+	# 	[!md @$(get_type_blob_sha) !toml-type-v1]
+	# 	[konfig @$(get_konfig_sha) !toml-config-v1]
+	# EOM
+
+	run_zit last
 	assert_success
 	assert_output - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]

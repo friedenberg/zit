@@ -36,6 +36,7 @@ func (cmd Deinit) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if !cmd.Force && !cmd.getPermission(localWorkingCopy) {
+		ui.Err().Print("permission denied and -force not specified, aborting")
 		return
 	}
 
@@ -45,7 +46,13 @@ func (cmd Deinit) Run(dep command.Request) {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	if err := localWorkingCopy.GetEnvRepo().DeleteAll(base); err != nil {
+	if err := localWorkingCopy.GetEnvRepo().Delete(
+		localWorkingCopy.GetEnvRepo().GetXDG().GetXDGPaths()...,
+	); err != nil {
+		localWorkingCopy.CancelWithError(err)
+	}
+
+	if err := localWorkingCopy.GetEnvWorkspace().DeleteWorkspace(); err != nil {
 		localWorkingCopy.CancelWithError(err)
 	}
 }

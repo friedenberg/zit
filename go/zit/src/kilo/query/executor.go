@@ -347,9 +347,9 @@ func (e *Executor) applyDotOperatorIfNecessary() (err error) {
 }
 
 func (e *Executor) readAllItemsIfNecessary() (err error) {
-	// if !e.InWorkspace() {
-	// 	return
-	// }
+	if !e.InWorkspace() {
+		return
+	}
 
 	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)

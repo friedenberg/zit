@@ -21,7 +21,7 @@ type DirectoryPaths interface {
 
 type Directory interface {
 	DirectoryPaths
-	Delete(string) error
+	Delete(...string) error
 }
 
 type CacheIOFactory interface {

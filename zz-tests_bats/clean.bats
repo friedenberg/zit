@@ -8,6 +8,7 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
+	run_zit_init_workspace
 }
 
 teardown() {
@@ -45,7 +46,7 @@ function clean_all { # @test
 		          deleted [tag.tag]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.xdg*'
+	run_find
 	assert_output '.'
 }
 
@@ -59,7 +60,7 @@ function clean_zettels { # @test
 		          deleted [one/]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.xdg*'
+	run_find
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
@@ -118,7 +119,7 @@ function clean_all_dirty_wd { # @test
 		          deleted [tag.tag]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.xdg*'
+	run_find
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
@@ -183,7 +184,7 @@ function clean_all_force_dirty_wd { # @test
 		          deleted [zz-archive.tag]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.xdg*'
+	run_find
 	assert_success
 	assert_output '.'
 }

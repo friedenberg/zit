@@ -8,6 +8,8 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
+  # TODO prevent checkouts if workspace is not initialized
+  run_zit_init_workspace
 
 	cat >txt.type <<-EOM
 		---
