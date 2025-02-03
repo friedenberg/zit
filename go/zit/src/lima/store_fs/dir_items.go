@@ -12,10 +12,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -69,18 +71,18 @@ func (d *dirItems) walkDir(
 ) (err error) {
 	if err = filepath.WalkDir(
 		dir,
-		func(p string, de fs.DirEntry, in error) (err error) {
+		func(path string, dirEntry fs.DirEntry, in error) (err error) {
 			if in != nil {
 				err = errors.Wrap(in)
 				return
 			}
 
-			if p == d.root {
+			if path == d.root {
 				return
 			}
 
-			if de.Type()&fs.ModeSymlink != 0 {
-				if p, err = filepath.EvalSymlinks(p); err != nil {
+			if dirEntry.Type()&fs.ModeSymlink != 0 {
+				if path, err = filepath.EvalSymlinks(path); err != nil {
 					err = nil
 					return
 					// err = errors.Wrap(err)
@@ -89,16 +91,16 @@ func (d *dirItems) walkDir(
 
 				var fi fs.FileInfo
 
-				if fi, err = os.Lstat(p); err != nil {
+				if fi, err = os.Lstat(path); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				de = fs.FileInfoToDirEntry(fi)
+				dirEntry = fs.FileInfoToDirEntry(fi)
 			}
 
-			if strings.HasPrefix(filepath.Base(p), ".") {
-				if de.IsDir() {
+			if strings.HasPrefix(filepath.Base(path), ".") {
+				if dirEntry.IsDir() {
 					err = filepath.SkipDir
 				}
 
@@ -108,7 +110,7 @@ func (d *dirItems) walkDir(
 			if pattern != "" {
 				var matched bool
 
-				if matched, err = filepath.Match(pattern, p); err != nil {
+				if matched, err = filepath.Match(pattern, path); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -118,12 +120,18 @@ func (d *dirItems) walkDir(
 				}
 			}
 
-			if de.IsDir() {
+			if dirEntry.IsDir() {
+				fileWorkspace := filepath.Join(path, env_workspace.FileWorkspace)
+
+				if files.Exists(fileWorkspace) {
+					err = filepath.SkipDir
+				}
+
 				return
 			}
 
-			if _, _, err = d.addPathAndDirEntry(cache, p, de); err != nil {
-				err = errors.Wrapf(err, "DirEntry: %s", de)
+			if _, _, err = d.addPathAndDirEntry(cache, path, dirEntry); err != nil {
+				err = errors.Wrapf(err, "DirEntry: %s", dirEntry)
 				return
 			}
 
@@ -234,12 +242,12 @@ func (d *dirItems) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
-func (d *dirItems) processDir(p string) (results []*sku.FSItem, err error) {
+func (d *dirItems) processDir(path string) (results []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
 
 	results = make([]*sku.FSItem, 0)
 
-	if err = d.walkDir(cache, p, ""); err != nil {
+	if err = d.walkDir(cache, path, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
