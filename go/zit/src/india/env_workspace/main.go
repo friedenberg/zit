@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -59,12 +58,10 @@ func Make(
 		defaults = out.blob.GetDefaults()
 
 		if newType := defaults.GetType(); !newType.IsEmpty() {
-			ui.Debug().Print(newType)
 			out.defaults.Type = newType
 		}
 
 		if newTags := defaults.GetTags(); newTags.Len() > 0 {
-			ui.Debug().Print(newTags)
 			out.defaults.Tags = newTags
 		}
 	}
