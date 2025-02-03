@@ -45,6 +45,7 @@ func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
 				Organize: "md",
 				Tag:      "tag",
 				Repo:     "repo",
+				Config:   "konfig",
 			},
 			Tools: options_tools.Options{
 				Merge: []string{

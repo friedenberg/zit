@@ -388,6 +388,7 @@ function show_konfig { # @test
 		type = 'type'
 		tag = 'tag'
 		repo = 'repo'
+		config = 'konfig'
 
 		[cli-output]
 		print-include-description = false

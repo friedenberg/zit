@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -58,39 +59,41 @@ func (cmd EditConfig) Run(
 }
 
 func (c EditConfig) editInVim(
-	u *local_working_copy.Repo,
+	repo *local_working_copy.Repo,
 ) (sk *sku.Transacted, err error) {
-	var f *os.File
+	var file *os.File
 
-	if f, err = u.GetEnvRepo().GetTempLocal().FileTemp(); err != nil {
+	if file, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+		fmt.Sprintf("*.%s", repo.GetConfig().GetFileExtensions().GetFileExtensionConfig()),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	p := f.Name()
+	path := file.Name()
 
-	if err = f.Close(); err != nil {
+	if err = file.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.makeTempConfigFile(u, p); err != nil {
+	if err = c.makeTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().
-			WithFileType("zit-konfig").
+			WithFileType("zit-object").
 			Build(),
 	}
 
-	if err = openVimOp.Run(u, p); err != nil {
+	if err = openVimOp.Run(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = c.readTempConfigFile(u, p); err != nil {
+	if sk, err = c.readTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -99,12 +102,12 @@ func (c EditConfig) editInVim(
 }
 
 func (c EditConfig) makeTempConfigFile(
-	u *local_working_copy.Repo,
-	p string,
+	repo *local_working_copy.Repo,
+	path string,
 ) (err error) {
 	var k *sku.Transacted
 
-	if k, err = u.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
+	if k, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,14 +115,14 @@ func (c EditConfig) makeTempConfigFile(
 	var i sku.FSItem
 	i.Reset()
 
-	if err = i.Object.Set(p); err != nil {
+	if err = i.Object.Set(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	i.MutableSetLike.Add(&i.Object)
 
-	if err = u.GetFileEncoder().Encode(
+	if err = repo.GetFileEncoder().Encode(
 		checkout_options.TextFormatterOptions{},
 		k,
 		&i,

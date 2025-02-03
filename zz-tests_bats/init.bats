@@ -36,7 +36,8 @@ function init_compression { # @test
 	run_zit cat-blob "$(get_konfig_sha)"
 	assert_success
 
-	run zstd --decompress .xdg/data/zit/objects/blobs/35/* --stdout
+	sha="$(get_konfig_sha)"
+	run zstd --decompress .xdg/data/zit/objects/blobs/"${sha:0:2}"/* --stdout
 	assert_success
 }
 

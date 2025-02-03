@@ -11,6 +11,7 @@ type V1 struct {
 	Type     string `toml:"type"`
 	Tag      string `toml:"tag"`
 	Repo     string `toml:"repo"`
+	Config   string `toml:"config"`
 }
 
 func (a V1) GetFileExtensionForGenre(
@@ -30,6 +31,9 @@ func (a V1) GetFileExtensionForGenre(
 
 	case genres.Repo:
 		return a.GetFileExtensionRepo()
+
+	case genres.Config:
+		return a.GetFileExtensionConfig()
 
 	default:
 		return ""
@@ -60,12 +64,17 @@ func (a V1) GetFileExtensionRepo() string {
 	return a.Repo
 }
 
+func (a V1) GetFileExtensionConfig() string {
+	return a.Config
+}
+
 func (a *V1) Reset() {
 	a.Zettel = ""
 	a.Organize = ""
 	a.Type = ""
 	a.Tag = ""
 	a.Repo = ""
+	a.Config = ""
 }
 
 func (a *V1) ResetWith(b V1) {
@@ -74,4 +83,5 @@ func (a *V1) ResetWith(b V1) {
 	a.Type = b.Type
 	a.Tag = b.Tag
 	a.Repo = b.Repo
+	a.Config = b.Config
 }

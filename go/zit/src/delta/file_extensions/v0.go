@@ -60,6 +60,10 @@ func (a V0) GetFileExtensionRepo() string {
 	return a.Repo
 }
 
+func (a V0) GetFileExtensionConfig() string {
+	return "konfig"
+}
+
 func (a *V0) Reset() {
 	a.Zettel = ""
 	a.Organize = ""

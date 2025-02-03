@@ -36,6 +36,7 @@ if zettel != ""
 endif
 
 syn region zitAkte start=// end=// contains=@akte
+" TODO set comment strings for body
 
 let m = expand("<sfile>:h") . "/zit-metadata.vim"
 exec "source " . m

@@ -7,6 +7,7 @@ type FileExtensionGetter interface {
 	GetFileExtensionType() string
 	GetFileExtensionTag() string
 	GetFileExtensionRepo() string
+	GetFileExtensionConfig() string
 }
 
 type ObjectIOFactory interface {

@@ -174,6 +174,11 @@ func (d *dirItems) addPathAndDirEntry(
 }
 
 func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
+	if fdee.ExtSansDot() == d.GetFileExtensionConfig() {
+		key = "konfig"
+		return
+	}
+
 	var rel string
 
 	if rel, err = filepath.Rel(d.root, fdee.GetPath()); err != nil {

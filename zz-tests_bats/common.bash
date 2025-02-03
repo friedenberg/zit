@@ -116,7 +116,7 @@ function run_zit_init_workspace {
 }
 
 function get_konfig_sha() {
-  echo -n "359e9645b225731ce57f8dba3fa90413f322383f634a13496e453f009e4a0f4d"
+  echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
 }
 
 function get_type_blob_sha() {
