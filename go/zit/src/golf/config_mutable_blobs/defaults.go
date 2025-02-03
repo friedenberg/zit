@@ -30,3 +30,16 @@ func (d DefaultsV1) GetType() ids.Type {
 func (d DefaultsV1) GetTags() quiter.Slice[ids.Tag] {
 	return quiter.Slice[ids.Tag](d.Tags)
 }
+
+type DefaultsV1OmitEmpty struct {
+	Type ids.Type  `toml:"type,omitempty"`
+	Tags []ids.Tag `toml:"tags,omitempty"`
+}
+
+func (d DefaultsV1OmitEmpty) GetType() ids.Type {
+	return d.Type
+}
+
+func (d DefaultsV1OmitEmpty) GetTags() quiter.Slice[ids.Tag] {
+	return quiter.Slice[ids.Tag](d.Tags)
+}

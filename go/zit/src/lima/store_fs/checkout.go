@@ -216,14 +216,14 @@ func (s *Store) SetFilenameForTransacted(
 	sk *sku.Transacted,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	cwd := s.repoLayout.GetCwd()
+	cwd := s.envRepo.GetCwd()
 
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
-		if f, err = s.repoLayout.GetTempLocal().FileTemp(); err != nil {
+		if f, err = s.envRepo.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -295,7 +295,7 @@ func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
 	// TODO check conflict state
 	if err = i.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
-			if err = f.Remove(s.repoLayout); err != nil {
+			if err = f.Remove(s.envRepo); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

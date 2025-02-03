@@ -105,7 +105,7 @@ function run_zit_init {
   assert_success
   assert_output - <<-EOM
 [!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-[konfig @359e9645b225731ce57f8dba3fa90413f322383f634a13496e453f009e4a0f4d !toml-config-v1]
+[konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
 }
 
