@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
@@ -26,8 +27,12 @@ func (u *Repo) GetImmutableConfig() config_immutable_io.ConfigLoaded {
 	return u.GetEnvRepo().GetConfig()
 }
 
-func (u *Repo) GetEnvLocal() env_local.Env {
-	return u
+func (repo *Repo) GetEnvLocal() env_local.Env {
+	return repo
+}
+
+func (repo *Repo) GetEnvWorkspace() env_workspace.Env {
+	return repo.envWorkspace
 }
 
 func (u *Repo) GetEnvLua() env_lua.Env {

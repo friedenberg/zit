@@ -34,7 +34,7 @@ type (
 type Repo struct {
 	envLocal
 	envBox
-	envWorkspace
+	envWorkspace envWorkspace
 
 	sunrise ids.Tai
 

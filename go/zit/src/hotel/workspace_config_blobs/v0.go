@@ -9,13 +9,20 @@ import (
 )
 
 type V0 struct {
-	config_mutable_blobs.V1
+	Defaults config_mutable_blobs.DefaultsV1 `toml:"defaults,omitempty"`
+	// FileExtensions file_extensions.V1    `toml:"file-extensions"`
+	// PrintOptions   options_print.V0      `toml:"cli-output"`
+	// Tools          options_tools.Options `toml:"tools"`
 
 	Query string `toml:"query,omitempty"`
 }
 
 func (blob V0) GetWorkspaceConfig() Blob {
 	return blob
+}
+
+func (blob V0) GetDefaults() config_mutable_blobs.Defaults {
+	return blob.Defaults
 }
 
 func (blob V0) GetDefaultQueryGroup() string {

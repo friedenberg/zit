@@ -26,15 +26,15 @@ type Checkin struct {
 }
 
 func (op Checkin) Run(
-	u *local_working_copy.Repo,
-	qg *query.Group,
+	repo *local_working_copy.Repo,
+	queryGroup *query.Group,
 ) (err error) {
 	var l sync.Mutex
 
 	results := sku.MakeSkuTypeSetMutable()
 
-	if err = u.GetStore().QuerySkuType(
-		qg,
+	if err = repo.GetStore().QuerySkuType(
+		queryGroup,
 		func(co sku.SkuType) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -47,7 +47,7 @@ func (op Checkin) Run(
 	}
 
 	if op.Organize {
-		if err = op.runOrganize(u, qg, results); err != nil {
+		if err = op.runOrganize(repo, queryGroup, results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -55,7 +55,7 @@ func (op Checkin) Run(
 
 	var processed sku.TransactedMutableSet
 
-	if processed, err = u.Checkin(
+	if processed, err = repo.Checkin(
 		results,
 		op.Proto,
 		op.Delete,
@@ -64,7 +64,7 @@ func (op Checkin) Run(
 		return
 	}
 
-	if err = op.openBlobIfNecessary(u, processed); err != nil {
+	if err = op.openBlobIfNecessary(repo, processed); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,8 +73,8 @@ func (op Checkin) Run(
 }
 
 func (op Checkin) runOrganize(
-	u *local_working_copy.Repo,
-	qg *query.Group,
+	repo *local_working_copy.Repo,
+	queryGroup *query.Group,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{
@@ -83,9 +83,9 @@ func (op Checkin) runOrganize(
 	}
 
 	opOrganize := Organize{
-		Repo: u,
+		Repo: repo,
 		Metadata: organize_text.Metadata{
-			RepoId: qg.RepoId,
+			RepoId: queryGroup.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				map[string]organize_text.OptionComment{
 					"delete": flagDelete,
@@ -102,13 +102,13 @@ func (op Checkin) runOrganize(
 		DontUseQueryGroupForOrganizeMetadata: true,
 	}
 
-	ui.Log().Print(qg)
+	ui.Log().Print(queryGroup)
 
 	var organizeResults organize_text.OrganizeResults
 
 	// TODO switch to using SkuType?
 	if organizeResults, err = opOrganize.RunWithQueryGroup(
-		qg,
+		queryGroup,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -117,7 +117,7 @@ func (op Checkin) runOrganize(
 	var changes organize_text.Changes
 
 	if changes, err = organize_text.ChangesFromResults(
-		u.GetConfig().GetCLIConfig().PrintOptions,
+		repo.GetConfig().GetCLIConfig().PrintOptions,
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

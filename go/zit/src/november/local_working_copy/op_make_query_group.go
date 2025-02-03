@@ -18,13 +18,19 @@ func (repo *Repo) MakeExternalQueryGroup(
 ) (queryGroup *query.Group, err error) {
 	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
-	workspaceConfig := repo.GetWorkspaceConfig()
+	workspaceConfig := repo.envWorkspace.GetWorkspaceConfig()
 
 	if workspaceConfig != nil {
-		args = append(
-			args,
-			fmt.Sprintf("[%s]", workspaceConfig.GetDefaultQueryGroup()),
-		)
+		defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
+
+    // TODO add after parsing as an independent query group, rather than as a
+    // literal
+		if defaultQueryGroup != "" {
+			args = append(
+				args,
+				fmt.Sprintf("[%s]", workspaceConfig.GetDefaultQueryGroup()),
+			)
+		}
 	}
 
 	if queryGroup, err = builder.BuildQueryGroupWithRepoId(

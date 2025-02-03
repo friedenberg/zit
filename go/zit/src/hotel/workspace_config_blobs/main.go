@@ -19,7 +19,7 @@ const (
 
 type (
 	Blob interface {
-		config_mutable_blobs.Blob
+		GetDefaults() config_mutable_blobs.Defaults
 		GetDefaultQueryGroup() string
 	}
 )
@@ -39,12 +39,36 @@ func DecodeFromFile(
 	object TypeWithBlob,
 	path string,
 ) (err error) {
-	var reader io.Reader
+	var file *os.File
+
+	if file, err = files.OpenExclusiveReadOnly(path); err != nil {
+		if !errors.IsNotExist(err) {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.DeferredCloser(&err, file)
+
+	if _, err = Coder.DecodeFrom(object, file); err != nil {
+		err = errors.Wrapf(err, "File: %q", file.Name())
+		return
+	}
+
+	return
+}
+
+func EncodeToFile(
+	object TypeWithBlob,
+	path string,
+) (err error) {
+	var writer io.Writer
 
 	{
 		var file *os.File
 
-		if file, err = files.OpenExclusiveReadOnly(path); err != nil {
+		if file, err = files.CreateExclusiveWriteOnly(path); err != nil {
 			if !errors.IsNotExist(err) {
 				err = errors.Wrap(err)
 			}
@@ -53,11 +77,11 @@ func DecodeFromFile(
 		} else {
 			defer errors.DeferredCloser(&err, file)
 
-			reader = file
+			writer = file
 		}
 	}
 
-	if _, err = Coder.DecodeFrom(object, reader); err != nil {
+	if _, err = Coder.EncodeTo(object, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

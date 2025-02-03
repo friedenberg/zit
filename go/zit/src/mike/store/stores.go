@@ -168,23 +168,24 @@ func (s *Store) Open(
 	return
 }
 
-func (s *Store) makeQueryExecutor(
-	qg *query.Group,
-) (e query.Executor, err error) {
-	if qg == nil {
-		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+func (store *Store) makeQueryExecutor(
+	queryGroup *query.Group,
+) (executor query.Executor, err error) {
+	if queryGroup == nil {
+		if queryGroup, err = store.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	es := s.externalStores[qg.RepoId]
+	externalStore := store.externalStores[queryGroup.RepoId]
 
-	e = query.MakeExecutorWithExternalStore(
-		qg,
-		s.GetStreamIndex().ReadPrimitiveQuery,
-		s.ReadOneInto,
-		es,
+	executor = query.MakeExecutorWithExternalStore(
+		queryGroup,
+		store.GetStreamIndex().ReadPrimitiveQuery,
+		store.ReadOneInto,
+		externalStore,
+		store.envWorkspace,
 	)
 
 	return

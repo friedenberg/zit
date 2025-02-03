@@ -16,7 +16,7 @@ func init() {
 }
 
 type Status struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+  command_components.LocalWorkingCopyWithQueryGroup
 }
 
 func (c Status) DefaultGenres() ids.Genre {

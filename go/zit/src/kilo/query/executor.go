@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -28,6 +29,7 @@ type (
 		ExternalStore
 		sku.FuncPrimitiveQuery
 		sku.FuncReadOneInto
+		env_workspace.Env
 	}
 )
 
@@ -39,17 +41,19 @@ type Executor struct {
 }
 
 func MakeExecutorWithExternalStore(
-	qg *Group,
+	queryGroup *Group,
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
-	es ExternalStore,
+	externalStore ExternalStore,
+	envWorkspace env_workspace.Env,
 ) Executor {
 	return Executor{
-		Group: qg,
+		Group: queryGroup,
 		ExecutionInfo: ExecutionInfo{
 			FuncPrimitiveQuery: fpq,
 			FuncReadOneInto:    froi,
-			ExternalStore:      es,
+			ExternalStore:      externalStore,
+			Env:                envWorkspace,
 		},
 	}
 }
@@ -151,8 +155,7 @@ func (e *Executor) ExecuteSkuType(
 func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	// [kr/vap !task project-2021-zit-bugs zz-inbox] fix issue with `ExternalStore.ReadAllExternalItems` being called un…
-	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
+	if err = e.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,8 +179,7 @@ func (e *Executor) ExecuteTransacted(
 func (e *Executor) ExecuteTransactedAsSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
+	if err = e.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -335,6 +337,19 @@ func (e *Executor) applyDotOperatorIfNecessary() (err error) {
 	if !e.DotOperatorActive() {
 		return
 	}
+
+	if err = e.readAllItemsIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (e *Executor) readAllItemsIfNecessary() (err error) {
+	// if !e.InWorkspace() {
+	// 	return
+	// }
 
 	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
