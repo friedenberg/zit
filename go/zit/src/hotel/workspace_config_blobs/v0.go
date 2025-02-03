@@ -9,7 +9,7 @@ import (
 )
 
 type V0 struct {
-	Defaults config_mutable_blobs.DefaultsV1 `toml:"defaults,omitempty"`
+	Defaults config_mutable_blobs.DefaultsV1OmitEmpty `toml:"defaults,omitempty"`
 	// FileExtensions file_extensions.V1    `toml:"file-extensions"`
 	// PrintOptions   options_print.V0      `toml:"cli-output"`
 	// Tools          options_tools.Options `toml:"tools"`
