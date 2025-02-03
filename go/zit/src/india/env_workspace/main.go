@@ -62,7 +62,7 @@ func Make(
 		}
 
 		if newTags := defaults.GetTags(); newTags.Len() > 0 {
-			out.defaults.Tags = newTags
+			out.defaults.Tags = append(out.defaults.Tags, newTags...)
 		}
 	}
 

@@ -86,14 +86,14 @@ func (cmd *Organize) Run(dep command.Request) {
 		),
 	}
 
-	typen := queryGroup.GetTypes()
+	types := queryGroup.GetTypes()
 
-	if typen.Len() == 1 {
-		createOrganizeFileOp.Type = typen.Any()
+	if types.Len() == 1 {
+		createOrganizeFileOp.Type = types.Any()
 	}
 
 	skus := sku.MakeSkuTypeSetMutable()
-	var l sync.RWMutex
+	var l sync.Mutex
 
 	if err := localWorkingCopy.GetStore().QueryTransactedAsSkuType(
 		queryGroup,
@@ -108,6 +108,12 @@ func (cmd *Organize) Run(dep command.Request) {
 	}
 
 	createOrganizeFileOp.Skus = skus
+
+	if createOrganizeFileOp.Skus.Len() == 0 && createOrganizeFileOp.TagSet.Len() == 0 {
+		createOrganizeFileOp.TagSet = ids.MakeTagSet(
+			localWorkingCopy.GetEnvWorkspace().GetDefaults().GetTags()...,
+		)
+	}
 
 	switch cmd.Mode {
 	case organize_text_mode.ModeCommitDirectly:
