@@ -19,7 +19,7 @@ type stackEl interface {
 
 type buildState struct {
 	builder      *Builder
-	qg           *Group
+	group        *Group
 	latentErrors errors.Multi
 	missingBlobs []ErrBlobMissing
 
@@ -27,11 +27,35 @@ type buildState struct {
 	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repo                    sku.ExternalStoreForQuery
-	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
 
 	scanner box.Scanner
+}
+
+func (src *buildState) copy() (dst *buildState) {
+	dst = &buildState{
+		builder:      src.builder,
+		latentErrors: errors.MakeMulti(),
+	}
+
+	if src.luaVMPoolBuilder != nil {
+		dst.luaVMPoolBuilder = src.luaVMPoolBuilder.Clone()
+	}
+
+	dst.group = dst.makeGroup()
+
+	dst.pinnedObjectIds = make([]pinnedObjectId, len(src.pinnedObjectIds))
+	copy(dst.pinnedObjectIds, src.pinnedObjectIds)
+
+	dst.pinnedExternalObjectIds = make(
+		[]sku.ExternalObjectId,
+		len(src.pinnedExternalObjectIds),
+	)
+
+	copy(dst.pinnedExternalObjectIds, src.pinnedExternalObjectIds)
+
+	return
 }
 
 func (b *buildState) makeGroup() *Group {
@@ -56,7 +80,7 @@ func (b *buildState) build(
 	} else {
 		for _, v := range vs {
 			if v == "." {
-				b.qg.dotOperatorActive = true
+				b.group.dotOperatorActive = true
 				remaining = append(remaining, v)
 			}
 
@@ -115,7 +139,7 @@ func (b *buildState) build(
 			return
 		}
 
-		if err = b.qg.addExactExternalObjectId(b, k); err != nil {
+		if err = b.group.addExactExternalObjectId(b, k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -129,7 +153,7 @@ func (b *buildState) build(
 			return
 		}
 
-		if err = b.qg.Add(q); err != nil {
+		if err = b.group.add(q); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -137,7 +161,7 @@ func (b *buildState) build(
 
 	b.addDefaultsIfNecessary()
 
-	if err = b.qg.reduce(b); err != nil {
+	if err = b.group.reduce(b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -146,11 +170,11 @@ func (b *buildState) build(
 }
 
 func (b *buildState) addDefaultsIfNecessary() {
-	if b.builder.defaultGenres.IsEmpty() || !b.qg.IsEmpty() {
+	if b.builder.defaultGenres.IsEmpty() || !b.group.IsEmpty() {
 		return
 	}
 
-	if b.builder.requireNonEmptyQuery && b.qg.IsEmpty() {
+	if b.builder.requireNonEmptyQuery && b.group.IsEmpty() {
 		return
 	}
 
@@ -158,13 +182,13 @@ func (b *buildState) addDefaultsIfNecessary() {
 		return
 	}
 
-	b.qg.matchOnEmpty = true
+	b.group.matchOnEmpty = true
 
 	g := ids.MakeGenre()
-	dq, ok := b.qg.UserQueries[g]
+	dq, ok := b.group.UserQueries[g]
 
 	if ok {
-		delete(b.qg.UserQueries, g)
+		delete(b.group.UserQueries, g)
 	} else {
 		dq = b.makeQuery()
 	}
@@ -177,7 +201,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		dq.Sigil = b.builder.defaultSigil
 	}
 
-	b.qg.UserQueries[b.builder.defaultGenres] = dq
+	b.group.UserQueries[b.builder.defaultGenres] = dq
 }
 
 func (b *buildState) parseTokens() (err error) {
@@ -324,7 +348,7 @@ LOOP:
 				}
 
 				if !isNegated {
-					if err = b.qg.Types.Add(t); err != nil {
+					if err = b.group.Types.Add(t); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -356,7 +380,7 @@ LOOP:
 		q.Sigil = b.builder.defaultSigil
 	}
 
-	if err = b.qg.Add(q); err != nil {
+	if err = b.group.add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -400,7 +424,7 @@ func (b *buildState) parseSigilsAndGenres(
 				return
 
 			case '.':
-				b.qg.dotOperatorActive = true
+				b.group.dotOperatorActive = true
 				fallthrough
 
 			case ':', '+', '?':

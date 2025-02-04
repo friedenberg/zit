@@ -51,27 +51,27 @@ type Builder struct {
 	defaultQuery            string
 }
 
-func (b *Builder) makeState() *buildState {
+func (builder *Builder) makeState() *buildState {
 	state := &buildState{
-		builder:      b,
+		builder:      builder,
 		latentErrors: errors.MakeMulti(),
 	}
 
-	if b.luaVMPoolBuilder != nil {
-		state.luaVMPoolBuilder = b.luaVMPoolBuilder.Clone()
+	if builder.luaVMPoolBuilder != nil {
+		state.luaVMPoolBuilder = builder.luaVMPoolBuilder.Clone()
 	}
 
-	state.qg = state.makeGroup()
+	state.group = state.makeGroup()
 
-	state.pinnedObjectIds = make([]pinnedObjectId, len(b.pinnedObjectIds))
-	copy(state.pinnedObjectIds, b.pinnedObjectIds)
+	state.pinnedObjectIds = make([]pinnedObjectId, len(builder.pinnedObjectIds))
+	copy(state.pinnedObjectIds, builder.pinnedObjectIds)
 
 	state.pinnedExternalObjectIds = make(
 		[]sku.ExternalObjectId,
-		len(b.pinnedExternalObjectIds),
+		len(builder.pinnedExternalObjectIds),
 	)
 
-	copy(state.pinnedExternalObjectIds, b.pinnedExternalObjectIds)
+	copy(state.pinnedExternalObjectIds, builder.pinnedExternalObjectIds)
 
 	return state
 }
@@ -232,20 +232,19 @@ func (b *Builder) WithOptionsFromOriginalQuery(
 }
 
 func (b *Builder) BuildQueryGroupWithRepoId(
-	eqo sku.ExternalQueryOptions,
+	externalQueryOptions sku.ExternalQueryOptions,
 	vs ...string,
-) (qg *Group, err error) {
+) (group *Group, err error) {
 	state := b.makeState()
 
 	ok := false
-	state.eqo = eqo
-	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(eqo.RepoId)
+	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(externalQueryOptions.RepoId)
 
-	state.qg.RepoId = eqo.RepoId
-	state.qg.ExternalQueryOptions = eqo
+	state.group.RepoId = externalQueryOptions.RepoId
+	state.group.ExternalQueryOptions = externalQueryOptions
 
 	if !ok {
-		err = errors.Errorf("kasten not found: %q", eqo.RepoId)
+		err = errors.Errorf("kasten not found: %q", externalQueryOptions.RepoId)
 		return
 	}
 
@@ -254,12 +253,12 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 		return
 	}
 
-	qg = state.qg
+	group = state.group
 
 	return
 }
 
-func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
+func (b *Builder) BuildQueryGroup(vs ...string) (group *Group, err error) {
 	state := b.makeState()
 
 	if err = b.build(state, vs...); err != nil {
@@ -267,27 +266,26 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 		return
 	}
 
-	qg = state.qg
+	group = state.group
 
 	return
 }
 
 func (b *Builder) build(state *buildState, args ...string) (err error) {
 	if b.defaultQuery != "" {
-		args = append(
-			args,
-			b.defaultQuery,
-		)
+		args = append(args, b.defaultQuery)
+		// defaultQueryGroupState := state.copy()
+
+		// if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
 	}
 
 	var latent errors.Multi
 
 	if err, latent = state.build(args...); err != nil {
 		if !errors.IsBadRequest(err) {
-			if latent == nil {
-				latent = errors.MakeMulti()
-			}
-
 			latent.Add(errors.Wrapf(err, "Query String: %q", args))
 			err = latent
 		}
@@ -309,7 +307,7 @@ func (b *Builder) build(state *buildState, args ...string) (err error) {
 		return
 	}
 
-	ui.Log().Print(state.qg.StringDebug())
+	ui.Log().Print(state.group.StringDebug())
 
 	return
 }

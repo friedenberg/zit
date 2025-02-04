@@ -184,7 +184,7 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 		return
 	}
 
-	if e.DotOperatorActive() {
+	if e.isDotOperatorActive() {
 		if err = e.executeExternalQueryCheckedOut(out); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -334,7 +334,7 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 }
 
 func (e *Executor) applyDotOperatorIfNecessary() (err error) {
-	if !e.DotOperatorActive() {
+	if !e.isDotOperatorActive() {
 		return
 	}
 
