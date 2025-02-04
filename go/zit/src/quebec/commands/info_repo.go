@@ -10,14 +10,14 @@ import (
 )
 
 func init() {
-	command.Register("repo-info", &RepoInfo{})
+	command.Register("info-repo", &InfoRepo{})
 }
 
-type RepoInfo struct {
+type InfoRepo struct {
 	command_components.EnvRepo
 }
 
-func (cmd RepoInfo) Run(dep command.Request) {
+func (cmd InfoRepo) Run(dep command.Request) {
 	args := dep.Args()
 	repo := cmd.MakeEnvRepo(dep, false)
 	configLoaded := repo.GetConfig()

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
@@ -18,20 +19,23 @@ func MakeBuilder(
 	objectProbeIndex sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
+	envWorkspace env_workspace.Env,
 ) (b *Builder) {
 	b = &Builder{
-		dirLayout:        s,
+		envRepo:          s,
 		typedBlobStore:   typedBlobStore,
 		objectProbeIndex: objectProbeIndex,
 		luaVMPoolBuilder: luaVMPoolBuilder,
 		repoGetter:       repoGetter,
+		envWorkspace:     envWorkspace,
 	}
 
 	return
 }
 
 type Builder struct {
-	dirLayout               env_repo.Env
+	envRepo                 env_repo.Env
+	envWorkspace            env_workspace.Env
 	typedBlobStore          typed_blob_store.Stores
 	objectProbeIndex        sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
@@ -271,16 +275,33 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 	return
 }
 
-func (b *Builder) build(state *buildState, vs ...string) (err error) {
+func (b *Builder) build(state *buildState, args ...string) (err error) {
+	if b.envWorkspace != nil {
+		workspaceConfig := b.envWorkspace.GetWorkspaceConfig()
+
+		if workspaceConfig != nil {
+			defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
+
+			// TODO add after parsing as an independent query group, rather than as a
+			// literal
+			if defaultQueryGroup != "" {
+				args = append(
+					args,
+					workspaceConfig.GetDefaultQueryGroup(),
+				)
+			}
+		}
+	}
+
 	var latent errors.Multi
 
-	if err, latent = state.build(vs...); err != nil {
+	if err, latent = state.build(args...); err != nil {
 		if !errors.IsBadRequest(err) {
 			if latent == nil {
 				latent = errors.MakeMulti()
 			}
 
-			latent.Add(errors.Wrapf(err, "Query String: %q", vs))
+			latent.Add(errors.Wrapf(err, "Query String: %q", args))
 			err = latent
 		}
 

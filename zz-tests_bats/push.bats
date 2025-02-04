@@ -84,7 +84,7 @@ function bootstrap_archive {
 		-repo-type archive \
 		-lock-internal-files=false
 
-	run_zit repo-info type
+	run_zit info-repo type
 	assert_success
 	assert_output 'archive'
 

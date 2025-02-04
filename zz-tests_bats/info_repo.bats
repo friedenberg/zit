@@ -19,13 +19,13 @@ teardown() {
 
 # bats test_tags=user_story:store_version
 function info_store_version { # @test
-	run_zit repo-info
+	run_zit info-repo
 	assert_output
 }
 
 # bats test_tags=user_story:age_encryption
 function info_age_none { # @test
-	run_zit repo-info age-encryption
+	run_zit info-repo age-encryption
 	assert_output ''
 }
 
@@ -34,19 +34,19 @@ function info_age_some { # @test
 	age-keygen --output age-key >/dev/null 2>&1
 	key="$(tail -n1 age-key)"
 	run_zit_init -override-xdg-with-cwd -age-identity age-key
-	run_zit repo-info age-encryption
+	run_zit info-repo age-encryption
 	assert_output "$key"
 }
 
 # bats test_tags=user_story:compression
 function info_compression_type { # @test
-	run_zit repo-info compression-type
+	run_zit info-repo compression-type
 	assert_output 'zstd'
 }
 
 # bats test_tags=user_story:xdg
 function info_xdg { # @test
-	run_zit repo-info xdg
+	run_zit info-repo xdg
 	assert_output - <<-EOM
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.xdg/data/zit
 		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.xdg/config/zit
@@ -58,7 +58,7 @@ function info_xdg { # @test
 
 function info_non_xdg { # @test
 	run_zit_init -override-xdg-with-cwd
-	run_zit repo-info xdg
+	run_zit info-repo xdg
 	assert_output - <<-EOM
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.zit/local/share
 		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.zit/config

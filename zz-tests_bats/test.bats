@@ -30,7 +30,7 @@ function can_initialize_with_age { # @test
 
 	run test -f .xdg/data/zit/config-permanent
 
-	run_zit repo-info age-encryption
+	run_zit info-repo age-encryption
 	assert_success
 	assert_output
 }

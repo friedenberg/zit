@@ -1,8 +1,6 @@
 package local_working_copy
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -18,21 +16,6 @@ func (repo *Repo) MakeExternalQueryGroup(
 ) (queryGroup *query.Group, err error) {
 	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
-	workspaceConfig := repo.envWorkspace.GetWorkspaceConfig()
-
-	if workspaceConfig != nil {
-		defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
-
-    // TODO add after parsing as an independent query group, rather than as a
-    // literal
-		if defaultQueryGroup != "" {
-			args = append(
-				args,
-				fmt.Sprintf("[%s]", workspaceConfig.GetDefaultQueryGroup()),
-			)
-		}
-	}
-
 	if queryGroup, err = builder.BuildQueryGroupWithRepoId(
 		externalQueryOptions,
 		args...,
@@ -46,30 +29,31 @@ func (repo *Repo) MakeExternalQueryGroup(
 	return
 }
 
-func (u *Repo) makeQueryBuilder() *query.Builder {
+func (repo *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
-		u.GetEnvRepo(),
-		u.GetStore().GetTypedBlobStore(),
-		u.GetStore().GetStreamIndex(),
-		u.envLua.MakeLuaVMPoolBuilder(),
-		u,
+		repo.GetEnvRepo(),
+		repo.GetStore().GetTypedBlobStore(),
+		repo.GetStore().GetStreamIndex(),
+		repo.envLua.MakeLuaVMPoolBuilder(),
+		repo,
+		repo.GetEnvWorkspace(),
 	)
 }
 
-func (u *Repo) MakeQueryBuilderExcludingHidden(
-	dg ids.Genre,
+func (repo *Repo) MakeQueryBuilderExcludingHidden(
+	genre ids.Genre,
 	options query.BuilderOptions,
 ) *query.Builder {
-	if dg.IsEmpty() {
-		dg = ids.MakeGenre(genres.Zettel)
+	if genre.IsEmpty() {
+		genre = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder().
-		WithDefaultGenres(dg).
+	return repo.makeQueryBuilder().
+		WithDefaultGenres(genre).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
-		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
-		WithHidden(u.GetMatcherDormant()).
+		WithFileExtensionGetter(repo.GetConfig().GetFileExtensions()).
+		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
+		WithHidden(repo.GetMatcherDormant()).
 		WithOptions(options)
 }
 

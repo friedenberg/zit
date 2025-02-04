@@ -109,7 +109,7 @@ function init_and_deinit { # @test
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_zit_init
-	age_id="$(zit repo-info age-encryption)"
+	age_id="$(zit info-repo age-encryption)"
 
 	mkdir inner
 	pushd inner || exit 1
@@ -118,7 +118,7 @@ function init_and_with_another_age { # @test
 	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id"
 	assert_success
 
-	run_zit repo-info age-encryption
+	run_zit info-repo age-encryption
 	assert_success
 	assert_output "$age_id"
 }
