@@ -36,7 +36,6 @@ func (repo *Repo) makeQueryBuilder() *query.Builder {
 		repo.GetStore().GetStreamIndex(),
 		repo.envLua.MakeLuaVMPoolBuilder(),
 		repo,
-		repo.GetEnvWorkspace(),
 	)
 }
 

@@ -8,26 +8,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
-	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
 func MakeBuilder(
-	s env_repo.Env,
+	envRepo env_repo.Env,
 	typedBlobStore typed_blob_store.Stores,
 	objectProbeIndex sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
-	envWorkspace env_workspace.Env,
 ) (b *Builder) {
 	b = &Builder{
-		envRepo:          s,
+		envRepo:          envRepo,
 		typedBlobStore:   typedBlobStore,
 		objectProbeIndex: objectProbeIndex,
 		luaVMPoolBuilder: luaVMPoolBuilder,
 		repoGetter:       repoGetter,
-		envWorkspace:     envWorkspace,
 	}
 
 	return
@@ -35,7 +32,6 @@ func MakeBuilder(
 
 type Builder struct {
 	envRepo                 env_repo.Env
-	envWorkspace            env_workspace.Env
 	typedBlobStore          typed_blob_store.Stores
 	objectProbeIndex        sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
@@ -52,6 +48,7 @@ type Builder struct {
 	doNotMatchEmpty         bool
 	debug                   bool
 	requireNonEmptyQuery    bool
+	defaultQuery            string
 }
 
 func (b *Builder) makeState() *buildState {
@@ -276,21 +273,11 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 }
 
 func (b *Builder) build(state *buildState, args ...string) (err error) {
-	if b.envWorkspace != nil {
-		workspaceConfig := b.envWorkspace.GetWorkspaceConfig()
-
-		if workspaceConfig != nil {
-			defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
-
-			// TODO add after parsing as an independent query group, rather than as a
-			// literal
-			if defaultQueryGroup != "" {
-				args = append(
-					args,
-					workspaceConfig.GetDefaultQueryGroup(),
-				)
-			}
-		}
+	if b.defaultQuery != "" {
+		args = append(
+			args,
+			b.defaultQuery,
+		)
 	}
 
 	var latent errors.Multi

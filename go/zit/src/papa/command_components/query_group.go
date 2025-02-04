@@ -4,8 +4,6 @@ import (
 	"flag"
 	"os"
 
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -13,10 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
-
-type CompletionGenresGetter interface {
-	CompletionGenres() ids.Genre
-}
 
 type QueryGroup struct {
 	sku.ExternalQueryOptions
@@ -47,29 +41,25 @@ func (c QueryGroup) MakeQueryGroup(
 	return
 }
 
-func (c QueryGroup) CompleteWithRepo(
+func (cmd QueryGroup) CompleteWithRepo(
 	req command.Request,
-	cmd any,
 	local *local_working_copy.Repo,
+	queryBuilderOptions query.BuilderOptions,
 	args ...string,
 ) {
-	if _, ok := cmd.(CompletionGenresGetter); !ok {
-		return
-	}
+	completionWriter := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer local.MustClose(completionWriter)
 
-	w := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer local.MustClose(w)
-
-	queryGroup := c.MakeQueryGroup(
+	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.BuilderOptionDefaultGenre(ids.MakeGenre(genres.Tag)),
+		queryBuilderOptions,
 		local,
 		args,
 	)
 
 	if err := local.GetStore().QueryTransacted(
 		queryGroup,
-		w.WriteOneTransacted,
+		completionWriter.WriteOneTransacted,
 	); err != nil {
 		local.CancelWithError(err)
 	}

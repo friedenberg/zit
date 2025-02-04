@@ -50,12 +50,6 @@ func (cmd Show) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Zettel,
-	)
-}
-
 func (cmd Show) Run(req command.Request) {
 	repoLayout := cmd.MakeEnvRepo(req, false)
 
@@ -66,12 +60,17 @@ func (cmd Show) Run(req command.Request) {
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {
 		case repoLayout.GetCLIConfig().Complete:
-			cmd.CompleteWithRepo(req, cmd, localWorkingCopy, args...)
+			cmd.CompleteWithRepo(
+				req,
+				localWorkingCopy,
+				query.MakeBuilderOptionDefaultGenres(genres.Tag),
+				args...,
+			)
 
 		default:
 			queryGroup := cmd.MakeQueryGroup(
 				req,
-				query.MakeBuilderOptions(cmd),
+				query.MakeBuilderOptionDefaultGenres(genres.Zettel),
 				localWorkingCopy,
 				args,
 			)

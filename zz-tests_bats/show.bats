@@ -14,6 +14,8 @@ teardown() {
 	rm_from_version "$version"
 }
 
+# bats file_tags=user_story:query
+
 function show_simple_one_zettel { # @test
 	run_zit show -format text one/uno
 	assert_success
@@ -563,5 +565,49 @@ function show_builtin_type_md { # @test
 
 		file-extension = 'md'
 		vim-syntax-type = 'markdown'
+	EOM
+}
+
+# bats file_tags=user_story:workspace
+
+function show_workspace_default { # @test
+	skip
+	run_zit organize -mode commit-directly one/uno <<-EOM
+		- [one/uno !md tag-3 tag-4 tag-5] wow the first
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
+		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+
+	run_zit init-workspace -query tag-5
+	assert_success
+
+	run_zit show :
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
+	EOM
+}
+
+function show_workspace_exactly_one_zettel { # @test
+	skip
+	run_zit organize -mode commit-directly one/uno <<-EOM
+		- [one/uno !md tag-3 tag-4 tag-5] wow the first
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
+		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+
+	run_zit init-workspace -query tag-3
+	assert_success
+
+	run_zit show one/dos
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
 	EOM
 }

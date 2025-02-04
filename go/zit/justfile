@@ -176,6 +176,14 @@ bats_timeout := "10"
 test-bats-targets *targets="zz-tests_bats/*.bats":
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
 
+# runs specific bats test tags
+test-bats-tags *tags:
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats \
+    --tap \
+    --jobs {{num_cpus()}} \
+    --filter-tags {{tags}} \
+    zz-tests_bats/*.bats
+
 test-bats-integration: (test-bats-targets "zz-tests_bats/*.bats")
 test-bats-migration: (test-bats-targets "zz-tests_bats/migration/*.bats")
 

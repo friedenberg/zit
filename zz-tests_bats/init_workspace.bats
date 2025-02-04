@@ -14,6 +14,8 @@ teardown() {
 	rm_from_version "$version"
 }
 
+# bats file_tags=user_story:init,user_story:workspace,user_story:info
+
 function init_workspace_empty { # @test
 	run_zit info-workspace
 	assert_failure
