@@ -536,7 +536,11 @@ func (b *buildState) makeExp(
 
 func (b *buildState) makeQuery() *Query {
 	return &Query{
-		internal:         make(map[string]ObjectId),
-		external: make(map[string]sku.ExternalObjectId),
+		expOrObjectIds: expOrObjectIds{
+			objectIds: objectIds{
+				internal: make(map[string]ObjectId),
+				external: make(map[string]sku.ExternalObjectId),
+			},
+		},
 	}
 }

@@ -15,9 +15,7 @@ type Query struct {
 	ids.Sigil
 	ids.Genre
 
-	Exp
-	internal map[string]ObjectId
-	external map[string]sku.ExternalObjectId
+	expOrObjectIds
 
 	Hidden sku.Query
 }
@@ -79,11 +77,15 @@ func (a *Query) ContainsObjectId(k *ids.ObjectId) bool {
 
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
-		Sigil:    a.Sigil,
-		Genre:    a.Genre,
-		internal: make(map[string]ObjectId, len(a.internal)),
-		external: make(map[string]sku.ExternalObjectId, len(a.external)),
-		Hidden:   a.Hidden,
+		Sigil: a.Sigil,
+		Genre: a.Genre,
+		expOrObjectIds: expOrObjectIds{
+			objectIds: objectIds{
+				internal: make(map[string]ObjectId, len(a.internal)),
+				external: make(map[string]sku.ExternalObjectId, len(a.external)),
+			},
+		},
+		Hidden: a.Hidden,
 	}
 
 	bExp := a.Exp.Clone()

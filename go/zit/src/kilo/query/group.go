@@ -91,9 +91,13 @@ func (qg *Group) add(q *Query) (err error) {
 
 	if !ok {
 		existing = &Query{
-			Hidden:    qg.Hidden,
-			Genre:     q.Genre,
-			internal: make(map[string]ObjectId),
+			Hidden: qg.Hidden,
+			Genre:  q.Genre,
+			expOrObjectIds: expOrObjectIds{
+				objectIds: objectIds{
+					internal: make(map[string]ObjectId),
+				},
+			},
 		}
 	}
 
