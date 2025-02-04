@@ -8,18 +8,16 @@ import (
 
 type (
 	Queryable interface {
-		// AppendMatchToQueryPath(*Transacted, *QueryPath) error
 		ContainsSku(TransactedGetter) bool
+	}
+
+	SigilGetter interface {
+		GetSigil() ids.Sigil
 	}
 
 	Query interface {
 		Queryable
 		interfaces.Stringer
-		// Each(schnittstellen.FuncIter[Query]) error
-	}
-
-	SigilGetter interface {
-		GetSigil() ids.Sigil
 	}
 
 	QueryWithSigilAndObjectId interface {

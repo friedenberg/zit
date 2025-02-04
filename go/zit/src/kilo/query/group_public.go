@@ -44,7 +44,7 @@ func (qg *Group) IsExactlyOneObjectId() bool {
 		q = q1
 	}
 
-	kn := q.ObjectIds
+	kn := q.internal
 	lk := len(kn)
 
 	if lk != 1 {
@@ -82,10 +82,10 @@ func (queryGroup *Group) GetExactlyOneExternalObjectId(
 		return
 	}
 
-	oids := query.ObjectIds
+	oids := query.internal
 	oidsLen := len(oids)
 
-	eoids := query.ExternalObjectIds
+	eoids := query.external
 	eoidsLen := len(eoids)
 
 	switch {
@@ -139,10 +139,10 @@ func (queryGroup *Group) GetExactlyOneObjectId(
 		return
 	}
 
-	oids := query.ObjectIds
+	oids := query.internal
 	oidsLen := len(oids)
 
-	eoids := query.ExternalObjectIds
+	eoids := query.external
 	eoidsLen := len(eoids)
 
 	switch {

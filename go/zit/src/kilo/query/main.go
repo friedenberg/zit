@@ -14,10 +14,10 @@ import (
 type Query struct {
 	ids.Sigil
 	ids.Genre
-	Exp
 
-	ObjectIds         map[string]ObjectId
-	ExternalObjectIds map[string]sku.ExternalObjectId
+	Exp
+	internal map[string]ObjectId
+	external map[string]sku.ExternalObjectId
 
 	Hidden sku.Query
 }
@@ -26,7 +26,7 @@ func (a *Query) IsEmpty() bool {
 	return a.Sigil == ids.SigilUnknown &&
 		a.Genre.IsEmpty() &&
 		len(a.Children) == 0 &&
-		len(a.ObjectIds) == 0
+		len(a.internal) == 0
 }
 
 func (a *Query) GetSigil() ids.Sigil {
@@ -56,7 +56,7 @@ func (q *Query) addExactObjectId(
 	}
 
 	q.Sigil.Add(sigil)
-	q.ObjectIds[k.GetObjectId().String()] = k
+	q.internal[k.GetObjectId().String()] = k
 	q.Genre.Add(genres.Must(k))
 
 	return
@@ -68,33 +68,33 @@ func (a *Query) ContainsObjectId(k *ids.ObjectId) bool {
 		panic(err)
 	}
 
-	if len(a.ObjectIds) == 0 {
+	if len(a.internal) == 0 {
 		return false
 	}
 
-	_, ok := a.ObjectIds[k.String()]
+	_, ok := a.internal[k.String()]
 
 	return ok
 }
 
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
-		Sigil:             a.Sigil,
-		Genre:             a.Genre,
-		ObjectIds:         make(map[string]ObjectId, len(a.ObjectIds)),
-		ExternalObjectIds: make(map[string]sku.ExternalObjectId, len(a.ExternalObjectIds)),
-		Hidden:            a.Hidden,
+		Sigil:    a.Sigil,
+		Genre:    a.Genre,
+		internal: make(map[string]ObjectId, len(a.internal)),
+		external: make(map[string]sku.ExternalObjectId, len(a.external)),
+		Hidden:   a.Hidden,
 	}
 
 	bExp := a.Exp.Clone()
 	b.Exp = *bExp
 
-	for k, v := range a.ObjectIds {
-		b.ObjectIds[k] = v
+	for k, v := range a.internal {
+		b.internal[k] = v
 	}
 
-	for k, v := range a.ExternalObjectIds {
-		b.ExternalObjectIds[k] = v
+	for k, v := range a.external {
+		b.external[k] = v
 	}
 
 	return b
@@ -128,20 +128,20 @@ func (q *Query) Add(m sku.Query) (err error) {
 func (a *Query) Merge(b *Query) (err error) {
 	a.Sigil.Add(b.Sigil)
 
-	if a.ObjectIds == nil {
-		a.ObjectIds = make(map[string]ObjectId, len(b.ObjectIds))
+	if a.internal == nil {
+		a.internal = make(map[string]ObjectId, len(b.internal))
 	}
 
-	for _, k := range b.ObjectIds {
-		a.ObjectIds[k.GetObjectId().String()] = k
+	for _, k := range b.internal {
+		a.internal[k.GetObjectId().String()] = k
 	}
 
-	if a.ExternalObjectIds == nil {
-		a.ExternalObjectIds = make(map[string]sku.ExternalObjectId, len(b.ExternalObjectIds))
+	if a.external == nil {
+		a.external = make(map[string]sku.ExternalObjectId, len(b.external))
 	}
 
-	for _, k := range b.ExternalObjectIds {
-		a.ExternalObjectIds[k.GetExternalObjectId().String()] = k
+	for _, k := range b.external {
+		a.external[k.GetExternalObjectId().String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)
@@ -152,14 +152,14 @@ func (a *Query) Merge(b *Query) (err error) {
 func (q *Query) StringDebug() string {
 	var sb strings.Builder
 
-	if q.ObjectIds == nil || len(q.ObjectIds) == 0 {
+	if q.internal == nil || len(q.internal) == 0 {
 		sb.WriteString(q.Exp.StringDebug())
 	} else {
 		sb.WriteString("[[")
 
 		first := true
 
-		for _, k := range q.ObjectIds {
+		for _, k := range q.internal {
 			if !first {
 				sb.WriteString(", ")
 			}
@@ -185,13 +185,13 @@ func (q *Query) StringDebug() string {
 }
 
 func (q *Query) SortedObjectIds() []string {
-	out := make([]string, 0, len(q.ObjectIds)+len(q.ExternalObjectIds))
+	out := make([]string, 0, len(q.internal)+len(q.external))
 
-	for k := range q.ObjectIds {
+	for k := range q.internal {
 		out = append(out, k)
 	}
 
-	for k := range q.ExternalObjectIds {
+	for k := range q.external {
 		out = append(out, k)
 	}
 
@@ -247,7 +247,7 @@ func (q *Query) String() string {
 }
 
 func (q *Query) ShouldHide(tg sku.TransactedGetter, k string) bool {
-	_, ok := q.ObjectIds[k]
+	_, ok := q.internal[k]
 
 	if q.IncludesHidden() || q.Hidden == nil || ok {
 		return false
@@ -272,12 +272,12 @@ func (q *Query) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		return
 	}
 
-	if _, ok = q.ObjectIds[k]; ok {
+	if _, ok = q.internal[k]; ok {
 		return
 	}
 
 	if len(q.Children) == 0 {
-		ok = len(q.ObjectIds) == 0
+		ok = len(q.internal) == 0
 		return
 	} else if !q.Exp.ContainsSku(tg) {
 		return
@@ -306,22 +306,22 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	}
 
 	eoid := el.GetExternalObjectId().String()
-	ui.Log().Print(eoid, q.ExternalObjectIds, q.ObjectIds)
+	ui.Log().Print(eoid, q.external, q.internal)
 
-	if _, ok = q.ExternalObjectIds[eoid]; ok {
+	if _, ok = q.external[eoid]; ok {
 		return
 	}
 
-	if _, ok = q.ExternalObjectIds[k]; ok {
+	if _, ok = q.external[k]; ok {
 		return
 	}
 
-	if _, ok = q.ObjectIds[k]; ok {
+	if _, ok = q.internal[k]; ok {
 		return
 	}
 
 	if len(q.Children) == 0 {
-		ok = len(q.ObjectIds) == 0 && len(q.ExternalObjectIds) == 0
+		ok = len(q.internal) == 0 && len(q.external) == 0
 		return
 	} else if !q.Exp.ContainsSku(el) {
 		return

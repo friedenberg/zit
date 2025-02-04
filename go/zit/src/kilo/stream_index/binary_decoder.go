@@ -125,12 +125,12 @@ func (bf *binaryDecoder) readFormatExactly(
 	return
 }
 
-func (bf *binaryDecoder) readFormatAndMatchSigil(
+func (decoder *binaryDecoder) readFormatAndMatchSigil(
 	r io.Reader,
 	sk *skuWithRangeAndSigil,
 ) (n int64, err error) {
-	bf.binaryField.Reset()
-	bf.Buffer.Reset()
+	decoder.binaryField.Reset()
+	decoder.Buffer.Reset()
 
 	var n1 int
 	var n2 int64
@@ -138,7 +138,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 	// loop thru entries to find the next one that matches the current sigil
 	// when found, break the loop and deserialize it and return
 	for {
-		n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
+		n1, decoder.ContentLength, err = ohio.ReadFixedUInt16(r)
 		n += int64(n1)
 
 		if err != nil {
@@ -151,12 +151,12 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		contentLength64 := int64(bf.ContentLength)
+		contentLength64 := int64(decoder.ContentLength)
 
-		bf.limitedReader.R = r
-		bf.limitedReader.N = contentLength64
+		decoder.limitedReader.R = r
+		decoder.limitedReader.N = contentLength64
 
-		n2, err = bf.readSigil(sk, &bf.limitedReader)
+		n2, err = decoder.readSigil(sk, &decoder.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -164,7 +164,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		n2, err = bf.binaryField.ReadFrom(&bf.limitedReader)
+		n2, err = decoder.binaryField.ReadFrom(&decoder.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -172,28 +172,22 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		if err = bf.readFieldKey(sk.Transacted); err != nil {
+		if err = decoder.readFieldKey(sk.Transacted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		g := genres.Must(sk.Transacted)
-		q, ok := bf.queryGroup.Get(g)
+		genre := genres.Must(sk.Transacted)
+		query, ok := decoder.queryGroup.Get(genre)
 
 		// TODO-D4 use query to decide whether to read and inflate or skip
 		if ok {
-			qs := q.GetSigil()
+			sigil := query.GetSigil()
 
-			wantsHidden := qs.IncludesHidden()
-			wantsHistory := qs.IncludesHistory()
+			wantsHidden := sigil.IncludesHidden()
+			wantsHistory := sigil.IncludesHistory()
 			isLatest := sk.Contains(ids.SigilLatest)
 			isHidden := sk.Contains(ids.SigilHidden)
-
-			// log.Log().Print(sk)
-			// log.Log().Print("wantsHistory", wantsHistory)
-			// log.Log().Print("wantsHidden", wantsHidden)
-			// log.Log().Print("isLatest", isLatest)
-			// log.Log().Print("isHidden", isHidden)
 
 			if (wantsHistory && wantsHidden) ||
 				(wantsHidden && isLatest) ||
@@ -202,8 +196,8 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 				break
 			}
 
-			if q.ContainsObjectId(&sk.ObjectId) &&
-				(qs.ContainsOneOf(ids.SigilHistory) ||
+			if query.ContainsObjectId(&sk.ObjectId) &&
+				(sigil.ContainsOneOf(ids.SigilHistory) ||
 					sk.ContainsOneOf(ids.SigilLatest)) {
 				break
 			}
@@ -211,14 +205,14 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		// TODO-D4 replace with buffered seeker
 		// discard the next record
-		if _, err = io.Copy(io.Discard, &bf.limitedReader); err != nil {
+		if _, err = io.Copy(io.Discard, &decoder.limitedReader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for bf.limitedReader.N > 0 {
-		n2, err = bf.binaryField.ReadFrom(&bf.limitedReader)
+	for decoder.limitedReader.N > 0 {
+		n2, err = decoder.binaryField.ReadFrom(&decoder.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -226,7 +220,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		if err = bf.readFieldKey(sk.Transacted); err != nil {
+		if err = decoder.readFieldKey(sk.Transacted); err != nil {
 			err = errors.Wrapf(err, "Sku: %#v", sk.Transacted)
 			return
 		}

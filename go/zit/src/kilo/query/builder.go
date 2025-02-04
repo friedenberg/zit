@@ -273,7 +273,7 @@ func (b *Builder) BuildQueryGroup(vs ...string) (group *Group, err error) {
 
 func (b *Builder) build(state *buildState, args ...string) (err error) {
 	if b.defaultQuery != "" {
-		args = append(args, b.defaultQuery)
+    args = append(args, b.defaultQuery)
 		// defaultQueryGroupState := state.copy()
 
 		// if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
