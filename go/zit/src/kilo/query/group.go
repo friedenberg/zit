@@ -74,7 +74,7 @@ func (qg *Group) addExactExternalObjectId(
 	q.Sigil.Add(ids.SigilExternal)
 	q.Sigil.Add(ids.SigilLatest)
 	q.Genre.Add(genres.Must(k))
-	q.external[k.String()] = k
+	q.expObjectIds.external[k.String()] = k
 
 	if err = qg.add(q); err != nil {
 		err = errors.Wrap(err)
@@ -93,8 +93,8 @@ func (qg *Group) add(q *Query) (err error) {
 		existing = &Query{
 			Hidden: qg.Hidden,
 			Genre:  q.Genre,
-			expOrObjectIds: expOrObjectIds{
-				objectIds: objectIds{
+			exp: exp{
+				expObjectIds: expObjectIds{
 					internal: make(map[string]ObjectId),
 				},
 			},

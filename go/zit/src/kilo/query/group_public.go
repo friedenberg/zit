@@ -44,7 +44,7 @@ func (qg *Group) IsExactlyOneObjectId() bool {
 		q = q1
 	}
 
-	kn := q.internal
+	kn := q.expObjectIds.internal
 	lk := len(kn)
 
 	if lk != 1 {
@@ -82,10 +82,10 @@ func (queryGroup *Group) GetExactlyOneExternalObjectId(
 		return
 	}
 
-	oids := query.internal
+  oids := query.expObjectIds.internal
 	oidsLen := len(oids)
 
-	eoids := query.external
+	eoids := query.expObjectIds.external
 	eoidsLen := len(eoids)
 
 	switch {
@@ -139,10 +139,10 @@ func (queryGroup *Group) GetExactlyOneObjectId(
 		return
 	}
 
-	oids := query.internal
+	oids := query.expObjectIds.internal
 	oidsLen := len(oids)
 
-	eoids := query.external
+	eoids := query.expObjectIds.external
 	eoidsLen := len(eoids)
 
 	switch {
@@ -170,7 +170,7 @@ func (qg *Group) GetTags() ids.TagSet {
 	mes := ids.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
-		oq.Exp.CollectTags(mes)
+		oq.expTagsOrTypes.CollectTags(mes)
 	}
 
 	return mes

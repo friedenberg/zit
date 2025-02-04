@@ -231,7 +231,7 @@ LOOP:
 				}
 
 			case ',':
-				last := stack[len(stack)-1].(*Exp)
+				last := stack[len(stack)-1].(*expTagsOrTypes)
 				last.Or = true
 				// TODO handle or when invalid
 
@@ -525,8 +525,8 @@ func (b *buildState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 func (b *buildState) makeExp(
 	negated, exact bool,
 	children ...sku.Query,
-) *Exp {
-	return &Exp{
+) *expTagsOrTypes {
+	return &expTagsOrTypes{
 		// MatchOnEmpty: !b.doNotMatchEmpty,
 		Negated:  negated,
 		Exact:    exact,
@@ -536,8 +536,8 @@ func (b *buildState) makeExp(
 
 func (b *buildState) makeQuery() *Query {
 	return &Query{
-		expOrObjectIds: expOrObjectIds{
-			objectIds: objectIds{
+		exp: exp{
+			expObjectIds: expObjectIds{
 				internal: make(map[string]ObjectId),
 				external: make(map[string]sku.ExternalObjectId),
 			},
