@@ -26,6 +26,20 @@ type BuilderOptions interface {
 	Apply(*Builder) *Builder
 }
 
+type BuilderOptionsMulti []BuilderOptions
+
+func MakeBuilderOptionsMulti(options ...BuilderOptions) BuilderOptionsMulti {
+	return BuilderOptionsMulti(options)
+}
+
+func (options BuilderOptionsMulti) Apply(builder *Builder) *Builder {
+	for _, option := range options {
+		builder = option.Apply(builder)
+	}
+
+	return builder
+}
+
 type builderOptionDefaultGenre ids.Genre
 
 func MakeBuilderOptionDefaultGenres(

@@ -571,7 +571,6 @@ function show_builtin_type_md { # @test
 # bats file_tags=user_story:workspace
 
 function show_workspace_default { # @test
-	skip
 	run_zit organize -mode commit-directly one/uno <<-EOM
 		- [one/uno !md tag-3 tag-4 tag-5] wow the first
 	EOM

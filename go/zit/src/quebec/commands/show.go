@@ -51,26 +51,32 @@ func (cmd Show) CompletionGenres() ids.Genre {
 }
 
 func (cmd Show) Run(req command.Request) {
-	repoLayout := cmd.MakeEnvRepo(req, false)
+	envRepo := cmd.MakeEnvRepo(req, false)
 
-	archive := cmd.MakeLocalArchive(repoLayout)
+	archive := cmd.MakeLocalArchive(envRepo)
 
 	args := req.Args()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		switch {
-		case repoLayout.GetCLIConfig().Complete:
+		case envRepo.GetCLIConfig().Complete:
 			cmd.CompleteWithRepo(
 				req,
 				localWorkingCopy,
-				query.MakeBuilderOptionDefaultGenres(genres.Tag),
+				query.MakeBuilderOptionsMulti(
+					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
+					query.MakeBuilderOptionDefaultGenres(genres.Tag),
+				),
 				args...,
 			)
 
 		default:
 			queryGroup := cmd.MakeQueryGroup(
 				req,
-				query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+				query.MakeBuilderOptionsMulti(
+					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
+					query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+				),
 				localWorkingCopy,
 				args,
 			)
@@ -82,7 +88,7 @@ func (cmd Show) Run(req command.Request) {
 			ui.Err().Print("ignoring arguments for archive repo")
 		}
 
-		cmd.runWithArchive(repoLayout, archive)
+		cmd.runWithArchive(envRepo, archive)
 	}
 }
 
