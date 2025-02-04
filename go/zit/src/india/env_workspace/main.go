@@ -18,7 +18,7 @@ type Env interface {
 	InWorkspace() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() config_mutable_blobs.Defaults
-	CreateWorkspace() (err error)
+	CreateWorkspace(workspace_config_blobs.Blob) (err error)
 	DeleteWorkspace() (err error)
 }
 
@@ -92,8 +92,8 @@ func (env *env) GetDefaults() config_mutable_blobs.Defaults {
 	return env.defaults
 }
 
-func (env *env) CreateWorkspace() (err error) {
-	env.blob = &workspace_config_blobs.V0{}
+func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
+	env.blob = blob
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
 	object := ids.TypeWithObject[*workspace_config_blobs.Blob]{
@@ -104,7 +104,10 @@ func (env *env) CreateWorkspace() (err error) {
 	if err = workspace_config_blobs.EncodeToFile(
 		&object,
 		env.GetWorkspacePath(),
-	); errors.IsNotExist(err) {
+	); errors.IsExist(err) {
+		err = errors.BadRequestf("workspace already exists")
+		return
+	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

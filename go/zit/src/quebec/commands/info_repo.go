@@ -17,9 +17,9 @@ type InfoRepo struct {
 	command_components.EnvRepo
 }
 
-func (cmd InfoRepo) Run(dep command.Request) {
-	args := dep.Args()
-	repo := cmd.MakeEnvRepo(dep, false)
+func (cmd InfoRepo) Run(req command.Request) {
+	args := req.Args()
+	repo := cmd.MakeEnvRepo(req, false)
 	configLoaded := repo.GetConfig()
 	c := configLoaded.ImmutableConfig
 

@@ -32,7 +32,7 @@ func (d DefaultsV1) GetTags() quiter.Slice[ids.Tag] {
 }
 
 type DefaultsV1OmitEmpty struct {
-	Type ids.Type  `toml:"type,omitempty"`
+	Type ids.Type  `toml:"type"`
 	Tags []ids.Tag `toml:"tags,omitempty"`
 }
 

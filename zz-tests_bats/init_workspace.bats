@@ -14,8 +14,54 @@ teardown() {
 	rm_from_version "$version"
 }
 
-function init_workspace { # @test
+function init_workspace_empty { # @test
+	run_zit info-workspace
+	assert_failure
+  assert_output 'not in a workspace'
+
 	run_zit init-workspace
 	assert_success
-  assert_output ''
+	assert_output ''
+
+	run_zit init-workspace
+	assert_failure
+	assert_output 'workspace already exists'
+
+	run_zit info-workspace defaults.type
+	assert_success
+	assert_output ''
+
+	run_zit info-workspace defaults.tags
+	assert_success
+	assert_output '[]'
+
+	run_zit info-workspace query
+	assert_success
+	assert_output ''
+}
+
+function init_workspace { # @test
+	run_zit info-workspace
+	assert_failure
+  assert_output 'not in a workspace'
+
+	run_zit init-workspace -query "due" -tags today -type task
+	assert_success
+	assert_output ''
+
+	run_zit init-workspace
+	assert_failure
+	assert_output 'workspace already exists'
+
+	run_zit info-workspace defaults.type
+	assert_success
+	assert_output '!task'
+
+	run_zit info-workspace defaults.tags
+	assert_success
+	assert_output '[today]'
+
+	run_zit info-workspace query
+	assert_success
+	assert_output 'due'
 }

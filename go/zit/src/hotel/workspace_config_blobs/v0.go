@@ -54,9 +54,9 @@ func (blobV0Coder) DecodeFrom(
 
 func (blobV0Coder) EncodeTo(
 	subject TypeWithBlob,
-	w io.Writer,
+	writer io.Writer,
 ) (n int64, err error) {
-	dec := toml.NewEncoder(w)
+	dec := toml.NewEncoder(writer)
 
 	if err = dec.Encode(*subject.Object); err != nil {
 		if err == io.EOF {

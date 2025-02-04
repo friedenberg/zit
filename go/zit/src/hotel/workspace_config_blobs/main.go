@@ -1,7 +1,6 @@
 package workspace_config_blobs
 
 import (
-	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -63,25 +62,19 @@ func EncodeToFile(
 	object TypeWithBlob,
 	path string,
 ) (err error) {
-	var writer io.Writer
+	var file *os.File
 
-	{
-		var file *os.File
-
-		if file, err = files.CreateExclusiveWriteOnly(path); err != nil {
-			if !errors.IsNotExist(err) {
-				err = errors.Wrap(err)
-			}
-
-			return
-		} else {
-			defer errors.DeferredCloser(&err, file)
-
-			writer = file
+	if file, err = files.CreateExclusiveWriteOnly(path); err != nil {
+		if !errors.IsNotExist(err) {
+			err = errors.Wrap(err)
 		}
+
+		return
 	}
 
-	if _, err = Coder.EncodeTo(object, writer); err != nil {
+	defer errors.DeferredCloser(&err, file)
+
+	if _, err = Coder.EncodeTo(object, file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

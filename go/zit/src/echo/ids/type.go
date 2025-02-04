@@ -24,7 +24,7 @@ type (
 )
 
 func MakeType(v string) (t Type, err error) {
-	if t.Set(v); err != nil {
+	if err = t.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
