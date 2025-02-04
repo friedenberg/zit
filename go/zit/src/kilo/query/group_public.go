@@ -170,7 +170,7 @@ func (qg *Group) GetTags() ids.TagSet {
 	mes := ids.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
-		oq.CollectTags(mes)
+		oq.Exp.CollectTags(mes)
 	}
 
 	return mes

@@ -23,8 +23,7 @@ type Query struct {
 func (a *Query) IsEmpty() bool {
 	return a.Sigil == ids.SigilUnknown &&
 		a.Genre.IsEmpty() &&
-		len(a.Children) == 0 &&
-		len(a.internal) == 0
+		a.expOrObjectIds.IsEmpty()
 }
 
 func (a *Query) GetSigil() ids.Sigil {
@@ -146,7 +145,7 @@ func (a *Query) Merge(b *Query) (err error) {
 		a.external[k.GetExternalObjectId().String()] = k
 	}
 
-	a.Children = append(a.Children, b.Children...)
+	a.Exp.Children = append(a.Exp.Children, b.Exp.Children...)
 
 	return
 }
@@ -278,7 +277,7 @@ func (q *Query) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		return
 	}
 
-	if len(q.Children) == 0 {
+	if len(q.Exp.Children) == 0 {
 		ok = len(q.internal) == 0
 		return
 	} else if !q.Exp.ContainsSku(tg) {
@@ -322,8 +321,8 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 		return
 	}
 
-	if len(q.Children) == 0 {
-		ok = len(q.internal) == 0 && len(q.external) == 0
+	if len(q.Exp.Children) == 0 {
+    ok = q.objectIds.IsEmpty()
 		return
 	} else if !q.Exp.ContainsSku(el) {
 		return
