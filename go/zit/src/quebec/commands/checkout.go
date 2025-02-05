@@ -66,7 +66,7 @@ func (cmd Checkout) Run(req command.Request) {
 	}
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(localWorkingCopy)
+	envWorkspace.AssertInWorkspaceOrOfferToCreate(localWorkingCopy)
 
 	if _, err := opCheckout.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)

@@ -20,7 +20,6 @@ function init_workspace_empty { # @test
 	run_zit info-workspace
 	assert_failure
 	assert_output - <<-EOM
-		stdin is not a tty, unable to get permission to continue
 		not creating a workspace. aborting.
 	EOM
 
@@ -49,7 +48,6 @@ function init_workspace { # @test
 	run_zit info-workspace
 	assert_failure
 	assert_output - <<-EOM
-		stdin is not a tty, unable to get permission to continue
 		not creating a workspace. aborting.
 	EOM
 

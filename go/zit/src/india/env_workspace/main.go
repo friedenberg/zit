@@ -17,6 +17,7 @@ const FileWorkspace = ".zit-workspace"
 type Env interface {
 	env_dir.Env
 	AssertInWorkspace(errors.Context)
+	AssertInWorkspaceOrOfferToCreate(errors.Context)
 	InWorkspace() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() config_mutable_blobs.Defaults
@@ -85,6 +86,17 @@ func (env *env) GetWorkspacePath() string {
 func (env *env) AssertInWorkspace(context errors.Context) {
 	if !env.InWorkspace() {
 		context.CancelWithError(ErrNotInWorkspace{env: env})
+	}
+}
+
+func (env *env) AssertInWorkspaceOrOfferToCreate(context errors.Context) {
+	if !env.InWorkspace() {
+		context.CancelWithError(
+			ErrNotInWorkspace{
+				env:           env,
+				offerToCreate: true,
+			},
+		)
 	}
 }
 

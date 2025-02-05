@@ -37,7 +37,7 @@ func (cmd Status) Run(req command.Request) {
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(req)
+	envWorkspace.AssertInWorkspaceOrOfferToCreate(req)
 
 	pcol := localWorkingCopy.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 

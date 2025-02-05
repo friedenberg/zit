@@ -7,6 +7,7 @@ import (
 
 type ErrNotInWorkspace struct {
 	*env
+	offerToCreate bool
 }
 
 func (err ErrNotInWorkspace) Error() string {
@@ -27,7 +28,8 @@ func (err ErrNotInWorkspace) GetRetryableError() errors.Retryable {
 }
 
 func (err ErrNotInWorkspace) Recover(context errors.Context, in error) {
-	if err.Confirm("a workspace is necessary to run this command. create one?") {
+	if err.offerToCreate &&
+  err.Confirm("a workspace is necessary to run this command. create one?") {
 		blob := &workspace_config_blobs.V0{}
 
 		if err := err.CreateWorkspace(blob); err != nil {
