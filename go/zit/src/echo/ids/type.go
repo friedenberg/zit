@@ -15,7 +15,7 @@ func init() {
 
 type (
 	Type struct {
-		value string
+		Value string
 	}
 
 	InlineTypeChecker interface {
@@ -41,15 +41,15 @@ func MustType(v string) (t Type) {
 }
 
 func (t Type) IsEmpty() bool {
-	return t.value == ""
+	return t.Value == ""
 }
 
 func (t *Type) Reset() {
-	t.value = ""
+	t.Value = ""
 }
 
 func (a *Type) ResetWith(b Type) {
-	a.value = b.value
+	a.Value = b.Value
 }
 
 func (a Type) EqualsAny(b any) bool {
@@ -57,7 +57,7 @@ func (a Type) EqualsAny(b any) bool {
 }
 
 func (a Type) Equals(b Type) bool {
-	return a.value == b.value
+	return a.Value == b.Value
 }
 
 func (t Type) GetType() Type {
@@ -73,14 +73,14 @@ func (o Type) GetGenre() interfaces.Genre {
 }
 
 func (t Type) IsToml() bool {
-	return strings.HasPrefix(t.value, "toml")
+	return strings.HasPrefix(t.Value, "toml")
 }
 
 func (e Type) StringSansOp() string {
 	if e.IsEmpty() {
 		return ""
 	} else {
-		return e.value
+		return e.Value
 	}
 }
 
@@ -88,12 +88,12 @@ func (e Type) String() string {
 	if e.IsEmpty() {
 		return ""
 	} else {
-		return "!" + e.value
+		return "!" + e.Value
 	}
 }
 
 func (t Type) Parts() [3]string {
-	return [3]string{"", "!", t.value}
+	return [3]string{"", "!", t.Value}
 }
 
 func (e *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
@@ -113,7 +113,7 @@ func (e *Type) Set(v string) (err error) {
 		return
 	}
 
-	e.value = v
+	e.Value = v
 
 	return
 }
