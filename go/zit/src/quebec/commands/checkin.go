@@ -68,6 +68,8 @@ func (cmd Checkin) Run(dep command.Request) {
 		query.MakeBuilderOptions(cmd),
 	)
 
+	localWorkingCopy.AssertCLINotComplete()
+
 	// envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	// envWorkspace.AssertInWorkspace(localWorkingCopy)
 

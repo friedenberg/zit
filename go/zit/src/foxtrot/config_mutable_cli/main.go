@@ -111,7 +111,7 @@ func (c Config) UsePrintTags() bool {
 }
 
 func (c Config) IsDryRun() bool {
-	return c.dryRun
+	return c.dryRun || c.Complete
 }
 
 func (c *Config) SetDryRun(v bool) {

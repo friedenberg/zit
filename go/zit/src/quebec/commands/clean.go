@@ -80,6 +80,8 @@ func (cmd Clean) Run(req command.Request) {
 		query.MakeBuilderOptions(cmd),
 	)
 
+	localWorkingCopy.AssertCLINotComplete()
+
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	envWorkspace.AssertInWorkspace(req)
 

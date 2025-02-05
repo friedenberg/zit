@@ -51,11 +51,13 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (cmd Checkout) Run(dep command.Request) {
+func (cmd Checkout) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
+
+	localWorkingCopy.AssertCLINotComplete()
 
 	opCheckout := user_ops.Checkout{
 		Repo:     localWorkingCopy,

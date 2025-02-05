@@ -21,16 +21,16 @@ func Run(ctx errors.Context, args ...string) {
 	var cmd command.Command
 	var ok bool
 
-	specifiedSubcommand := args[1]
+	name := args[1]
 
-	if cmd, ok = cmds[specifiedSubcommand]; !ok {
+	if cmd, ok = cmds[name]; !ok {
 		PrintUsage(
 			ctx,
-			errors.BadRequestf("No subcommand '%s'", specifiedSubcommand),
+			errors.BadRequestf("No subcommand '%s'", name),
 		)
 	}
 
-	f := flag.NewFlagSet(specifiedSubcommand, flag.ContinueOnError)
+	f := flag.NewFlagSet(name, flag.ContinueOnError)
 	cmd.SetFlagSet(f)
 
 	args = args[2:]
@@ -42,11 +42,20 @@ func Run(ctx errors.Context, args ...string) {
 		ctx.CancelWithError(err)
 	}
 
-	dep := command.Request{
+	req := command.Request{
 		Context: ctx,
 		Config:  configCli,
 		FlagSet: f,
 	}
 
-	cmd.Run(dep)
+	if configCli.Complete {
+		if _, ok := cmd.(command.SupportsCompletion); !ok {
+			ctx.CancelWithBadRequestf(
+				"command %q does not support completion",
+				name,
+			)
+		}
+	}
+
+	cmd.Run(req)
 }

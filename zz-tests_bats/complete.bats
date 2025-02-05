@@ -11,6 +11,25 @@ teardown() {
 	rm_from_version "$version"
 }
 
+function assert_complete_fails() (
+	for cmd in "$@"; do
+		run_zit "$cmd" -complete
+		assert_failure
+		assert_output "command \"$cmd\" does not support completion"
+	done
+)
+
+function complete_fails { # @test
+	cmds=(
+		checkin
+		checkin-blob
+		checkin-json
+		checkout
+	)
+
+	assert_complete_fails "${cmds[@]}"
+}
+
 function complete_show { # @test
 	run_zit show -complete
 	assert_success
@@ -42,7 +61,7 @@ function complete_show_all { # @test
 	EOM
 }
 
-function complete_show_zettelen { # @test
+function complete_show_zettels { # @test
 	run_zit show -verbose -complete :z
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -51,7 +70,7 @@ function complete_show_zettelen { # @test
 	EOM
 }
 
-function complete_show_typen { # @test
+function complete_show_types { # @test
 	run_zit show -complete :t
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -59,7 +78,7 @@ function complete_show_typen { # @test
 	EOM
 }
 
-function complete_show_etiketten { # @test
+function complete_show_tags { # @test
 	run_zit show -complete :e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM

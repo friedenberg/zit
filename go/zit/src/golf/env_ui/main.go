@@ -16,6 +16,8 @@ import (
 type Env interface {
 	errors.Context
 
+	AssertCLINotComplete()
+
 	GetOptions() Options
 	GetIn() fd.Std
 	GetInFile() io.Reader
@@ -101,6 +103,12 @@ func Make(
 	}
 
 	return e
+}
+
+func (env env) AssertCLINotComplete() {
+	if env.GetCLIConfig().Complete {
+		env.CancelWithBadRequestf("command running with `-complete`, aborting")
+	}
 }
 
 func (u env) GetOptions() Options {

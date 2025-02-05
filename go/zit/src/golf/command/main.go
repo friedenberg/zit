@@ -19,6 +19,10 @@ type Command interface {
 	Run(Request)
 }
 
+type SupportsCompletion interface {
+  SupportsCompletion()
+}
+
 var commands = map[string]Command{}
 
 func Commands() map[string]Command {

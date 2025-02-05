@@ -42,11 +42,14 @@ func (cmd *CheckinBlob) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (cmd CheckinBlob) Run(dep command.Request) {
-	args := dep.Args()
+func (cmd CheckinBlob) Run(req command.Request) {
+	args := req.Args()
+
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	localWorkingCopy.AssertCLINotComplete()
 
 	if len(args)%2 != 0 {
-		dep.CancelWithErrorf(
+		req.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",
 		)
 	}
@@ -67,15 +70,13 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 			var err error
 
 			if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
-				dep.CancelWithError(err)
+				req.CancelWithError(err)
 			}
 		}
 
 		p.path = ap
 		pairs[i] = p
 	}
-
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	zettels := make([]*sku.Transacted, len(pairs))
 
@@ -87,7 +88,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 			if zettels[i], err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 				p.ZettelId,
 			); err != nil {
-				dep.CancelWithError(err)
+				req.CancelWithError(err)
 			}
 		}
 	}
@@ -99,7 +100,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 			var err error
 
 			if ow, err = localWorkingCopy.GetEnvRepo().BlobWriter(); err != nil {
-				dep.CancelWithError(err)
+				req.CancelWithError(err)
 			}
 		}
 
@@ -115,18 +116,18 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 				var err error
 
 				if f, err = files.Open(p.path); err != nil {
-					dep.CancelWithError(err)
+					req.CancelWithError(err)
 				}
 			}
 
-			defer dep.MustClose(f)
+			defer req.MustClose(f)
 
 			if _, err := io.Copy(ow, f); err != nil {
-				dep.CancelWithError(err)
+				req.CancelWithError(err)
 			}
 
 			if err := ow.Close(); err != nil {
-				dep.CancelWithError(err)
+				req.CancelWithError(err)
 			}
 
 			{
@@ -135,7 +136,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 				if zettels[i], err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 					p.ZettelId,
 				); err != nil {
-					dep.CancelWithError(err)
+					req.CancelWithError(err)
 				}
 			}
 
@@ -145,7 +146,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 			zettels[i].SetBlobSha(&as)
 
 		default:
-			dep.CancelWithError(errors.Errorf("argument is neither sha nor path"))
+			req.CancelWithError(errors.Errorf("argument is neither sha nor path"))
 		}
 
 		if cmd.NewTags.Len() > 0 {
@@ -154,7 +155,7 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 		}
 	}
 
-	dep.Must(localWorkingCopy.Lock)
+	req.Must(localWorkingCopy.Lock)
 
 	for _, z := range zettels {
 		if err := localWorkingCopy.GetStore().CreateOrUpdate(
@@ -163,9 +164,9 @@ func (cmd CheckinBlob) Run(dep command.Request) {
 				MergeCheckedOut: true,
 			},
 		); err != nil {
-			dep.CancelWithError(err)
+			req.CancelWithError(err)
 		}
 	}
 
-	dep.Must(localWorkingCopy.Unlock)
+	req.Must(localWorkingCopy.Unlock)
 }

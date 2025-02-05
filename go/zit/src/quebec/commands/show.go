@@ -50,6 +50,8 @@ func (cmd Show) CompletionGenres() ids.Genre {
 	)
 }
 
+func (cmd Show) SupportsCompletion() {}
+
 func (cmd Show) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
