@@ -152,7 +152,7 @@ func (cmd *New) Run(req command.Request) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					Workspace: envWorkspace.InWorkspace(),
+					IgnoreWorkspace: !envWorkspace.InWorkspace(),
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						TextFormatterOptions: cotfo,
 					},

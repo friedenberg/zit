@@ -57,7 +57,7 @@ function edit_and_dont_change_workspace { # @test
 
 function edit_and_change_no_workspace { # @test
 	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
-	run_zit edit -use-workspace=false one/uno
+	run_zit edit one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @85eb98a5c8f7ccc354f35b846bb24adc1764e88cb907f63293f6902aa105af58]
@@ -72,7 +72,7 @@ function edit_and_change_no_workspace { # @test
 
 function edit_and_dont_change_no_workspace { # @test
 	export EDITOR="true"
-	run_zit edit -use-workspace=false one/uno
+	run_zit edit one/uno
 	assert_success
 	assert_output - <<-EOM
 	EOM

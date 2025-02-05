@@ -17,7 +17,6 @@ func init() {
 	command.Register(
 		"edit",
 		&Edit{
-			Workspace:    true,
 			CheckoutMode: checkout_mode.MetadataOnly,
 		},
 	)
@@ -27,7 +26,7 @@ type Edit struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 
 	// TODO-P3 add force
-	Workspace bool
+	IgnoreWorkspace bool
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
@@ -38,7 +37,7 @@ func (cmd *Edit) SetFlagSet(f *flag.FlagSet) {
 	cmd.Checkout.SetFlagSet(f)
 
 	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
-	f.BoolVar(&cmd.Workspace, "use-workspace", true, "checkout the object into the current workspace (CWD)")
+	f.BoolVar(&cmd.IgnoreWorkspace, "ignore-workspace", false, "ignore any workspaces that may be present and checkout the object in a temporary directory")
 }
 
 func (c Edit) CompletionGenres() ids.Genre {
@@ -75,12 +74,8 @@ func (cmd Edit) Run(req command.Request) {
 		Edit:    true,
 	}
 
-	opEdit.Options.Workspace = cmd.Workspace
-
-	if cmd.Workspace {
-		envWorkspace := localWorkingCopy.GetEnvWorkspace()
-		envWorkspace.AssertInWorkspace(req)
-	}
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	opEdit.Options.IgnoreWorkspace = cmd.IgnoreWorkspace || !envWorkspace.InWorkspace()
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)

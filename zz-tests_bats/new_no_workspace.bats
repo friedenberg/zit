@@ -32,6 +32,9 @@ function new_empty_edit { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
+
+  run_zit status .
+  assert_failure
 }
 
 function can_duplicate_zettel_content { # @test

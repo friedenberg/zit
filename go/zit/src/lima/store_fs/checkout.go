@@ -223,7 +223,9 @@ func (s *Store) SetFilenameForTransacted(
 	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
-		if f, err = s.envRepo.GetTempLocal().FileTemp(); err != nil {
+		if f, err = s.envRepo.GetTempLocal().FileTempWithTemplate(
+			fmt.Sprintf("*.%s", s.FileExtensionForGenre(sk)),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

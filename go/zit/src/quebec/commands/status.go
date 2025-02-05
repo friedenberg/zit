@@ -16,7 +16,7 @@ func init() {
 }
 
 type Status struct {
-  command_components.LocalWorkingCopyWithQueryGroup
+	command_components.LocalWorkingCopyWithQueryGroup
 }
 
 func (c Status) DefaultGenres() ids.Genre {
@@ -30,11 +30,14 @@ func (c Status) ModifyBuilder(
 		WithDefaultSigil(ids.SigilExternal)
 }
 
-func (cmd Status) Run(dep command.Request) {
+func (cmd Status) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
+
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	envWorkspace.AssertInWorkspace(req)
 
 	pcol := localWorkingCopy.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 

@@ -16,8 +16,7 @@ teardown() {
 
 function migration_status_empty { # @test
 	run_zit status
-	assert_success
-	assert_output ''
+	assert_failure
 }
 
 function migration_validate_schwanzen { # @test

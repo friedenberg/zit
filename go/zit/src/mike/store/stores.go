@@ -78,7 +78,7 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
-		if options.Workspace {
+		if !options.IgnoreWorkspace {
 			if err = s.ui.CheckedOutCheckedOut(co); err != nil {
 				err = errors.Wrap(err)
 				return

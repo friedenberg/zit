@@ -10,7 +10,7 @@ setup() {
 	copy_from_version "$DIR" "$version"
 
 	run_zit init-workspace
-  assert_success
+	assert_success
 
 	export BATS_TEST_BODY=true
 }
@@ -35,6 +35,12 @@ function new_empty_edit { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 		      checked out [two/uno.zettel @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		             same [two/uno.zettel @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 }
 

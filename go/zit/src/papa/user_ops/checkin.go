@@ -135,7 +135,7 @@ func (op Checkin) runOrganize(
 }
 
 func (c Checkin) openBlobIfNecessary(
-	u *local_working_copy.Repo,
+	repo *local_working_copy.Repo,
 	objects sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
@@ -143,14 +143,12 @@ func (c Checkin) openBlobIfNecessary(
 	}
 
 	opCheckout := Checkout{
-		Repo: u,
+		Repo: repo,
 		Options: checkout_options.Options{
 			CheckoutMode: checkout_mode.BlobOnly,
 		},
 		Utility: c.CheckoutBlobAndRun,
 	}
-
-	opCheckout.Workspace = true
 
 	if _, err = opCheckout.Run(objects); err != nil {
 		err = errors.Wrap(err)

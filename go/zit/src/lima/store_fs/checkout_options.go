@@ -43,7 +43,7 @@ func GetCheckoutOptionsFromOptionsWithoutMode(
 		panic(fmt.Sprintf("expected %T or nil but got %T", fsOptions, t))
 	}
 
-	if !options.Workspace {
+	if options.IgnoreWorkspace {
 		fsOptions.Path = PathOptionTempLocal
 	}
 
