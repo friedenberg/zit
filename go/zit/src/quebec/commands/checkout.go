@@ -63,6 +63,8 @@ func (cmd Checkout) Run(dep command.Request) {
 		Options:  cmd.CheckoutOptions,
 	}
 
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	envWorkspace.AssertInWorkspace(localWorkingCopy)
 	opCheckout.Options.Workspace = true
 
 	if _, err := opCheckout.RunQuery(queryGroup); err != nil {

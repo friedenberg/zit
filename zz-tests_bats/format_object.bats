@@ -78,6 +78,9 @@ function format_simple { # @test
 }
 
 function show_simple_one_zettel_binary { # @test
+	run_zit init-workspace
+	assert_success
+
 	echo "binary file" >file.bin
 	run_zit add -delete file.bin
 	assert_success

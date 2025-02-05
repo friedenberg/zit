@@ -33,7 +33,7 @@ function show_simple_one_zettel { # @test
 
 function show_simple_one_zettel_with_description_with_quotes { # @test
 	run_zit init-workspace
-  assert_success
+	assert_success
 
 	run_zit new -edit=false - <<-EOM
 		---
@@ -91,6 +91,9 @@ function show_simple_one_zettel_with_sigil_and_genre { # @test
 }
 
 function show_simple_one_zettel_checked_out { # @test
+	run_zit init-workspace
+	assert_success
+
 	run_zit checkout one/uno
 	assert_success
 	assert_output - <<-EOM
@@ -244,6 +247,9 @@ function show_zettel_etikett { # @test
 }
 
 function show_zettel_etikett_complex { # @test
+	run_zit init-workspace
+	assert_success
+
 	run_zit checkout o/u
 	assert_success
 	assert_output - <<-EOM

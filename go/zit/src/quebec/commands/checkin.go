@@ -68,6 +68,9 @@ func (cmd Checkin) Run(dep command.Request) {
 		query.MakeBuilderOptions(cmd),
 	)
 
+	// envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	// envWorkspace.AssertInWorkspace(localWorkingCopy)
+
 	op := user_ops.Checkin{
 		Delete:             cmd.Delete,
 		Organize:           cmd.Organize,
