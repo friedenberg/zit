@@ -333,12 +333,12 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 	}
 }
 
-func (e *Executor) applyDotOperatorIfNecessary() (err error) {
-	if !e.isDotOperatorActive() {
+func (executor *Executor) applyDotOperatorIfNecessary() (err error) {
+	if !executor.isDotOperatorActive() {
 		return
 	}
 
-	if err = e.readAllItemsIfNecessary(); err != nil {
+	if err = executor.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -346,12 +346,12 @@ func (e *Executor) applyDotOperatorIfNecessary() (err error) {
 	return
 }
 
-func (e *Executor) readAllItemsIfNecessary() (err error) {
-	if !e.InWorkspace() {
+func (executor *Executor) readAllItemsIfNecessary() (err error) {
+	if !executor.InWorkspace() {
 		return
 	}
 
-	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
+	if err = executor.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

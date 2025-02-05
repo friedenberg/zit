@@ -57,29 +57,11 @@ func (cmd Deinit) Run(dep command.Request) {
 	}
 }
 
-func (c Deinit) getPermission(u *local_working_copy.Repo) (success bool) {
-	var err error
-	ui.Err().Printf(
-		"are you sure you want to deinit in %q? (y/*)",
-		u.GetEnvRepo().Dir(),
+func (c Deinit) getPermission(u *local_working_copy.Repo) bool {
+	return u.Confirm(
+		fmt.Sprintf(
+			"are you sure you want to deinit in %q?",
+			u.GetEnvRepo().Dir(),
+		),
 	)
-
-	var answer rune
-	var n int
-
-	if n, err = fmt.Scanf("%c", &answer); err != nil {
-		ui.Err().Printf("failed to read answer: %s", err)
-		return
-	}
-
-	if n != 1 {
-		ui.Err().Printf("failed to read at exactly 1 answer: %s", err)
-		return
-	}
-
-	if answer == 'y' || answer == 'Y' {
-		success = true
-	}
-
-	return
 }

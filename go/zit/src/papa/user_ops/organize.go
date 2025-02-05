@@ -1,7 +1,6 @@
 package user_ops
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -12,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -174,7 +174,7 @@ func (op Organize) RunWithSkuType(
 				op.GetPrototypeOptionComments(),
 			),
 		); err != nil {
-			if op.handleReadChangesError(err) {
+			if op.handleReadChangesError(op.Repo, err) {
 				err = nil
 				continue
 			} else {
@@ -189,7 +189,10 @@ func (op Organize) RunWithSkuType(
 	return
 }
 
-func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
+func (cmd Organize) handleReadChangesError(
+	envUI env_ui.Env,
+	err error,
+) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {
@@ -198,27 +201,9 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
-	ui.Err().Printf("reading changes failed: %q", err)
-	ui.Err().Printf("would you like to edit and try again? (y/*)")
-
-	var answer rune
-	var n int
-
-	if n, err = fmt.Scanf("%c", &answer); err != nil {
-		tryAgain = false
-		ui.Err().Printf("failed to read answer: %s", err)
-		return
-	}
-
-	if n != 1 {
-		tryAgain = false
-		ui.Err().Printf("failed to read at exactly 1 answer: %s", err)
-		return
-	}
-
-	if answer == 'y' || answer == 'Y' {
-		tryAgain = true
-	}
-
-	return
+	return envUI.Retry(
+		"reading changes failed",
+		"edit and try again?",
+		err,
+	)
 }

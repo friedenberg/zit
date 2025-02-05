@@ -2,7 +2,6 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
@@ -183,7 +182,7 @@ func (s *Store) tryPreCommitHooks(
 			err = errors.Wrapf(err, "Hook: %#v", h)
 			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
 
-			if ui.Continue("hook failed", err) {
+			if s.envRepo.Retry("hook failed", "ignore error and continue?", err) {
 				// TODO fix this to properly continue past the failure
 				err = nil
 			} else {

@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -70,9 +71,9 @@ func (c *Organize) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd *Organize) Run(dep command.Request) {
+func (cmd *Organize) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
 
@@ -241,10 +242,10 @@ func (cmd *Organize) Run(dep command.Request) {
 }
 
 func (c Organize) readFromVim(
-	u *local_working_copy.Repo,
-	f string,
+	repo *local_working_copy.Repo,
+	path string,
 	results *organize_text.Text,
-	qg *query.Group,
+	queryGroup *query.Group,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().
@@ -252,17 +253,21 @@ func (c Organize) readFromVim(
 			Build(),
 	}
 
-	if err = openVimOp.Run(u, f); err != nil {
+	if err = openVimOp.Run(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.RunWithPath(u, f, qg.RepoId); err != nil {
-		if c.handleReadChangesError(err) {
+	if ot, err = readOrganizeTextOp.RunWithPath(
+		repo,
+		path,
+		queryGroup.RepoId,
+	); err != nil {
+		if c.handleReadChangesError(repo, err) {
 			err = nil
-			ot, err = c.readFromVim(u, f, results, qg)
+			ot, err = c.readFromVim(repo, path, results, queryGroup)
 		} else {
 			ui.Err().Printf("aborting organize")
 			return
@@ -272,7 +277,11 @@ func (c Organize) readFromVim(
 	return
 }
 
-func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
+// TODO migrate to using errors.Retryable
+func (cmd Organize) handleReadChangesError(
+	envUI env_ui.Env,
+	err error,
+) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {
@@ -281,8 +290,7 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
-	// TODO move this to errors.Context
-	tryAgain = ui.Retry("reading changes failed", err)
+	tryAgain = envUI.Retry("reading changes failed", "edit and retry?", err)
 
 	return
 }

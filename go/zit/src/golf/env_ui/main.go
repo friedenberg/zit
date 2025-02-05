@@ -27,6 +27,9 @@ type Env interface {
 	GetErrFile() interfaces.WriterAndStringWriter
 	GetCLIConfig() config_mutable_cli.Config
 
+	Confirm(message string) (success bool)
+	Retry(header, retry string, err error) (tryAgain bool)
+
 	FormatOutputOptions() (o string_format_writer.OutputOptions)
 	FormatColorOptionsOut() (o string_format_writer.ColorOptions)
 	FormatColorOptionsErr() (o string_format_writer.ColorOptions)

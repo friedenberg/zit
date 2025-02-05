@@ -83,7 +83,7 @@ func (env *env) GetWorkspacePath() string {
 
 func (env *env) AssertInWorkspace(context errors.Context) {
 	if !env.InWorkspace() {
-		context.CancelWithBadRequestf("not in a workspace")
+		context.CancelWithError(ErrNotInWorkspace{env: env})
 	}
 }
 
