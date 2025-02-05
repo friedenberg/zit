@@ -66,19 +66,22 @@ func (c *Clean) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&c.organize, "organize", false, "")
 }
 
-func (c Clean) DefaultGenres() ids.Genre {
+func (req Clean) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Clean) ModifyBuilder(b *query.Builder) {
+func (req Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
 
-func (cmd Clean) Run(dep command.Request) {
+func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
+
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	envWorkspace.AssertInWorkspace(req)
 
 	if cmd.organize {
 		if err := cmd.runOrganize(localWorkingCopy, queryGroup); err != nil {

@@ -8,7 +8,6 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
-	run_zit_init_workspace
 }
 
 teardown() {
@@ -16,6 +15,7 @@ teardown() {
 }
 
 function prepare_checkouts() {
+	run_zit_init_workspace
 	run_zit checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -29,6 +29,16 @@ function prepare_checkouts() {
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 }
+
+# bats file_tags=user_story:clean
+
+# bats test_tags=user_story:workspace
+function clean_fails_outside_workspace { # @test
+	run_zit clean .
+	assert_failure
+}
+
+# bats file_tags=user_story:workspace
 
 function clean_all { # @test
 	prepare_checkouts
@@ -271,6 +281,7 @@ function clean_mode_blob_hidden { # @test
 }
 
 function clean_mode_blob { # @test
+	run_zit_init_workspace
 	run_zit checkout -mode blob one/uno
 	assert_success
 	assert_output - <<-EOM
