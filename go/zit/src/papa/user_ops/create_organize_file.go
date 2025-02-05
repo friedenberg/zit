@@ -1,6 +1,7 @@
 package user_ops
 
 import (
+	"fmt"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -14,15 +15,15 @@ type CreateOrganizeFile struct {
 	organize_text.Options
 }
 
-func (c CreateOrganizeFile) RunAndWrite(
-	w io.Writer,
+func (cmd CreateOrganizeFile) RunAndWrite(
+	writer io.Writer,
 ) (results *organize_text.Text, err error) {
-	if results, err = c.Run(); err != nil {
+	if results, err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = results.WriteTo(w); err != nil {
+	if _, err = results.WriteTo(writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -30,8 +31,21 @@ func (c CreateOrganizeFile) RunAndWrite(
 	return
 }
 
-func (c CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
-	if results, err = organize_text.New(c.Options); err != nil {
+func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
+	count := cmd.Options.Skus.Len()
+	if count > 30 {
+		if !cmd.Confirm(
+			fmt.Sprintf(
+				"a large number (%d) of objects would be edited in organize. continue to organize?",
+				count,
+			),
+		) {
+			err = errors.BadRequestf("aborting")
+			return
+		}
+	}
+
+	if results, err = organize_text.New(cmd.Options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
