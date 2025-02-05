@@ -81,9 +81,6 @@ func (cmd *New) Run(req command.Request) {
 	args := req.Args()
 	repo := cmd.MakeLocalWorkingCopy(req)
 
-	envWorkspace := repo.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(req)
-
 	if err := cmd.ValidateFlagsAndArgs(repo, args...); err != nil {
 		repo.CancelWithError(err)
 	}
@@ -146,6 +143,8 @@ func (cmd *New) Run(req command.Request) {
 		}
 	}
 
+	envWorkspace := repo.GetEnvWorkspace()
+
 	// TODO make mutually exclusive with organize
 	if cmd.Edit {
 		opCheckout := user_ops.Checkout{
@@ -153,7 +152,7 @@ func (cmd *New) Run(req command.Request) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					Workspace: true,
+					Workspace: envWorkspace.InWorkspace(),
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						TextFormatterOptions: cotfo,
 					},
