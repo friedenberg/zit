@@ -41,7 +41,7 @@ func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut
 // TODO make generic external version
 func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
-		u.GetConfig().GetCLIConfig().DryRun,
+		u.GetConfig().GetCLIConfig().IsDryRun(),
 		id_fmts.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
 			u.envRepo.MakeRelativePathStringFormatWriter(),

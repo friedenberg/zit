@@ -69,7 +69,7 @@ func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Config = e.GetConfig()
 	oo.Abbr = e.GetStore().GetAbbrStore().GetAbbr()
 
-	if !e.GetConfig().GetCLIConfig().DryRun {
+	if !e.GetConfig().GetCLIConfig().IsDryRun() {
 		return
 	}
 

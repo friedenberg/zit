@@ -30,9 +30,9 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 		default:
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
-    case "":
-    // TODO what should this be?
-    // TODO print toml representation?
+		case "":
+			// TODO what should this be?
+			// TODO print toml representation?
 
 		case "query":
 			repo.GetUI().Print(

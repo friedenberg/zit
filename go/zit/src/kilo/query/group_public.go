@@ -82,7 +82,7 @@ func (queryGroup *Group) GetExactlyOneExternalObjectId(
 		return
 	}
 
-  oids := query.expObjectIds.internal
+	oids := query.expObjectIds.internal
 	oidsLen := len(oids)
 
 	eoids := query.expObjectIds.external

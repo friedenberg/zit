@@ -15,7 +15,7 @@ import (
 func (s *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if s.GetConfig().GetCLIConfig().DryRun {
+	if s.GetConfig().GetCLIConfig().IsDryRun() {
 		return
 	}
 
@@ -76,7 +76,7 @@ func (c *Store) Flush(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	// TODO handle flushes with dry run
-	if c.GetConfig().GetCLIConfig().DryRun {
+	if c.GetConfig().GetCLIConfig().IsDryRun() {
 		return
 	}
 

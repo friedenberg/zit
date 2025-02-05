@@ -130,7 +130,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	a.Sigil.Add(b.Sigil)
 
 	if a.expObjectIds.internal == nil {
-    a.expObjectIds.internal = make(map[string]ObjectId, len(b.expObjectIds.internal))
+		a.expObjectIds.internal = make(map[string]ObjectId, len(b.expObjectIds.internal))
 	}
 
 	for _, k := range b.expObjectIds.internal {
@@ -153,7 +153,7 @@ func (a *Query) Merge(b *Query) (err error) {
 func (q *Query) StringDebug() string {
 	var sb strings.Builder
 
-  if q.expObjectIds.internal == nil || len(q.expObjectIds.internal) == 0 {
+	if q.expObjectIds.internal == nil || len(q.expObjectIds.internal) == 0 {
 		sb.WriteString(q.expTagsOrTypes.StringDebug())
 	} else {
 		sb.WriteString("[[")
@@ -192,7 +192,7 @@ func (q *Query) SortedObjectIds() []string {
 		out = append(out, k)
 	}
 
-  for k := range q.expObjectIds.external {
+	for k := range q.expObjectIds.external {
 		out = append(out, k)
 	}
 
@@ -322,7 +322,7 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	}
 
 	if len(q.expTagsOrTypes.Children) == 0 {
-    ok = q.expObjectIds.IsEmpty()
+		ok = q.expObjectIds.IsEmpty()
 		return
 	} else if !q.expTagsOrTypes.ContainsSku(el) {
 		return

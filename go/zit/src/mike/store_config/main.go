@@ -170,11 +170,11 @@ func (kc *store) SetCliFromCommander(k config_mutable_cli.Config) {
 }
 
 func (k *store) IsDryRun() bool {
-	return k.DryRun
+	return k.cli.IsDryRun()
 }
 
 func (k *store) SetDryRun(v bool) {
-	k.DryRun = v
+	k.cli.SetDryRun(v)
 }
 
 func (k *store) GetTypeStringFromExtension(t string) string {

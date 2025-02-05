@@ -195,7 +195,7 @@ func (kc *store) Flush(
 	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
-	if !kc.HasChanges() || kc.DryRun {
+	if !kc.HasChanges() || kc.IsDryRun() {
 		return
 	}
 

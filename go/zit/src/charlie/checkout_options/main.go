@@ -14,7 +14,7 @@ type Options struct {
 type OptionsWithoutMode struct {
 	Force                bool
 	AllowConflicted      bool
-	IgnoreWorkspace            bool
+	IgnoreWorkspace      bool
 	StoreSpecificOptions any
 }
 

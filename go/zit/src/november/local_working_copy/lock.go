@@ -59,7 +59,7 @@ func (u *Repo) Unlock() (err error) {
 		if err = u.dormantIndex.Flush(
 			u.GetEnvRepo(),
 			u.PrinterHeader(),
-			u.config.GetCLIConfig().DryRun,
+			u.config.GetCLIConfig().IsDryRun(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

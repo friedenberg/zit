@@ -11,7 +11,7 @@ func (u *Repo) DeleteFiles(fs interfaces.Collection[*fd.FD]) (err error) {
 	deleteOp := store_fs.DeleteCheckout{}
 
 	if err = deleteOp.Run(
-		u.GetConfig().GetCLIConfig().DryRun,
+		u.GetConfig().GetCLIConfig().IsDryRun(),
 		u.GetEnvRepo(),
 		u.PrinterFDDeleted(),
 		fs,
