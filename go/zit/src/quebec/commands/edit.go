@@ -59,9 +59,9 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (cmd Edit) Run(dep command.Request) {
+func (cmd Edit) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
 
@@ -76,6 +76,11 @@ func (cmd Edit) Run(dep command.Request) {
 	}
 
 	opEdit.Options.Workspace = cmd.Workspace
+
+	if cmd.Workspace {
+		envWorkspace := localWorkingCopy.GetEnvWorkspace()
+		envWorkspace.AssertInWorkspace(req)
+	}
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)

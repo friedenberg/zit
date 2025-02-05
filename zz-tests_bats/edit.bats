@@ -17,6 +17,9 @@ teardown() {
 # bats file_tags=user_story:workspace
 
 function edit_and_change_workspace { # @test
+	run_zit init-workspace
+	assert_success
+
 	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
 	run_zit edit one/uno
 	assert_success
@@ -33,6 +36,9 @@ function edit_and_change_workspace { # @test
 }
 
 function edit_and_dont_change_workspace { # @test
+	run_zit init-workspace
+	assert_success
+
 	export EDITOR="true"
 	run_zit edit one/uno
 	assert_success

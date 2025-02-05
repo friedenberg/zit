@@ -77,20 +77,23 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (cmd *New) Run(dep command.Request) {
-	args := dep.Args()
-	u := cmd.MakeLocalWorkingCopy(dep)
+func (cmd *New) Run(req command.Request) {
+	args := req.Args()
+	repo := cmd.MakeLocalWorkingCopy(req)
 
-	if err := cmd.ValidateFlagsAndArgs(u, args...); err != nil {
-		u.CancelWithError(err)
+	envWorkspace := repo.GetEnvWorkspace()
+	envWorkspace.AssertInWorkspace(req)
+
+	if err := cmd.ValidateFlagsAndArgs(repo, args...); err != nil {
+		repo.CancelWithError(err)
 	}
 
 	cotfo := checkout_options.TextFormatterOptions{}
 
 	f := object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			EnvDir:    u.GetEnvRepo(),
-			BlobStore: u.GetEnvRepo(),
+			EnvDir:    repo.GetEnvRepo(),
+			BlobStore: repo.GetEnvRepo(),
 		},
 	)
 
@@ -98,19 +101,19 @@ func (cmd *New) Run(dep command.Request) {
 
 	if len(args) == 0 {
 		emptyOp := user_ops.WriteNewZettels{
-			Repo: u,
+			Repo: repo,
 		}
 
 		{
 			var err error
 
 			if zts, err = emptyOp.RunMany(cmd.Proto, cmd.Count); err != nil {
-				u.CancelWithError(err)
+				repo.CancelWithError(err)
 			}
 		}
 	} else if cmd.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
-			Repo:  u,
+			Repo:  repo,
 			Proto: cmd.Proto,
 		}
 
@@ -118,12 +121,12 @@ func (cmd *New) Run(dep command.Request) {
 			var err error
 
 			if zts, err = opCreateFromShas.Run(args...); err != nil {
-				u.CancelWithError(err)
+				repo.CancelWithError(err)
 			}
 		}
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
-			Repo:       u,
+			Repo:       repo,
 			TextParser: f,
 			Filter:     cmd.Filter,
 			Delete:     cmd.Delete,
@@ -135,9 +138,9 @@ func (cmd *New) Run(dep command.Request) {
 
 			if zts, err = opCreateFromPath.Run(args...); err != nil {
 				if errors.IsNotExist(err) {
-					u.CancelWithBadRequestf("Expected a valid file path. Did you mean to add `-description`?")
+					repo.CancelWithBadRequestf("Expected a valid file path. Did you mean to add `-description`?")
 				} else {
-					u.CancelWithError(err)
+					repo.CancelWithError(err)
 				}
 			}
 		}
@@ -146,7 +149,7 @@ func (cmd *New) Run(dep command.Request) {
 	// TODO make mutually exclusive with organize
 	if cmd.Edit {
 		opCheckout := user_ops.Checkout{
-			Repo: u,
+			Repo: repo,
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -160,20 +163,20 @@ func (cmd *New) Run(dep command.Request) {
 		}
 
 		if _, err := opCheckout.Run(zts); err != nil {
-			u.CancelWithError(err)
+			repo.CancelWithError(err)
 		}
 	}
 
 	if cmd.Organize {
 		opOrganize := user_ops.Organize{
-			Repo: u,
+			Repo: repo,
 		}
 
 		if err := opOrganize.Metadata.SetFromObjectMetadata(
 			&cmd.Metadata,
 			ids.RepoId{},
 		); err != nil {
-			u.CancelWithError(err)
+			repo.CancelWithError(err)
 		}
 
 		var results organize_text.OrganizeResults
@@ -182,12 +185,12 @@ func (cmd *New) Run(dep command.Request) {
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
-				u.CancelWithError(err)
+				repo.CancelWithError(err)
 			}
 		}
 
-		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
-			u.CancelWithError(err)
+		if _, err := repo.LockAndCommitOrganizeResults(results); err != nil {
+			repo.CancelWithError(err)
 		}
 	}
 }

@@ -71,6 +71,9 @@ function run_clone_default_with() {
 }
 
 function try_add_new_after_clone {
+	run_zit init-workspace
+  assert_success
+
 	run_zit new -edit=false - <<-EOM
 		---
 		# zettel after clone description

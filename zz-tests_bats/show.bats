@@ -32,6 +32,9 @@ function show_simple_one_zettel { # @test
 }
 
 function show_simple_one_zettel_with_description_with_quotes { # @test
+	run_zit init-workspace
+  assert_success
+
 	run_zit new -edit=false - <<-EOM
 		---
 		# see these "quotes"

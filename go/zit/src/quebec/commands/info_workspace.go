@@ -18,12 +18,7 @@ type InfoWorkspace struct {
 func (cmd InfoWorkspace) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := repo.GetEnvWorkspace()
-
-	if !envWorkspace.InWorkspace() {
-		repo.CancelWithBadRequestf("not in a workspace")
-		return
-	}
-
+	envWorkspace.AssertInWorkspace(repo)
 	args := req.Args()
 
 	if len(args) == 0 {

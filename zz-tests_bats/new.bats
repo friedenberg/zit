@@ -9,6 +9,9 @@ setup() {
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
 
+	run_zit init-workspace
+  assert_success
+
 	export BATS_TEST_BODY=true
 }
 
