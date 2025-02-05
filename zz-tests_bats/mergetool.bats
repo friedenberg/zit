@@ -8,20 +8,26 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
-	run_zit_init_workspace
 }
 
 teardown() {
 	rm_from_version "$version"
 }
 
+function mergetool_fails_outside_workspace { # @test
+	run_zit merge-tool .
+	assert_failure
+}
+
 function mergetool_none { # @test
+	run_zit_init_workspace
 	run_zit merge-tool .
 	assert_success
 	assert_output "nothing to merge"
 }
 
 function mergetool_conflict_base {
+	run_zit_init_workspace
 	run_zit checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM

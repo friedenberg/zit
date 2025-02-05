@@ -30,11 +30,14 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (cmd Mergetool) Run(dep command.Request) {
+func (cmd Mergetool) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.MakeBuilderOptions(cmd),
 	)
+
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	envWorkspace.AssertInWorkspace(req)
 
 	conflicted := sku.MakeSkuTypeSetMutable()
 
