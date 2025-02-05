@@ -19,7 +19,10 @@ teardown() {
 function init_workspace_empty { # @test
 	run_zit info-workspace
 	assert_failure
-  assert_output 'not in a workspace'
+	assert_output - <<-EOM
+		stdin is not a tty, unable to get permission to continue
+		not creating a workspace. aborting.
+	EOM
 
 	run_zit init-workspace
 	assert_success
@@ -45,7 +48,10 @@ function init_workspace_empty { # @test
 function init_workspace { # @test
 	run_zit info-workspace
 	assert_failure
-  assert_output 'not in a workspace'
+	assert_output - <<-EOM
+		stdin is not a tty, unable to get permission to continue
+		not creating a workspace. aborting.
+	EOM
 
 	run_zit init-workspace -query "due" -tags today -type task
 	assert_success

@@ -20,29 +20,10 @@ func main() {
 				commands.Run(ctx, os.Args...)
 			},
 		); err != nil {
-			var retryable errors.Retryable
-
-			if errors.As(err, &retryable) {
-				// TODO retry
-				// continue
-			}
-
 			var helpful errors.Helpful
 
 			if errors.As(err, &helpful) {
-				ui.Err().Printf("Error: %s", helpful.Error())
-				ui.Err().Printf("\nCause:")
-
-				for _, causeLine := range helpful.ErrorCause() {
-					ui.Err().Print(causeLine)
-				}
-
-				ui.Err().Printf("\nRecovery:")
-
-				for _, recoveryLine := range helpful.ErrorRecovery() {
-					ui.Err().Print(recoveryLine)
-				}
-
+				errors.PrintHelpful(ui.Err(), helpful)
 				break
 			}
 

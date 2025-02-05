@@ -27,7 +27,7 @@ function deinit_force() { # @test
 		not in a zit directory
 	EOM
 
-  # TODO determine why this zit init is not emitting the created objects
+	# TODO determine why this zit init is not emitting the created objects
 	run_zit_init
 	assert_success
 	# assert_output - <<-EOM
@@ -47,7 +47,7 @@ function deinit() { # @test
 	run_zit deinit
 	assert_success
 	assert_output --regexp - <<-EOM
-		are you sure you want to deinit in ".*"? \(y/\*)
-		failed to read answer: EOF
+		stdin is not a tty, unable to get permission to continue
+		permission denied and -force not specified, aborting
 	EOM
 }

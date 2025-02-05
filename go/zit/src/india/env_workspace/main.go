@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 )
 
@@ -24,11 +25,11 @@ type Env interface {
 }
 
 func Make(
-	envDir env_dir.Env,
+	envLocal env_local.Env,
 	configMutableBlob config_mutable_blobs.Blob,
 ) (out *env, err error) {
 	out = &env{
-		Env:           envDir,
+		Env:           envLocal,
 		configMutable: configMutableBlob,
 	}
 
@@ -71,7 +72,7 @@ func Make(
 }
 
 type env struct {
-	env_dir.Env
+	env_local.Env
 	configMutable config_mutable_blobs.Blob
 	blob          workspace_config_blobs.Blob
 	defaults      config_mutable_blobs.DefaultsV1

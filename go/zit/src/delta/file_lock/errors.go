@@ -2,8 +2,10 @@ package file_lock
 
 import (
 	"fmt"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
 
 type ErrLockRequired struct {
@@ -23,7 +25,8 @@ func (e ErrLockRequired) Error() string {
 }
 
 type ErrUnableToAcquireLock struct {
-	Path string
+	envUI env_ui.Env
+	Path  string
 }
 
 func (e ErrUnableToAcquireLock) Error() string {
@@ -56,6 +59,14 @@ func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
 	}
 }
 
-func (e ErrUnableToAcquireLock) Recover(ctx errors.Context) {
-	// TODO delete existing lock
+func (err ErrUnableToAcquireLock) Recover(ctx errors.Context, in error) {
+	errors.PrintHelpful(err.envUI.GetErr(), err)
+
+	if err.envUI.Confirm("delete the existing lock?") {
+		if err := os.Remove(err.Path); err != nil {
+			ctx.CancelWithError(err)
+		}
+	} else {
+		ctx.CancelWithBadRequestf("not deleting the lock. aborting.")
+	}
 }

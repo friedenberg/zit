@@ -57,11 +57,11 @@ func (cmd Deinit) Run(dep command.Request) {
 	}
 }
 
-func (c Deinit) getPermission(u *local_working_copy.Repo) bool {
-	return u.Confirm(
+func (c Deinit) getPermission(repo *local_working_copy.Repo) bool {
+	return repo.Confirm(
 		fmt.Sprintf(
 			"are you sure you want to deinit in %q?",
-			u.GetEnvRepo().Dir(),
+			repo.GetEnvRepo().Dir(),
 		),
 	)
 }

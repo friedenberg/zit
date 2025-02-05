@@ -1,11 +1,11 @@
 package ui
 
 import (
-	"io"
 	"log"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 var (
@@ -37,14 +37,7 @@ func IsVerbose() bool {
 	return verbose
 }
 
-type Printer interface {
-	io.Writer
-	GetPrinter() Printer
-	GetFile() *os.File
-	IsTty() bool
-	Print(v ...interface{}) error
-	Printf(format string, v ...interface{}) error
-}
+type Printer = interfaces.Printer
 
 type DevPrinter interface {
 	Printer

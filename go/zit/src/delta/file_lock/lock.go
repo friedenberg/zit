@@ -8,16 +8,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
 
 type Lock struct {
+	envUI env_ui.Env
 	path  string
 	mutex sync.Locker
 	f     *os.File
 }
 
-func New(path string) (l *Lock) {
+func New(envUI env_ui.Env, path string) (l *Lock) {
 	return &Lock{
+		envUI: envUI,
 		path:  path,
 		mutex: &sync.Mutex{},
 	}
@@ -48,7 +51,7 @@ func (l *Lock) Lock() (err error) {
 	ui.Log().Caller(2, "locking "+l.Path())
 	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 0o755); err != nil {
 		if errors.Is(err, fs.ErrExist) {
-			err = ErrUnableToAcquireLock{Path: l.Path()}
+			err = ErrUnableToAcquireLock{envUI: l.envUI, Path: l.Path()}
 		} else {
 			err = errors.Wrap(err)
 		}

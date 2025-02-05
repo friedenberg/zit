@@ -5,6 +5,14 @@ import (
 )
 
 func (env *env) Confirm(message string) (success bool) {
+	if !env.GetIn().IsTty() {
+		env.GetErr().Print(
+			"stdin is not a tty, unable to get permission to continue",
+		)
+
+		return
+	}
+
 	var err error
 
 	env.GetErr().Printf(
@@ -15,7 +23,7 @@ func (env *env) Confirm(message string) (success bool) {
 	var answer rune
 	var n int
 
-	if n, err = fmt.Fscanf(env.GetInFile(), "%c", &answer); err != nil {
+	if n, err = fmt.Fscanf(env.GetInFile(), "%c\n", &answer); err != nil {
 		env.GetErr().Printf("failed to read answer: %s", err)
 		return
 	}

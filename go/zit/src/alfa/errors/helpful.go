@@ -1,5 +1,9 @@
 package errors
 
+import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+)
+
 type Helpful interface {
 	error
 	GetHelpfulError() Helpful
@@ -9,5 +13,20 @@ type Helpful interface {
 
 type Retryable interface {
 	GetRetryableError() Retryable
-	Recover(Context)
+	Recover(Context, error)
+}
+
+func PrintHelpful(printer interfaces.Printer, helpful Helpful) {
+	printer.Printf("Error: %s", helpful.Error())
+	printer.Printf("\nCause:")
+
+	for _, causeLine := range helpful.ErrorCause() {
+		printer.Print(causeLine)
+	}
+
+	printer.Printf("\nRecovery:")
+
+	for _, recoveryLine := range helpful.ErrorRecovery() {
+		printer.Print(recoveryLine)
+	}
 }

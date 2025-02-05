@@ -81,7 +81,7 @@ func Make(
 		return
 	}
 
-	s.lockSmith = file_lock.New(s.FileLock())
+	s.lockSmith = file_lock.New(env, s.FileLock())
 
 	// TODO switch to useing MakeCommonEnv()
 	{

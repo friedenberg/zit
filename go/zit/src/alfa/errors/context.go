@@ -76,6 +76,8 @@ type context struct {
 	lock          sync.Mutex
 	doAfter       []FuncWithStackInfo
 	doAfterErrors []error // TODO expose and use
+
+	retriesDisabled bool
 }
 
 func MakeContextDefault() *context {
@@ -132,19 +134,19 @@ func (c *context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(c.signals, signals...)
 }
 
-func (c *context) Run(f func(Context)) error {
+func (context *context) Run(f func(Context)) error {
 	go func() {
 		select {
-		case <-c.Done():
-		case sig := <-c.signals:
-			c.cancel(errContextCancelledExpected{Signal{Signal: sig}})
+		case <-context.Done():
+		case sig := <-context.signals:
+			context.cancel(errContextCancelledExpected{Signal{Signal: sig}})
 		}
 
-		signal.Stop(c.signals)
+		signal.Stop(context.signals)
 	}()
 
 	func() {
-		defer c.cancel(errContextCancelled)
+		defer context.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
 				// TODO capture panic stack trace and add to custom error objects
@@ -158,30 +160,36 @@ func (c *context) Run(f func(Context)) error {
 					panic(r)
 
 				case error:
-					c.cancel(err)
+					context.cancel(err)
 				}
 			}
 		}()
 
-		f(c)
+		f(context)
 	}()
 
-	for i := len(c.doAfter) - 1; i >= 0; i-- {
-		doAfter := c.doAfter[i]
+	for i := len(context.doAfter) - 1; i >= 0; i-- {
+		doAfter := context.doAfter[i]
 		err := doAfter.Func()
 		if err != nil {
-			c.doAfterErrors = append(
-				c.doAfterErrors,
+			context.doAfterErrors = append(
+				context.doAfterErrors,
 				doAfter.Wrap(err),
 			)
 		}
 	}
 
-	return c.Cause()
+	return context.Cause()
 }
 
 func (c *context) cancel(err error) {
-	c.cancelFunc(err)
+	var retryable Retryable
+
+	if !c.retriesDisabled && As(err, &retryable) {
+		retryable.Recover(c, err)
+	} else {
+		c.cancelFunc(err)
+	}
 }
 
 //go:noinline
