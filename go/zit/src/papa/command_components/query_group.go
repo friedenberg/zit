@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -17,6 +18,7 @@ type QueryGroup struct {
 }
 
 func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
+  // TODO switch to repo
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
@@ -55,6 +57,28 @@ func (cmd QueryGroup) CompleteWithRepo(
 		queryBuilderOptions,
 		local,
 		args,
+	)
+
+	if err := local.GetStore().QueryTransacted(
+		queryGroup,
+		completionWriter.WriteOneTransacted,
+	); err != nil {
+		local.CancelWithError(err)
+	}
+}
+
+func (cmd QueryGroup) CompleteTagsWithRepo(
+	req command.Request,
+	local *local_working_copy.Repo,
+) {
+	completionWriter := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer local.MustClose(completionWriter)
+
+	queryGroup := cmd.MakeQueryGroup(
+		req,
+		query.MakeBuilderOptionDefaultGenres(genres.Tag),
+		local,
+		nil,
 	)
 
 	if err := local.GetStore().QueryTransacted(

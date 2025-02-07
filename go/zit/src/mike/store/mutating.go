@@ -103,14 +103,14 @@ func (s *Store) Commit(
 	if o.AddToInventoryList && (child.ObjectId.IsEmpty() ||
 		child.GetGenre() == genres.None ||
 		child.GetGenre() == genres.Blob) {
-		var ken *ids.ZettelId
+		var zettelId *ids.ZettelId
 
-		if ken, err = s.zettelIdIndex.CreateZettelId(); err != nil {
+		if zettelId, err = s.zettelIdIndex.CreateZettelId(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = child.ObjectId.SetWithIdLike(ken); err != nil {
+		if err = child.ObjectId.SetWithIdLike(zettelId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -212,6 +212,14 @@ func (s *Store) Commit(
 		}
 
 		if parent == nil {
+			if child.GetGenre() == genres.Zettel {
+        // TODO if this is a local zettel (i.e., not a different repo and not a
+        // different domain)
+
+				// TODO verify that the zettel id consists of our identifiers, otherwise
+				// abort
+			}
+
 			if err = s.ui.TransactedNew(child); err != nil {
 				err = errors.Wrap(err)
 				return

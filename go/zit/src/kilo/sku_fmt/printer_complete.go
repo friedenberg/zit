@@ -25,7 +25,7 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 		chTransacted: make(chan *sku.Transacted),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
-		pool: pool.MakePool[sku.Transacted, *sku.Transacted](
+		pool: pool.MakePool[sku.Transacted](
 			nil,
 			nil,
 		),

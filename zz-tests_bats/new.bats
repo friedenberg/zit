@@ -9,9 +9,6 @@ setup() {
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
 
-	run_zit init-workspace
-	assert_success
-
 	export BATS_TEST_BODY=true
 }
 
@@ -33,14 +30,7 @@ function new_empty_edit { # @test
 	assert_success
 	assert_output - <<-EOM
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-		      checked out [two/uno.zettel @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
-	EOM
-
-	run_zit status .
-	assert_success
-	assert_output - <<-EOM
-		             same [two/uno.zettel @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 }
 
@@ -112,5 +102,42 @@ function use_blob_shas { # @test
 	assert_success
 	assert_output --partial - <<-EOM
 		ad100d00763b333c0c8af3c89dbcc1f52f9c4a8a208476c35eb9d364121301b6 appears in object already checked in (["one/tres"]). Ignoring
+	EOM
+}
+
+# bats file_tags=user_story:workspace
+
+function new_empty_no_edit_workspace { # @test
+	run_zit init-workspace -tags workspace-tags
+	assert_success
+
+	run_zit new -edit=false
+	assert_success
+	assert_output - <<-EOM
+		[workspace @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[workspace-tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
+	EOM
+}
+
+function new_empty_edit_workspace { # @test
+	run_zit init-workspace -tags workspace-tags
+	assert_success
+
+	export EDITOR="/bin/bash -c 'echo \"this is the body\" > \"\$0\"'"
+	run_zit new
+	assert_success
+	assert_output - <<-EOM
+		[workspace @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[workspace-tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
+		      checked out [two/uno.zettel @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
+		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		             same [two/uno.zettel @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 }

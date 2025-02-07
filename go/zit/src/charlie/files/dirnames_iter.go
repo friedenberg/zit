@@ -1,6 +1,7 @@
 package files
 
 import (
+	"io/fs"
 	"iter"
 	"os"
 	"path"
@@ -10,6 +11,83 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
+
+type WalkDirEntry struct {
+	Path    string
+	RelPath string
+	os.DirEntry
+}
+
+type WalkDirEntryIgnoreFunc func(WalkDirEntry) bool
+
+func WalkDirIgnoreFuncHidden(dirEntry WalkDirEntry) bool {
+	if strings.HasPrefix(dirEntry.RelPath, ".") {
+		return true
+	}
+
+	return false
+}
+
+func WalkDir(
+	base string,
+) iter.Seq2[WalkDirEntry, error] {
+	return func(yield func(WalkDirEntry, error) bool) {
+		if err := filepath.WalkDir(
+			base,
+			func(path string, dirEntry os.DirEntry, in error) (out error) {
+				if in != nil {
+					out = in
+					return
+				}
+
+				entry := WalkDirEntry{
+					Path:     path,
+					DirEntry: dirEntry,
+				}
+
+				if entry.RelPath, out = filepath.Rel(base, path); out != nil {
+					out = errors.Wrap(out)
+					return
+				}
+
+				if entry.RelPath == "." {
+					return
+				}
+
+				if !yield(entry, nil) {
+					out = fs.SkipAll
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			yield(WalkDirEntry{}, errors.Wrap(err))
+			return
+		}
+	}
+}
+
+func DirNames2(p string) iter.Seq2[os.DirEntry, error] {
+	return func(yield func(os.DirEntry, error) bool) {
+		var names []os.DirEntry
+
+		{
+			var err error
+
+			if names, err = ReadDir(p); err != nil {
+				yield(nil, errors.Wrap(err))
+				return
+			}
+		}
+
+		for _, dirEntry := range names {
+			if !yield(dirEntry, nil) {
+				return
+			}
+		}
+	}
+}
 
 func DirNames(p string) (slice quiter.Slice[string], err error) {
 	var names []os.DirEntry

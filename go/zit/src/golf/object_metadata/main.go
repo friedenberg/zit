@@ -47,12 +47,31 @@ func (m *Metadata) Mutter() *sha.Sha {
 }
 
 func (m *Metadata) SetFlagSet(f *flag.FlagSet) {
-	f.Var(
-		&m.Description,
-		"description",
+	m.SetFlagSetDescription(
+		f,
 		"the description to use for created or updated Zettels",
 	)
 
+	m.SetFlagSetTags(
+		f,
+		"the tags to use for created or updated object",
+	)
+
+	m.SetFlagSetType(
+		f,
+		"the type for the created or updated object",
+	)
+}
+
+func (m *Metadata) SetFlagSetDescription(f *flag.FlagSet, usage string) {
+	f.Var(
+		&m.Description,
+		"description",
+		usage,
+	)
+}
+
+func (m *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 	// TODO add support for tag_paths
 	fes := flag.Make(
 		flag_policy.FlagPolicyAppend,
@@ -79,12 +98,14 @@ func (m *Metadata) SetFlagSet(f *flag.FlagSet) {
 	f.Var(
 		fes,
 		"tags",
-		"the tags to use for created or updated object",
+		usage,
 	)
+}
 
+func (m *Metadata) SetFlagSetType(f *flag.FlagSet, usage string) {
 	f.Func(
 		"type",
-		"the type for the created or updated object",
+		usage,
 		func(v string) (err error) {
 			return m.Type.Set(v)
 		},

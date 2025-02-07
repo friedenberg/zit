@@ -21,7 +21,7 @@ type encodedIds struct {
 }
 
 type index struct {
-	su interfaces.CacheIOFactory
+	cacheFactory interfaces.CacheIOFactory
 
 	lock sync.Mutex
 	path string
@@ -37,20 +37,20 @@ type index struct {
 }
 
 func MakeIndex(
-	k interfaces.Config,
-	s interfaces.Directory,
-	su interfaces.CacheIOFactory,
+	config interfaces.Config,
+	dir interfaces.Directory,
+	cacheFactory interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
-		path:               s.FileCacheObjectId(),
-		nonRandomSelection: k.UsePredictableZettelIds(),
-		su:                 su,
+		path:               dir.FileCacheObjectId(),
+		nonRandomSelection: config.UsePredictableZettelIds(),
+		cacheFactory:       cacheFactory,
 		encodedIds: encodedIds{
 			AvailableIds: make(map[int]bool),
 		},
 	}
 
-	if i.oldZettelIdStore, err = object_id_provider.New(s); err != nil {
+	if i.oldZettelIdStore, err = object_id_provider.New(dir); err != nil {
 		if errors.IsNotExist(err) {
 			ui.TodoP4("determine which layer handles no-create kasten")
 			err = nil
@@ -74,7 +74,7 @@ func (i *index) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.su.WriteCloserCache(i.path); err != nil {
+	if w1, err = i.cacheFactory.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +109,7 @@ func (i *index) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, err = i.su.ReadCloserCache(i.path); err != nil {
+	if r1, err = i.cacheFactory.ReadCloserCache(i.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

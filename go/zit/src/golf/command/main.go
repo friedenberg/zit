@@ -1,26 +1,21 @@
 package command
 
 import (
-	"flag"
-
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
-type Request struct {
-	errors.Context
-	config_mutable_cli.Config
-	*flag.FlagSet
-}
-
+// TODO add description
 type Command interface {
 	interfaces.CommandComponent
 	Run(Request)
 }
 
-type SupportsCompletion interface {
-  SupportsCompletion()
+type Description struct {
+	Short, Long string
+}
+
+type HasDescription interface {
+	GetDescription() Description
 }
 
 var commands = map[string]Command{}

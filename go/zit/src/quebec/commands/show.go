@@ -54,7 +54,6 @@ func (cmd Show) SupportsCompletion() {}
 
 func (cmd Show) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
-
 	archive := cmd.MakeLocalArchive(envRepo)
 
 	args := req.Args()

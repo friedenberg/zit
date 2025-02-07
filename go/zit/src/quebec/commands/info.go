@@ -26,19 +26,19 @@ func init() {
 
 func (c Info) SetFlagSet(f *flag.FlagSet) {}
 
-func (c Info) Run(dependencies command.Request) {
+func (c Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(
-		dependencies,
-		dependencies.Debug,
+		req,
+		req.Debug,
 	)
 
 	ui := env_ui.Make(
-		dependencies,
-		dependencies.Config,
+		req,
+		req.Config,
 		env_ui.Options{},
 	)
 
-	args := dependencies.Args()
+	args := req.Args()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}

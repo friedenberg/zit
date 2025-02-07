@@ -86,3 +86,109 @@ function complete_show_tags { # @test
 		tag-4.*Etikett
 	EOM
 }
+
+function complete_subcmd { # @test
+	run_zit complete
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		add
+		cat-alfred
+		cat-blob
+		cat-blob-shas
+		checkin
+		checkin-blob
+		checkin-json
+		checkout
+		clean
+		clone
+		complete.*complete a command-line
+		deinit
+		diff
+		dormant-add
+		dormant-edit
+		dormant-remove
+		edit
+		edit-config
+		exec
+		export
+		find-missing
+		format-blob
+		format-object
+		format-organize
+		fsck
+		import
+		info
+		info-repo
+		info-workspace
+		init
+		init-archive
+		init-workspace
+		last
+		merge-tool
+		new
+		organize
+		peek-zettel-ids
+		pull
+		pull-blob-store
+		push
+		read-blob
+		reindex
+		revert
+		save
+		serve
+		show
+		status
+		test
+		write-blob
+	EOM
+}
+
+function complete_complete { # @test
+	run_zit complete complete
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		-bash-style.*
+		-in-progress.*
+	EOM
+}
+
+function complete_init_workspace { # @test
+	run_zit complete init-workspace
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		-query.*default query for `show`
+		-tags.*tags added for new objects in `checkin`, `new`, `organize`
+		-type.*type used for new objects in `new` and `organize`
+	EOM
+
+	run_zit complete init-workspace -tags
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		tag-1.*Etikett
+		tag-2.*Etikett
+		tag-3.*Etikett
+		tag-4.*Etikett
+		tag.*Etikett
+	EOM
+
+	run_zit complete -in-progress="tag" init-workspace -tags tag
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		tag-1.*Etikett
+		tag-2.*Etikett
+		tag-3.*Etikett
+		tag-4.*Etikett
+		tag.*Etikett
+	EOM
+
+	mkdir -p workspaces/test
+
+	run_zit complete -in-progress="workspaces" init-workspace -tags tag workspaces
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		-query.*default query for `show`
+		-tags.*tags added for new objects in `checkin`, `new`, `organize`
+		test/.*directory
+		-type.*type used for new objects in `new` and `organize`
+	EOM
+}

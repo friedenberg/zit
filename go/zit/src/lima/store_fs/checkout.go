@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -211,20 +210,23 @@ func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	return
 }
 
-func (s *Store) SetFilenameForTransacted(
+func (store *Store) SetFilenameForTransacted(
 	options checkout_options.Options,
 	sk *sku.Transacted,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	cwd := s.envRepo.GetCwd()
+	cwd := store.envRepo.GetCwd()
 
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	if fsOptions.Path == PathOptionTempLocal {
 		var f *os.File
 
-		if f, err = s.envRepo.GetTempLocal().FileTempWithTemplate(
-			fmt.Sprintf("*.%s", s.FileExtensionForGenre(sk)),
+		if f, err = store.envRepo.GetTempLocal().FileTempWithTemplate(
+			fmt.Sprintf(
+				"*.%s",
+				store.FileExtensionForObject(sk),
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -251,9 +253,9 @@ func (s *Store) SetFilenameForTransacted(
 			return
 		}
 
-		info.objectName = s.PathForTransacted(cwd, sk)
+		info.objectName = store.PathForTransacted(cwd, sk)
 	} else {
-		info.basename = s.PathForTransacted(cwd, sk)
+		info.basename = store.PathForTransacted(cwd, sk)
 		info.objectName = info.basename
 	}
 
@@ -270,27 +272,37 @@ func (s *Store) SetFilenameForTransacted(
 	return
 }
 
-func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
+func (store *Store) PathForTransacted(dir string, sk *sku.Transacted) string {
 	return path.Join(
 		dir,
 		fmt.Sprintf(
 			"%s.%s",
-			tl.GetObjectId().StringSansOp(),
-			s.FileExtensionForGenre(tl),
+			sk.GetObjectId().StringSansOp(),
+			store.FileExtensionForObject(sk),
 		),
 	)
 }
 
-func (s *Store) FileExtensionForGenre(
-	gg interfaces.GenreGetter,
+func (store *Store) FileExtensionForObject(
+	sk *sku.Transacted,
 ) string {
-	ext := s.fileExtensions.GetFileExtensionForGenre(gg)
+	var extension string
 
-	if ext == "" {
-		panic("empty file extension")
+	if sk.GetGenre() == genres.Blob {
+		extension = store.config.GetTypeExtension(sk.GetType().String())
+
+		if extension == "" {
+			extension = sk.GetType().StringSansOp()
+		}
+	} else {
+		extension = store.fileExtensions.GetFileExtensionForGenre(sk)
 	}
 
-	return ext
+	if extension == "" {
+		extension = "unknown"
+	}
+
+	return extension
 }
 
 func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
