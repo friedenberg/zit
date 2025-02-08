@@ -233,12 +233,14 @@ func (b *Builder) WithOptionsFromOriginalQuery(
 
 func (b *Builder) BuildQueryGroupWithRepoId(
 	externalQueryOptions sku.ExternalQueryOptions,
-	vs ...string,
+	values ...string,
 ) (group *Group, err error) {
 	state := b.makeState()
 
 	ok := false
-	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(externalQueryOptions.RepoId)
+	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(
+		externalQueryOptions.RepoId,
+	)
 
 	state.group.RepoId = externalQueryOptions.RepoId
 	state.group.ExternalQueryOptions = externalQueryOptions
@@ -248,7 +250,7 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 		return
 	}
 
-	if err = b.build(state, vs...); err != nil {
+	if err = b.build(state, values...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -271,9 +273,9 @@ func (b *Builder) BuildQueryGroup(vs ...string) (group *Group, err error) {
 	return
 }
 
-func (b *Builder) build(state *buildState, args ...string) (err error) {
+func (b *Builder) build(state *buildState, values ...string) (err error) {
 	if b.defaultQuery != "" {
-		args = append(args, b.defaultQuery)
+		values = append(values, b.defaultQuery)
 		// defaultQueryGroupState := state.copy()
 
 		// if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
@@ -284,9 +286,9 @@ func (b *Builder) build(state *buildState, args ...string) (err error) {
 
 	var latent errors.Multi
 
-	if err, latent = state.build(args...); err != nil {
+	if err, latent = state.build(values...); err != nil {
 		if !errors.IsBadRequest(err) {
-			latent.Add(errors.Wrapf(err, "Query String: %q", args))
+			latent.Add(errors.Wrapf(err, "Query String: %q", values))
 			err = latent
 		}
 

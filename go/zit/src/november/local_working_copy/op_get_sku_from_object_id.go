@@ -8,19 +8,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Repo) GetSkuFromObjectId(
+func (repo *Repo) GetSkuFromObjectId(
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
-	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
+	builder := repo.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
 
-	var qg *query.Group
+	var queryGroup *query.Group
 
-	if qg, err = b.BuildQueryGroup(objectIdString); err != nil {
+	if queryGroup, err = builder.BuildQueryGroup(
+		objectIdString,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = u.GetStore().QueryExactlyOne(qg); err != nil {
+	if sk, err = repo.GetStore().QueryExactlyOne(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -82,7 +82,9 @@ func (cmd *FormatObject) Run(dep command.Request) {
 	{
 		var err error
 
-		if object, err = localWorkingCopy.GetSkuFromObjectId(objectIdString); err != nil {
+		if object, err = localWorkingCopy.GetSkuFromObjectId(
+			objectIdString,
+		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}

@@ -81,7 +81,7 @@ func (executor *Executor) ExecuteExactlyOneExternal() (sk *sku.Transacted, err e
 		externalObjectId,
 		sk,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "ExternalObjectId: %q", externalObjectId)
 		return
 	}
 

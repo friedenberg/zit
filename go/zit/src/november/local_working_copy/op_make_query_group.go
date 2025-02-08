@@ -56,7 +56,7 @@ func (repo *Repo) MakeQueryBuilderExcludingHidden(
 		WithOptions(options)
 }
 
-func (u *Repo) MakeQueryBuilder(
+func (repo *Repo) MakeQueryBuilder(
 	dg ids.Genre,
 	options query.BuilderOptions,
 ) *query.Builder {
@@ -64,11 +64,11 @@ func (u *Repo) MakeQueryBuilder(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	return u.makeQueryBuilder().
+	return repo.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
-		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
+		WithFileExtensionGetter(repo.GetConfig().GetFileExtensions()).
+		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
 		WithOptions(options)
 }
 

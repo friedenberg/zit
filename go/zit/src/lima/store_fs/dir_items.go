@@ -179,14 +179,31 @@ func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 		return
 	}
 
+	path := fdee.GetPath()
+
+	if path == "" {
+		err = errors.Errorf("empty path")
+		return
+	}
+
 	var rel string
 
-	if rel, err = filepath.Rel(d.root, fdee.GetPath()); err != nil {
+	if rel, err = filepath.Rel(d.root, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	if rel == "" {
+		err = errors.Errorf("empty rel path")
+		return
+	}
+
 	key = d.keyForObjectIdString(rel)
+
+	if key == "" {
+		err = errors.Errorf("empty key for rel path: %q", rel)
+		return
+	}
 
 	return
 }
@@ -224,10 +241,9 @@ func (d *dirItems) addFD(
 
 		fds.Add(fileDescriptor)
 	} else {
-		var ok bool
-		fds, ok = cache[key]
+		fds = cache[key]
 
-		if !ok {
+		if fds == nil {
 			fds = &sku.FSItem{
 				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 			}
@@ -344,7 +360,7 @@ func (d *dirItems) getFDsForObjectIdString(
 		objectIdString,
 		item,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "FD: %q, ObjectIdString: %q", item.Debug(), objectIdString)
 		return
 	}
 
@@ -614,6 +630,7 @@ func (d *dirItems) addOneObject(
 //  |___|\__\___|_|  \__,_|\__|_|\___/|_| |_|
 //
 
+// TODO switch to seq.Iter2
 func (d *dirItems) All(
 	f interfaces.FuncIter[*sku.FSItem],
 ) (err error) {

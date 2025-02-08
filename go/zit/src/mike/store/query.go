@@ -84,18 +84,18 @@ func (s *Store) QueryTransactedAsSkuType(
 	return
 }
 
-func (s *Store) QuerySkuType(
-	qg *query.Group,
-	f interfaces.FuncIter[sku.SkuType],
+func (store *Store) QuerySkuType(
+	queryGroup *query.Group,
+	output interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var e query.Executor
 
-	if e, err = s.makeQueryExecutor(qg); err != nil {
+	if e, err = store.makeQueryExecutor(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.ExecuteSkuType(f); err != nil {
+	if err = e.ExecuteSkuType(output); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,17 +103,35 @@ func (s *Store) QuerySkuType(
 	return
 }
 
-func (s *Store) QueryExactlyOne(
-	qg *query.Group,
+func (store *Store) QueryExactlyOneExternal(
+	queryGroup *query.Group,
 ) (sk *sku.Transacted, err error) {
-	var e query.Executor
+	var executor query.Executor
 
-	if e, err = s.makeQueryExecutor(qg); err != nil {
+	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = e.ExecuteExactlyOne(); err != nil {
+	if sk, err = executor.ExecuteExactlyOneExternal(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (store *Store) QueryExactlyOne(
+	queryGroup *query.Group,
+) (sk *sku.Transacted, err error) {
+	var executor query.Executor
+
+	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if sk, err = executor.ExecuteExactlyOne(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

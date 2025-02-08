@@ -68,7 +68,7 @@ func (b *buildState) makeGroup() *Group {
 }
 
 func (b *buildState) build(
-	vs ...string,
+	values ...string,
 ) (err error, latent errors.Multi) {
 	em := errors.MakeMulti()
 	latent = em
@@ -76,19 +76,21 @@ func (b *buildState) build(
 	var remaining []string
 
 	if b.repo == nil {
-		remaining = vs
+		remaining = values
 	} else {
-		for _, v := range vs {
-			if v == "." {
+		for _, value := range values {
+			if value == "." {
 				b.group.dotOperatorActive = true
-				remaining = append(remaining, v)
+				remaining = append(remaining, value)
 			}
 
-			var k []sku.ExternalObjectId
+			var externalObjectIds []sku.ExternalObjectId
 
-			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
-				if v != "." {
-					remaining = append(remaining, v)
+			if externalObjectIds, err = b.repo.GetObjectIdsForString(
+				value,
+			); err != nil {
+				if value != "." {
+					remaining = append(remaining, value)
 				}
 
 				em.Add(err)
@@ -99,15 +101,15 @@ func (b *buildState) build(
 
 			b.externalStoreAcceptedQueryComponent = true
 
-			for _, k := range k {
-				if k.GetGenre() == genres.None {
-					err = errors.Errorf("id with empty genre: %q", k)
+			for _, externalObjectId := range externalObjectIds {
+				if externalObjectId.GetGenre() == genres.None {
+					err = errors.Errorf("id with empty genre: %q", externalObjectId)
 					return
 				}
 
 				b.pinnedExternalObjectIds = append(
 					b.pinnedExternalObjectIds,
-					k,
+					externalObjectId,
 				)
 			}
 		}
@@ -204,16 +206,16 @@ func (b *buildState) addDefaultsIfNecessary() {
 	b.group.UserQueries[b.builder.defaultGenres] = dq
 }
 
-func (b *buildState) parseTokens() (err error) {
-	q := b.makeQuery()
+func (state *buildState) parseTokens() (err error) {
+	q := state.makeQuery()
 	stack := []stackEl{q}
 
 	isNegated := false
 	isExact := false
 
 LOOP:
-	for b.scanner.Scan() {
-		seq := b.scanner.GetSeq()
+	for state.scanner.Scan() {
+		seq := state.scanner.GetSeq()
 
 		if seq.MatchAll(box.TokenTypeOperator) {
 			op := seq.At(0).Contents[0]
@@ -236,7 +238,7 @@ LOOP:
 				// TODO handle or when invalid
 
 			case '[':
-				exp := b.makeExp(isNegated, isExact)
+				exp := state.makeExp(isNegated, isExact)
 				isExact = false
 				isNegated = false
 				stack[len(stack)-1].Add(exp)
@@ -256,9 +258,9 @@ LOOP:
 					return
 				}
 
-				b.scanner.Unscan()
+				state.scanner.Unscan()
 
-				if err = b.parseSigilsAndGenres(q); err != nil {
+				if err = state.parseSigilsAndGenres(q); err != nil {
 					err = errors.Wrapf(err, "Seq: %q", seq)
 					return
 				}
@@ -276,7 +278,7 @@ LOOP:
 					if err = q.AddString(string(right.At(0).Contents)); err != nil {
 						err = nil
 					} else {
-						if err = b.addSigilFromOp(q, partition.Contents[0]); err != nil {
+						if err = state.addSigilFromOp(q, partition.Contents[0]); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -286,7 +288,7 @@ LOOP:
 
 					// left: !md, partition: ., right: ''
 				case right.Len() == 0:
-					if err = b.addSigilFromOp(q, partition.Contents[0]); err != nil {
+					if err = state.addSigilFromOp(q, partition.Contents[0]); err != nil {
 						err = nil
 					} else {
 						seq = left
@@ -294,36 +296,36 @@ LOOP:
 				}
 			}
 
-			k := ObjectId{
+			objectId := ObjectId{
 				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
 			// TODO if this fails, permit an external store to try to read this as an
 			// external object ID. And if that fails, try to remove the last two
 			// elements as per the above and read that and force the genre and sigils
-			if err = k.GetObjectId().ReadFromSeq(seq); err != nil {
+			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = k.reduce(b); err != nil {
+			if err = objectId.reduce(state); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			pid := pinnedObjectId{
 				Sigil:    ids.SigilLatest,
-				ObjectId: k,
+				ObjectId: objectId,
 			}
 
-			switch k.GetGenre() {
+			switch objectId.GetGenre() {
 			case genres.InventoryList, genres.Zettel:
-				b.pinnedObjectIds = append(
-					b.pinnedObjectIds,
+				state.pinnedObjectIds = append(
+					state.pinnedObjectIds,
 					pid,
 				)
 
-				if err = q.addPinnedObjectId(b, pid); err != nil {
+				if err = q.addPinnedObjectId(state, pid); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -331,30 +333,30 @@ LOOP:
 			case genres.Tag:
 				var et sku.Query
 
-				if et, err = b.makeTagExp(&k); err != nil {
+				if et, err = state.makeTagExp(&objectId); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				exp := b.makeExp(isNegated, isExact, et)
+				exp := state.makeExp(isNegated, isExact, et)
 				stack[len(stack)-1].Add(exp)
 
 			case genres.Type:
 				var t ids.Type
 
-				if err = t.TodoSetFromObjectId(k.GetObjectId()); err != nil {
+				if err = t.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
 				if !isNegated {
-					if err = b.group.Types.Add(t); err != nil {
+					if err = state.group.Types.Add(t); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 				}
 
-				exp := b.makeExp(isNegated, isExact, &k)
+				exp := state.makeExp(isNegated, isExact, &objectId)
 				stack[len(stack)-1].Add(exp)
 			}
 
@@ -363,7 +365,7 @@ LOOP:
 		}
 	}
 
-	if err = b.scanner.Error(); err != nil {
+	if err = state.scanner.Error(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -372,15 +374,15 @@ LOOP:
 		return
 	}
 
-	if q.Genre.IsEmpty() && !b.builder.requireNonEmptyQuery {
-		q.Genre = b.builder.defaultGenres
+	if q.Genre.IsEmpty() && !state.builder.requireNonEmptyQuery {
+		q.Genre = state.builder.defaultGenres
 	}
 
 	if q.Sigil.IsEmpty() {
-		q.Sigil = b.builder.defaultSigil
+		q.Sigil = state.builder.defaultSigil
 	}
 
-	if err = b.group.add(q); err != nil {
+	if err = state.group.add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
