@@ -19,6 +19,8 @@ type Query struct {
 
 	dotOperatorActive bool
 	matchOnEmpty      bool
+
+	defaultQuery *Query
 }
 
 func (qg *Query) isDotOperatorActive() bool {
@@ -288,6 +290,11 @@ func (qg *Query) sortedUserQueries() []*expSigilAndGenre {
 }
 
 func (qg *Query) containsSku(tg sku.TransactedGetter) (ok bool) {
+	if qg.defaultQuery != nil &&
+		!qg.defaultQuery.containsSku(tg) {
+		return
+	}
+
 	sk := tg.GetSku()
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 

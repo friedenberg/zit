@@ -88,6 +88,11 @@ func ContainsExternalSku(
 	el sku.ExternalLike,
 	state checked_out_state.State,
 ) (ok bool) {
+	if qg.defaultQuery != nil &&
+		!ContainsExternalSku(qg.defaultQuery, el, state) {
+		return
+	}
+
 	sk := el.GetSku()
 
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
@@ -119,6 +124,11 @@ func ContainsSkuCheckedOutState(
 	qg *Query,
 	state checked_out_state.State,
 ) (ok bool) {
+	if qg.defaultQuery != nil &&
+		!ContainsSkuCheckedOutState(qg.defaultQuery, state) {
+		return
+	}
+
 	switch state {
 	case checked_out_state.Untracked:
 		ok = !qg.ExcludeUntracked

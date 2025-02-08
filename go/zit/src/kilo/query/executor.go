@@ -272,6 +272,11 @@ func (e *Executor) makeEmitSkuSigilLatest(
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
 		g := genres.Must(z.GetGenre())
+
+    if !e.containsSku(z) {
+      return
+    }
+
 		m, ok := e.Get(g)
 
 		if !ok {
@@ -285,9 +290,9 @@ func (e *Executor) makeEmitSkuSigilLatest(
 			}
 		}
 
-		if !m.ContainsSku(z) {
-			return
-		}
+		// if !m.ContainsSku(z) {
+		// 	return
+		// }
 
 		if err = out(z); err != nil {
 			err = errors.Wrap(err)

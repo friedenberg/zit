@@ -37,12 +37,6 @@ func (c *Checkout) SetFlagSet(f *flag.FlagSet) {
 	c.CheckoutOptions.SetFlagSet(f)
 }
 
-func (c Checkout) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Zettel,
-	)
-}
-
 func (c Checkout) ModifyBuilder(b *query.Builder) {
 	b.
 		WithPermittedSigil(ids.SigilLatest).
@@ -52,9 +46,18 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 }
 
 func (cmd Checkout) Run(req command.Request) {
-	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+
+	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.MakeBuilderOptionsMulti(
+			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+		),
+		localWorkingCopy,
+		req.Args(),
 	)
 
 	localWorkingCopy.AssertCLINotComplete()
@@ -65,7 +68,6 @@ func (cmd Checkout) Run(req command.Request) {
 		Options:  cmd.CheckoutOptions,
 	}
 
-	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	envWorkspace.AssertInWorkspaceOrOfferToCreate(localWorkingCopy)
 
 	if _, err := opCheckout.RunQuery(queryGroup); err != nil {

@@ -274,16 +274,6 @@ func (b *Builder) BuildQueryGroup(vs ...string) (group *Query, err error) {
 }
 
 func (b *Builder) build(state *buildState, values ...string) (err error) {
-	if b.defaultQuery != "" {
-		values = append(values, b.defaultQuery)
-		// defaultQueryGroupState := state.copy()
-
-		// if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
-	}
-
 	var latent errors.Multi
 
 	if err, latent = state.build(values...); err != nil {
@@ -308,6 +298,19 @@ func (b *Builder) build(state *buildState, values ...string) (err error) {
 
 		return
 	}
+
+	if b.defaultQuery == "" {
+		return
+	}
+
+	defaultQueryGroupState := state.copy()
+
+	if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	state.group.defaultQuery = defaultQueryGroupState.group
 
 	ui.Log().Print(state.group.StringDebug())
 

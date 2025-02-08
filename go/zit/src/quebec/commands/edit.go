@@ -50,18 +50,27 @@ func (c Edit) CompletionGenres() ids.Genre {
 }
 
 func (c Edit) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Tag,
-		genres.Zettel,
-		genres.Type,
-		genres.Repo,
-	)
+	return ids.MakeGenre()
 }
 
 func (cmd Edit) Run(req command.Request) {
-	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+
+	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.MakeBuilderOptionsMulti(
+			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.MakeBuilderOptionDefaultGenres(
+				genres.Tag,
+				genres.Zettel,
+				genres.Type,
+				genres.Repo,
+			),
+		),
+		localWorkingCopy,
+		req.Args(),
 	)
 
 	options := checkout_options.Options{
@@ -74,7 +83,6 @@ func (cmd Edit) Run(req command.Request) {
 		Edit:    true,
 	}
 
-	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	opEdit.Options.IgnoreWorkspace = cmd.IgnoreWorkspace || !envWorkspace.InWorkspace()
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {

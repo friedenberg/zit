@@ -1,6 +1,7 @@
 package query
 
 import (
+	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -8,6 +9,10 @@ import (
 
 func (qg *Query) StringDebug() string {
 	var sb strings.Builder
+
+	if qg.defaultQuery != nil {
+		fmt.Fprintf(&sb, "default: %q", qg.defaultQuery)
+	}
 
 	first := true
 
