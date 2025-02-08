@@ -75,3 +75,31 @@ function workspace_checkout { # @test
 		last time
 	EOM
 }
+
+function workspace_organize { # @test
+	run_zit init-workspace -tags tag-3
+	assert_success
+
+	run_zit organize -mode output-only
+	assert_success
+	assert_output - <<-EOM
+		---
+		- tag-3
+		---
+	EOM
+
+	run_zit organize -mode output-only :
+	assert_success
+	assert_output - <<-EOM
+
+		- [one/dos !md tag-3 tag-4] wow ok again
+		- [one/uno !md tag-3 tag-4] wow the first
+	EOM
+
+	run_zit organize -mode output-only one/uno
+	assert_success
+	assert_output - <<-EOM
+
+		- [one/uno !md tag-3 tag-4] wow the first
+	EOM
+}

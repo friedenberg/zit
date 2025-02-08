@@ -35,7 +35,7 @@ type (
 
 // TODO use ExecutorPrimitive
 type Executor struct {
-  primitive
+	primitive
 	ExecutionInfo
 	Out interfaces.FuncIter[sku.ExternalLike]
 }
@@ -243,7 +243,7 @@ func (e *Executor) executeInternalQuerySkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if err = e.FuncPrimitiveQuery(
-    primitive{Query: e.Query},
+		primitive{Query: e.Query},
 		e.makeEmitSkuSigilLatestSkuType(out),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -273,9 +273,9 @@ func (e *Executor) makeEmitSkuSigilLatest(
 	return func(z *sku.Transacted) (err error) {
 		g := genres.Must(z.GetGenre())
 
-    if !e.containsSku(z) {
-      return
-    }
+		if !e.containsSku(z) {
+			return
+		}
 
 		m, ok := e.Get(g)
 
@@ -289,10 +289,6 @@ func (e *Executor) makeEmitSkuSigilLatest(
 				return
 			}
 		}
-
-		// if !m.ContainsSku(z) {
-		// 	return
-		// }
 
 		if err = out(z); err != nil {
 			err = errors.Wrap(err)

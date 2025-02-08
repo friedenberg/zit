@@ -72,9 +72,18 @@ func (c *Organize) CompletionGenres() ids.Genre {
 }
 
 func (cmd *Organize) Run(req command.Request) {
-	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+
+	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.MakeBuilderOptionsMulti(
+			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+			query.MakeBuilderOptions(cmd),
+		),
+		localWorkingCopy,
+		req.Args(),
 	)
 
 	localWorkingCopy.ApplyToOrganizeOptions(&cmd.Options)
