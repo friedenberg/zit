@@ -304,6 +304,11 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(internal *sku.Transacted) (err error) {
 		g := genres.Must(internal.GetGenre())
+
+		if !e.containsSku(internal) {
+			return
+		}
+
 		m, ok := e.Get(g)
 
 		if !ok {
@@ -316,10 +321,6 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 				err = errors.Wrap(err)
 				return
 			}
-		}
-
-		if !m.ContainsSku(internal) {
-			return
 		}
 
 		co := sku.GetCheckedOutPool().Get()
