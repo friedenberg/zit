@@ -49,7 +49,7 @@ func (op Checkout) RunWithKasten(
 		ids.SigilExternal,
 	).WithRequireNonEmptyQuery()
 
-	var qg *query.Group
+	var qg *query.Query
 
 	if qg, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (op Checkout) RunWithKasten(
 }
 
 func (op Checkout) RunQuery(
-	qg *query.Group,
+	qg *query.Query,
 ) (checkedOut sku.SkuTypeSetMutable, err error) {
 	checkedOut = sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
@@ -146,9 +146,9 @@ func (op Checkout) RunQuery(
 }
 
 func (op Checkout) runOrganize(
-	qgOriginal *query.Group,
+	qgOriginal *query.Query,
 	onCheckedOut interfaces.FuncIter[sku.SkuType],
-) (qgModified *query.Group, err error) {
+) (qgModified *query.Query, err error) {
 	opOrganize := Organize{
 		Repo: op.Repo,
 		Metadata: organize_text.Metadata{

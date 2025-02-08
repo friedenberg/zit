@@ -19,7 +19,7 @@ type stackEl interface {
 
 type buildState struct {
 	builder      *Builder
-	group        *Group
+	group        *Query
 	latentErrors errors.Multi
 	missingBlobs []ErrBlobMissing
 
@@ -58,12 +58,12 @@ func (src *buildState) copy() (dst *buildState) {
 	return
 }
 
-func (b *buildState) makeGroup() *Group {
-	return &Group{
-		Hidden:           b.builder.hidden,
-		OptimizedQueries: make(map[genres.Genre]*Query),
-		UserQueries:      make(map[ids.Genre]*Query),
-		Types:            ids.MakeMutableTypeSet(),
+func (b *buildState) makeGroup() *Query {
+	return &Query{
+		hidden:           b.builder.hidden,
+		optimizedQueries: make(map[genres.Genre]*expSigilAndGenre),
+		userQueries:      make(map[ids.Genre]*expSigilAndGenre),
+		types:            ids.MakeMutableTypeSet(),
 	}
 }
 
@@ -172,11 +172,11 @@ func (b *buildState) build(
 }
 
 func (b *buildState) addDefaultsIfNecessary() {
-	if b.builder.defaultGenres.IsEmpty() || !b.group.IsEmpty() {
+	if b.builder.defaultGenres.IsEmpty() || !b.group.isEmpty() {
 		return
 	}
 
-	if b.builder.requireNonEmptyQuery && b.group.IsEmpty() {
+	if b.builder.requireNonEmptyQuery && b.group.isEmpty() {
 		return
 	}
 
@@ -187,10 +187,10 @@ func (b *buildState) addDefaultsIfNecessary() {
 	b.group.matchOnEmpty = true
 
 	g := ids.MakeGenre()
-	dq, ok := b.group.UserQueries[g]
+	dq, ok := b.group.userQueries[g]
 
 	if ok {
-		delete(b.group.UserQueries, g)
+		delete(b.group.userQueries, g)
 	} else {
 		dq = b.makeQuery()
 	}
@@ -203,7 +203,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		dq.Sigil = b.builder.defaultSigil
 	}
 
-	b.group.UserQueries[b.builder.defaultGenres] = dq
+	b.group.userQueries[b.builder.defaultGenres] = dq
 }
 
 func (state *buildState) parseTokens() (err error) {
@@ -350,7 +350,7 @@ LOOP:
 				}
 
 				if !isNegated {
-					if err = state.group.Types.Add(t); err != nil {
+					if err = state.group.types.Add(t); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -390,7 +390,7 @@ LOOP:
 	return
 }
 
-func (b *buildState) addSigilFromOp(q *Query, op byte) (err error) {
+func (b *buildState) addSigilFromOp(q *expSigilAndGenre, op byte) (err error) {
 	var s ids.Sigil
 
 	if err = s.SetByte(op); err != nil {
@@ -409,7 +409,7 @@ func (b *buildState) addSigilFromOp(q *Query, op byte) (err error) {
 }
 
 func (b *buildState) parseSigilsAndGenres(
-	q *Query,
+	q *expSigilAndGenre,
 ) (err error) {
 	for b.scanner.Scan() {
 		seq := b.scanner.GetSeq()
@@ -536,8 +536,8 @@ func (b *buildState) makeExp(
 	}
 }
 
-func (b *buildState) makeQuery() *Query {
-	return &Query{
+func (b *buildState) makeQuery() *expSigilAndGenre {
+	return &expSigilAndGenre{
 		exp: exp{
 			expObjectIds: expObjectIds{
 				internal: make(map[string]ObjectId),

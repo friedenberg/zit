@@ -9,11 +9,11 @@ import (
 
 func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 	organizeFlags organize_text.Flags,
-	qg *query.Group,
+	qg *query.Query,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
 		e.GetConfig().GetCLIConfig().PrintOptions,
-		qg,
+		query.GetTags(qg),
 		e.SkuFormatBoxCheckedOutNoColor(),
 		e.GetStore().GetAbbrStore().GetAbbr(),
 		e.GetExternalLikePoolForRepoId(qg.RepoId),
@@ -76,6 +76,7 @@ func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.AddPrototypeAndOption(
 		"dry-run",
 		&organize_text.OptionCommentDryRun{
-			MutableConfigDryRun: e.GetConfig()},
+			MutableConfigDryRun: e.GetConfig(),
+		},
 	)
 }

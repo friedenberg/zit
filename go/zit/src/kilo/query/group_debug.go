@@ -6,12 +6,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-func (qg *Group) StringDebug() string {
+func (qg *Query) StringDebug() string {
 	var sb strings.Builder
 
 	first := true
 
-	for _, g := range qg.SortedUserQueries() {
+	for _, g := range qg.sortedUserQueries() {
 		if !first {
 			sb.WriteRune(' ')
 		}
@@ -25,7 +25,7 @@ func (qg *Group) StringDebug() string {
 	first = true
 
 	for _, g := range genres.TrueGenre() {
-		q, ok := qg.OptimizedQueries[g]
+		q, ok := qg.optimizedQueries[g]
 
 		if !ok {
 			continue
@@ -43,7 +43,7 @@ func (qg *Group) StringDebug() string {
 	return sb.String()
 }
 
-func (qg *Group) StringOptimized() string {
+func (qg *Query) StringOptimized() string {
 	var sb strings.Builder
 
 	first := true
@@ -63,7 +63,7 @@ func (qg *Group) StringOptimized() string {
 	// )
 
 	for _, g := range genres.TrueGenre() {
-		q, ok := qg.OptimizedQueries[g]
+		q, ok := qg.optimizedQueries[g]
 
 		if !ok {
 			continue

@@ -9,7 +9,7 @@ import (
 
 func (local *Repo) PullQueryGroupFromRemote(
 	remote repo.Repo,
-	qg *query.Group,
+	qg *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	return local.pullQueryGroupFromWorkingCopy(
@@ -21,7 +21,7 @@ func (local *Repo) PullQueryGroupFromRemote(
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(
 	remote repo.WorkingCopy,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List

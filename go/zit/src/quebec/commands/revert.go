@@ -73,7 +73,7 @@ func (cmd Revert) Run(dep command.Request) {
 
 func (c Revert) runRevertFromQuery(
 	u *local_working_copy.Repo,
-	eq *query.Group,
+	eq *query.Query,
 ) (err error) {
 	if err = u.GetStore().QueryTransacted(
 		eq,

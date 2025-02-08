@@ -7,7 +7,7 @@ import (
 
 type (
 	ExternalStoreForQuery interface {
-		ParseAndApplyExternalObjectIdsForQuery(qg *Group, v string) error
+		ParseAndApplyExternalObjectIdsForQuery(qg *Query, v string) error
 		sku.ExternalStoreForQuery
 	}
 

@@ -202,7 +202,7 @@ func (c *Store) CheckoutOne(
 }
 
 func (c *Store) QueryCheckedOut(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// o := sku.CommitOptions{

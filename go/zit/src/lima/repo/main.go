@@ -44,15 +44,15 @@ type WorkingCopy interface {
 		builderOptions query.BuilderOptions,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
-	) (qg *query.Group, err error)
+	) (qg *query.Query, err error)
 
 	MakeInventoryList(
-		qg *query.Group,
+		qg *query.Query,
 	) (list *sku.List, err error)
 
 	PullQueryGroupFromRemote(
 		remote Repo,
-		qg *query.Group,
+		qg *query.Query,
 		options RemoteTransferOptions,
 	) (err error)
 

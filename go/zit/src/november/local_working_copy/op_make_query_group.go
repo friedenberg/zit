@@ -13,7 +13,7 @@ func (repo *Repo) MakeExternalQueryGroup(
 	metaBuilder query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
-) (queryGroup *query.Group, err error) {
+) (queryGroup *query.Query, err error) {
 	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
 	if queryGroup, err = builder.BuildQueryGroupWithRepoId(

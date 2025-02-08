@@ -136,16 +136,13 @@ func (o *Flags) GetOptionsWithMetadata(
 
 func (o *Flags) GetOptions(
 	printOptions options_print.V0,
-	q TagSetGetter,
+	tagSet ids.TagSet,
 	skuBoxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	of sku.ObjectFactory,
 ) Options {
 	m := o.Metadata
-
-	if q != nil {
-		m.TagSet = q.GetTags()
-	}
+	m.TagSet = tagSet
 
 	if m.prototype == nil {
 		panic("Metadata not initalized")

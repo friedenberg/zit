@@ -225,7 +225,7 @@ func (b *Builder) WithCheckedOut(
 }
 
 func (b *Builder) WithOptionsFromOriginalQuery(
-	qg *Group,
+	qg *Query,
 ) *Builder {
 	b.doNotMatchEmpty = !qg.matchOnEmpty
 	return b
@@ -234,7 +234,7 @@ func (b *Builder) WithOptionsFromOriginalQuery(
 func (b *Builder) BuildQueryGroupWithRepoId(
 	externalQueryOptions sku.ExternalQueryOptions,
 	values ...string,
-) (group *Group, err error) {
+) (group *Query, err error) {
 	state := b.makeState()
 
 	ok := false
@@ -260,7 +260,7 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 	return
 }
 
-func (b *Builder) BuildQueryGroup(vs ...string) (group *Group, err error) {
+func (b *Builder) BuildQueryGroup(vs ...string) (group *Query, err error) {
 	state := b.makeState()
 
 	if err = b.build(state, vs...); err != nil {

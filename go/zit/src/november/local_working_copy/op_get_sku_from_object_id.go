@@ -13,7 +13,7 @@ func (repo *Repo) GetSkuFromObjectId(
 ) (sk *sku.Transacted, err error) {
 	builder := repo.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
 
-	var queryGroup *query.Group
+	var queryGroup *query.Query
 
 	if queryGroup, err = builder.BuildQueryGroupWithRepoId(
 		sku.ExternalQueryOptions{},

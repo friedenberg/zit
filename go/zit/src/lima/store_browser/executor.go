@@ -14,7 +14,7 @@ import (
 
 type executor struct {
 	store *Store
-	qg    *query.Group
+	qg    *query.Query
 	out   interfaces.FuncIter[sku.SkuType]
 	co    sku.CheckedOut
 }
@@ -57,7 +57,7 @@ func (c *executor) tryToEmitOneRecognized(
 ) (err error) {
 	c.co.SetState(checked_out_state.Recognized)
 
-	if !c.qg.ContainsSkuCheckedOutState(c.co.GetState()) {
+	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
 		return
 	}
 
@@ -85,7 +85,7 @@ func (c *executor) tryToEmitOneUntracked(
 ) (err error) {
 	c.co.SetState(checked_out_state.Untracked)
 
-	if !c.qg.ContainsSkuCheckedOutState(c.co.GetState()) {
+  if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
 		return
 	}
 
@@ -118,7 +118,7 @@ func (c *executor) tryToEmitOneCommon(
 	external.ObjectId.SetGenre(genres.Zettel)
 	external.ExternalObjectId.SetGenre(genres.Zettel)
 
-	if !c.qg.ContainsExternalSku(external, c.co.GetState()) {
+	if !query.ContainsExternalSku(c.qg, external, c.co.GetState()) {
 		return
 	}
 

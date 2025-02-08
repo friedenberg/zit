@@ -53,7 +53,7 @@ func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
 
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	es, ok := s.externalStores[qg.RepoId]
@@ -169,7 +169,7 @@ func (s *Store) Open(
 }
 
 func (store *Store) makeQueryExecutor(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (executor query.Executor, err error) {
 	if queryGroup == nil {
 		if queryGroup, err = store.queryBuilder.BuildQueryGroup(); err != nil {

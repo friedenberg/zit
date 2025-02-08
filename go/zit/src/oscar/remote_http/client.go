@@ -129,13 +129,13 @@ func (client *client) MakeExternalQueryGroup(
 	builderOptions query.BuilderOptions,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
-) (qg *query.Group, err error) {
+) (qg *query.Query, err error) {
 	err = todo.Implement()
 	return
 }
 
 func (remote *client) MakeInventoryList(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (list *sku.List, err error) {
 	var request *http.Request
 
@@ -206,7 +206,7 @@ func (remote *client) MakeInventoryList(
 
 func (client *client) PullQueryGroupFromRemote(
 	remote repo.Repo,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	return client.pullQueryGroupFromWorkingCopy(
@@ -218,7 +218,7 @@ func (client *client) PullQueryGroupFromRemote(
 
 func (remote *client) pullQueryGroupFromWorkingCopy(
 	local repo.WorkingCopy,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List

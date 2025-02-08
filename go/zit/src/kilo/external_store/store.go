@@ -46,7 +46,7 @@ func (ve *Store) Flush() (err error) {
 }
 
 func (s *Store) QueryCheckedOut(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	es, ok := s.StoreLike.(QueryCheckedOut)

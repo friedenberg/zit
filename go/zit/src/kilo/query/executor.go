@@ -13,7 +13,7 @@ import (
 type (
 	QueryCheckedOut interface {
 		QueryCheckedOut(
-			qg *Group,
+			qg *Query,
 			f interfaces.FuncIter[sku.SkuType],
 		) (err error)
 	}
@@ -35,20 +35,20 @@ type (
 
 // TODO use ExecutorPrimitive
 type Executor struct {
-	*Group
+  primitive
 	ExecutionInfo
 	Out interfaces.FuncIter[sku.ExternalLike]
 }
 
 func MakeExecutorWithExternalStore(
-	queryGroup *Group,
+	queryGroup *Query,
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
 	externalStore ExternalStore,
 	envWorkspace env_workspace.Env,
 ) Executor {
 	return Executor{
-		Group: queryGroup,
+		primitive: primitive{queryGroup},
 		ExecutionInfo: ExecutionInfo{
 			FuncPrimitiveQuery: fpq,
 			FuncReadOneInto:    froi,
@@ -64,7 +64,7 @@ func (executor *Executor) ExecuteExactlyOneExternal(
 ) (sk *sku.Transacted, err error) {
 	var externalObjectId ids.ObjectIdLike
 
-	if externalObjectId, _, err = executor.Group.GetExactlyOneExternalObjectId(
+	if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
 		genres.Zettel,
 		permitInternal,
 	); err != nil {
@@ -100,7 +100,7 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 	var objectId *ids.ObjectId
 	var sigil ids.Sigil
 
-	if objectId, sigil, err = executor.Group.GetExactlyOneObjectId(
+	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(
 		genres.Zettel,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -207,7 +207,7 @@ func (e *Executor) executeExternalQueryCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if err = e.ExternalStore.QueryCheckedOut(
-		e.Group,
+		e.Query,
 		out,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -243,7 +243,7 @@ func (e *Executor) executeInternalQuerySkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if err = e.FuncPrimitiveQuery(
-		e.Group,
+    primitive{Query: e.Query},
 		e.makeEmitSkuSigilLatestSkuType(out),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -257,7 +257,7 @@ func (e *Executor) executeInternalQuery(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = e.FuncPrimitiveQuery(
-		e.Group,
+		primitive{e.Query},
 		e.makeEmitSkuSigilLatest(out),
 	); err != nil {
 		err = errors.Wrap(err)

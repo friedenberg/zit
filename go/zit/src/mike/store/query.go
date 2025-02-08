@@ -30,7 +30,7 @@ func (s *Store) QueryPrimitive(
 }
 
 func (s *Store) QueryTransacted(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var e query.Executor
@@ -67,7 +67,7 @@ func (s *Store) QueryTransacted(
 }
 
 func (s *Store) QueryTransactedAsSkuType(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var e query.Executor
@@ -86,7 +86,7 @@ func (s *Store) QueryTransactedAsSkuType(
 }
 
 func (store *Store) QuerySkuType(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 	output interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var e query.Executor
@@ -105,7 +105,7 @@ func (store *Store) QuerySkuType(
 }
 
 func (store *Store) QueryExactlyOneExternal(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (sk *sku.Transacted, err error) {
 	var executor query.Executor
 
@@ -123,7 +123,7 @@ func (store *Store) QueryExactlyOneExternal(
 }
 
 func (store *Store) QueryExactlyOne(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (sk *sku.Transacted, err error) {
 	var executor query.Executor
 

@@ -116,7 +116,7 @@ func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy.Must(localWorkingCopy.Unlock)
 }
 
-func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Group) (err error) {
+func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err error) {
 	opOrganize := user_ops.Organize{
 		Repo: u,
 		Metadata: organize_text.Metadata{
@@ -178,7 +178,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Group) (err err
 func (c Clean) shouldClean(
 	u *local_working_copy.Repo,
 	co sku.SkuType,
-	qg *query.Group,
+	qg *query.Query,
 ) bool {
 	if c.force {
 		return true

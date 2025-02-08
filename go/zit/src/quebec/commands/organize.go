@@ -87,7 +87,7 @@ func (cmd *Organize) Run(req command.Request) {
 		),
 	}
 
-	types := queryGroup.GetTypes()
+	types := query.GetTypes(queryGroup)
 
 	if types.Len() == 1 {
 		createOrganizeFileOp.Type = types.Any()
@@ -245,7 +245,7 @@ func (c Organize) readFromVim(
 	repo *local_working_copy.Repo,
 	path string,
 	results *organize_text.Text,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().

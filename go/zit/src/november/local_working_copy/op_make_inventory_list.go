@@ -9,7 +9,7 @@ import (
 )
 
 func (u *Repo) MakeInventoryList(
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (list *sku.List, err error) {
 	list = sku.MakeList()
 

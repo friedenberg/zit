@@ -95,11 +95,11 @@ func (cmd Show) Run(req command.Request) {
 
 func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) {
 	var f interfaces.FuncIter[*sku.Transacted]
 
-	if cmd.Format == "" && queryGroup.IsExactlyOneObjectId() {
+	if cmd.Format == "" && query.IsExactlyOneObjectId(queryGroup) {
 		cmd.Format = "text"
 	}
 

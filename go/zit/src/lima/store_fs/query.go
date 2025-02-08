@@ -15,7 +15,7 @@ import (
 )
 
 func (s *Store) QueryCheckedOut(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	wg := errors.MakeWaitGroupParallel()
@@ -260,11 +260,12 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 }
 
 func (s *Store) makeFuncIterFilterAndApply(
-	qg *query.Group,
+	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	return func(co *sku.CheckedOut) (err error) {
-		if !qg.ContainsExternalSku(
+		if !query.ContainsExternalSku(
+      qg,
 			co.GetSkuExternal(),
 			co.GetState(),
 		) {
@@ -286,7 +287,7 @@ type fsItemRecognized struct {
 }
 
 func (s *Store) queryUntracked(
-	qg *query.Group, // TODO use this to conditionally perform recognition
+	qg *query.Query, // TODO use this to conditionally perform recognition
 	aco interfaces.FuncIter[any],
 ) (err error) {
 	definitelyNotCheckedOut := s.dirItems.definitelyNotCheckedOut.Clone()

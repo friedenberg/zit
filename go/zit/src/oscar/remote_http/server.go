@@ -555,7 +555,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 	}
 
 	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		var queryGroup *query.Group
+		var queryGroup *query.Query
 
 		{
 			var err error

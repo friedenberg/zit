@@ -29,7 +29,7 @@ func (c QueryGroup) MakeQueryGroup(
 	options query.BuilderOptions,
 	repo repo.WorkingCopy,
 	args []string,
-) (queryGroup *query.Group) {
+) (queryGroup *query.Query) {
 	var err error
 
 	if queryGroup, err = repo.MakeExternalQueryGroup(

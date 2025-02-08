@@ -27,7 +27,7 @@ type Checkin struct {
 
 func (op Checkin) Run(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 ) (err error) {
 	var l sync.Mutex
 
@@ -74,7 +74,7 @@ func (op Checkin) Run(
 
 func (op Checkin) runOrganize(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Group,
+	queryGroup *query.Query,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{

@@ -156,7 +156,7 @@ func (c Changes) String() string {
 type OrganizeResults struct {
 	Before, After *Text
 	Original      sku.SkuTypeSet
-	QueryGroup    *query.Group
+	QueryGroup    *query.Query
 }
 
 func ChangesFrom(

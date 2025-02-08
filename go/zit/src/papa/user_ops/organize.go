@@ -25,7 +25,7 @@ type Organize struct {
 }
 
 func (op Organize) RunWithQueryGroup(
-	qg *query.Group,
+	qg *query.Query,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.RWMutex
@@ -53,7 +53,7 @@ func (op Organize) RunWithQueryGroup(
 
 // TODO remove
 func (op Organize) RunWithTransacted(
-	qg *query.Group,
+	qg *query.Query,
 	transacted sku.TransactedSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeSkuTypeSetMutable()
@@ -76,7 +76,7 @@ func (op Organize) RunWithTransacted(
 }
 
 func (op Organize) RunWithSkuType(
-	qg *query.Group,
+	qg *query.Query,
 	skus sku.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	organizeResults.Original = skus
@@ -117,7 +117,7 @@ func (op Organize) RunWithSkuType(
 		),
 	}
 
-	typen := organizeResults.QueryGroup.GetTypes()
+	typen := query.GetTypes(organizeResults.QueryGroup)
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Type = typen.Any()
