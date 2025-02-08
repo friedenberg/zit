@@ -305,14 +305,6 @@ func (d *dirItems) processFDPattern(
 	item := cache[objectIdString]
 
 	if item == nil {
-		err = errors.Errorf(
-			"failed to write FSItem to cache. Cache: %s, Pattern: %s, ObjectId: %s, Dir: %s",
-			cache,
-			pattern,
-			objectIdString,
-			dir,
-		)
-
 		return
 	}
 

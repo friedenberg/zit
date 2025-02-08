@@ -9,14 +9,15 @@ import (
 
 func (s *Store) ReadExternalLikeFromObjectIdLike(
 	commitOptions sku.CommitOptions,
-	objectId interfaces.Stringer,
+	objectIdMaybeExternal interfaces.Stringer,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
 	var items []*sku.FSItem
 
-	oidString := objectId.String()
+	oidString := objectIdMaybeExternal.String()
+	_, isExternal := objectIdMaybeExternal.(ids.ExternalObjectIdLike)
 
-	if _, ok := objectId.(ids.ExternalObjectIdLike); !ok {
+	if !isExternal {
 		oidString = s.keyForObjectIdString(oidString)
 	}
 
@@ -30,6 +31,25 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 
 	switch len(items) {
 	case 0:
+		if !isExternal {
+			external = sku.GetTransactedPool().Get()
+
+			var objectId ids.ObjectId
+
+			if err = objectId.Set(oidString); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = s.externalStoreSupplies.ReadOneInto(
+				&objectId,
+				external.GetSku(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
 		return
 
 	case 1:
@@ -39,7 +59,7 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 		err = errors.Errorf(
 			"more than one FSItem (%q) matches object id (%q).",
 			items,
-			objectId,
+			objectIdMaybeExternal,
 		)
 
 		return

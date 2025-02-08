@@ -15,14 +15,15 @@ func (repo *Repo) GetSkuFromObjectId(
 
 	var queryGroup *query.Group
 
-	if queryGroup, err = builder.BuildQueryGroup(
+	if queryGroup, err = builder.BuildQueryGroupWithRepoId(
+		sku.ExternalQueryOptions{},
 		objectIdString,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = repo.GetStore().QueryExactlyOne(queryGroup); err != nil {
+	if sk, err = repo.GetStore().QueryExactlyOneExternal(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
