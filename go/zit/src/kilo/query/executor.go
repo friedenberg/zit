@@ -59,7 +59,7 @@ func MakeExecutorWithExternalStore(
 }
 
 func (executor *Executor) ExecuteExactlyOneExternal() (sk *sku.Transacted, err error) {
-	var externalObjectId ids.ExternalObjectIdLike
+	var externalObjectId ids.ObjectIdLike
 
 	if externalObjectId, _, err = executor.Group.GetExactlyOneExternalObjectId(
 		genres.Zettel,
