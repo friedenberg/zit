@@ -217,9 +217,10 @@ func (d *dirItems) keyForObjectIdString(
 
 	if !ok {
 		key = oidString
+	} else if key == "" {
+		key = fd.FileNameSansExt(oidString)
 	}
 	// ui.DebugBatsTestBody().Print(oidString, key)
-	// key = fd.FileNameSansExt(oidString)
 	// ui.DebugBatsTestBody().Print(oidString, key)
 	return
 }
