@@ -83,3 +83,19 @@ function edit_and_dont_change_no_workspace { # @test
 		last time
 	EOM
 }
+
+function edit_and_format_no_workspace { # @test
+	skip
+	export EDITOR="bash -c 'out=\"\$(mktemp)\"; zit format-object \$0 > \"\$out\"; mv \"\$out\" \"\$0\" || true'"
+	run_zit edit one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11]
+	EOM
+
+	run_zit show -format blob one/uno
+	assert_success
+	assert_output - <<-EOM
+		last time
+	EOM
+}
