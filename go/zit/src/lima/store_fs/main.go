@@ -2,6 +2,8 @@ package store_fs
 
 import (
 	"encoding/gob"
+	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -198,13 +200,13 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
+func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
 	if err = s.dirItems.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ks = make([]sku.ExternalObjectId, 0)
+	ks = make([]*sku.FSItem, 0)
 	var l sync.Mutex
 
 	if err = s.All(
@@ -212,17 +214,7 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			var eoid ids.ExternalObjectId
-
-			if err = kfp.WriteToExternalObjectId(
-				&eoid,
-				s.envRepo,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			ks = append(ks, &eoid)
+			ks = append(ks, kfp)
 
 			return
 		},
@@ -234,42 +226,29 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 	return
 }
 
-func (s *Store) GetObjectIdsForDir(
+func (s *Store) GetFSItemsForDir(
 	fd *fd.FD,
-) (k []sku.ExternalObjectId, err error) {
+) (items []*sku.FSItem, err error) {
 	if !fd.IsDir() {
 		err = errors.Errorf("not a directory: %q", fd)
 		return
 	}
 
-	var results []*sku.FSItem
-
-	if results, err = s.dirItems.processDir(fd.GetPath()); err != nil {
+	if items, err = s.dirItems.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	for _, r := range results {
-		var eoid ids.ExternalObjectId
-
-		if err = r.WriteToExternalObjectId(
-			&eoid,
-			s.envRepo,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		k = append(k, &eoid)
 	}
 
 	return
 }
 
 // TODO confirm against actual Object Id
-func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
-	if v == "." {
-		if k, err = s.GetExternalObjectIds(); err != nil {
+func (s *Store) GetFSItemsForString(
+	value string,
+	tryPattern bool,
+) (items []*sku.FSItem, err error) {
+	if value == "." {
+		if items, err = s.GetExternalObjectIds(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -279,39 +258,60 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPath(v, s.envRepo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fdee.IsDir() {
-		if k, err = s.GetObjectIdsForDir(fdee); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		var results []*sku.FSItem
-
-		if _, results, err = s.dirItems.processFD(fdee); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		k = make([]sku.ExternalObjectId, 0, len(results))
-
-		for _, r := range results {
-			var eoid ids.ExternalObjectId
-
-			if err = r.WriteToExternalObjectId(
-				&eoid,
-				s.envRepo,
+	if fdee, err = fd.MakeFromPath(value, s.envRepo); err != nil {
+		if errors.IsNotExist(err) && tryPattern {
+			if items, err = s.dirItems.processFDPattern(
+				value,
+				filepath.Join(s.dir, fmt.Sprintf("%s*", value)),
+				s.dir,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			k = append(k, &eoid)
+		} else {
+			err = errors.Wrap(err)
 		}
+
+		return
+	}
+
+	if fdee.IsDir() {
+		if items, err = s.GetFSItemsForDir(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if _, items, err = s.dirItems.processFD(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Store) GetObjectIdsForString(
+	v string,
+) (k []sku.ExternalObjectId, err error) {
+	var items []*sku.FSItem
+
+	if items, err = s.GetFSItemsForString(v, false); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, item := range items {
+		var eoid ids.ExternalObjectId
+
+		if err = item.WriteToExternalObjectId(
+			&eoid,
+			s.envRepo,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		k = append(k, &eoid)
 	}
 
 	return

@@ -212,12 +212,15 @@ func (d *dirItems) keyForObjectIdString(
 	oidString string,
 ) (key string) {
 	var ok bool
+
 	key, _, ok = strings.Cut(oidString, ".")
 
 	if !ok {
 		key = oidString
 	}
-
+	// ui.DebugBatsTestBody().Print(oidString, key)
+	// key = fd.FileNameSansExt(oidString)
+	// ui.DebugBatsTestBody().Print(oidString, key)
 	return
 }
 
@@ -287,18 +290,12 @@ func (d *dirItems) processDir(path string) (results []*sku.FSItem, err error) {
 	return
 }
 
-func (d *dirItems) processFD(
-	fdee *fd.FD,
-) (objectIdString string, fds []*sku.FSItem, err error) {
+func (d *dirItems) processFDPattern(
+	objectIdString string,
+	pattern string,
+	dir string,
+) (fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
-
-	if objectIdString, err = d.keyForFD(fdee); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	dir := filepath.Dir(fdee.GetPath())
-	pattern := filepath.Join(dir, fmt.Sprintf("%s*", fdee.FileNameSansExt()))
 
 	if err = d.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)
@@ -316,26 +313,32 @@ func (d *dirItems) processFD(
 			dir,
 		)
 
-		panic(err)
+		return
 	}
 
 	if fds, err = d.processFDSet(
 		objectIdString,
 		item,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "FD: %q, ObjectIdString: %q", item.Debug(), objectIdString)
 		return
 	}
 
 	return
 }
 
-func (d *dirItems) getFDsForObjectIdString(
-	objectIdString string,
-) (fds []*sku.FSItem, err error) {
+func (d *dirItems) processFD(
+	fdee *fd.FD,
+) (objectIdString string, fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
-	dir := d.repoLayout.GetCwd()
-	pattern := filepath.Join(dir, fmt.Sprintf("%s*", objectIdString))
+
+	if objectIdString, err = d.keyForFD(fdee); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	dir := filepath.Dir(fdee.GetPath())
+	pattern := filepath.Join(dir, fmt.Sprintf("%s*", fdee.FileNameSansExt()))
 
 	if err = d.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)

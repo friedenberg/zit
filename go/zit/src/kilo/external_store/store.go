@@ -98,7 +98,7 @@ func (s *Store) ReadTransactedFromObjectId(
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
+	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -110,7 +110,7 @@ func (s *Store) ReadTransactedFromObjectId(
 		return
 	}
 
-	if e, err = es.ReadExternalLikeFromObjectId(
+	if e, err = es.ReadExternalLikeFromObjectIdLike(
 		o,
 		k1,
 		t,
@@ -122,12 +122,12 @@ func (s *Store) ReadTransactedFromObjectId(
 	return
 }
 
-func (s *Store) ReadExternalLikeFromObjectId(
+func (s *Store) ReadExternalLikeFromObjectIdLike(
 	o sku.CommitOptions,
 	k1 interfaces.Stringer,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
+	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -139,7 +139,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 		return
 	}
 
-	if e, err = es.ReadExternalLikeFromObjectId(
+	if e, err = es.ReadExternalLikeFromObjectIdLike(
 		o,
 		k1,
 		t,

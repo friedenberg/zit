@@ -52,8 +52,8 @@ type (
 		UpdateTransacted(z *Transacted) (err error)
 	}
 
-	ExternalStoreReadExternalLikeFromObjectId interface {
-		ReadExternalLikeFromObjectId(
+	ExternalStoreReadExternalLikeFromObjectIdLike interface {
+		ReadExternalLikeFromObjectIdLike(
 			o CommitOptions,
 			oid interfaces.Stringer,
 			t *Transacted,

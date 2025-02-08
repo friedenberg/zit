@@ -21,7 +21,7 @@ type (
 	ExternalStore interface {
 		sku.ExternalStoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
-		sku.ExternalStoreReadExternalLikeFromObjectId
+		sku.ExternalStoreReadExternalLikeFromObjectIdLike
 		QueryCheckedOut
 	}
 
@@ -72,7 +72,7 @@ func (executor *Executor) ExecuteExactlyOneExternal() (sk *sku.Transacted, err e
 
 	var external sku.ExternalLike
 
-	if external, err = executor.ReadExternalLikeFromObjectId(
+	if external, err = executor.ReadExternalLikeFromObjectIdLike(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
@@ -116,7 +116,7 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 
 	var external sku.ExternalLike
 
-	if external, err = executor.ReadExternalLikeFromObjectId(
+	if external, err = executor.ReadExternalLikeFromObjectIdLike(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,

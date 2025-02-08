@@ -3,26 +3,32 @@ package store_fs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (s *Store) ReadExternalLikeFromObjectId(
+func (s *Store) ReadExternalLikeFromObjectIdLike(
 	commitOptions sku.CommitOptions,
 	objectId interfaces.Stringer,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
-	var results []*sku.FSItem
+	var items []*sku.FSItem
 
-	oidString := s.keyForObjectIdString(objectId.String())
+	oidString := objectId.String()
 
-	if results, err = s.dirItems.getFDsForObjectIdString(
+	if _, ok := objectId.(ids.ExternalObjectIdLike); !ok {
+		oidString = s.keyForObjectIdString(oidString)
+	}
+
+	if items, err = s.GetFSItemsForString(
 		oidString,
+		true,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "ObjectIdString: %q", oidString)
 		return
 	}
 
-	switch len(results) {
+	switch len(items) {
 	case 0:
 		return
 
@@ -32,14 +38,14 @@ func (s *Store) ReadExternalLikeFromObjectId(
 	default:
 		err = errors.Errorf(
 			"more than one FSItem (%q) matches object id (%q).",
-			results,
+			items,
 			objectId,
 		)
 
 		return
 	}
 
-	item := results[0]
+	item := items[0]
 
 	if external, err = s.ReadExternalFromItem(
 		commitOptions,
