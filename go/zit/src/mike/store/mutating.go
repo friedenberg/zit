@@ -213,8 +213,8 @@ func (s *Store) Commit(
 
 		if parent == nil {
 			if child.GetGenre() == genres.Zettel {
-        // TODO if this is a local zettel (i.e., not a different repo and not a
-        // different domain)
+				// TODO if this is a local zettel (i.e., not a different repo and not a
+				// different domain)
 
 				// TODO verify that the zettel id consists of our identifiers, otherwise
 				// abort

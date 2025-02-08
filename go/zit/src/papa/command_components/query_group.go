@@ -18,7 +18,7 @@ type QueryGroup struct {
 }
 
 func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
-  // TODO switch to repo
+	// TODO switch to repo
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")

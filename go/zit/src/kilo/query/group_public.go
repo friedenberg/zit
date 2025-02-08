@@ -56,7 +56,8 @@ func (qg *Group) IsExactlyOneObjectId() bool {
 
 func (queryGroup *Group) GetExactlyOneExternalObjectId(
 	genre genres.Genre,
-) (objectId ids.ExternalObjectIdLike, sigil ids.Sigil, err error) {
+	permitInternal bool,
+) (objectId ids.ObjectIdLike, sigil ids.Sigil, err error) {
 	if len(queryGroup.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 genre query but got %d",
@@ -89,6 +90,11 @@ func (queryGroup *Group) GetExactlyOneExternalObjectId(
 	eoidsLen := len(eoids)
 
 	switch {
+	case eoidsLen == 0 && oidsLen == 1 && permitInternal:
+		for _, k1 := range oids {
+			objectId = k1
+		}
+
 	case eoidsLen == 1 && oidsLen == 0:
 		for _, k1 := range eoids {
 			objectId = k1.GetExternalObjectId()
@@ -98,9 +104,10 @@ func (queryGroup *Group) GetExactlyOneExternalObjectId(
 
 	default:
 		err = errors.Errorf(
-			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids",
+			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids. Permit internal: %t",
 			oidsLen,
 			eoidsLen,
+			permitInternal,
 		)
 
 		return
