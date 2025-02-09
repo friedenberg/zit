@@ -58,8 +58,6 @@ func (c *Organize) SetFlagSet(f *flag.FlagSet) {
 
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
-		WithDefaultSigil(ids.SigilLatest).
-		WithDefaultGenres(ids.MakeGenre(genres.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 
@@ -77,10 +75,11 @@ func (cmd *Organize) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.BuilderOptions(
+		query.BuilderOptionsOld(
+			cmd,
 			query.BuilderOptionWorkspace{Env: envWorkspace},
 			query.BuilderOptionDefaultGenres(genres.Zettel),
-			query.BuilderOptionsOld(cmd),
+			query.BuilderOptionDefaultSigil(ids.SigilLatest),
 		),
 		localWorkingCopy,
 		req.Args(),

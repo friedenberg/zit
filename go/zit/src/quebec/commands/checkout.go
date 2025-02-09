@@ -41,7 +41,6 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 	b.
 		WithPermittedSigil(ids.SigilLatest).
 		WithPermittedSigil(ids.SigilHidden).
-		WithDefaultGenres(ids.MakeGenre(genres.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 
