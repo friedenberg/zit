@@ -33,7 +33,7 @@ func (c Status) ModifyBuilder(
 func (cmd Status) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(cmd),
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()

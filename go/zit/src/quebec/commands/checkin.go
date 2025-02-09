@@ -65,7 +65,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 func (cmd Checkin) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(cmd),
 	)
 
 	localWorkingCopy.AssertCLINotComplete()

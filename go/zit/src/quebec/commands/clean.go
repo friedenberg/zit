@@ -77,7 +77,7 @@ func (req Clean) ModifyBuilder(b *query.Builder) {
 func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(cmd),
 	)
 
 	localWorkingCopy.AssertCLINotComplete()

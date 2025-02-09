@@ -49,10 +49,6 @@ func (c Edit) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Edit) DefaultGenres() ids.Genre {
-	return ids.MakeGenre()
-}
-
 func (cmd Edit) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
@@ -60,7 +56,7 @@ func (cmd Edit) Run(req command.Request) {
 	queryGroup := cmd.MakeQueryGroup(
 		req,
 		query.BuilderOptions(
-			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsOld(cmd),
 			query.BuilderOptionWorkspace{Env: envWorkspace},
 			query.BuilderOptionDefaultGenres(
 				genres.Tag,

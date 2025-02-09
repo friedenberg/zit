@@ -33,7 +33,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 func (cmd Mergetool) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(cmd),
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()

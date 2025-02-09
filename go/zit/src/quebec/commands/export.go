@@ -39,18 +39,17 @@ func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
 	cmd.CompressionType.SetFlagSet(f)
 }
 
-func (c Export) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.InventoryList)
-}
-
 func (cmd Export) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(
+			cmd,
 			query.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
+			),
+			query.BuilderOptionDefaultGenres(
+				genres.InventoryList,
 			),
 		),
 	)

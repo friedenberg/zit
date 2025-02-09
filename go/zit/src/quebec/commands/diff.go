@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -28,10 +27,6 @@ func (cmd *Diff) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 }
 
-func (c Diff) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.All()...)
-}
-
 func (c Diff) ModifyBuilder(
 	b *query.Builder,
 ) {
@@ -41,7 +36,10 @@ func (c Diff) ModifyBuilder(
 func (cmd Diff) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(genres.All()...),
+		),
 	)
 
 	o := checkout_options.TextFormatterOptions{

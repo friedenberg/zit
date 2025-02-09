@@ -46,7 +46,7 @@ func (cmd Pull) Run(req command.Request) {
 	qg := cmd.MakeQueryGroup(
 		req,
 		query.BuilderOptions(
-			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsOld(cmd),
 			query.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,

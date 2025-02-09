@@ -51,7 +51,7 @@ func (c Revert) DefaultGenres() ids.Genre {
 func (cmd Revert) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(cmd),
 	)
 
 	localWorkingCopy.Must(localWorkingCopy.Lock)

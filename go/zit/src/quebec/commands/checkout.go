@@ -52,7 +52,7 @@ func (cmd Checkout) Run(req command.Request) {
 	queryGroup := cmd.MakeQueryGroup(
 		req,
 		query.BuilderOptions(
-			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsOld(cmd),
 			query.BuilderOptionWorkspace{Env: envWorkspace},
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 		),

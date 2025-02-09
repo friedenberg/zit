@@ -39,18 +39,17 @@ func (c CatAlfred) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Tag,
-		genres.Type,
-		genres.Zettel,
-	)
-}
-
 func (cmd CatAlfred) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptions(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(
+				genres.Tag,
+				genres.Type,
+				genres.Zettel,
+			),
+		),
 	)
 
 	// this command does its own error handling

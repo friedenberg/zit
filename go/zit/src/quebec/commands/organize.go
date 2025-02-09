@@ -80,7 +80,7 @@ func (cmd *Organize) Run(req command.Request) {
 		query.BuilderOptions(
 			query.BuilderOptionWorkspace{Env: envWorkspace},
 			query.BuilderOptionDefaultGenres(genres.Zettel),
-			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsOld(cmd),
 		),
 		localWorkingCopy,
 		req.Args(),

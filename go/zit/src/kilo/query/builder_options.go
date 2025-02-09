@@ -15,7 +15,7 @@ type DefaultGenresGetter interface {
 }
 
 type BuilderOptionGetter interface {
-	GetQueryBuilderOptions() builderOptionsInterfaces
+	GetQueryBuilderOptions() builderOptionsOld
 }
 
 type BuilderOption interface {
@@ -61,13 +61,13 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 	return builder
 }
 
-type builderOptionsInterfaces struct {
+type builderOptionsOld struct {
 	QueryBuilderModifier
 	DefaultGenresGetter
 }
 
-func MakeBuilderOptions(o any) builderOptionsInterfaces {
-	var options builderOptionsInterfaces
+func BuilderOptionsOld(o any, remainder ...BuilderOption) builderOptions {
+	var options builderOptionsOld
 
 	if dgg, ok := o.(DefaultGenresGetter); ok {
 		options.DefaultGenresGetter = dgg
@@ -77,10 +77,10 @@ func MakeBuilderOptions(o any) builderOptionsInterfaces {
 		options.QueryBuilderModifier = qbm
 	}
 
-	return options
+	return BuilderOptions(append([]BuilderOption{options}, remainder...)...)
 }
 
-func (options builderOptionsInterfaces) Apply(b *Builder) *Builder {
+func (options builderOptionsOld) Apply(b *Builder) *Builder {
 	if options.DefaultGenresGetter != nil {
 		b = b.WithDefaultGenres(options.DefaultGenres())
 	}
