@@ -91,7 +91,7 @@ func (op Organize) RunWithSkuType(
 	if organizeResults.QueryGroup == nil ||
 		op.DontUseQueryGroupForOrganizeMetadata {
 		b := op.MakeQueryBuilder(
-			ids.MakeGenre(genres.TrueGenre()...),
+			ids.MakeGenre(genres.All()...),
 			nil,
 		).WithExternalLike(
 			skus,

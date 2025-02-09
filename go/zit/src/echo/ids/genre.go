@@ -16,7 +16,7 @@ import (
 type Genre byte
 
 func MakeGenreAll() Genre {
-	return MakeGenre(genres.TrueGenre()...)
+	return MakeGenre(genres.All()...)
 }
 
 func MakeGenre(vs ...genres.Genre) (s Genre) {
@@ -65,7 +65,7 @@ func (a Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
 }
 
 func (a Genre) Slice() []genres.Genre {
-	tg := genres.TrueGenre()
+	tg := genres.All()
 	out := make([]genres.Genre, 0, len(tg))
 
 	for _, g := range tg {
@@ -84,7 +84,7 @@ func (a Genre) String() string {
 
 	first := true
 
-	for _, g := range genres.TrueGenre() {
+	for _, g := range genres.All() {
 		if !a.ContainsOneOf(g) {
 			continue
 		}

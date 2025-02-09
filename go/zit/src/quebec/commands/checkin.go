@@ -53,7 +53,7 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c Checkin) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.TrueGenre()...)
+	return ids.MakeGenre(genres.All()...)
 }
 
 func (c *Checkin) ModifyBuilder(b *query.Builder) {

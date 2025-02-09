@@ -20,7 +20,7 @@ type Status struct {
 }
 
 func (c Status) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.TrueGenre()...)
+	return ids.MakeGenre(genres.All()...)
 }
 
 func (c Status) ModifyBuilder(

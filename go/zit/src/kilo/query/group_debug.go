@@ -29,7 +29,7 @@ func (qg *Query) StringDebug() string {
 	sb.WriteString(" | ")
 	first = true
 
-	for _, g := range genres.TrueGenre() {
+	for _, g := range genres.All() {
 		q, ok := qg.optimizedQueries[g]
 
 		if !ok {
@@ -67,7 +67,7 @@ func (qg *Query) StringOptimized() string {
 	// 	},
 	// )
 
-	for _, g := range genres.TrueGenre() {
+	for _, g := range genres.All() {
 		q, ok := qg.optimizedQueries[g]
 
 		if !ok {

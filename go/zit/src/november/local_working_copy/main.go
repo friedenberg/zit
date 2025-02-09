@@ -225,7 +225,7 @@ func (repo *Repo) initialize(
 		repo.sunrise,
 		repo.envLua,
 		repo.makeQueryBuilder().
-			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
+			WithDefaultGenres(ids.MakeGenre(genres.All()...)),
 		objectInventoryFormatOptions,
 		boxFormatArchive,
 		repo.typedBlobStore,

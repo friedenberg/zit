@@ -50,7 +50,7 @@ func (e errUnrecognizedGenre) Error() string {
 	return fmt.Sprintf(
 		"unknown genre: %q. Available genres: %q",
 		string(e),
-		quiter.Strings(quiter.Slice[Genre](TrueGenre())),
+		quiter.Strings(quiter.Slice[Genre](All())),
 	)
 }
 

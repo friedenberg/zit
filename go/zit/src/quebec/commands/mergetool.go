@@ -27,7 +27,7 @@ type Mergetool struct {
 }
 
 func (c Mergetool) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.TrueGenre()...)
+	return ids.MakeGenre(genres.All()...)
 }
 
 func (cmd Mergetool) Run(req command.Request) {

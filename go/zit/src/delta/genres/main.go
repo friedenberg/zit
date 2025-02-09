@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
@@ -30,7 +31,7 @@ const (
 	_ // AkteTyp
 	Repo
 
-	MaxGenre = Repo
+	maxGenre = Repo
 )
 
 const (
@@ -44,28 +45,17 @@ const (
 	repo
 )
 
-// TODO switch to
-// quiter.Slice[Genre](All())
-func All() (out []Genre) {
-	out = make([]Genre, 0, MaxGenre-1)
+func All() (out quiter.Slice[Genre]) {
+	out = make([]Genre, 0, maxGenre-1)
 
-	for i := None + 1; i <= MaxGenre; i++ {
-		out = append(out, Genre(i))
-	}
-
-	return
-}
-
-// TODO switch to
-// quiter.Slice[Genre](TrueGenre())
-func TrueGenre() (out []Genre) {
-	out = make([]Genre, 0, MaxGenre-1)
-
-	for i := None + 1; i <= MaxGenre; i++ {
+	for i := None + 1; i <= maxGenre; i++ {
 		g := Genre(i)
 
-		if !g.IsTrueGenre() {
+		switch g {
+		default:
 			continue
+
+		case Type, Tag, Zettel, Config, Repo, InventoryList, Blob:
 		}
 
 		out = append(out, g)
@@ -138,26 +128,6 @@ func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 
 func (g Genre) GetGenreString() string {
 	return g.String()
-}
-
-func (g Genre) HasParents() bool {
-	switch g {
-	case Type, Tag, Repo:
-		return true
-
-	default:
-		return false
-	}
-}
-
-func (g Genre) IsTrueGenre() bool {
-	switch g {
-	case Type, Tag, Zettel, Config, Repo, InventoryList, Blob:
-		return true
-
-	default:
-		return false
-	}
 }
 
 func (g Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {

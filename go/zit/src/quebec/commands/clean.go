@@ -67,7 +67,7 @@ func (c *Clean) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (req Clean) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.TrueGenre()...)
+	return ids.MakeGenre(genres.All()...)
 }
 
 func (req Clean) ModifyBuilder(b *query.Builder) {

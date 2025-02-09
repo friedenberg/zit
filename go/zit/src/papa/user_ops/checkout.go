@@ -189,7 +189,7 @@ func (op Checkout) runOrganize(
 	}
 
 	b := op.MakeQueryBuilder(
-		ids.MakeGenre(genres.TrueGenre()...),
+		ids.MakeGenre(genres.All()...),
 		nil,
 	).WithTransacted(
 		changeResults.After.AsTransactedSet(),

@@ -29,7 +29,7 @@ func (cmd *Diff) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c Diff) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.TrueGenre()...)
+	return ids.MakeGenre(genres.All()...)
 }
 
 func (c Diff) ModifyBuilder(
