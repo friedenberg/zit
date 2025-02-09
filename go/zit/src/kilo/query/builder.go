@@ -289,6 +289,7 @@ func (b *Builder) build(state *buildState, values ...string) (err error) {
 	}
 
 	defaultQueryGroupState := state.copy()
+	defaultQueryGroupState.options.defaultGenres = ids.MakeGenre(genres.TrueGenre()...)
 
 	if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
 		err = errors.Wrap(err)

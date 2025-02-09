@@ -27,11 +27,11 @@ function workspace_show { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	eom
 
-	# run_zit show :e
-	# assert_success
-	# assert_output_unsorted - <<-eom
-	# 	[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# eom
+	run_zit show :e
+	assert_success
+	assert_output_unsorted - <<-eom
+		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	eom
 
 	run_zit show one/uno
 	assert_success

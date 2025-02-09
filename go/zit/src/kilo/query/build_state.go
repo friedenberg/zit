@@ -175,7 +175,7 @@ func (b *buildState) build(
 }
 
 func (b *buildState) addDefaultsIfNecessary() {
-	if b.builder.defaultGenres.IsEmpty() || !b.group.isEmpty() {
+	if b.defaultGenres.IsEmpty() || !b.group.isEmpty() {
 		return
 	}
 
@@ -198,7 +198,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		dq = b.makeQuery()
 	}
 
-	dq.Genre = b.builder.defaultGenres
+	dq.Genre = b.defaultGenres
 
 	if b.builder.defaultSigil.IsEmpty() {
 		dq.Sigil = ids.SigilLatest
@@ -206,7 +206,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		dq.Sigil = b.builder.defaultSigil
 	}
 
-	b.group.userQueries[b.builder.defaultGenres] = dq
+	b.group.userQueries[b.defaultGenres] = dq
 }
 
 func (state *buildState) parseTokens() (err error) {
@@ -378,7 +378,7 @@ LOOP:
 	}
 
 	if q.Genre.IsEmpty() && !state.builder.requireNonEmptyQuery {
-		q.Genre = state.builder.defaultGenres
+		q.Genre = state.defaultGenres
 	}
 
 	if q.Sigil.IsEmpty() {
