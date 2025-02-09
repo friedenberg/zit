@@ -37,13 +37,11 @@ func (cmd *PullBlobStore) Run(
 ) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.MakeBuilderOptions(cmd),
-			query.BuilderOptionsDefaultSigil(
-				ids.MakeSigil(
-					ids.SigilHistory,
-					ids.SigilHidden,
-				),
+			query.BuilderOptionDefaultSigil(
+				ids.SigilHistory,
+				ids.SigilHidden,
 			),
 		),
 	)

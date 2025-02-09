@@ -18,34 +18,24 @@ type BuilderOptionGetter interface {
 	GetQueryBuilderOptions() builderOptionsInterfaces
 }
 
-type BuilderOptions interface {
+type BuilderOption interface {
 	Apply(*Builder) *Builder
 }
 
-type BuilderOptionsMulti []BuilderOptions
+type (
+	BuilderOptionsMulti []BuilderOption
+	builderOptions      []BuilderOption
+)
 
-func MakeBuilderOptionsMulti(options ...BuilderOptions) BuilderOptionsMulti {
-	return BuilderOptionsMulti(options)
+func BuilderOptions(options ...BuilderOption) builderOptions {
+	return builderOptions(options)
 }
 
-func (options BuilderOptionsMulti) Apply(builder *Builder) *Builder {
+func (options builderOptions) Apply(builder *Builder) *Builder {
 	for _, option := range options {
 		builder = option.Apply(builder)
 	}
 
-	return builder
-}
-
-type builderOptionDefaultGenre ids.Genre
-
-func MakeBuilderOptionDefaultGenres(
-	genres ...genres.Genre,
-) builderOptionDefaultGenre {
-	return builderOptionDefaultGenre(ids.MakeGenre(genres...))
-}
-
-func (options builderOptionDefaultGenre) Apply(builder *Builder) *Builder {
-	builder = builder.WithDefaultGenres(ids.Genre(options))
 	return builder
 }
 
@@ -108,9 +98,26 @@ type options struct {
 	permittedSigil ids.Sigil
 }
 
-type BuilderOptionsDefaultSigil ids.Sigil
+func BuilderOptionDefaultSigil(sigils ...ids.Sigil) builderOptionDefaultSigil {
+	return builderOptionDefaultSigil(ids.MakeSigil(sigils...))
+}
 
-func (option BuilderOptionsDefaultSigil) Apply(builder *Builder) *Builder {
+type builderOptionDefaultSigil ids.Sigil
+
+func (option builderOptionDefaultSigil) Apply(builder *Builder) *Builder {
 	builder.options.defaultSigil = ids.Sigil(option)
+	return builder
+}
+
+type builderOptionDefaultGenre ids.Genre
+
+func BuilderOptionDefaultGenres(
+	genres ...genres.Genre,
+) builderOptionDefaultGenre {
+	return builderOptionDefaultGenre(ids.MakeGenre(genres...))
+}
+
+func (options builderOptionDefaultGenre) Apply(builder *Builder) *Builder {
+	builder.options.defaultGenres = ids.Genre(options)
 	return builder
 }

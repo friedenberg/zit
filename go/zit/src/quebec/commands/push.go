@@ -45,13 +45,11 @@ func (cmd Push) Run(req command.Request) {
 	case repo_type.TypeWorkingCopy:
 		queryGroup := cmd.MakeQueryGroup(
 			req,
-			query.MakeBuilderOptionsMulti(
+			query.BuilderOptions(
 				query.MakeBuilderOptions(cmd),
-				query.BuilderOptionsDefaultSigil(
-					ids.MakeSigil(
-						ids.SigilHistory,
-						ids.SigilHidden,
-					),
+				query.BuilderOptionDefaultSigil(
+					ids.SigilHistory,
+					ids.SigilHidden,
 				),
 			),
 			localWorkingCopy,

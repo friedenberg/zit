@@ -26,7 +26,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 
 func (c QueryGroup) MakeQueryGroup(
 	req command.Request,
-	options query.BuilderOptions,
+	options query.BuilderOption,
 	repo repo.WorkingCopy,
 	args []string,
 ) (queryGroup *query.Query) {
@@ -46,7 +46,7 @@ func (c QueryGroup) MakeQueryGroup(
 func (cmd QueryGroup) CompleteWithRepo(
 	req command.Request,
 	local *local_working_copy.Repo,
-	queryBuilderOptions query.BuilderOptions,
+	queryBuilderOptions query.BuilderOption,
 	args ...string,
 ) {
 	completionWriter := sku_fmt.MakeWriterComplete(os.Stdout)
@@ -76,7 +76,7 @@ func (cmd QueryGroup) CompleteTagsWithRepo(
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptionDefaultGenres(genres.Tag),
+		query.BuilderOptionDefaultGenres(genres.Tag),
 		local,
 		nil,
 	)

@@ -66,13 +66,11 @@ func (cmd Clone) Run(req command.Request) {
 	case repo.WorkingCopy:
 		queryGroup := cmd.MakeQueryGroup(
 			req,
-			query.MakeBuilderOptionsMulti(
+			query.BuilderOptions(
 				query.MakeBuilderOptions(cmd),
-				query.BuilderOptionsDefaultSigil(
-					ids.MakeSigil(
-						ids.SigilHistory,
-						ids.SigilHidden,
-					),
+				query.BuilderOptionDefaultSigil(
+					ids.SigilHistory,
+					ids.SigilHidden,
 				),
 			),
 			local,

@@ -41,7 +41,7 @@ type WorkingCopy interface {
 	// ) (qg *query.Group, err error)
 
 	MakeExternalQueryGroup(
-		builderOptions query.BuilderOptions,
+		builderOptions query.BuilderOption,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
 	) (qg *query.Query, err error)

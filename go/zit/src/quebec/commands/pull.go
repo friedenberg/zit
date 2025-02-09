@@ -45,13 +45,11 @@ func (cmd Pull) Run(req command.Request) {
 
 	qg := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.MakeBuilderOptions(cmd),
-			query.BuilderOptionsDefaultSigil(
-				ids.MakeSigil(
-					ids.SigilHistory,
-					ids.SigilHidden,
-				),
+			query.BuilderOptionDefaultSigil(
+				ids.SigilHistory,
+				ids.SigilHidden,
 			),
 		),
 		localWorkingCopy,

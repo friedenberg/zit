@@ -10,7 +10,7 @@ import (
 )
 
 func (repo *Repo) MakeExternalQueryGroup(
-	metaBuilder query.BuilderOptions,
+	metaBuilder query.BuilderOption,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (queryGroup *query.Query, err error) {
@@ -41,7 +41,7 @@ func (repo *Repo) makeQueryBuilder() *query.Builder {
 
 func (repo *Repo) MakeQueryBuilderExcludingHidden(
 	genre ids.Genre,
-	options query.BuilderOptions,
+	options query.BuilderOption,
 ) *query.Builder {
 	if genre.IsEmpty() {
 		genre = ids.MakeGenre(genres.Zettel)
@@ -58,7 +58,7 @@ func (repo *Repo) MakeQueryBuilderExcludingHidden(
 
 func (repo *Repo) MakeQueryBuilder(
 	dg ids.Genre,
-	options query.BuilderOptions,
+	options query.BuilderOption,
 ) *query.Builder {
 	if dg.IsEmpty() {
 		dg = ids.MakeGenre(genres.Zettel)

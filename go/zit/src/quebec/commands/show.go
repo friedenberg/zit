@@ -64,9 +64,9 @@ func (cmd Show) Run(req command.Request) {
 			cmd.CompleteWithRepo(
 				req,
 				localWorkingCopy,
-				query.MakeBuilderOptionsMulti(
+				query.BuilderOptions(
 					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
-					query.MakeBuilderOptionDefaultGenres(genres.Tag),
+					query.BuilderOptionDefaultGenres(genres.Tag),
 				),
 				args...,
 			)
@@ -74,9 +74,9 @@ func (cmd Show) Run(req command.Request) {
 		default:
 			queryGroup := cmd.MakeQueryGroup(
 				req,
-				query.MakeBuilderOptionsMulti(
+				query.BuilderOptions(
 					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
-					query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+					query.BuilderOptionDefaultGenres(genres.Zettel),
 				),
 				localWorkingCopy,
 				args,

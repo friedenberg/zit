@@ -51,10 +51,10 @@ func (cmd Checkout) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.MakeBuilderOptions(cmd),
 			query.BuilderOptionWorkspace{Env: envWorkspace},
-			query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+			query.BuilderOptionDefaultGenres(genres.Zettel),
 		),
 		localWorkingCopy,
 		req.Args(),

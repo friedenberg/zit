@@ -77,9 +77,9 @@ func (cmd *Organize) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.BuilderOptionWorkspace{Env: envWorkspace},
-			query.MakeBuilderOptionDefaultGenres(genres.Zettel),
+			query.BuilderOptionDefaultGenres(genres.Zettel),
 			query.MakeBuilderOptions(cmd),
 		),
 		localWorkingCopy,

@@ -46,13 +46,11 @@ func (c Export) DefaultGenres() ids.Genre {
 func (cmd Export) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.MakeBuilderOptions(cmd),
-			query.BuilderOptionsDefaultSigil(
-				ids.MakeSigil(
-					ids.SigilHistory,
-					ids.SigilHidden,
-				),
+			query.BuilderOptionDefaultSigil(
+				ids.SigilHistory,
+				ids.SigilHidden,
 			),
 		),
 	)

@@ -76,7 +76,7 @@ func (builder *Builder) makeState() *buildState {
 	return state
 }
 
-func (b *Builder) WithOptions(options BuilderOptions) *Builder {
+func (b *Builder) WithOptions(options BuilderOption) *Builder {
 	if options != nil {
 		b = options.Apply(b)
 	}

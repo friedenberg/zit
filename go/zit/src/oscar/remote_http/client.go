@@ -126,7 +126,7 @@ func (client *client) ImportList(
 }
 
 func (client *client) MakeExternalQueryGroup(
-	builderOptions query.BuilderOptions,
+	builderOptions query.BuilderOption,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (qg *query.Query, err error) {

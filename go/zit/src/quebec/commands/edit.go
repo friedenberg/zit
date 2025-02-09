@@ -59,10 +59,10 @@ func (cmd Edit) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptionsMulti(
+		query.BuilderOptions(
 			query.MakeBuilderOptions(cmd),
 			query.BuilderOptionWorkspace{Env: envWorkspace},
-			query.MakeBuilderOptionDefaultGenres(
+			query.BuilderOptionDefaultGenres(
 				genres.Tag,
 				genres.Zettel,
 				genres.Type,
