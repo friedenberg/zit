@@ -114,3 +114,7 @@ func (options builderOptionsInterfaces) Apply(b *Builder) *Builder {
 
 	return b
 }
+
+type options struct {
+	defaultGenres ids.Genre
+}

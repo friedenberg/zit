@@ -42,17 +42,19 @@ type Builder struct {
 	fileExtensionGetter     interfaces.FileExtensionGetter
 	expanders               ids.Abbr
 	hidden                  sku.Query
-	defaultGenres           ids.Genre
 	defaultSigil            ids.Sigil
 	permittedSigil          ids.Sigil
 	doNotMatchEmpty         bool
 	debug                   bool
 	requireNonEmptyQuery    bool
 	defaultQuery            string
+
+	options
 }
 
 func (builder *Builder) makeState() *buildState {
 	state := &buildState{
+		options:      builder.options,
 		builder:      builder,
 		latentErrors: errors.MakeMulti(),
 	}
@@ -84,26 +86,31 @@ func (b *Builder) WithOptions(options BuilderOptions) *Builder {
 	return b
 }
 
+// TODO refactor into BuilderOption
 func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
 	b.permittedSigil.Add(s)
 	return b
 }
 
+// TODO refactor into BuilderOption
 func (b *Builder) WithDoNotMatchEmpty() *Builder {
 	b.doNotMatchEmpty = true
 	return b
 }
 
+// TODO refactor into BuilderOption
 func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 	b.requireNonEmptyQuery = true
 	return b
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithDebug() *Builder {
 	mb.debug = true
 	return mb
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithRepoId(
 	repoId ids.RepoId,
 ) *Builder {
@@ -111,6 +118,7 @@ func (mb *Builder) WithRepoId(
 	return mb
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithFileExtensionGetter(
 	feg interfaces.FileExtensionGetter,
 ) *Builder {
@@ -118,6 +126,7 @@ func (mb *Builder) WithFileExtensionGetter(
 	return mb
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithExpanders(
 	expanders ids.Abbr,
 ) *Builder {
@@ -125,6 +134,7 @@ func (mb *Builder) WithExpanders(
 	return mb
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithDefaultGenres(
 	defaultGenres ids.Genre,
 ) *Builder {
@@ -132,6 +142,7 @@ func (mb *Builder) WithDefaultGenres(
 	return mb
 }
 
+// TODO refactor into BuilderOption
 func (mb *Builder) WithDefaultSigil(
 	defaultSigil ids.Sigil,
 ) *Builder {
@@ -202,32 +213,6 @@ func (b *Builder) WithTransacted(
 		},
 	))
 
-	return b
-}
-
-func (b *Builder) WithCheckedOut(
-	cos sku.SkuTypeSet,
-) *Builder {
-	for co := range cos.All() {
-		b.pinnedObjectIds = append(
-			b.pinnedObjectIds,
-			pinnedObjectId{
-				Sigil: ids.SigilExternal,
-				ObjectId: ObjectId{
-					Exact:    true,
-					ObjectId: co.GetSku().ObjectId.Clone(),
-				},
-			},
-		)
-	}
-
-	return b
-}
-
-func (b *Builder) WithOptionsFromOriginalQuery(
-	qg *Query,
-) *Builder {
-	b.doNotMatchEmpty = !qg.matchOnEmpty
 	return b
 }
 

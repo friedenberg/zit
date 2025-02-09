@@ -18,6 +18,8 @@ type stackEl interface {
 }
 
 type buildState struct {
+	options
+
 	builder      *Builder
 	group        *Query
 	latentErrors errors.Multi
@@ -35,6 +37,7 @@ type buildState struct {
 
 func (src *buildState) copy() (dst *buildState) {
 	dst = &buildState{
+		options:      src.options,
 		builder:      src.builder,
 		latentErrors: errors.MakeMulti(),
 	}
