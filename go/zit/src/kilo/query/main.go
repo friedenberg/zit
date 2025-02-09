@@ -120,7 +120,7 @@ func (qg *Query) addOptimized(b *buildState, q *expSigilAndGenre) (err error) {
 	gs := q.Slice()
 
 	if len(gs) == 0 {
-		gs = b.builder.defaultGenres.Slice()
+		gs = b.defaultGenres.Slice()
 	}
 
 	for _, g := range gs {

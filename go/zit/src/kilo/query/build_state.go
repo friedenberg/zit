@@ -200,10 +200,10 @@ func (b *buildState) addDefaultsIfNecessary() {
 
 	dq.Genre = b.defaultGenres
 
-	if b.builder.defaultSigil.IsEmpty() {
+	if b.defaultSigil.IsEmpty() {
 		dq.Sigil = ids.SigilLatest
 	} else {
-		dq.Sigil = b.builder.defaultSigil
+		dq.Sigil = b.defaultSigil
 	}
 
 	b.group.userQueries[b.defaultGenres] = dq
@@ -382,7 +382,7 @@ LOOP:
 	}
 
 	if q.Sigil.IsEmpty() {
-		q.Sigil = state.builder.defaultSigil
+		q.Sigil = state.defaultSigil
 	}
 
 	if err = state.group.add(q); err != nil {
@@ -401,7 +401,7 @@ func (b *buildState) addSigilFromOp(q *expSigilAndGenre, op byte) (err error) {
 		return
 	}
 
-	if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
+	if !b.permittedSigil.IsEmpty() && !b.permittedSigil.ContainsOneOf(s) {
 		err = errors.BadRequestf("this query cannot contain the %q sigil", s)
 		return
 	}

@@ -42,14 +42,12 @@ type Builder struct {
 	fileExtensionGetter     interfaces.FileExtensionGetter
 	expanders               ids.Abbr
 	hidden                  sku.Query
-	defaultSigil            ids.Sigil
-	permittedSigil          ids.Sigil
 	doNotMatchEmpty         bool
 	debug                   bool
 	requireNonEmptyQuery    bool
 	defaultQuery            string
 
-	options
+	options options
 }
 
 func (builder *Builder) makeState() *buildState {
@@ -88,7 +86,7 @@ func (b *Builder) WithOptions(options BuilderOptions) *Builder {
 
 // TODO refactor into BuilderOption
 func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
-	b.permittedSigil.Add(s)
+	b.options.permittedSigil.Add(s)
 	return b
 }
 
@@ -138,7 +136,7 @@ func (mb *Builder) WithExpanders(
 func (mb *Builder) WithDefaultGenres(
 	defaultGenres ids.Genre,
 ) *Builder {
-	mb.defaultGenres = defaultGenres
+	mb.options.defaultGenres = defaultGenres
 	return mb
 }
 
@@ -146,7 +144,7 @@ func (mb *Builder) WithDefaultGenres(
 func (mb *Builder) WithDefaultSigil(
 	defaultSigil ids.Sigil,
 ) *Builder {
-	mb.defaultSigil = defaultSigil
+	mb.options.defaultSigil = defaultSigil
 	return mb
 }
 

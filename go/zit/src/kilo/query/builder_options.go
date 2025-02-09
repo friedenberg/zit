@@ -116,5 +116,7 @@ func (options builderOptionsInterfaces) Apply(b *Builder) *Builder {
 }
 
 type options struct {
-	defaultGenres ids.Genre
+	defaultGenres  ids.Genre
+	defaultSigil   ids.Sigil
+	permittedSigil ids.Sigil
 }
