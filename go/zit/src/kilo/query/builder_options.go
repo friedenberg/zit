@@ -10,10 +10,6 @@ type QueryBuilderModifier interface {
 	ModifyBuilder(*Builder)
 }
 
-type DefaultSigilGetter interface {
-	DefaultSigil() ids.Sigil
-}
-
 type DefaultGenresGetter interface {
 	DefaultGenres() ids.Genre
 }
@@ -77,7 +73,6 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 
 type builderOptionsInterfaces struct {
 	QueryBuilderModifier
-	DefaultSigilGetter
 	DefaultGenresGetter
 }
 
@@ -86,10 +81,6 @@ func MakeBuilderOptions(o any) builderOptionsInterfaces {
 
 	if dgg, ok := o.(DefaultGenresGetter); ok {
 		options.DefaultGenresGetter = dgg
-	}
-
-	if dsg, ok := o.(DefaultSigilGetter); ok {
-		options.DefaultSigilGetter = dsg
 	}
 
 	if qbm, ok := o.(QueryBuilderModifier); ok {
@@ -104,10 +95,6 @@ func (options builderOptionsInterfaces) Apply(b *Builder) *Builder {
 		b = b.WithDefaultGenres(options.DefaultGenres())
 	}
 
-	if options.DefaultSigilGetter != nil {
-		b.WithDefaultSigil(options.DefaultSigil())
-	}
-
 	if options.QueryBuilderModifier != nil {
 		options.ModifyBuilder(b)
 	}
@@ -119,4 +106,11 @@ type options struct {
 	defaultGenres  ids.Genre
 	defaultSigil   ids.Sigil
 	permittedSigil ids.Sigil
+}
+
+type BuilderOptionsDefaultSigil ids.Sigil
+
+func (option BuilderOptionsDefaultSigil) Apply(builder *Builder) *Builder {
+	builder.options.defaultSigil = ids.Sigil(option)
+	return builder
 }

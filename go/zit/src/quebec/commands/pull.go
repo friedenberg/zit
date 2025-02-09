@@ -27,10 +27,6 @@ func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
 }
 
-func (c Pull) DefaultSigil() ids.Sigil {
-	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
-}
-
 func (c Pull) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
@@ -49,7 +45,15 @@ func (cmd Pull) Run(req command.Request) {
 
 	qg := cmd.MakeQueryGroup(
 		req,
-		query.MakeBuilderOptions(cmd),
+		query.MakeBuilderOptionsMulti(
+			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsDefaultSigil(
+				ids.MakeSigil(
+					ids.SigilHistory,
+					ids.SigilHidden,
+				),
+			),
+		),
 		localWorkingCopy,
 		req.Args()[1:],
 	)

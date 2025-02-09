@@ -41,10 +41,6 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.Config.RepoType = repo_type.TypeWorkingCopy
 }
 
-func (c Clone) DefaultSigil() ids.Sigil {
-	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
-}
-
 func (c Clone) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 	// return ids.MakeGenre(genres.TrueGenre()...)
@@ -70,7 +66,15 @@ func (cmd Clone) Run(req command.Request) {
 	case repo.WorkingCopy:
 		queryGroup := cmd.MakeQueryGroup(
 			req,
-			query.MakeBuilderOptions(cmd),
+			query.MakeBuilderOptionsMulti(
+				query.MakeBuilderOptions(cmd),
+				query.BuilderOptionsDefaultSigil(
+					ids.MakeSigil(
+						ids.SigilHistory,
+						ids.SigilHidden,
+					),
+				),
+			),
 			local,
 			req.Args()[1:],
 		)

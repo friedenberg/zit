@@ -39,10 +39,6 @@ func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
 	cmd.CompressionType.SetFlagSet(f)
 }
 
-func (c Export) DefaultSigil() ids.Sigil {
-	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
-}
-
 func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
@@ -50,7 +46,15 @@ func (c Export) DefaultGenres() ids.Genre {
 func (cmd Export) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.MakeBuilderOptions(cmd),
+		query.MakeBuilderOptionsMulti(
+			query.MakeBuilderOptions(cmd),
+			query.BuilderOptionsDefaultSigil(
+				ids.MakeSigil(
+					ids.SigilHistory,
+					ids.SigilHidden,
+				),
+			),
+		),
 	)
 
 	var list *sku.List

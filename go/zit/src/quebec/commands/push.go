@@ -29,10 +29,6 @@ func (cmd *Push) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
 }
 
-func (c Push) DefaultSigil() ids.Sigil {
-	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
-}
-
 func (c Push) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
@@ -49,7 +45,15 @@ func (cmd Push) Run(req command.Request) {
 	case repo_type.TypeWorkingCopy:
 		queryGroup := cmd.MakeQueryGroup(
 			req,
-			query.MakeBuilderOptions(cmd),
+			query.MakeBuilderOptionsMulti(
+				query.MakeBuilderOptions(cmd),
+				query.BuilderOptionsDefaultSigil(
+					ids.MakeSigil(
+						ids.SigilHistory,
+						ids.SigilHidden,
+					),
+				),
+			),
 			localWorkingCopy,
 			req.Args()[1:],
 		)
