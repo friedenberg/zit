@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -66,10 +65,6 @@ func (c *Clean) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&c.organize, "organize", false, "")
 }
 
-func (req Clean) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.All()...)
-}
-
 func (req Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
@@ -77,7 +72,10 @@ func (req Clean) ModifyBuilder(b *query.Builder) {
 func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(genres.All()...),
+		),
 	)
 
 	localWorkingCopy.AssertCLINotComplete()

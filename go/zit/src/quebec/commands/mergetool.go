@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -26,14 +25,13 @@ type Mergetool struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-func (c Mergetool) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.All()...)
-}
-
 func (cmd Mergetool) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(genres.All()...),
+		),
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()

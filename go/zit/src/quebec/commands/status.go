@@ -19,21 +19,20 @@ type Status struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-func (c Status) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.All()...)
-}
-
 func (c Status) ModifyBuilder(
 	b *query.Builder,
 ) {
-	b.WithHidden(nil).
-		WithDefaultSigil(ids.SigilExternal)
+	b.WithHidden(nil)
 }
 
 func (cmd Status) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(genres.All()...),
+			query.BuilderOptionDefaultSigil(ids.SigilExternal),
+		),
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()

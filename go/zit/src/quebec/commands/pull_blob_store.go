@@ -27,22 +27,18 @@ func (cmd *PullBlobStore) SetFlagSet(f *flag.FlagSet) {
 	cmd.RemoteBlobStore.SetFlagSet(f)
 }
 
-func (c *PullBlobStore) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.InventoryList)
-	// return ids.MakeGenre(genres.TrueGenre()...)
-}
-
 func (cmd *PullBlobStore) Run(
 	dep command.Request,
 ) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
 			query.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
 			),
+			query.BuilderOptionDefaultGenres(genres.InventoryList),
 		),
 	)
 

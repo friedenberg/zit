@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
@@ -15,10 +14,6 @@ func init() {
 
 type CheckinJson struct {
 	command_components.LocalWorkingCopy
-}
-
-func (c CheckinJson) DefaultGenres() ids.Genre {
-	return ids.MakeGenre()
 }
 
 type TomlBookmark struct {

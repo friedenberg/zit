@@ -41,11 +41,6 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.Config.RepoType = repo_type.TypeWorkingCopy
 }
 
-func (c Clone) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.InventoryList)
-	// return ids.MakeGenre(genres.TrueGenre()...)
-}
-
 func (cmd Clone) Run(req command.Request) {
 	local := cmd.OnTheFirstDay(req)
 
@@ -66,12 +61,13 @@ func (cmd Clone) Run(req command.Request) {
 	case repo.WorkingCopy:
 		queryGroup := cmd.MakeQueryGroup(
 			req,
-			query.BuilderOptions(
-				query.BuilderOptionsOld(cmd),
+			query.BuilderOptionsOld(
+				cmd,
 				query.BuilderOptionDefaultSigil(
 					ids.SigilHistory,
 					ids.SigilHidden,
 				),
+				query.BuilderOptionDefaultGenres(genres.InventoryList),
 			),
 			local,
 			req.Args()[1:],

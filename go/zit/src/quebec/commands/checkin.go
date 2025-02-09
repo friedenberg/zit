@@ -52,20 +52,19 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 	cmd.Checkout.SetFlagSet(f)
 }
 
-func (c Checkin) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(genres.All()...)
-}
-
 func (c *Checkin) ModifyBuilder(b *query.Builder) {
 	b.
-		WithDefaultSigil(ids.SigilExternal).
 		WithRequireNonEmptyQuery()
 }
 
 func (cmd Checkin) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultSigil(ids.SigilExternal),
+			query.BuilderOptionDefaultGenres(genres.All()...),
+		),
 	)
 
 	localWorkingCopy.AssertCLINotComplete()

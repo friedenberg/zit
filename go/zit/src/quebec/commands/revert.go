@@ -39,19 +39,18 @@ func (c Revert) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Revert) DefaultGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Zettel,
-		genres.Tag,
-		genres.Type,
-		genres.Repo,
-	)
-}
-
 func (cmd Revert) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptionsOld(
+			cmd,
+			query.BuilderOptionDefaultGenres(
+				genres.Zettel,
+				genres.Tag,
+				genres.Type,
+				genres.Repo,
+			),
+		),
 	)
 
 	localWorkingCopy.Must(localWorkingCopy.Lock)
