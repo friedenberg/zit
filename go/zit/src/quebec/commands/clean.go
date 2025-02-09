@@ -78,8 +78,6 @@ func (cmd Clean) Run(req command.Request) {
 		),
 	)
 
-	localWorkingCopy.AssertCLINotComplete()
-
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	envWorkspace.AssertInWorkspace(req)
 

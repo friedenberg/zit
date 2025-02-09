@@ -72,25 +72,25 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo: test_logz.MakeStackInfo(&t, 0),
-			expected:  "ducks:Etikett [!md house]+?Zettel",
+			expected:  "ducks:Tag [!md house]+?Zettel",
 			inputs:    []string{"!md?z", "house+z", "ducks:e"},
 		},
 		{
 			stackInfo: test_logz.MakeStackInfo(&t, 0),
-			expected:  "ducks:Etikett [!md house]?Zettel",
-			inputs:    []string{"ducks:Etikett [!md house]?Zettel"},
+			expected:  "ducks:Tag [!md house]?Zettel",
+			inputs:    []string{"ducks:Tag [!md house]?Zettel"},
 		},
 		{
 			stackInfo: test_logz.MakeStackInfo(&t, 0),
-			expected:  "ducks:Etikett [=!md house]?Zettel",
-			inputs:    []string{"ducks:Etikett [=!md house]?Zettel"},
+			expected:  "ducks:Tag [=!md house]?Zettel",
+			inputs:    []string{"ducks:Tag [=!md house]?Zettel"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			expectedOptimized: "ducks:Etikett [=!md house wow]:?Zettel",
-			expected:          "ducks:Etikett [=!md house wow]:?Zettel",
+			expectedOptimized: "ducks:Tag [=!md house wow]:?Zettel",
+			expected:          "ducks:Tag [=!md house wow]:?Zettel",
 			inputs: []string{
-				"ducks:Etikett [=!md house]?Zettel wow:Zettel",
+				"ducks:Tag [=!md house]?Zettel wow:Zettel",
 			},
 		},
 		{ // TODO try to make this expect `one/uno.zettel`
@@ -114,8 +114,8 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			expectedOptimized: ":Konfig",
-			expected:          ":Konfig",
+			expectedOptimized: ":Config",
+			expected:          ":Config",
 			inputs:            []string{":konfig"},
 		},
 		{
@@ -126,8 +126,8 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			expectedOptimized: ":Kasten",
-			expected:          ":Kasten",
+			expectedOptimized: ":Repo",
+			expected:          ":Repo",
 			inputs:            []string{":k"},
 		},
 		{
@@ -143,29 +143,29 @@ func TestQuery(t1 *testing.T) {
 			inputs:            []string{"one/uno", "one/dos"},
 		},
 		{
-			expectedOptimized: ":Typ :Etikett :Zettel",
-			expected:          ":Typ,Etikett,Zettel",
+			expectedOptimized: ":Type :Tag :Zettel",
+			expected:          ":Type,Tag,Zettel",
 			inputs:            []string{":z,t,e"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
-			expectedOptimized: ":Akte :Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
-			expected:          ":Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
+			expectedOptimized: ":Blob :Type :Tag :Zettel :Config :InventoryList :Repo",
+			expected:          ":Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
-			expectedOptimized: ":Akte :Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
-			expected:          ":Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
+			expectedOptimized: ":Blob :Type :Tag :Zettel :Config :InventoryList :Repo",
+			expected:          ":Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{":"},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
-			expectedOptimized: "2109504781.792086:Bestandsaufnahme",
-			expected:          "2109504781.792086:Bestandsaufnahme",
+			expectedOptimized: "2109504781.792086:InventoryList",
+			expected:          "2109504781.792086:InventoryList",
 			inputs:            []string{"[2109504781.792086]:b"},
 		},
 		{
@@ -178,8 +178,8 @@ func TestQuery(t1 *testing.T) {
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
-			expectedOptimized: "!md.Akte !md.Typ !md.Etikett !md.Zettel !md.Konfig !md.Bestandsaufnahme !md.Kasten",
-			expected:          "!md.Akte,Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
+			expectedOptimized: "!md.Blob !md.Type !md.Tag !md.Zettel !md.Config !md.InventoryList !md.Repo",
+			expected:          "!md.Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{"!md."},
 		},
 		{

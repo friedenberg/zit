@@ -81,7 +81,7 @@ func (cmd Complete) Run(req command.Request) {
 		return
 	}
 
-	cmd.completeSubcommandArgs(envLocal, subcmd, commandLine)
+	cmd.completeSubcommandArgs(req, envLocal, subcmd, commandLine)
 }
 
 func (cmd Complete) completeSubcommands(
@@ -114,6 +114,7 @@ func (cmd Complete) completeSubcommand(
 }
 
 func (cmd Complete) completeSubcommandArgs(
+	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Command,
 	commandLine command.CommandLine,
@@ -128,7 +129,7 @@ func (cmd Complete) completeSubcommandArgs(
 		return
 	}
 
-	completer.Complete(envLocal, commandLine)
+	completer.Complete(req, envLocal, commandLine)
 }
 
 func (cmd Complete) completeSubcommandFlags(

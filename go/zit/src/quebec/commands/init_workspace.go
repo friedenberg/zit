@@ -47,6 +47,7 @@ func (cmd *InitWorkspace) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd InitWorkspace) Complete(
+	_ command.Request,
 	envLocal env_local.Env,
 	commandLine command.CommandLine,
 ) {

@@ -81,8 +81,6 @@ func (cmd *New) Run(req command.Request) {
 	args := req.Args()
 	repo := cmd.MakeLocalWorkingCopy(req)
 
-	repo.AssertCLINotComplete()
-
 	if err := cmd.ValidateFlagsAndArgs(repo, args...); err != nil {
 		repo.CancelWithError(err)
 	}

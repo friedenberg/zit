@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -50,7 +51,31 @@ func (cmd Show) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Show) SupportsCompletion() {}
+func (cmd Show) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	envRepo := cmd.MakeEnvRepo(req, false)
+	archive := cmd.MakeLocalArchive(envRepo)
+
+	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
+		args := commandLine.Args[1:]
+
+		if commandLine.InProgress != "" {
+			args = args[:len(args)-1]
+		}
+
+		cmd.CompleteWithRepo(
+			req,
+			localWorkingCopy,
+			query.BuilderOptions(
+				query.BuilderOptionDefaultGenres(genres.Tag),
+			),
+			args...,
+		)
+	}
+}
 
 func (cmd Show) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
@@ -59,31 +84,17 @@ func (cmd Show) Run(req command.Request) {
 	args := req.Args()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		switch {
-		case envRepo.GetCLIConfig().Complete:
-			cmd.CompleteWithRepo(
-				req,
-				localWorkingCopy,
-				query.BuilderOptions(
-					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
-					query.BuilderOptionDefaultGenres(genres.Tag),
-				),
-				args...,
-			)
+		queryGroup := cmd.MakeQueryGroup(
+			req,
+			query.BuilderOptions(
+				query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
+				query.BuilderOptionDefaultGenres(genres.Zettel),
+			),
+			localWorkingCopy,
+			args,
+		)
 
-		default:
-			queryGroup := cmd.MakeQueryGroup(
-				req,
-				query.BuilderOptions(
-					query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
-					query.BuilderOptionDefaultGenres(genres.Zettel),
-				),
-				localWorkingCopy,
-				args,
-			)
-
-			cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, queryGroup)
-		}
+		cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, queryGroup)
 	} else {
 		if len(args) != 0 {
 			ui.Err().Print("ignoring arguments for archive repo")

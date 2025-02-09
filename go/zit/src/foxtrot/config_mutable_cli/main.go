@@ -18,7 +18,6 @@ type Config struct {
 	Quiet            bool
 	Todo             bool
 	dryRun           bool
-	Complete         bool
 	IgnoreHookErrors bool
 	Hooks            string
 
@@ -51,7 +50,6 @@ func (c *Config) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&c.dryRun, "dry-run", false, "")
 	f.BoolVar(&c.Verbose, "verbose", false, "")
 	f.BoolVar(&c.Quiet, "quiet", false, "")
-	f.BoolVar(&c.Complete, "complete", false, "")
 
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 
@@ -111,7 +109,7 @@ func (c Config) UsePrintTags() bool {
 }
 
 func (c Config) IsDryRun() bool {
-	return c.dryRun || c.Complete
+	return c.dryRun
 }
 
 func (c *Config) SetDryRun(v bool) {

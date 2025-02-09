@@ -48,14 +48,5 @@ func Run(ctx errors.Context, args ...string) {
 		FlagSet: f,
 	}
 
-	if configCli.Complete {
-		if _, ok := cmd.(command.SupportsCompletion); !ok {
-			ctx.CancelWithBadRequestf(
-				"command %q does not support completion",
-				name,
-			)
-		}
-	}
-
 	cmd.Run(req)
 }

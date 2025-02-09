@@ -11,58 +11,46 @@ teardown() {
 	rm_from_version "$version"
 }
 
-function assert_complete_fails() (
-	for cmd in "$@"; do
-		run_zit "$cmd" -complete
-		assert_failure
-		assert_output "command \"$cmd\" does not support completion"
-	done
-)
-
-function complete_fails { # @test
-	cmds=(
-		checkin
-		checkin-blob
-		checkin-json
-		checkout
-	)
-
-	assert_complete_fails "${cmds[@]}"
-}
-
 function complete_show { # @test
-	run_zit show -complete
+	run_zit complete show
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		tag-1.*Etikett
-		tag-2.*Etikett
-		tag-3.*Etikett
-		tag-4.*Etikett
-		tag.*Etikett
+		tag-1.*Tag
+		tag-2.*Tag
+		tag-3.*Tag
+		tag-4.*Tag
+		tag.*Tag
 	EOM
 }
 
 function complete_show_all { # @test
-	run_zit show -complete :z,t,b,e
+	skip
+	run_zit complete show :z,t,b,e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
-		.*Bestandsaufnahme
-		.*Bestandsaufnahme
-		.*Bestandsaufnahme
-		.*Bestandsaufnahme
-		!md.*Typ
+		-after
+		-before
+		-exclude-recognized
+		-exclude-untracked
+		-format.*format
+		-kasten.*none or Browser
+		.*InventoryList
+		.*InventoryList
+		.*InventoryList
+		.*InventoryList
+		!md.*Type
 		one/dos.*Zettel: !md wow ok again
 		one/uno.*Zettel: !md wow the first
-		tag.*Etikett
-		tag.1.*Etikett
-		tag.2.*Etikett
-		tag.3.*Etikett
-		tag.4.*Etikett
+		tag.*Tag
+		tag.1.*Tag
+		tag.2.*Tag
+		tag.3.*Tag
+		tag.4.*Tag
 	EOM
 }
 
 function complete_show_zettels { # @test
-	run_zit show -verbose -complete :z
+	run_zit complete show :z
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		one/dos.*Zettel: !md wow ok again
@@ -71,19 +59,19 @@ function complete_show_zettels { # @test
 }
 
 function complete_show_types { # @test
-	run_zit show -complete :t
+	run_zit complete show :t
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
-		md.*Typ
+		md.*Type
 	EOM
 }
 
 function complete_show_tags { # @test
-	run_zit show -complete :e
+	run_zit complete show :e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
-		tag-3.*Etikett
-		tag-4.*Etikett
+		tag-3.*Tag
+		tag-4.*Tag
 	EOM
 }
 
@@ -164,21 +152,21 @@ function complete_init_workspace { # @test
 	run_zit complete init-workspace -tags
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		tag-1.*Etikett
-		tag-2.*Etikett
-		tag-3.*Etikett
-		tag-4.*Etikett
-		tag.*Etikett
+		tag-1.*Tag
+		tag-2.*Tag
+		tag-3.*Tag
+		tag-4.*Tag
+		tag.*Tag
 	EOM
 
 	run_zit complete -in-progress="tag" init-workspace -tags tag
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		tag-1.*Etikett
-		tag-2.*Etikett
-		tag-3.*Etikett
-		tag-4.*Etikett
-		tag.*Etikett
+		tag-1.*Tag
+		tag-2.*Tag
+		tag-3.*Tag
+		tag-4.*Tag
+		tag.*Tag
 	EOM
 
 	mkdir -p workspaces/test

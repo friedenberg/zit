@@ -42,5 +42,5 @@ type Completion struct {
 }
 
 type Completer interface {
-	Complete(env_local.Env, CommandLine)
+	Complete(Request, env_local.Env, CommandLine)
 }

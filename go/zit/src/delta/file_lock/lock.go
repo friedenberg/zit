@@ -40,11 +40,6 @@ func (l *Lock) IsAcquired() (acquired bool) {
 }
 
 func (l *Lock) Lock() (err error) {
-	if l.envUI.GetCLIConfig().Complete {
-		err = errors.BadRequestf("command running with `-complete`, refusing to lock")
-		return
-	}
-
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 

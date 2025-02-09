@@ -46,7 +46,6 @@ func (cmd CheckinBlob) Run(req command.Request) {
 	args := req.Args()
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
-	localWorkingCopy.AssertCLINotComplete()
 
 	if len(args)%2 != 0 {
 		req.CancelWithErrorf(

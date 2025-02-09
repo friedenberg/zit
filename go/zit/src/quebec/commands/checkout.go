@@ -59,8 +59,6 @@ func (cmd Checkout) Run(req command.Request) {
 		req.Args(),
 	)
 
-	localWorkingCopy.AssertCLINotComplete()
-
 	opCheckout := user_ops.Checkout{
 		Repo:     localWorkingCopy,
 		Organize: cmd.Organize,

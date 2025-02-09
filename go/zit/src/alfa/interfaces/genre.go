@@ -22,6 +22,7 @@ type Genre interface {
 	EqualsGenre(GenreGetter) bool
 	GetGenreBitInt() byte
 	GetGenreString() string
+	GetGenreStringVersioned(StoreVersion) string
 	GetGenreStringPlural(StoreVersion) string
 }
 

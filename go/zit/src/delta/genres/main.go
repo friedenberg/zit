@@ -127,7 +127,19 @@ func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 }
 
 func (g Genre) GetGenreString() string {
-	return g.String()
+  return g.String()
+}
+
+func (g Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {
+	v := sv.GetInt()
+
+	switch {
+	case v <= 6:
+		return g.stringOld()
+
+	default:
+		return g.String()
+	}
 }
 
 func (g Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
@@ -193,6 +205,37 @@ func (g Genre) getGenreStringPluralOld() string {
 }
 
 func (g Genre) String() string {
+	switch g {
+	case Blob:
+		return "Blob"
+
+	case Type:
+		return "Type"
+
+	case Tag:
+		return "Tag"
+
+	case Zettel:
+		return "Zettel"
+
+	case Config:
+		return "Config"
+
+	case InventoryList:
+		return "InventoryList"
+
+	case Repo:
+		return "Repo"
+
+	case None:
+		return "none"
+
+	default:
+		return fmt.Sprintf("Unknown(%#v)", g)
+	}
+}
+
+func (g Genre) stringOld() string {
 	switch g {
 	case Blob:
 		return "Akte"

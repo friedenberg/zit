@@ -24,7 +24,6 @@ type TomlBookmark struct {
 
 func (cmd CheckinJson) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
-	localWorkingCopy.AssertCLINotComplete()
 
 	dec := json.NewDecoder(localWorkingCopy.GetInFile())
 

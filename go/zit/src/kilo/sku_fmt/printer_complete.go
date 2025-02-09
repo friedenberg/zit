@@ -32,23 +32,23 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 	}
 
 	go func(s *WriterComplete) {
-		for z := range s.chTransacted {
+		for sk := range s.chTransacted {
 			ui.TodoP4("handle write errors")
-			s.wBuf.WriteString(z.GetObjectId().String())
+			s.wBuf.WriteString(sk.GetObjectId().String())
 			s.wBuf.WriteByte('\t')
 
-			g := z.GetObjectId().GetGenre()
+			g := sk.GetObjectId().GetGenre()
 			s.wBuf.WriteString(g.String())
 
 			if g == genres.Zettel {
 				s.wBuf.WriteString(": ")
-				s.wBuf.WriteString(z.GetType().String())
+				s.wBuf.WriteString(sk.GetType().String())
 				s.wBuf.WriteString(" ")
-				s.wBuf.WriteString(z.GetMetadata().Description.String())
+				s.wBuf.WriteString(sk.GetMetadata().Description.String())
 			}
 
 			s.wBuf.WriteString("\n")
-			w1.pool.Put(z)
+			w1.pool.Put(sk)
 		}
 
 		s.chDone <- struct{}{}
