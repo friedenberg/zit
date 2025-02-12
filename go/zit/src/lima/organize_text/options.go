@@ -42,6 +42,7 @@ type Options struct {
 	UsePrefixJoints   bool
 	UseRefiner        bool
 	UseMetadataHeader bool
+	Limit             int
 
 	PrintOptions options_print.V0
 	fmtBox       *box_format.BoxCheckedOut
@@ -106,6 +107,13 @@ func (o *Flags) SetFlagSet(f *flag.FlagSet) {
 		"metadata-header",
 		true,
 		"metadata header",
+	)
+
+	f.IntVar(
+		&o.Limit,
+		"limit",
+		0,
+		"limit the number of objects edited in organize",
 	)
 }
 
@@ -174,9 +182,23 @@ func (o Options) Make() (ot *Text, err error) {
 		c.TagSet = ids.MakeTagSet()
 	}
 
-	if err = c.Options.Skus.Each(c.all.AddSku); err != nil {
-		err = errors.Wrap(err)
-		return
+	var objects Objects
+
+	for sk := range c.Options.Skus.All() {
+		objects.Add(&obj{sku: sk})
+	}
+
+	objects.Sort()
+
+	for i, obj := range objects {
+		if i != 0 && i == o.Limit {
+			break
+		}
+
+		if err = c.all.AddSku(obj.sku); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {

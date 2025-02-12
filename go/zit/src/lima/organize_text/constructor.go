@@ -21,40 +21,33 @@ func (c *constructor) collectExplicitAndImplicitFor(
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
-	if err = skus.Each(
-		func(st sku.SkuType) (err error) {
-			sk := st.GetSkuExternal()
+	for st := range skus.All() {
+		sk := st.GetSkuExternal()
 
-			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
-				if ewp.Tag.String() == sk.ObjectId.String() {
-					continue
-				}
-
-				cmp := ewp.ComparePartial(res)
-
-				if cmp != 0 {
-					continue
-				}
-
-				if len(ewp.Parents) == 0 { // TODO use Type
-					explicitCount++
-					break
-				}
-
-				for _, p := range ewp.Parents {
-					if p.Type == tag_paths.TypeDirect {
-						explicitCount++
-					} else {
-						implicitCount++
-					}
-				}
+		for _, ewp := range sk.Metadata.Cache.TagPaths.All {
+			if ewp.Tag.String() == sk.ObjectId.String() {
+				continue
 			}
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+			cmp := ewp.ComparePartial(res)
+
+			if cmp != 0 {
+				continue
+			}
+
+			if len(ewp.Parents) == 0 { // TODO use Type
+				explicitCount++
+				break
+			}
+
+			for _, p := range ewp.Parents {
+				if p.Type == tag_paths.TypeDirect {
+					explicitCount++
+				} else {
+					implicitCount++
+				}
+			}
+		}
 	}
 
 	return

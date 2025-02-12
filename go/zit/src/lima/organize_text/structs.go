@@ -59,26 +59,28 @@ func (a *obj) String() string {
 
 func sortObjSet(
 	s interfaces.MutableSetLike[*obj],
-) (out []*obj) {
+) (out Objects) {
 	out = quiter.Elements(s)
+	out.Sort()
+	return
+}
 
-	sort.Slice(out, func(i, j int) bool {
+func (objects Objects) Sort() {
+	sort.Slice(objects, func(i, j int) bool {
 		switch {
-		case out[i].GetSkuExternal().ObjectId.IsEmpty() && out[j].GetSkuExternal().ObjectId.IsEmpty():
-			return out[i].GetSkuExternal().Metadata.Description.String() < out[j].GetSkuExternal().Metadata.Description.String()
+		case objects[i].GetSkuExternal().ObjectId.IsEmpty() && objects[j].GetSkuExternal().ObjectId.IsEmpty():
+			return objects[i].GetSkuExternal().Metadata.Description.String() < objects[j].GetSkuExternal().Metadata.Description.String()
 
-		case out[i].GetSkuExternal().ObjectId.IsEmpty():
+		case objects[i].GetSkuExternal().ObjectId.IsEmpty():
 			return true
 
-		case out[j].GetSkuExternal().ObjectId.IsEmpty():
+		case objects[j].GetSkuExternal().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].GetSkuExternal().ObjectId.String() < out[j].GetSkuExternal().ObjectId.String()
+			return objects[i].GetSkuExternal().ObjectId.String() < objects[j].GetSkuExternal().ObjectId.String()
 		}
 	})
-
-	return
 }
 
 type Objects []*obj
@@ -138,13 +140,13 @@ func (os *Objects) Del(v *obj) error {
 	return nil
 }
 
-func (os Objects) Sort() {
-	sort.Slice(os, func(i, j int) bool {
-		ei, ej := os[i].sku, os[j].sku
+// func (os Objects) Sort() {
+// 	sort.Slice(os, func(i, j int) bool {
+// 		ei, ej := os[i].sku, os[j].sku
 
-		keyI := keyer.GetKey(ei)
-		keyJ := keyer.GetKey(ej)
+// 		keyI := keyer.GetKey(ei)
+// 		keyJ := keyer.GetKey(ej)
 
-		return keyI < keyJ
-	})
-}
+// 		return keyI < keyJ
+// 	})
+// }

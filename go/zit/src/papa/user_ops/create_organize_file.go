@@ -33,7 +33,8 @@ func (cmd CreateOrganizeFile) RunAndWrite(
 
 func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
 	count := cmd.Options.Skus.Len()
-	if count > 30 {
+
+	if count > 30 && !cmd.GetCLIConfig().IsDryRun() {
 		if !cmd.Confirm(
 			fmt.Sprintf(
 				"a large number (%d) of objects would be edited in organize. continue to organize?",

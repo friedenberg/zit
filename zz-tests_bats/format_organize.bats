@@ -261,8 +261,8 @@ function format_organize_with_new_spreading_several_lines { # @test
 		- today
 		---
 
-		- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
 		- [/ !task pom-1] john jacob jingleheimer smith that's my name too
+		- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
 		- [mes/mare !task pom-4 priority-2_want today-in_progress zz-inbox] john jacob jingleheimer smith
 		- [ne/har !task pom-1 priority-1_should zz-inbox] jingleheimer smith
 	EOM
@@ -330,8 +330,8 @@ function format_organize_with_heading_having_space { # @test
 		- today
 		---
 
-		- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
 		- [/ !task pom-1] john jacob jingleheimer smith that's my name too
+		- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
 		- [mes/mare !task pom-4 priority-2_want today-in_progress zz-inbox] john jacob jingleheimer smith
 		- [ne/har !task pom-1 priority-1_should zz-inbox] jingleheimer smith
 	EOM
