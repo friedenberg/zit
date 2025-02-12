@@ -2,83 +2,70 @@ package sku_fmt
 
 import (
 	"bufio"
-	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-type WriterComplete struct {
-	wBuf         *bufio.Writer
-	pool         interfaces.Pool[sku.Transacted, *sku.Transacted]
-	chTransacted chan *sku.Transacted
-	chDone       chan struct{}
+type PrinterComplete struct {
+	bufferedWriter *bufio.Writer
+	pool           interfaces.Pool[sku.Transacted, *sku.Transacted]
+	chObjects      chan *sku.Transacted
+	chDone         chan struct{}
 }
 
-func MakeWriterComplete(w io.Writer) *WriterComplete {
-	w1 := &WriterComplete{
-		chTransacted: make(chan *sku.Transacted),
-		chDone:       make(chan struct{}),
-		wBuf:         bufio.NewWriter(w),
+func MakePrinterComplete(envLocal env_local.Env) *PrinterComplete {
+	printer := &PrinterComplete{
+		chObjects:      make(chan *sku.Transacted),
+		chDone:         make(chan struct{}),
+		bufferedWriter: bufio.NewWriter(envLocal.GetUIFile()),
 		pool: pool.MakePool[sku.Transacted](
 			nil,
 			nil,
 		),
 	}
 
-	go func(s *WriterComplete) {
-		for sk := range s.chTransacted {
+	envLocal.AfterWithContext(printer.Close)
+
+	go func(s *PrinterComplete) {
+		for sk := range s.chObjects {
 			ui.TodoP4("handle write errors")
-			s.wBuf.WriteString(sk.GetObjectId().String())
-			s.wBuf.WriteByte('\t')
+			s.bufferedWriter.WriteString(sk.GetObjectId().String())
+			s.bufferedWriter.WriteByte('\t')
 
 			g := sk.GetObjectId().GetGenre()
-			s.wBuf.WriteString(g.String())
+			s.bufferedWriter.WriteString(g.String())
 
-			if g == genres.Zettel {
-				s.wBuf.WriteString(": ")
-				s.wBuf.WriteString(sk.GetType().String())
-				s.wBuf.WriteString(" ")
-				s.wBuf.WriteString(sk.GetMetadata().Description.String())
+			tipe := sk.GetType().String()
+
+			if tipe != "" {
+				s.bufferedWriter.WriteString(": ")
+				s.bufferedWriter.WriteString(sk.GetType().String())
 			}
 
-			s.wBuf.WriteString("\n")
-			w1.pool.Put(sk)
+			description := sk.GetMetadata().Description.String()
+
+			if description != "" {
+				s.bufferedWriter.WriteString(" ")
+				s.bufferedWriter.WriteString(sk.GetMetadata().Description.String())
+			}
+
+			s.bufferedWriter.WriteString("\n")
+			printer.pool.Put(sk)
 		}
 
 		s.chDone <- struct{}{}
-	}(w1)
+	}(printer)
 
-	return w1
+	return printer
 }
 
-func (w *WriterComplete) WriteOneSkuType(
-	co sku.SkuType,
-) (err error) {
-	switch co.GetState() {
-	// case checked_out_state.Internal:
-	// 	sku.Resetter.ResetWith(sk, co.GetSku())
-
-	default:
-		// sku.Resetter.ResetWith(sk, co.GetSkuExternal())
-		// TODO use proper states
-		// sku.Resetter.ResetWith(sk, co.GetSku())
-	}
-
-	if err = w.WriteOneTransacted(co.GetSku()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (w *WriterComplete) WriteOneTransacted(
+func (printer *PrinterComplete) PrintOne(
 	src *sku.Transacted,
 ) (err error) {
 	if src.GetObjectId().String() == "/" {
@@ -86,24 +73,29 @@ func (w *WriterComplete) WriteOneTransacted(
 		return
 	}
 
-	dst := w.pool.Get()
+	dst := printer.pool.Get()
 	sku.Resetter.ResetWith(dst, src)
 
 	select {
-	case <-w.chDone:
+	case <-printer.chDone:
 		err = collections.MakeErrStopIteration()
 
-	case w.chTransacted <- dst:
+	case printer.chObjects <- dst:
 	}
 
 	return
 }
 
-func (w *WriterComplete) Close() (err error) {
-	close(w.chTransacted)
-	<-w.chDone
+func (printer *PrinterComplete) Close(context errors.Context) (err error) {
+	close(printer.chObjects)
+	<-printer.chDone
 
-	if err = w.wBuf.Flush(); err != nil {
+	if err = context.Cause(); err != nil {
+		err = nil
+		return
+	}
+
+	if err = printer.bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

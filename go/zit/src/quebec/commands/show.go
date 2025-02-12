@@ -37,14 +37,14 @@ type Show struct {
 	Format string
 }
 
-func (cmd *Show) SetFlagSet(f *flag.FlagSet) {
-	cmd.EnvRepo.SetFlagSet(f)
-	cmd.LocalArchive.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
+func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.EnvRepo.SetFlagSet(flagSet)
+	cmd.LocalArchive.SetFlagSet(flagSet)
+	cmd.QueryGroup.SetFlagSet(flagSet)
 
-	f.StringVar(&cmd.Format, "format", "log", "format")
-	f.Var((*ids.TaiRFC3339Value)(&cmd.Before), "before", "")
-	f.Var((*ids.TaiRFC3339Value)(&cmd.After), "after", "")
+	flagSet.StringVar(&cmd.Format, "format", "log", "format")
+	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.Before), "before", "")
+	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.After), "after", "")
 }
 
 func (cmd Show) CompletionGenres() ids.Genre {

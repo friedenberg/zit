@@ -1,8 +1,6 @@
 package command_components
 
 import (
-	"os"
-
 	"code.linenisgreat.com/zit/go/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -88,8 +86,7 @@ func (cmd Complete) CompleteObjects(
 	queryBuilderOptions query.BuilderOption,
 	args ...string,
 ) {
-	completionWriter := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer local.MustClose(completionWriter)
+	printerCompletions := sku_fmt.MakePrinterComplete(local)
 
 	queryGroup := cmd.MakeQueryGroup(
 		req,
@@ -100,7 +97,7 @@ func (cmd Complete) CompleteObjects(
 
 	if err := local.GetStore().QueryTransacted(
 		queryGroup,
-		completionWriter.WriteOneTransacted,
+		printerCompletions.PrintOne,
 	); err != nil {
 		local.CancelWithError(err)
 	}
