@@ -32,6 +32,7 @@ type InitWorkspace struct {
 
 func (cmd *InitWorkspace) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
+	// TODO add command.Completer variants of tags, type, and query flags
 
 	cmd.Proto.SetFlagSetTags(
 		f,

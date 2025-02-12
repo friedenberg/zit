@@ -20,6 +20,7 @@ function FormatObjectImage(imgSrc, format)
   return pandoc.pipe("zit", { "format-object", objectID, format }, ""), objectID
 end
 
+-- [fib/chil @b7a8 !task project-2021-zit-bugs zz-inbox] modify pandoc filters to handle non-objects in images
 function ReplaceObjectImageWithTextIfNecessary(img)
   if img.src == nil then
     return nil
@@ -32,6 +33,7 @@ function ReplaceObjectImageWithTextIfNecessary(img)
   return pandoc.RawInline("markdown", data)
 end
 
+-- [fib/chil @b7a8 !task project-2021-zit-bugs zz-inbox] modify pandoc filters to handle non-objects in images
 function ReplaceObjectImageWithImageIfNecessary(img)
   if img.src == nil then
     return nil
@@ -47,6 +49,7 @@ function ReplaceObjectImageWithImageIfNecessary(img)
   return pandoc.Image(img.caption, fname)
 end
 
+-- [fib/chil @b7a8 !task project-2021-zit-bugs zz-inbox] modify pandoc filters to handle non-objects in images
 function IsSku(str)
   return true
 end

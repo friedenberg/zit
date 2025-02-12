@@ -24,7 +24,7 @@ func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
 }
 
-func (c QueryGroup) MakeQueryGroup(
+func (cmd QueryGroup) MakeQueryGroup(
 	req command.Request,
 	options query.BuilderOption,
 	repo repo.WorkingCopy,
@@ -34,7 +34,7 @@ func (c QueryGroup) MakeQueryGroup(
 
 	if queryGroup, err = repo.MakeExternalQueryGroup(
 		options,
-		c.ExternalQueryOptions,
+		cmd.ExternalQueryOptions,
 		args...,
 	); err != nil {
 		req.CancelWithError(err)

@@ -162,6 +162,7 @@ func (cmd Complete) completeSubcommandFlags(
 			envLocal,
 			subcmd,
 			flagSet,
+			commandLine,
 			err,
 		)
 	} else {
@@ -178,6 +179,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	envLocal env_local.Env,
 	subcmd command.Command,
 	flagSet *flag.FlagSet,
+	commandLine command.CommandLine,
 	err error,
 ) {
 	if subcmd == nil {
@@ -194,6 +196,17 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
+	var flagCompleter command.Completer
+
+	if flag := flagSet.Lookup(after); flag != nil {
+		flagCompleter, _ = flag.Value.(command.Completer)
+	}
+
+	if flagCompleter != nil {
+		flagCompleter.Complete(req, envLocal, commandLine)
+		return
+	}
+
 	switch after {
 	case "tags":
 		local := command_components.LocalWorkingCopy{}.MakeLocalWorkingCopy(req)
@@ -203,6 +216,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		)
 
 	default:
+
 		ui.Debug().Print("to complete:", after)
 	}
 }

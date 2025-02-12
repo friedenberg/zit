@@ -30,6 +30,8 @@ type Show struct {
 	command_components.LocalArchive
 	command_components.QueryGroup
 
+	complete command_components.Complete
+
 	After  ids.Tai
 	Before ids.Tai
 	Format string
@@ -66,7 +68,7 @@ func (cmd Show) Complete(
 			args = args[:len(args)-1]
 		}
 
-		cmd.CompleteWithRepo(
+		cmd.complete.CompleteObjects(
 			req,
 			localWorkingCopy,
 			query.BuilderOptions(
