@@ -7,7 +7,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 )
 
-type FlagSet = flag.FlagSet
+type (
+	FlagSet = flag.FlagSet
+	Value   = flag.Value
+)
 
 func Make(
 	fp flag_policy.FlagPolicy,

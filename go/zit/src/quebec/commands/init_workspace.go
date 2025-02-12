@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
@@ -26,7 +27,9 @@ type InitWorkspace struct {
 	command_components.Env
 	command_components.LocalWorkingCopy
 
-	DefaultQueryGroup string
+	complete command_components.Complete
+
+	DefaultQueryGroup values.String
 	Proto             sku.Proto
 }
 
@@ -34,17 +37,23 @@ func (cmd *InitWorkspace) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
 	// TODO add command.Completer variants of tags, type, and query flags
 
-	cmd.Proto.SetFlagSetTags(
-		f,
+	f.Var(
+		cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
+		"tags",
 		"tags added for new objects in `checkin`, `new`, `organize`",
 	)
 
-	cmd.Proto.SetFlagSetType(
-		f,
+	f.Var(
+		cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
+		"type",
 		"type used for new objects in `new` and `organize`",
 	)
 
-	f.StringVar(&cmd.DefaultQueryGroup, "query", "", "default query for `show`")
+	f.Var(
+		cmd.complete.GetFlagValueStringTags(&cmd.DefaultQueryGroup),
+		"query",
+		"default query for `show`",
+	)
 }
 
 func (cmd InitWorkspace) Complete(
@@ -121,7 +130,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	blob := &workspace_config_blobs.V0{
-		Query: cmd.DefaultQueryGroup,
+		Query: cmd.DefaultQueryGroup.String(),
 		Defaults: config_mutable_blobs.DefaultsV1OmitEmpty{
 			Type: cmd.Proto.Type,
 			Tags: quiter.Elements(cmd.Proto.Tags),

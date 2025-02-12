@@ -71,9 +71,7 @@ func (cmd Show) Complete(
 		cmd.complete.CompleteObjects(
 			req,
 			localWorkingCopy,
-			query.BuilderOptions(
-				query.BuilderOptionDefaultGenres(genres.Tag),
-			),
+			query.BuilderOptionDefaultGenres(genres.Tag),
 			args...,
 		)
 	}

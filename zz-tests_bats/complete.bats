@@ -159,6 +159,22 @@ function complete_init_workspace { # @test
 		tag.*Tag
 	EOM
 
+	run_zit complete init-workspace -query
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		tag-1.*Tag
+		tag-2.*Tag
+		tag-3.*Tag
+		tag-4.*Tag
+		tag.*Tag
+	EOM
+
+	run_zit complete init-workspace -type
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		!md.*Type
+	EOM
+
 	run_zit complete -in-progress="tag" init-workspace -tags tag
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'

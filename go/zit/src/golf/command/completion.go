@@ -1,6 +1,10 @@
 package command
 
-import "code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+import (
+	"flag"
+
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+)
 
 type SupportsCompletion interface {
 	SupportsCompletion()
@@ -43,4 +47,19 @@ type Completion struct {
 
 type Completer interface {
 	Complete(Request, env_local.Env, CommandLine)
+}
+
+type FuncCompleter func(Request, env_local.Env, CommandLine)
+
+type FlagValueCompleter struct {
+	flag.Value
+	FuncCompleter
+}
+
+func (completer FlagValueCompleter) Complete(
+	req Request,
+	envLocal env_local.Env,
+	commandLine CommandLine,
+) {
+	completer.FuncCompleter(req, envLocal, commandLine)
 }

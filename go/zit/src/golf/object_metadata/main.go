@@ -46,6 +46,7 @@ func (m *Metadata) Mutter() *sha.Sha {
 	return &m.ParentMetadataObjectIdParent
 }
 
+// TODO replace with command_components.ObjectMetadata
 func (m *Metadata) SetFlagSet(f *flag.FlagSet) {
 	m.SetFlagSetDescription(
 		f,

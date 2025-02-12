@@ -5,7 +5,6 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -20,6 +19,8 @@ func init() {
 
 type Complete struct {
 	command_components.Env
+	command_components.Complete
+
 	bashStyle  bool
 	inProgress string
 }
@@ -207,16 +208,5 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	switch after {
-	case "tags":
-		local := command_components.LocalWorkingCopy{}.MakeLocalWorkingCopy(req)
-		command_components.QueryGroup{}.CompleteTagsWithRepo(
-			req,
-			local,
-		)
-
-	default:
-
-		ui.Debug().Print("to complete:", after)
-	}
+  req.CancelWithBadRequestf("no completion available for flag: %q", after)
 }
