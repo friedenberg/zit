@@ -150,20 +150,13 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err err
 
 	u.Must(u.Lock)
 
-	if err = changes.Removed.Each(
-		func(el sku.SkuType) (err error) {
-			if err = u.GetStore().DeleteCheckedOut(
-				el,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for _, el := range changes.Removed.AllSkuAndIndex() {
+		if err = u.GetStore().DeleteCheckedOut(
+			el,
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	u.Must(u.Unlock)

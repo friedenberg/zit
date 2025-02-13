@@ -50,23 +50,16 @@ func (repo *Repo) LockAndCommitOrganizeResults(
 		}
 	}
 
-	if err = changeResults.Changed.Each(
-		func(changed sku.SkuType) (err error) {
-			if err = repo.GetStore().CreateOrUpdate(
-				changed.GetSkuExternal(),
-				sku.StoreOptions{
-					MergeCheckedOut: true,
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for _, changed := range changeResults.Changed.AllSkuAndIndex() {
+		if err = repo.GetStore().CreateOrUpdate(
+			changed.GetSkuExternal(),
+			sku.StoreOptions{
+				MergeCheckedOut: true,
+			},
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	repo.Must(repo.Unlock)

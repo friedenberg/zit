@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -29,15 +28,21 @@ type SkuMapWithOrder struct {
 
 func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.SkuTypeSetMutable {
 	elms := sku.MakeSkuTypeSetMutable()
-	errors.PanicIfError(smwo.Each(elms.Add))
+
+	for _, sk := range smwo.AllSkuAndIndex() {
+		errors.PanicIfError(elms.Add(sk))
+	}
+
 	return elms
 }
 
 func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
 	tms := sku.MakeTransactedMutableSet()
-	errors.PanicIfError(smwo.Each(func(el sku.SkuType) (err error) {
-		return tms.Add(el.GetSkuExternal())
-	}))
+
+	for _, el := range smwo.AllSkuAndIndex() {
+		errors.PanicIfError(tms.Add(el.GetSkuExternal()))
+	}
+
 	return tms
 }
 
@@ -109,30 +114,6 @@ func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.SkuType] {
 			}
 		}
 	}
-}
-
-func (sm *SkuMapWithOrder) Each(
-	f interfaces.FuncIter[sku.SkuType],
-) (err error) {
-  for _, v := range sm.AllSkuAndIndex() {
-		_, ok := sm.m[keyer.GetKey(v)]
-
-		if !ok {
-			continue
-		}
-
-		if err = f(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
 }
 
 type Changes struct {
