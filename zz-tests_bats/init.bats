@@ -22,6 +22,7 @@ function init_compression { # @test
 
 			store-version = 8
 			repo-type = 'working-copy'
+			id = ''
 
 			[blob-store]
 			compression-type = 'zstd'
@@ -29,9 +30,13 @@ function init_compression { # @test
 		EOM
 	}
 
-	run cat .xdg/data/zit/config-permanent
+	run_zit info-repo config-immutable
 	assert_success
 	output_immutable_config | assert_output -
+
+	run cat .xdg/data/zit/config-permanent
+	assert_success
+  output_immutable_config | assert_output -
 
 	run_zit cat-blob "$(get_konfig_sha)"
 	assert_success

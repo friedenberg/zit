@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 // TODO Split into repo and blob store configs
@@ -51,6 +52,10 @@ func (k V0) GetStoreVersion() interfaces.StoreVersion {
 
 func (k V0) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
+}
+
+func (k V0) GetRepoId() ids.RepoId {
+	return ids.RepoId{}
 }
 
 func (k *V0) GetAgeEncryption() *age.Age {

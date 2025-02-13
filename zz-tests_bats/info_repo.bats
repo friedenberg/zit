@@ -17,6 +17,25 @@ teardown() {
 
 # bats file_tags=user_story:repo_info
 
+# bats test_tags=user_story:config-immutable
+function info_config_immutable { # @test
+	run_zit info-repo config-immutable
+	assert_success
+	assert_output - <<-EOM
+		---
+		! toml-config-immutable-v1
+		---
+
+		store-version = 8
+		repo-type = 'working-copy'
+		id = ''
+
+		[blob-store]
+		compression-type = 'zstd'
+		lock-internal-files = false
+	EOM
+}
+
 # bats test_tags=user_story:store_version
 function info_store_version { # @test
 	run_zit info-repo

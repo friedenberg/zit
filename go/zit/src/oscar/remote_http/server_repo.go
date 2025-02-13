@@ -43,7 +43,7 @@ func (server *Server) writeInventoryList(
 		}
 	}
 
-	seq := typedInventoryListStore.IterInventoryListBlobSkusFromReader(
+	seqInventoryListSkus := typedInventoryListStore.IterInventoryListBlobSkusFromReader(
 		listSku.GetType(),
 		bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 	)
@@ -54,7 +54,7 @@ func (server *Server) writeInventoryList(
 	{
 		count := 0
 
-		for sk, err := range seq {
+		for sk, err := range seqInventoryListSkus {
 			server.Repo.GetEnv().ContinueOrPanicOnDone()
 
 			if err != nil {

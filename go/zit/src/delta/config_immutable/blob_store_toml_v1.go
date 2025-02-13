@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 )
 
-// TODO Split into repo and blob store configs
 type BlobStoreTomlV1 struct {
 	AgeEncryption     age.Age         `toml:"age-encryption,omitempty"`
 	CompressionType   CompressionType `toml:"compression-type"`

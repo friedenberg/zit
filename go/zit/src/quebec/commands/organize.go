@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -34,7 +35,10 @@ func init() {
 
 // Refactor and fold components into userops
 type Organize struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components.LocalWorkingCopy
+	command_components.QueryGroup
+
+	complete command_components.Complete
 
 	organize_text.Flags
 	Mode organize_text_mode.Mode
@@ -43,7 +47,7 @@ type Organize struct {
 }
 
 func (c *Organize) SetFlagSet(f *flag.FlagSet) {
-	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	c.QueryGroup.SetFlagSet(f)
 
 	c.Flags.SetFlagSet(f)
 
@@ -66,6 +70,30 @@ func (c *Organize) CompletionGenres() ids.Genre {
 		genres.Zettel,
 		genres.Tag,
 		genres.Type,
+	)
+}
+
+func (cmd Organize) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+
+	args := commandLine.Args[1:]
+
+	if commandLine.InProgress != "" {
+		args = args[:len(args)-1]
+	}
+
+	cmd.complete.CompleteObjects(
+		req,
+		localWorkingCopy,
+		query.BuilderOptionDefaultGenres(
+			genres.Tag,
+			genres.Type,
+		),
+		args...,
 	)
 }
 

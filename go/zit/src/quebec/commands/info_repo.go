@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
@@ -32,11 +33,22 @@ func (cmd InfoRepo) Run(req command.Request) {
 		default:
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
+		case "config-immutable":
+      if _, err := (config_immutable_io.Coder{}).EncodeTo(
+        &configLoaded,
+        repo.GetUIFile(),
+      ); err != nil {
+        repo.CancelWithError(err)
+      }
+
 		case "store-version":
 			repo.GetUI().Print(c.GetStoreVersion())
 
 		case "type":
 			repo.GetUI().Print(c.GetRepoType())
+
+		case "id":
+			repo.GetUI().Print(c.GetRepoId())
 
 		case "compression-type":
 			repo.GetUI().Print(c.GetBlobStoreConfigImmutable().GetBlobCompression())

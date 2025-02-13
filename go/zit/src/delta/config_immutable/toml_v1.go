@@ -5,12 +5,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-// TODO Split into repo and blob store configs
 type TomlV1 struct {
 	StoreVersion StoreVersion    `toml:"store-version"`
 	RepoType     repo_type.Type  `toml:"repo-type"`
+	RepoId       ids.RepoId      `toml:"id"`
 	BlobStore    BlobStoreTomlV1 `toml:"blob-store"`
 }
 
@@ -34,4 +35,8 @@ func (k *TomlV1) GetStoreVersion() interfaces.StoreVersion {
 
 func (k TomlV1) GetRepoType() repo_type.Type {
 	return k.RepoType
+}
+
+func (k TomlV1) GetRepoId() ids.RepoId {
+	return k.RepoId
 }

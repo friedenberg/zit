@@ -4,6 +4,7 @@
 
 store-version = 8
 repo-type = 'working-copy'
+id = ''
 
 [blob-store]
 compression-type = 'zstd'

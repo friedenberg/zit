@@ -27,12 +27,17 @@ function init_archive { # @test
 
 			store-version = 8
 			repo-type = 'archive'
+			id = ''
 
 			[blob-store]
 			compression-type = 'zstd'
 			lock-internal-files = false
 		EOM
 	}
+
+	run_zit info-repo config-immutable
+	assert_success
+	output_immutable_config | assert_output -
 
 	run cat .xdg/data/zit/config-permanent
 	assert_success
