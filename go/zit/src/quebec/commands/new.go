@@ -25,6 +25,8 @@ func init() {
 type New struct {
 	command_components.LocalWorkingCopy
 
+	complete command_components.Complete
+
 	ids.RepoId
 	Count int
 	// TODO combine organize and edit and refactor
@@ -59,7 +61,14 @@ func (cmd *New) SetFlagSet(f *flag.FlagSet) {
 		"a script to run for each file to transform it the standard zettel format",
 	)
 
-	cmd.Metadata.SetFlagSet(f)
+	cmd.complete.SetFlagsProto(
+		&cmd.Proto,
+		f,
+		"description to use for new zettels",
+		"tags added for new zettels",
+		"type used for new zettels",
+	)
+
 	cmd.Checkout.SetFlagSet(f)
 }
 

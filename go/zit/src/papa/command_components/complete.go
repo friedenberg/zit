@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
@@ -78,6 +79,31 @@ func (cmd Complete) GetFlagValueMetadataType(
 			)
 		},
 	}
+}
+
+func (cmd Complete) SetFlagsProto(
+	proto *sku.Proto,
+	flagSet *flag.FlagSet,
+	descriptionUsage string,
+	tagUsage string,
+	typeUsage string,
+) {
+	proto.SetFlagSetDescription(
+		flagSet,
+		descriptionUsage,
+	)
+
+	flagSet.Var(
+		cmd.GetFlagValueMetadataTags(&proto.Metadata),
+		"tags",
+		tagUsage,
+	)
+
+	flagSet.Var(
+		cmd.GetFlagValueMetadataType(&proto.Metadata),
+		"type",
+		typeUsage,
+	)
 }
 
 func (cmd Complete) CompleteObjects(
