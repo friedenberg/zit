@@ -27,16 +27,6 @@ type SkuMapWithOrder struct {
 	next int
 }
 
-func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.SkuType] {
-	return func(yield func(int, sku.SkuType) bool) {
-		for _, sk := range smwo.m {
-			if !yield(sk.int, sk.sku) {
-				break
-			}
-		}
-	}
-}
-
 func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.SkuTypeSetMutable {
 	elms := sku.MakeSkuTypeSetMutable()
 	errors.PanicIfError(smwo.Each(elms.Add))
@@ -111,10 +101,20 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.SkuType) {
 	return
 }
 
+func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.SkuType] {
+	return func(yield func(int, sku.SkuType) bool) {
+		for i, sk := range smwo.Sorted() {
+			if !yield(i, sk) {
+				break
+			}
+		}
+	}
+}
+
 func (sm *SkuMapWithOrder) Each(
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	for _, v := range sm.Sorted() {
+  for _, v := range sm.AllSkuAndIndex() {
 		_, ok := sm.m[keyer.GetKey(v)]
 
 		if !ok {
