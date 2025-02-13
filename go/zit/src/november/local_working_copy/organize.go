@@ -1,6 +1,8 @@
 package local_working_copy
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -20,27 +22,37 @@ func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 	)
 }
 
-func (e *Repo) LockAndCommitOrganizeResults(
+func (repo *Repo) LockAndCommitOrganizeResults(
 	results organize_text.OrganizeResults,
 ) (changeResults organize_text.Changes, err error) {
-	if err = e.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if changeResults, err = organize_text.ChangesFromResults(
-		e.GetConfig().GetCLIConfig().PrintOptions,
+		repo.GetConfig().GetCLIConfig().PrintOptions,
 		results,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	// ui.Debug().Print(changeResults)
+	repo.Must(repo.Lock)
+
+	count := changeResults.Changed.Len()
+
+	if count > 30 {
+		if !repo.Confirm(
+			fmt.Sprintf(
+				"a large number (%d) of objects are being changed. continue to commit?",
+				count,
+			),
+		) {
+			// TODO output organize file used
+			repo.CancelWithBadRequestf("aborting")
+			return
+		}
+	}
 
 	if err = changeResults.Changed.Each(
 		func(changed sku.SkuType) (err error) {
-			if err = e.GetStore().CreateOrUpdate(
+			if err = repo.GetStore().CreateOrUpdate(
 				changed.GetSkuExternal(),
 				sku.StoreOptions{
 					MergeCheckedOut: true,
@@ -57,10 +69,7 @@ func (e *Repo) LockAndCommitOrganizeResults(
 		return
 	}
 
-	if err = e.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	repo.Must(repo.Unlock)
 
 	return
 }
