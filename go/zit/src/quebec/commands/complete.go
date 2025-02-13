@@ -193,7 +193,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	)
 
 	if !found {
-		envLocal.CancelWithError(err)
+		envLocal.CancelWithBadRequestf(err.Error())
 		return
 	}
 
@@ -208,5 +208,5 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-  req.CancelWithBadRequestf("no completion available for flag: %q", after)
+	req.CancelWithBadRequestf("no completion available for flag: %q", after)
 }
