@@ -70,7 +70,7 @@ function bootstrap_without_content {
 	mkdir -p them || exit 1
 
 	pushd them || exit 1
-	run_zit_init -override-xdg-with-cwd
+	run_zit_init -override-xdg-with-cwd test-repo-id-them
 	assert_success
 	popd || exit 1
 }
@@ -82,7 +82,8 @@ function bootstrap_archive {
 	run_zit init \
 		-override-xdg-with-cwd \
 		-repo-type archive \
-		-lock-internal-files=false
+		-lock-internal-files=false \
+    test-repo-id-them
 
 	run_zit info-repo type
 	assert_success

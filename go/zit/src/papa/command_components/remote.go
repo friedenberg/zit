@@ -65,7 +65,7 @@ func (cmd Remote) MakeArchive(
 		)
 
 	default:
-		env.CancelWithNotImplemented()
+		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 	}
 
 	return
@@ -109,7 +109,7 @@ func (cmd Remote) MakeRemoteWorkingCopy(
 		)
 
 	default:
-		req.CancelWithNotImplemented()
+		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 	}
 
 	return

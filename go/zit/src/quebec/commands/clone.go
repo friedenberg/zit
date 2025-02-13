@@ -42,11 +42,15 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Clone) Run(req command.Request) {
-	local := cmd.OnTheFirstDay(req)
+	if len(req.Args()) < 2 {
+		req.CancelWithBadRequestf("expected at least a new repo id and remote, but got %q", req.Args())
+	}
+
+	local := cmd.OnTheFirstDay(req, req.Args()[0])
 
 	remote := cmd.MakeRemoteWorkingCopy(
 		req,
-		req.Args()[0],
+		req.Args()[1],
 		local,
 	)
 
@@ -70,7 +74,7 @@ func (cmd Clone) Run(req command.Request) {
 				query.BuilderOptionDefaultGenres(genres.InventoryList),
 			),
 			local,
-			req.Args()[1:],
+			req.Args()[2:],
 		)
 
 		if err := local.PullQueryGroupFromRemote(

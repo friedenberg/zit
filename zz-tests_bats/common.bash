@@ -97,11 +97,18 @@ function run_zit_stderr_unified {
 }
 
 function run_zit_init {
+  if [[ "$#" -eq 0 ]]; then
+    args=("test")
+  else
+    args=("$@")
+  fi
+
   run_zit init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -lock-internal-files=false \
-    "$@"
+    "${args[@]}"
+
   assert_success
   assert_output - <<-EOM
 [!md @$(get_type_blob_sha) !toml-type-v1]
@@ -128,12 +135,18 @@ run_find() {
 }
 
 function run_zit_init_disable_age {
+  if [[ "$#" -eq 0 ]]; then
+    args=("test-repo-id")
+  else
+    args=("$@")
+  fi
+
   run_zit init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -age-identity none \
     -lock-internal-files=false \
-    "$@"
+    "${args[@]}"
 
   assert_success
   assert_output - <<-EOM

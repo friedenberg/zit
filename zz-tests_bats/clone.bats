@@ -16,7 +16,7 @@ teardown() {
 function bootstrap {
 	mkdir -p "$1"
 	pushd "$1" || exit 1
-	run_zit_init -override-xdg-with-cwd
+	run_zit_init -override-xdg-with-cwd "test-repo-id-them"
 
 	{
 		echo "---"
@@ -72,7 +72,7 @@ function run_clone_default_with() {
 
 function try_add_new_after_clone {
 	run_zit init-workspace
-  assert_success
+	assert_success
 
 	run_zit new -edit=false - <<-EOM
 		---
@@ -98,6 +98,7 @@ function clone_history_zettel_typ_etikett { # @test
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
+    test-repo-id-us \
 		<(print_their_xdg them) \
 		+zettel,typ,etikett
 
@@ -127,6 +128,7 @@ function clone_history_zettel_typ_etikett_stdio_local { # @test
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
+    test-repo-id-us \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -156,6 +158,7 @@ function clone_history_one_zettel_stdio_local { # @test
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
+    test-repo-id-us \
 		"$(realpath them)" \
 		o/d+
 
@@ -177,6 +180,7 @@ function clone_history_zettel_typ_etikett_stdio_ssh { # @test
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
+    test-repo-id-us \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -206,6 +210,7 @@ function clone_history_default_allow_conflicts { # @test
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
+    test-repo-id-us \
 		<(print_their_xdg them)
 
 	assert_success
@@ -236,6 +241,7 @@ function clone_archive_history_default_allow_conflicts { # @test
 	run_clone_default_with \
 		-repo-type archive \
 		-remote-type native-dotenv-xdg \
+    test-repo-id-us \
 		<(print_their_xdg them)
 
 	assert_success

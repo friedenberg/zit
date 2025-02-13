@@ -28,7 +28,7 @@ function info_config_immutable { # @test
 
 		store-version = 8
 		repo-type = 'working-copy'
-		id = ''
+		id = 'test-repo-id'
 
 		[blob-store]
 		compression-type = 'zstd'
@@ -52,7 +52,7 @@ function info_age_none { # @test
 function info_age_some { # @test
 	age-keygen --output age-key >/dev/null 2>&1
 	key="$(tail -n1 age-key)"
-	run_zit_init -override-xdg-with-cwd -age-identity age-key
+	run_zit_init -override-xdg-with-cwd -age-identity age-key test-repo-id
 	run_zit info-repo age-encryption
 	assert_output "$key"
 }
@@ -76,7 +76,7 @@ function info_xdg { # @test
 }
 
 function info_non_xdg { # @test
-	run_zit_init -override-xdg-with-cwd
+	run_zit_init -override-xdg-with-cwd test-repo-id
 	run_zit info-repo xdg
 	assert_output - <<-EOM
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.zit/local/share

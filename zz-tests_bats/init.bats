@@ -22,7 +22,7 @@ function init_compression { # @test
 
 			store-version = 8
 			repo-type = 'working-copy'
-			id = ''
+			id = 'test-repo-id'
 
 			[blob-store]
 			compression-type = 'zstd'
@@ -120,7 +120,7 @@ function init_and_with_another_age { # @test
 	pushd inner || exit 1
 
 	set_xdg "$(pwd)"
-	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id"
+	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id" test-repo-id
 	assert_success
 
 	run_zit info-repo age-encryption
@@ -129,7 +129,7 @@ function init_and_with_another_age { # @test
 }
 
 function init_with_non_xdg { # @test
-	run_zit_init -override-xdg-with-cwd
+	run_zit_init -override-xdg-with-cwd test-repo-id
 	run tree .zit
 	assert_output
 
@@ -150,7 +150,7 @@ function non_repo_failure { # @test
 
 function init_and_init { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit_init -override-xdg-with-cwd
+	run_zit_init -override-xdg-with-cwd test-repo-id
 	assert_success
 
 	{
@@ -176,7 +176,7 @@ function init_and_init { # @test
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit init -lock-internal-files=false -override-xdg-with-cwd
+	run_zit init -lock-internal-files=false -override-xdg-with-cwd test-repo-id
 	assert_failure
 	assert_output --partial '.zit/local/share/config-permanent: file exists'
 

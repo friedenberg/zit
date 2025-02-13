@@ -23,30 +23,45 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 	cmd.BigBang.SetFlagSet(f)
 }
 
-func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
-	dir := env_dir.MakeDefaultAndInitialize(
-		dep,
-		dep.Config.Debug,
-		cmd.OverrideXDGWithCwd,
-	)
-
+func (cmd Genesis) OnTheFirstDay(req command.Request, repoId string) repo.Repo {
 	ui := env_ui.Make(
-		dep,
-		dep.Config,
+		req,
+		req.Config,
 		env_ui.Options{},
 	)
 
-	var repoLayout env_repo.Env
+	// switch len(req.Args()) {
+	// case 0:
+	// 	ui.CancelWithBadRequestf("expected a repo id, but got nothing")
+
+	// default:
+	// 	ui.CancelWithBadRequestf("only acceptable argument is a repo id, but got %q", req.Args())
+
+	// case 1:
+	// 	break
+	// }
+
+	if err := cmd.Config.RepoId.Set(repoId); err != nil {
+		ui.CancelWithError(err)
+	}
+
+	dir := env_dir.MakeDefaultAndInitialize(
+		req,
+		req.Config.Debug,
+		cmd.OverrideXDGWithCwd,
+	)
+
+	var envRepo env_repo.Env
 
 	layoutOptions := env_repo.Options{
-		BasePath:             dep.Config.BasePath,
+		BasePath:             req.Config.BasePath,
 		PermitNoZitDirectory: true,
 	}
 
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
@@ -54,20 +69,20 @@ func (cmd Genesis) OnTheFirstDay(dep command.Request) repo.Repo {
 		}
 	}
 
-	repoLayout.Genesis(cmd.BigBang)
+	envRepo.Genesis(cmd.BigBang)
 
 	switch cmd.BigBang.Config.RepoType {
 	case repo_type.TypeWorkingCopy:
 		return local_working_copy.Genesis(
 			cmd.BigBang,
-			repoLayout,
+			envRepo,
 		)
 
 	case repo_type.TypeArchive:
-		return cmd.MakeLocalArchive(repoLayout)
+		return cmd.MakeLocalArchive(envRepo)
 
 	default:
-		dep.CancelWithError(
+		req.CancelWithError(
 			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.Config.RepoType},
 		)
 	}
