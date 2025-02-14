@@ -24,6 +24,7 @@ const (
 
 	RepoTypeXDGDotenvV0 = "!toml-repo-dotenv_xdg-v0"
 	RepoTypeLocalPath   = "!toml-repo-local_path-v0"
+	RepoTypeUri         = "!toml-repo-uri-v0"
 
 	ImmutableConfigV1 = "!toml-config-immutable-v1"
 
@@ -62,6 +63,7 @@ func init() {
 	register(InventoryListTypeV0, genres.InventoryList, false)
 	register(InventoryListTypeV1, genres.InventoryList, true)
 
+	register(RepoTypeUri, genres.Repo, true)
 	register(RepoTypeXDGDotenvV0, genres.Repo, false)
 	register(RepoTypeLocalPath, genres.Repo, false)
 

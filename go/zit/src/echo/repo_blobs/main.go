@@ -12,6 +12,8 @@ import (
 
 type Blob interface {
 	GetRepoBlob() Blob
+	// TODO
+	// GetSupportedConnectionTypes() []connection_type.Type
 }
 
 type TypeWithBlob = ids.TypeWithObject[*Blob]
@@ -19,7 +21,8 @@ type TypeWithBlob = ids.TypeWithObject[*Blob]
 var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
 	builtin_types.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
-	"":                                coderToml[V0]{},
+	builtin_types.RepoTypeUri:         coderToml[TomlUriV0]{},
+	"":                                coderToml[TomlUriV0]{},
 }
 
 var Coder = interfaces.Coder[*TypeWithBlob](ids.TypedCoders[*Blob](typedCoders))

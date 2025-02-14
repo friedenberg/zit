@@ -142,101 +142,27 @@ func (cmd Remote) MakeRemote(
 			local,
 		)
 
-	case repo_blobs.V0:
+	// case repo.RemoteTypeStdioSSH:
+	// 	remote = cmd.MakeRemoteStdioSSH(
+	// 		req,
+	// 		env,
+	// 		remoteArg,
+	// 		local,
+	// 	)
+
+	// case repo.RemoteTypeSocketUnix:
+	// 	remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
+	// 		req,
+	// 		remoteArg,
+	// 		env.GetOptions(),
+	// 		local,
+	// 	)
+
+	case repo_blobs.TomlUriV0:
 		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
 
 	default:
 		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
-	}
-
-	return
-}
-
-func (cmd Remote) MakeArchiveFromArg(
-	req command.Request,
-	remoteArg string,
-	local repo.Repo,
-) (remote repo.Repo) {
-	env := cmd.MakeEnv(req)
-
-	switch cmd.RemoteType {
-	case repo.RemoteTypeNativeDotenvXDG:
-		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
-			req,
-			remoteArg,
-			env.GetOptions(),
-		)
-
-	case repo.RemoteTypeStdioLocal:
-		remote = cmd.MakeRemoteStdioLocal(
-			req,
-			env,
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeStdioSSH:
-		remote = cmd.MakeRemoteStdioSSH(
-			req,
-			env,
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeSocketUnix:
-		remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
-			req,
-			remoteArg,
-			env.GetOptions(),
-			local,
-		)
-
-	default:
-		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
-	}
-
-	return
-}
-
-func (cmd Remote) MakeRemoteWorkingCopyFromArg(
-	req command.Request,
-	remoteArg string,
-	local repo.Repo,
-) (remote repo.WorkingCopy) {
-	switch cmd.RemoteType {
-	case repo.RemoteTypeNativeDotenvXDG:
-		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
-			req,
-			remoteArg,
-			env_ui.Options{},
-		)
-
-	case repo.RemoteTypeStdioLocal:
-		remote = cmd.MakeRemoteStdioLocal(
-			req,
-			cmd.MakeEnv(req),
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeStdioSSH:
-		remote = cmd.MakeRemoteStdioSSH(
-			req,
-			cmd.MakeEnv(req),
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeSocketUnix:
-		remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
-			req,
-			remoteArg,
-			env_ui.Options{},
-			local,
-		)
-
-	default:
-		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 	}
 
 	return
