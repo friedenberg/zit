@@ -83,7 +83,7 @@ function bootstrap_archive {
 		-override-xdg-with-cwd \
 		-repo-type archive \
 		-lock-internal-files=false \
-    test-repo-id-them
+		test-repo-id-them
 
 	run_zit info-repo type
 	assert_success
@@ -105,10 +105,16 @@ function push_history_zettel_typ_etikett_no_conflicts { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit push /them:k +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -154,10 +160,12 @@ function push_history_zettel_typ_etikett_yes_conflicts { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+
+	run_zit push /them +zettel,typ,etikett
 
 	assert_failure
 	assert_output_unsorted - <<-EOM
@@ -213,9 +221,16 @@ function push_history_default { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg)
+		<(print_their_xdg) \
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit push /them
 
 	assert_success
 
@@ -233,7 +248,7 @@ function push_history_default { # @test
 	EOM
 
 	set_xdg them
-	run_zit show +zettel,typ,konfig,etikett,repo
+	run_zit show +zettel,typ,konfig,etikett #,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
@@ -258,10 +273,16 @@ function push_history_default_only_blobs { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
-		-include-objects=false \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg)
+		<(print_their_xdg) \
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit push -include-objects=false /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -299,10 +320,16 @@ function push_history_default_stdio_local_once { # @test
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type stdio-local \
 		them \
-		:z
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+	EOM
+
+	run_zit push /them :z
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -326,11 +353,16 @@ function push_history_default_stdio_local_twice { # @test
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type stdio-local \
 		them \
-		:z
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+	EOM
 
+	run_zit push /them :z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
@@ -348,10 +380,7 @@ function push_history_default_stdio_local_twice { # @test
 	EOM
 	popd || exit 1
 
-	run_zit push \
-		-remote-type stdio-local \
-		them \
-		:z
+	run_zit push /them :z
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -362,9 +391,16 @@ function push_history_default_stdio_local_archive_twice { # @test
 	bootstrap_archive
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push \
+	run_zit remote-add \
 		-remote-type stdio-local \
+		them \
 		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+	EOM
+
+	run_zit push /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -400,9 +436,7 @@ function push_history_default_stdio_local_archive_twice { # @test
 	EOM
 	popd || exit 1
 
-	run_zit push \
-		-remote-type stdio-local \
-		them
+	run_zit push /them
 	assert_success
 	assert_output_unsorted ''
 }

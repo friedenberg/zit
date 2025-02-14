@@ -6,6 +6,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -31,54 +33,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
 }
 
-// TODO
-func (cmd Remote) MakeArchiveFromArg(
-	req command.Request,
-	remoteArg string,
-	local repo.Repo,
-) (remote repo.Repo) {
-	env := cmd.MakeEnv(req)
-
-	switch cmd.RemoteType {
-	case repo.RemoteTypeNativeDotenvXDG:
-		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
-			req,
-			remoteArg,
-			env.GetOptions(),
-		)
-
-	case repo.RemoteTypeStdioLocal:
-		remote = cmd.MakeRemoteStdioLocal(
-			req,
-			env,
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeStdioSSH:
-		remote = cmd.MakeRemoteStdioSSH(
-			req,
-			env,
-			remoteArg,
-			local,
-		)
-
-	case repo.RemoteTypeSocketUnix:
-		remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
-			req,
-			remoteArg,
-			env.GetOptions(),
-			local,
-		)
-
-	default:
-		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
-	}
-
-	return
-}
-
-func (cmd Remote) AddRemote(
+func (cmd Remote) CreateRemote(
 	req command.Request,
 	local *local_working_copy.Repo,
 	proto sku.Proto,
@@ -122,7 +77,7 @@ func (cmd Remote) AddRemote(
 		blob = repo_blobs.TomlLocalPathV0{Path: local.AbsFromCwdOrSame(path)}
 	}
 
-  req.AssertNoMoreArgs()
+	req.AssertNoMoreArgs()
 
 	var blobSha interfaces.Sha
 
@@ -158,17 +113,108 @@ func (cmd Remote) AddRemote(
 func (cmd Remote) MakeRemote(
 	req command.Request,
 	local *local_working_copy.Repo,
-	repoId ids.RepoId,
+	sk *sku.Transacted,
 ) (remote repo.Repo) {
-	sk := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(sk)
+	var blob repo_blobs.Blob
 
-	if err := local.GetStore().ReadOneInto(repoId, sk); err != nil {
-		req.CancelWithError(err)
-		return
+	{
+		var err error
+
+		if blob, _, err = local.GetStore().GetTypedBlobStore().Repo.ReadTypedBlob(
+			sk.Metadata.Type,
+			sk.GetBlobSha(),
+		); err != nil {
+			req.CancelWithError(err)
+		}
 	}
 
-	// TODO get sku type and initialize remote from blob
+	env := cmd.MakeEnv(req)
+
+	switch blob := blob.(type) {
+	case repo_blobs.TomlXDGV0:
+		envDir := env_dir.MakeWithXDG(
+			req,
+			req.Config.Debug,
+			xdg.XDG{
+				Data:    blob.Data,
+				Config:  blob.Config,
+				Cache:   blob.Cache,
+				Runtime: blob.Runtime,
+				State:   blob.State,
+			},
+		)
+
+		envUI := env_ui.Make(
+			req,
+			req.Config,
+			env.GetOptions(),
+		)
+
+		remote = local_working_copy.Make(
+			env_local.Make(envUI, envDir),
+			local_working_copy.OptionsEmpty,
+		)
+
+	case repo_blobs.TomlLocalPathV0:
+		remote = cmd.MakeRemoteStdioLocal(
+			req,
+			env,
+			blob.Path,
+			local,
+		)
+
+	case repo_blobs.V0:
+		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
+
+	default:
+		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
+	}
+
+	return
+}
+
+func (cmd Remote) MakeArchiveFromArg(
+	req command.Request,
+	remoteArg string,
+	local repo.Repo,
+) (remote repo.Repo) {
+	env := cmd.MakeEnv(req)
+
+	switch cmd.RemoteType {
+	case repo.RemoteTypeNativeDotenvXDG:
+		remote = cmd.MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
+			req,
+			remoteArg,
+			env.GetOptions(),
+		)
+
+	case repo.RemoteTypeStdioLocal:
+		remote = cmd.MakeRemoteStdioLocal(
+			req,
+			env,
+			remoteArg,
+			local,
+		)
+
+	case repo.RemoteTypeStdioSSH:
+		remote = cmd.MakeRemoteStdioSSH(
+			req,
+			env,
+			remoteArg,
+			local,
+		)
+
+	case repo.RemoteTypeSocketUnix:
+		remote = cmd.MakeRemoteHTTPFromXDGDotenvPath(
+			req,
+			remoteArg,
+			env.GetOptions(),
+			local,
+		)
+
+	default:
+		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
+	}
 
 	return
 }

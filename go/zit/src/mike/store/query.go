@@ -45,7 +45,7 @@ func (s *Store) QueryTransacted(
 	switch {
 	case true:
 		// TODO why does this not work with trying to read internal
-		if sk, err = e.ExecuteExactlyOneExternal(false); err != nil {
+		if sk, err = e.ExecuteExactlyOneExternalObject(false); err != nil {
 			err = nil
 			break
 		}
@@ -114,7 +114,7 @@ func (store *Store) QueryExactlyOneExternal(
 		return
 	}
 
-	if sk, err = executor.ExecuteExactlyOneExternal(true); err != nil {
+	if sk, err = executor.ExecuteExactlyOneExternalObject(true); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

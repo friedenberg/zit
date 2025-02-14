@@ -322,7 +322,7 @@ LOOP:
 			}
 
 			switch objectId.GetGenre() {
-			case genres.InventoryList, genres.Zettel:
+			case genres.InventoryList, genres.Zettel, genres.Repo:
 				state.pinnedObjectIds = append(
 					state.pinnedObjectIds,
 					pid,

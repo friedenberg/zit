@@ -17,25 +17,24 @@ type Blob interface {
 type TypeWithBlob = ids.TypeWithObject[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
-	builtin_types.RepoTypeLocalPath:   coderToml{Blob: TomlLocalPathV0{}},
-	builtin_types.RepoTypeXDGDotenvV0: coderToml{Blob: TomlXDGV0{}},
-	"":                                coderToml{Blob: V0{}},
+	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
+	builtin_types.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
+	"":                                coderToml[V0]{},
 }
 
 var Coder = interfaces.Coder[*TypeWithBlob](ids.TypedCoders[*Blob](typedCoders))
 
-type coderToml struct {
-	Blob
+type coderToml[T Blob] struct {
+	Blob T
 }
 
-func (coder coderToml) DecodeFrom(
+func (coder coderToml[T]) DecodeFrom(
 	subject *TypeWithBlob,
 	reader io.Reader,
 ) (n int64, err error) {
-	subject.Object = &coder.Blob
 	decoder := toml.NewDecoder(reader)
 
-	if err = decoder.Decode(subject.Object); err != nil {
+	if err = decoder.Decode(&coder.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -44,10 +43,13 @@ func (coder coderToml) DecodeFrom(
 		}
 	}
 
+	blob := Blob(coder.Blob)
+	subject.Object = &blob
+
 	return
 }
 
-func (coderToml) EncodeTo(
+func (coderToml[_]) EncodeTo(
 	subject *TypeWithBlob,
 	writer io.Writer,
 ) (n int64, err error) {

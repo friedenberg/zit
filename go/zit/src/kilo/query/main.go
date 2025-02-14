@@ -147,7 +147,6 @@ func (qg *Query) isEmpty() bool {
 }
 
 func (queryGroup *Query) getExactlyOneExternalObjectId(
-	genre genres.Genre,
 	permitInternal bool,
 ) (objectId ids.ObjectIdLike, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
@@ -159,11 +158,10 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 		return
 	}
 
-	query, ok := queryGroup.optimizedQueries[genre]
+	var query *expSigilAndGenre
 
-	if !ok {
-		err = errors.Errorf("expected to have genre %q", genre)
-		return
+	for _, query = range queryGroup.optimizedQueries {
+		break
 	}
 
 	if query.Sigil.ContainsOneOf(ids.SigilHistory) {

@@ -59,18 +59,24 @@ func MakeExecutorWithExternalStore(
 }
 
 // TODO refactor into methods that have internal in the name
-func (executor *Executor) ExecuteExactlyOneExternal(
+func (executor *Executor) ExecuteExactlyOneExternalObject(
 	permitInternal bool,
 ) (sk *sku.Transacted, err error) {
 	var externalObjectId ids.ObjectIdLike
 
 	if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
-		genres.Zettel,
 		permitInternal,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	// if err = genres.Must(externalObjectId.GetGenre()).AssertGenre(
+	// 	genres.Zettel,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	sk = sku.GetTransactedPool().Get()
 

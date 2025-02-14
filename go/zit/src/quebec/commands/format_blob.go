@@ -79,7 +79,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 	{
 		var err error
 
-		if object, err = localWorkingCopy.GetSkuFromObjectId(objectIdString); err != nil {
+		if object, err = localWorkingCopy.GetZettelFromObjectId(objectIdString); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}

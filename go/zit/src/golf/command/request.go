@@ -11,7 +11,11 @@ type Request struct {
 	errors.Context
 	config_mutable_cli.Config
 	*flag.FlagSet
+	Args
+}
 
+type Args struct {
+	errors.Context
 	args []string
 	argi *int
 }
@@ -27,31 +31,34 @@ func MakeRequest(
 		Context: ctx,
 		Config:  config,
 		FlagSet: flagSet,
-		args:    flagSet.Args(),
-		argi:    &argi,
+		Args: Args{
+			Context: ctx,
+			args:    flagSet.Args(),
+			argi:    &argi,
+		},
 	}
 }
 
-func (req Request) PeekArgs() []string {
+func (req Args) PeekArgs() []string {
 	args := req.args[*req.argi:]
 	return args
 }
 
-func (req Request) PopArgs() []string {
+func (req Args) PopArgs() []string {
 	args := req.PeekArgs()
 	*req.argi += len(args)
 	return args
 }
 
-func (req Request) RemainingArgCount() int {
+func (req Args) RemainingArgCount() int {
 	return len(req.args[*req.argi:])
 }
 
-func (req Request) PopArg(argName string) string {
+func (req Args) PopArg(argName string) string {
 	if req.RemainingArgCount() == 0 {
 		req.CancelWithBadRequestf(
 			"expected positional argument (%d) %s, but only received %q",
-      *req.argi,
+			*req.argi,
 			argName,
 			req.args,
 		)
@@ -62,7 +69,7 @@ func (req Request) PopArg(argName string) string {
 	return arg
 }
 
-func (req Request) AssertNoMoreArgs() {
+func (req Args) AssertNoMoreArgs() {
 	if req.RemainingArgCount() > 0 {
 		req.CancelWithBadRequestf(
 			"expected no more arguments, but have %q",
@@ -71,7 +78,7 @@ func (req Request) AssertNoMoreArgs() {
 	}
 }
 
-func (req Request) LastArg() (arg string, ok bool) {
+func (req Args) LastArg() (arg string, ok bool) {
 	if req.RemainingArgCount() > 0 {
 		ok = true
 		arg = req.PopArgs()[req.RemainingArgCount()-1]

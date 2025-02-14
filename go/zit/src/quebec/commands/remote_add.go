@@ -42,6 +42,6 @@ func (cmd *RemoteAdd) SetFlagSet(flagSet *flag.FlagSet) {
 func (cmd RemoteAdd) Run(req command.Request) {
 	local := cmd.MakeLocalWorkingCopy(req)
 	req.Must(local.Lock)
-	cmd.AddRemote(req, local, cmd.proto)
+	cmd.CreateRemote(req, local, cmd.proto)
 	req.Must(local.Unlock)
 }

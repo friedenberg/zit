@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -22,17 +23,28 @@ type Push struct {
 	command_components.QueryGroup
 }
 
-func (cmd *Push) SetFlagSet(f *flag.FlagSet) {
-	cmd.RemoteTransfer.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
-	cmd.LocalWorkingCopy.SetFlagSet(f)
+func (cmd *Push) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.RemoteTransfer.SetFlagSet(flagSet)
+	cmd.QueryGroup.SetFlagSet(flagSet)
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 }
 
 func (cmd Push) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	remoteArg := req.PopArg("remote arg")
-	remote := cmd.MakeArchiveFromArg(req, remoteArg, localWorkingCopy)
+	var object *sku.Transacted
+
+	{
+		var err error
+
+		if object, err = localWorkingCopy.GetObjectFromObjectId(
+			req.PopArg("repo-id"),
+		); err != nil {
+			localWorkingCopy.CancelWithError(err)
+		}
+	}
+
+	remote := cmd.MakeRemote(req, localWorkingCopy, object)
 
 	repoType := remote.GetImmutableConfig().ImmutableConfig.GetRepoType()
 

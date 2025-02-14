@@ -21,7 +21,7 @@ func MakeRepoStore(
 }
 
 func (a RepoStore) ReadTypedBlob(
-	tipe interfaces.ObjectId,
+	tipe ids.Type,
 	blobSha interfaces.Sha,
 ) (common repo_blobs.Blob, n int64, err error) {
 	var reader interfaces.ShaReadCloser
@@ -33,7 +33,9 @@ func (a RepoStore) ReadTypedBlob(
 
 	defer errors.DeferredCloser(&err, reader)
 
-	var blob repo_blobs.TypeWithBlob
+	blob := repo_blobs.TypeWithBlob{
+		Type: &tipe,
+	}
 
 	if n, err = repo_blobs.Coder.DecodeFrom(&blob, reader); err != nil {
 		err = errors.Wrap(err)

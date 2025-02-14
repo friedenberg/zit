@@ -82,7 +82,7 @@ func (cmd *FormatObject) Run(dep command.Request) {
 	{
 		var err error
 
-		if object, err = localWorkingCopy.GetSkuFromObjectId(
+		if object, err = localWorkingCopy.GetZettelFromObjectId(
 			objectIdString,
 		); err != nil {
 			localWorkingCopy.CancelWithError(err)
