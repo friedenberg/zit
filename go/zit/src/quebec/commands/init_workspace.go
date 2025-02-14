@@ -96,25 +96,14 @@ func (cmd InitWorkspace) Complete(
 }
 
 func (cmd InitWorkspace) Run(req command.Request) {
-	argc := len(req.PopArgs())
 	envLocal := cmd.MakeEnv(req)
 
-	switch argc {
+	switch req.RemainingArgCount() {
 	case 0:
 		break
 
-	default:
-		if !envLocal.Confirm(
-			"more than one argument passed in. ignore everything after first and continue?",
-		) {
-			req.CancelWithBadRequestf("aborted")
-			return
-		}
-
-		fallthrough
-
 	case 1:
-		dir := req.PopArgs()[0]
+		dir := req.PopArg("dir")
 
 		if err := envLocal.MakeDir(dir); err != nil {
 			req.CancelWithError(err)
@@ -126,6 +115,8 @@ func (cmd InitWorkspace) Run(req command.Request) {
 			return
 		}
 	}
+
+	req.AssertNoMoreArgs()
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 

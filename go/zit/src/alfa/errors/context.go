@@ -146,7 +146,6 @@ func (context *context) Run(f func(Context)) error {
 	}()
 
 	func() {
-		defer context.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
 				// TODO capture panic stack trace and add to custom error objects
@@ -167,6 +166,8 @@ func (context *context) Run(f func(Context)) error {
 
 		f(context)
 	}()
+
+	context.cancel(errContextCancelled)
 
 	for i := len(context.doAfter) - 1; i >= 0; i-- {
 		doAfter := context.doAfter[i]
