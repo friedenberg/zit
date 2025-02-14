@@ -46,11 +46,11 @@ func (cmd Clone) Run(req command.Request) {
 		req.CancelWithBadRequestf("expected at least a new repo id and remote, but got %q", req.Args())
 	}
 
-	local := cmd.OnTheFirstDay(req, req.Args()[0])
+	local := cmd.OnTheFirstDay(req, req.Argv(0, "new repo id"))
 
 	remote := cmd.MakeRemoteWorkingCopyFromArg(
 		req,
-		req.Args()[1],
+		req.Argv(1, "remote arg"),
 		local,
 	)
 

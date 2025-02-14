@@ -11,6 +11,26 @@ type Request struct {
 	errors.Context
 	config_mutable_cli.Config
 	*flag.FlagSet
+
+	args *[]string
+}
+
+func MakeRequest(
+	ctx errors.Context,
+	config config_mutable_cli.Config,
+	flagSet *flag.FlagSet,
+) Request {
+	args := flagSet.Args()
+	return Request{
+		Context: ctx,
+		Config:  config,
+		FlagSet: flagSet,
+		args:    &args,
+	}
+}
+
+func (req Request) Args() []string {
+  return *req.args
 }
 
 func (req Request) Argc() int {
@@ -28,6 +48,10 @@ func (req Request) Argv(idx int, argName string) string {
 	}
 
 	return req.Args()[idx]
+}
+
+func (req Request) AssertNoMoreArgs() {
+	// TODO
 }
 
 func (req Request) LastArg() (arg string, ok bool) {

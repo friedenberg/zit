@@ -30,23 +30,23 @@ func Run(ctx errors.Context, args ...string) {
 		)
 	}
 
-	f := flag.NewFlagSet(name, flag.ContinueOnError)
-	cmd.SetFlagSet(f)
+	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
+	cmd.SetFlagSet(flagSet)
 
 	args = args[2:]
 
 	configCli := config_mutable_cli.Default()
-	configCli.SetFlagSet(f)
+	configCli.SetFlagSet(flagSet)
 
-	if err := f.Parse(args); err != nil {
+	if err := flagSet.Parse(args); err != nil {
 		ctx.CancelWithError(err)
 	}
 
-	req := command.Request{
-		Context: ctx,
-		Config:  configCli,
-		FlagSet: f,
-	}
+	req := command.MakeRequest(
+		ctx,
+		configCli,
+		flagSet,
+	)
 
 	cmd.Run(req)
 }
