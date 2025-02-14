@@ -26,10 +26,12 @@ type Remote struct {
 	LocalWorkingCopy
 	LocalArchive
 
+	// TODO rename to ConnectionType
 	RemoteType repo.RemoteType
 }
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
+	// TODO remove and replace with repo builtin type options
 	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
 }
 

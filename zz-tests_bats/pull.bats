@@ -93,10 +93,17 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit_init_disable_age
-	run_zit pull \
+
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull /them +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -128,10 +135,18 @@ function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
 	export BATS_TEST_BODY=true
 
 	run_zit_init_disable_age
-	run_zit pull \
-		-remote-type socket-unix \
+
+	run_zit remote-add \
+		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	# TODO make this actually use a socket
+	run_zit pull /them +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -178,10 +193,16 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit pull \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull /them +zettel,typ,etikett
 
 	assert_failure
 	assert_output - <<-EOM
@@ -285,11 +306,16 @@ function pull_history_zettel_typ_etikett_yes_conflicts_allowed_remote_first { # 
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit pull \
-		-allow-merge-conflicts \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull -allow-merge-conflicts /them +zettel,typ,etikett
 
 	assert_success
 	assert_output - <<-EOM
@@ -361,10 +387,16 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit pull \
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel,typ,etikett
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull /them +zettel,typ,etikett
 
 	assert_failure
 	assert_output - <<-EOM
@@ -429,10 +461,17 @@ function pull_history_default_no_conflict { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit_init_disable_age
-	run_zit pull \
-		-remote-type native-dotenv-xdg \
-		<(print_their_xdg)
 
+	run_zit remote-add \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull /them
 	assert_success
 
 	run_zit show +?z,t,e
@@ -483,11 +522,17 @@ function pull_history_zettel_one_abbr { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit_init_disable_age
-	run_zit pull \
-		-include-blobs=false \
+
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		o/u+
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull -include-blobs=false /them o/u+
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -514,11 +559,17 @@ function pull_history_zettels_no_conflict_no_blobs { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit_init_disable_age
-	run_zit pull \
-		-include-blobs=false \
+
+	run_zit remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
-		+zettel
+		them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+	EOM
+
+	run_zit pull -include-blobs=false /them +zettel
 
 	assert_success
 	assert_output_unsorted - <<-EOM

@@ -8,6 +8,7 @@ import (
 
 //go:generate stringer -type=RemoteType
 type RemoteType int
+// TODO rename to ConnectionType
 
 const (
 	RemoteTypeUnspecified = RemoteType(iota)
