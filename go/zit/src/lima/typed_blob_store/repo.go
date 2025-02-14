@@ -9,9 +9,7 @@ import (
 )
 
 type RepoStore struct {
-	envRepo             env_repo.Env
-	v0                  TypedStore[repo_blobs.V0, *repo_blobs.V0]
-	toml_relay_local_v0 TypedStore[repo_blobs.TomlLocalPathV0, *repo_blobs.TomlLocalPathV0]
+	envRepo env_repo.Env
 }
 
 func MakeRepoStore(
@@ -19,38 +17,8 @@ func MakeRepoStore(
 ) RepoStore {
 	return RepoStore{
 		envRepo: dirLayout,
-		v0: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.V0](
-					dirLayout,
-				),
-				TomlBlobEncoder[repo_blobs.V0, *repo_blobs.V0]{},
-				dirLayout,
-			),
-			func(a *repo_blobs.V0) {
-				a.Reset()
-			},
-		),
-		toml_relay_local_v0: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.TomlLocalPathV0](
-					dirLayout,
-				),
-				TomlBlobEncoder[repo_blobs.TomlLocalPathV0, *repo_blobs.TomlLocalPathV0]{},
-				dirLayout,
-			),
-			func(a *repo_blobs.TomlLocalPathV0) {
-				a.Reset()
-			},
-		),
 	}
 }
-
-// func (a RepoStore) GetCommonStore() interfaces.TypedBlobStore[repo_blobs.Blob] {
-// 	return a
-// }
 
 func (a RepoStore) ReadTypedBlob(
 	tipe interfaces.ObjectId,
