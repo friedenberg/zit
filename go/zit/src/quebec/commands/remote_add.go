@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -41,7 +43,32 @@ func (cmd *RemoteAdd) SetFlagSet(flagSet *flag.FlagSet) {
 
 func (cmd RemoteAdd) Run(req command.Request) {
 	local := cmd.MakeLocalWorkingCopy(req)
+	remoteObject := cmd.CreateRemoteObject(req, local)
+
+	var id ids.RepoId
+
+	if err := id.Set(req.PopArg("repo-id")); err != nil {
+		req.CancelWithError(err)
+	}
+
+	req.AssertNoMoreArgs()
+
+	if err := remoteObject.ObjectId.SetWithIdLike(&id); err != nil {
+		req.CancelWithError(err)
+	}
+
+	cmd.proto.Apply(remoteObject.GetMetadata(), genres.Repo)
+
 	req.Must(local.Lock)
-	cmd.CreateRemote(req, local, cmd.proto)
+
+	if err := local.GetStore().CreateOrUpdate(
+		remoteObject,
+		sku.StoreOptions{
+			ApplyProto: true,
+		},
+	); err != nil {
+		req.CancelWithError(err)
+	}
+
 	req.Must(local.Unlock)
 }

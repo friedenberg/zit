@@ -44,10 +44,11 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 func (cmd Clone) Run(req command.Request) {
 	local := cmd.OnTheFirstDay(req, req.PopArg("new repo id"))
 
-	remote := cmd.MakeRemoteWorkingCopyFromArg(
+  // TODO offer option to persist remote object, if supported
+	remote := cmd.MakeRemote(
 		req,
-		req.PopArg("remote arg"),
 		local,
+		cmd.CreateRemoteObject(req, local),
 	)
 
 	switch local := local.(type) {

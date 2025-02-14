@@ -5,10 +5,8 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -16,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 )
@@ -35,17 +34,15 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
 }
 
-func (cmd Remote) CreateRemote(
+func (cmd Remote) CreateRemoteObject(
 	req command.Request,
-	local *local_working_copy.Repo,
-	proto sku.Proto,
+	local repo.Repo,
 ) (sk *sku.Transacted) {
-	env := cmd.MakeEnv(req)
+	envRepo := cmd.MakeEnvRepo(req, false)
+	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
 
 	sk = sku.GetTransactedPool().Get()
-	proto.Apply(sk.GetMetadata(), genres.Repo)
 
-	var id ids.RepoId
 	var blob repo_blobs.Blob
 
 	switch cmd.RemoteType {
@@ -55,14 +52,10 @@ func (cmd Remote) CreateRemote(
 	case repo.RemoteTypeNativeDotenvXDG:
 		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
 
-		if err := id.Set(req.PopArg("repo-id")); err != nil {
-			req.CancelWithError(err)
-		}
-
 		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 			req,
 			xdgDotenvPath,
-			env.GetOptions(),
+			envRepo.GetOptions(),
 		)
 
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
@@ -71,22 +64,16 @@ func (cmd Remote) CreateRemote(
 	case repo.RemoteTypeStdioLocal:
 		path := req.PopArg("path")
 
-		if err := id.Set(req.PopArg("repo-id")); err != nil {
-			req.CancelWithError(err)
-		}
-
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
-		blob = repo_blobs.TomlLocalPathV0{Path: local.AbsFromCwdOrSame(path)}
+		blob = repo_blobs.TomlLocalPathV0{Path: envRepo.AbsFromCwdOrSame(path)}
 	}
-
-	req.AssertNoMoreArgs()
 
 	var blobSha interfaces.Sha
 
 	{
 		var err error
 
-		if blobSha, _, err = local.GetStore().GetTypedBlobStore().Repo.WriteTypedBlob(
+		if blobSha, _, err = typedRepoBlobStore.WriteTypedBlob(
 			sk.Metadata.Type,
 			blob,
 		); err != nil {
@@ -96,33 +83,23 @@ func (cmd Remote) CreateRemote(
 
 	sk.Metadata.Blob.ResetWithShaLike(blobSha)
 
-	if err := sk.ObjectId.SetWithIdLike(&id); err != nil {
-		req.CancelWithError(err)
-	}
-
-	if err := local.GetStore().CreateOrUpdate(
-		sk,
-		sku.StoreOptions{
-			ApplyProto: true,
-		},
-	); err != nil {
-		req.CancelWithError(err)
-	}
-
 	return
 }
 
 func (cmd Remote) MakeRemote(
 	req command.Request,
-	local *local_working_copy.Repo,
+	local repo.Repo,
 	sk *sku.Transacted,
 ) (remote repo.Repo) {
+	envRepo := cmd.MakeEnvRepo(req, false)
+	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
+
 	var blob repo_blobs.Blob
 
 	{
 		var err error
 
-		if blob, _, err = local.GetStore().GetTypedBlobStore().Repo.ReadTypedBlob(
+		if blob, _, err = typedRepoBlobStore.ReadTypedBlob(
 			sk.Metadata.Type,
 			sk.GetBlobSha(),
 		); err != nil {
