@@ -110,6 +110,16 @@ func (cmd Remote) AddRemote(
 
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
+
+	case repo.RemoteTypeStdioLocal:
+		path := req.Argv(0, "path")
+
+		if err := id.Set(req.Argv(1, "repo-id")); err != nil {
+			req.CancelWithError(err)
+		}
+
+		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
+		blob = repo_blobs.TomlLocalPathV0{Path: local.AbsFromCwdOrSame(path)}
 	}
 
 	var blobSha interfaces.Sha

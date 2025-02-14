@@ -17,9 +17,9 @@ type Blob interface {
 type TypeWithBlob = ids.TypeWithObject[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
-	builtin_types.RepoTypeLocalRelay:  coderToml{Blob: TomlXDGV0{}},
-	builtin_types.RepoTypeXDGDotenvV0: coderToml{Blob: TomlLocalPathV0{}},
-	"":                                coderToml{Blob: TomlLocalPathV0{}},
+	builtin_types.RepoTypeLocalPath:   coderToml{Blob: TomlLocalPathV0{}},
+	builtin_types.RepoTypeXDGDotenvV0: coderToml{Blob: TomlXDGV0{}},
+	"":                                coderToml{Blob: V0{}},
 }
 
 var Coder = interfaces.Coder[*TypeWithBlob](ids.TypedCoders[*Blob](typedCoders))

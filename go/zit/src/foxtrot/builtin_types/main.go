@@ -22,8 +22,8 @@ const (
 	InventoryListTypeV0 = "!inventory_list-v0"
 	InventoryListTypeV1 = "!inventory_list-v1"
 
-	RepoTypeLocalRelay = "!toml-repo-relay-local-v0"
 	RepoTypeXDGDotenvV0 = "!toml-repo-dotenv_xdg-v0"
+	RepoTypeLocalPath   = "!toml-repo-local_path-v0"
 
 	ImmutableConfigV1 = "!toml-config-immutable-v1"
 
@@ -62,8 +62,8 @@ func init() {
 	register(InventoryListTypeV0, genres.InventoryList, false)
 	register(InventoryListTypeV1, genres.InventoryList, true)
 
-	register(RepoTypeLocalRelay, genres.Repo, false)
 	register(RepoTypeXDGDotenvV0, genres.Repo, false)
+	register(RepoTypeLocalPath, genres.Repo, false)
 
 	register(ImmutableConfigV1, genres.None, false)
 

@@ -30,6 +30,7 @@ type Env interface {
 	RelToCwdOrSame(p string) (p1 string)
 	MakeCommonEnv() map[string]string
 	MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[string]
+	AbsFromCwdOrSame(p string) (p1 string)
 
 	Delete(paths ...string) (err error)
 }

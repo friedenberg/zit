@@ -24,7 +24,7 @@ function print_their_xdg() {
 	zit info-repo xdg
 }
 
-function remote_add { # @test
+function remote_add_dotenv_xdg { # @test
 	set_xdg them
 	run_zit_init
 
@@ -53,5 +53,33 @@ function remote_add { # @test
 		state = '/tmp/bats-run-\w+/test/.+/them/\.xdg/state/zit'
 		cache = '/tmp/bats-run-\w+/test/.+/\.xdg/cache/zit'
 		runtime = '/tmp/bats-run-\w+/test/.+/them/\.xdg/runtime/zit'
+	EOM
+}
+
+function remote_add_local_path { # @test
+	set_xdg them
+	run_zit_init -override-xdg-with-cwd test-repo-remote
+
+	set_xdg "$BATS_TEST_TMPDIR"
+	run_zit remote-add -remote-type stdio-local them test-repo-id-them
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-local_path-v0]
+	EOM
+
+	run_zit show /test-repo-id-them:k
+	assert_success
+	assert_output_unsorted --regexp - <<-'EOM'
+		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-local_path-v0]
+	EOM
+
+	run_zit show -format text /test-repo-id-them:k
+	assert_success
+	assert_output --regexp - <<-'EOM'
+		---
+		! toml-repo-local_path-v0
+		---
+
+		path = '/tmp/bats-run-\w+/test/.+/them'
 	EOM
 }
