@@ -41,7 +41,7 @@ func (cmd Complete) Run(req command.Request) {
 	envLocal := cmd.MakeEnv(req)
 
 	commandLine := command.CommandLine{
-		Args:       req.Args(),
+		Args:       req.PeekArgs(),
 		InProgress: cmd.inProgress,
 	}
 
@@ -59,7 +59,7 @@ func (cmd Complete) Run(req command.Request) {
 		return
 	}
 
-	name := req.Args()[0]
+	name := req.PopArg("name")
 	subcmd, foundSubcmd := cmds[name]
 
 	if !foundSubcmd {

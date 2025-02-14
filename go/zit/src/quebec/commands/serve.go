@@ -26,7 +26,7 @@ func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Serve) Run(req command.Request) {
-	args := req.Args()
+	args := req.PopArgs()
 	req.SetCancelOnSIGHUP()
 
 	envLocal := cmd.MakeEnvWithOptions(

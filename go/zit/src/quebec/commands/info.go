@@ -38,7 +38,7 @@ func (c Info) Run(req command.Request) {
 		env_ui.Options{},
 	)
 
-	args := req.Args()
+	args := req.PopArgs()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}

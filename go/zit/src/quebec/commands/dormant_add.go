@@ -19,7 +19,7 @@ func (cmd DormantAdd) Run(dep command.Request) {
 
 	localWorkingCopy.Must(localWorkingCopy.Lock)
 
-	for _, v := range dep.Args() {
+	for _, v := range dep.PopArgs() {
 		cs := catgut.MakeFromString(v)
 
 		if err := localWorkingCopy.GetDormantIndex().AddDormantTag(cs); err != nil {

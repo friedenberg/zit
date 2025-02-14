@@ -20,7 +20,7 @@ func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *Init) Run(req command.Request) {
-  repoId := req.Argv("repo-id")
+  repoId := req.PopArg("repo-id")
   req.AssertNoMoreArgs()
 	cmd.OnTheFirstDay(req, repoId)
 }

@@ -30,12 +30,7 @@ func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
 func (cmd Pull) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	if len(req.Args()) == 0 {
-		// TODO add info about remote options
-		req.CancelWithBadRequestf("requires a remote to be specified")
-	}
-
-	remoteArg := req.Args()[0]
+	remoteArg := req.PopArg("remote arg")
 
 	remote := cmd.MakeRemoteWorkingCopyFromArg(req, remoteArg, localWorkingCopy)
 
@@ -50,7 +45,7 @@ func (cmd Pull) Run(req command.Request) {
 			query.BuilderOptionDefaultGenres(genres.InventoryList),
 		),
 		localWorkingCopy,
-		req.Args()[1:],
+		req.PopArgs(),
 	)
 
 	switch remote := remote.(type) {

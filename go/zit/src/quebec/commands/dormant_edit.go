@@ -27,7 +27,7 @@ type DormantEdit struct {
 }
 
 func (cmd DormantEdit) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if len(args) > 0 {

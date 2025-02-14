@@ -110,7 +110,7 @@ func (cmd *Organize) Run(req command.Request) {
 			query.BuilderOptionDefaultSigil(ids.SigilLatest),
 		),
 		localWorkingCopy,
-		req.Args(),
+		req.PopArgs(),
 	)
 
 	localWorkingCopy.ApplyToOrganizeOptions(&cmd.Options)

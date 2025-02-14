@@ -18,7 +18,7 @@ type PeekZettelIds struct {
 }
 
 func (cmd PeekZettelIds) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 
 	n := 0
 

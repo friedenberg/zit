@@ -56,7 +56,7 @@ func (cmd WriteBlob) Run(
 
 	sawStdin := false
 
-	for _, p := range dep.Args() {
+	for _, p := range dep.PopArgs() {
 		switch {
 		case sawStdin:
 			ui.Err().Print("'-' passed in more than once. Ignoring")

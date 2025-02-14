@@ -56,7 +56,7 @@ func (cmd Checkout) Run(req command.Request) {
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 		),
 		localWorkingCopy,
-		req.Args(),
+		req.PopArgs(),
 	)
 
 	opCheckout := user_ops.Checkout{

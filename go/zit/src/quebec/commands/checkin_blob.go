@@ -43,7 +43,7 @@ func (cmd *CheckinBlob) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd CheckinBlob) Run(req command.Request) {
-	args := req.Args()
+	args := req.PopArgs()
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 

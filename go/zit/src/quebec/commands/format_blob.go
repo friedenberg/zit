@@ -43,7 +43,7 @@ func (cmd *FormatBlob) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *FormatBlob) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if cmd.Stdin {

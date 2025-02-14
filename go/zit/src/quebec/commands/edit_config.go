@@ -28,7 +28,7 @@ type EditConfig struct {
 func (cmd EditConfig) Run(
 	dep command.Request,
 ) {
-	args := dep.Args()
+	args := dep.PopArgs()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if len(args) > 0 {

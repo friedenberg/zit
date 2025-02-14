@@ -32,18 +32,26 @@ func MakeRequest(
 	}
 }
 
-func (req Request) Args() []string {
-	return req.args[*req.argi:]
+func (req Request) PeekArgs() []string {
+	args := req.args[*req.argi:]
+	return args
 }
 
-func (req Request) Argc() int {
-	return len(req.Args())
+func (req Request) PopArgs() []string {
+	args := req.PeekArgs()
+	*req.argi += len(args)
+	return args
 }
 
-func (req Request) Argv(argName string) string {
-	if req.Argc() == 0 {
+func (req Request) RemainingArgCount() int {
+	return len(req.args[*req.argi:])
+}
+
+func (req Request) PopArg(argName string) string {
+	if req.RemainingArgCount() == 0 {
 		req.CancelWithBadRequestf(
 			"expected positional argument (%d) %s, but only received %q",
+      *req.argi,
 			argName,
 			req.args,
 		)
@@ -55,18 +63,18 @@ func (req Request) Argv(argName string) string {
 }
 
 func (req Request) AssertNoMoreArgs() {
-	if req.Argc() > 0 {
+	if req.RemainingArgCount() > 0 {
 		req.CancelWithBadRequestf(
 			"expected no more arguments, but have %q",
-			req.Args(),
+			req.PopArgs(),
 		)
 	}
 }
 
 func (req Request) LastArg() (arg string, ok bool) {
-	if req.Argc() > 0 {
+	if req.RemainingArgCount() > 0 {
 		ok = true
-		arg = req.Args()[req.Argc()-1]
+		arg = req.PopArgs()[req.RemainingArgCount()-1]
 	}
 
 	return

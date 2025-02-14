@@ -87,7 +87,7 @@ func (c New) ValidateFlagsAndArgs(
 }
 
 func (cmd *New) Run(req command.Request) {
-	args := req.Args()
+	args := req.PopArgs()
 	repo := cmd.MakeLocalWorkingCopy(req)
 
 	if err := cmd.ValidateFlagsAndArgs(repo, args...); err != nil {

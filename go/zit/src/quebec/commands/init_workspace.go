@@ -96,7 +96,7 @@ func (cmd InitWorkspace) Complete(
 }
 
 func (cmd InitWorkspace) Run(req command.Request) {
-	argc := len(req.Args())
+	argc := len(req.PopArgs())
 	envLocal := cmd.MakeEnv(req)
 
 	switch argc {
@@ -114,7 +114,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 		fallthrough
 
 	case 1:
-		dir := req.Args()[0]
+		dir := req.PopArgs()[0]
 
 		if err := envLocal.MakeDir(dir); err != nil {
 			req.CancelWithError(err)

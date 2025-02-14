@@ -107,7 +107,7 @@ func (cmd CatBlob) Run(
 
 	blobWriter := cmd.makeBlobWriter(blobStore)
 
-	for _, v := range dep.Args() {
+	for _, v := range dep.PopArgs() {
 		var sh sha.Sha
 
 		if err := sh.Set(v); err != nil {

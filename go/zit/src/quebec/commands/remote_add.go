@@ -40,10 +40,6 @@ func (cmd *RemoteAdd) SetFlagSet(flagSet *flag.FlagSet) {
 }
 
 func (cmd RemoteAdd) Run(req command.Request) {
-	if len(req.Args()) < 1 {
-		req.CancelWithBadRequestf("expected a remote type, but got nothing")
-	}
-
 	local := cmd.MakeLocalWorkingCopy(req)
 	req.Must(local.Lock)
 	cmd.AddRemote(req, local, cmd.proto)

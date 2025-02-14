@@ -96,9 +96,9 @@ func (cmd Remote) AddRemote(
 		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 
 	case repo.RemoteTypeNativeDotenvXDG:
-		xdgDotenvPath := req.Argv("xdg-dotenv-path")
+		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
 
-		if err := id.Set(req.Argv("repo-id")); err != nil {
+		if err := id.Set(req.PopArg("repo-id")); err != nil {
 			req.CancelWithError(err)
 		}
 
@@ -112,9 +112,9 @@ func (cmd Remote) AddRemote(
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
 	case repo.RemoteTypeStdioLocal:
-		path := req.Argv("path")
+		path := req.PopArg("path")
 
-		if err := id.Set(req.Argv("repo-id")); err != nil {
+		if err := id.Set(req.PopArg("repo-id")); err != nil {
 			req.CancelWithError(err)
 		}
 

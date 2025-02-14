@@ -28,7 +28,7 @@ func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
 		req,
 		builderOptions,
 		localWorkingCopy,
-		req.Args(),
+		req.PopArgs(),
 	)
 
 	return localWorkingCopy, queryGroup

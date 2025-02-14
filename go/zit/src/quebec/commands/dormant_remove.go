@@ -18,7 +18,7 @@ func (cmd DormantRemove) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 	localWorkingCopy.Must(localWorkingCopy.Lock)
 
-	for _, v := range dep.Args() {
+	for _, v := range dep.PopArgs() {
 		cs := catgut.MakeFromString(v)
 
 		if err := localWorkingCopy.GetDormantIndex().RemoveDormantTag(

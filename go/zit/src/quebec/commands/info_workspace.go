@@ -19,7 +19,7 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := repo.GetEnvWorkspace()
 	envWorkspace.AssertInWorkspace(repo)
-	args := req.Args()
+	args := req.PopArgs()
 
 	if len(args) == 0 {
 		args = []string{""}

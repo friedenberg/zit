@@ -81,7 +81,7 @@ func (cmd Show) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	archive := cmd.MakeLocalArchive(envRepo)
 
-	args := req.Args()
+	args := req.PopArgs()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		queryGroup := cmd.MakeQueryGroup(

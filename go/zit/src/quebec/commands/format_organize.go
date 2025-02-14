@@ -34,7 +34,7 @@ func (cmd *FormatOrganize) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *FormatOrganize) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	cmd.Flags.Config = localWorkingCopy.GetConfig()

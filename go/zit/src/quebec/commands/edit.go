@@ -66,7 +66,7 @@ func (cmd Edit) Run(req command.Request) {
 			),
 		),
 		localWorkingCopy,
-		req.Args(),
+		req.PopArgs(),
 	)
 
 	options := checkout_options.Options{

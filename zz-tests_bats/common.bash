@@ -5,7 +5,7 @@ load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert-additions/load"
 
 set_xdg() {
-  loc="$(realpath "$1")"
+  loc="$(realpath "$1" 2>/dev/null)"
   export XDG_DATA_HOME="$loc/.xdg/data"
   export XDG_CONFIG_HOME="$loc/.xdg/config"
   export XDG_STATE_HOME="$loc/.xdg/state"

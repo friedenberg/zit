@@ -19,7 +19,7 @@ type InfoRepo struct {
 }
 
 func (cmd InfoRepo) Run(req command.Request) {
-	args := req.Args()
+	args := req.PopArgs()
 	repo := cmd.MakeEnvRepo(req, false)
 
 	configLoaded := repo.GetConfig()

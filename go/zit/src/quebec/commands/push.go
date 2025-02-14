@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
@@ -32,7 +31,7 @@ func (cmd *Push) SetFlagSet(f *flag.FlagSet) {
 func (cmd Push) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	remoteArg := req.Args()[0]
+	remoteArg := req.PopArg("remote arg")
 	remote := cmd.MakeArchiveFromArg(req, remoteArg, localWorkingCopy)
 
 	repoType := remote.GetImmutableConfig().ImmutableConfig.GetRepoType()
@@ -50,7 +49,7 @@ func (cmd Push) Run(req command.Request) {
 				query.BuilderOptionDefaultGenres(genres.InventoryList),
 			),
 			localWorkingCopy,
-			req.Args()[1:],
+			req.PopArgs(),
 		)
 
 		if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
@@ -62,10 +61,7 @@ func (cmd Push) Run(req command.Request) {
 		}
 
 	case repo_type.TypeArchive:
-		if args := req.Args()[1:]; len(args) > 0 {
-			ui.Err().Printf("remote is archive, ignore arguments: %q", req.Args()[1:])
-		}
-
+		req.AssertNoMoreArgs()
 		cmd.PushAllToArchive(req, localWorkingCopy, remote)
 
 	default:

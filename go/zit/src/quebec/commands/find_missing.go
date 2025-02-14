@@ -27,7 +27,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 		}
 	}
 
-	for _, shSt := range dep.Args() {
+	for _, shSt := range dep.PopArgs() {
 		var sh sha.Sha
 
 		if err := sh.Set(shSt); err != nil {

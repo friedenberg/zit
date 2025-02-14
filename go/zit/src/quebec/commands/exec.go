@@ -23,7 +23,7 @@ type Exec struct {
 }
 
 func (cmd Exec) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 
 	if len(args) == 0 {
 		dep.CancelWithBadRequestf("needs at least Sku and possibly function name")

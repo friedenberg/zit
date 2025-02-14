@@ -16,7 +16,7 @@ type Reindex struct {
 }
 
 func (cmd Reindex) Run(dep command.Request) {
-	args := dep.Args()
+	args := dep.PopArgs()
 
 	if len(args) > 0 {
 		dep.CancelWithErrorf("reindex does not support arguments")

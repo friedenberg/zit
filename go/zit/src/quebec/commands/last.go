@@ -59,7 +59,7 @@ func (cmd Last) Run(dep command.Request) {
 
 	archive := cmd.MakeLocalArchive(repoLayout)
 
-	if len(dep.Args()) != 0 {
+	if len(dep.PopArgs()) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
