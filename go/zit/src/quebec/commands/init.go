@@ -20,16 +20,7 @@ func (cmd *Init) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd *Init) Run(req command.Request) {
-	switch len(req.Args()) {
-	case 0:
-		req.CancelWithBadRequestf("expected a repo id, but got nothing")
-
-	default:
-		req.CancelWithBadRequestf("only acceptable argument is a repo id, but got %q", req.Args())
-
-	case 1:
-		break
-	}
-
-	cmd.OnTheFirstDay(req, req.Args()[0])
+  repoId := req.Argv("repo-id")
+  req.AssertNoMoreArgs()
+	cmd.OnTheFirstDay(req, repoId)
 }

@@ -12,7 +12,8 @@ type Request struct {
 	config_mutable_cli.Config
 	*flag.FlagSet
 
-	args *[]string
+	args []string
+	argi *int
 }
 
 func MakeRequest(
@@ -20,38 +21,46 @@ func MakeRequest(
 	config config_mutable_cli.Config,
 	flagSet *flag.FlagSet,
 ) Request {
-	args := flagSet.Args()
+	argi := 0
+
 	return Request{
 		Context: ctx,
 		Config:  config,
 		FlagSet: flagSet,
-		args:    &args,
+		args:    flagSet.Args(),
+		argi:    &argi,
 	}
 }
 
 func (req Request) Args() []string {
-  return *req.args
+	return req.args[*req.argi:]
 }
 
 func (req Request) Argc() int {
 	return len(req.Args())
 }
 
-func (req Request) Argv(idx int, argName string) string {
-	if req.Argc()-1 < idx {
+func (req Request) Argv(argName string) string {
+	if req.Argc() == 0 {
 		req.CancelWithBadRequestf(
-			"expected %s at position %d, but only received %q",
+			"expected positional argument (%d) %s, but only received %q",
 			argName,
-			idx,
-			req.Args(),
+			req.args,
 		)
 	}
 
-	return req.Args()[idx]
+	arg := req.args[*req.argi]
+	*req.argi++
+	return arg
 }
 
 func (req Request) AssertNoMoreArgs() {
-	// TODO
+	if req.Argc() > 0 {
+		req.CancelWithBadRequestf(
+			"expected no more arguments, but have %q",
+			req.Args(),
+		)
+	}
 }
 
 func (req Request) LastArg() (arg string, ok bool) {

@@ -96,9 +96,9 @@ func (cmd Remote) AddRemote(
 		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 
 	case repo.RemoteTypeNativeDotenvXDG:
-		xdgDotenvPath := req.Argv(0, "xdg-dotenv-path")
+		xdgDotenvPath := req.Argv("xdg-dotenv-path")
 
-		if err := id.Set(req.Argv(1, "repo-id")); err != nil {
+		if err := id.Set(req.Argv("repo-id")); err != nil {
 			req.CancelWithError(err)
 		}
 
@@ -112,15 +112,17 @@ func (cmd Remote) AddRemote(
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
 	case repo.RemoteTypeStdioLocal:
-		path := req.Argv(0, "path")
+		path := req.Argv("path")
 
-		if err := id.Set(req.Argv(1, "repo-id")); err != nil {
+		if err := id.Set(req.Argv("repo-id")); err != nil {
 			req.CancelWithError(err)
 		}
 
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
 		blob = repo_blobs.TomlLocalPathV0{Path: local.AbsFromCwdOrSame(path)}
 	}
+
+  req.AssertNoMoreArgs()
 
 	var blobSha interfaces.Sha
 
