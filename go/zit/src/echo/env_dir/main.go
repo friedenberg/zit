@@ -49,21 +49,21 @@ func MakeFromXDGDotenvPath(
 		XDG: &xdg.XDG{},
 	}
 
-	var f *os.File
+	var file *os.File
 
 	{
 		var err error
 
-		if f, err = os.Open(xdgDotenvPath); err != nil {
+		if file, err = os.Open(xdgDotenvPath); err != nil {
 			context.CancelWithError(err)
 		}
 	}
 
-	if _, err := dotenv.ReadFrom(f); err != nil {
+	if _, err := dotenv.ReadFrom(file); err != nil {
 		context.CancelWithError(err)
 	}
 
-	if err := f.Close(); err != nil {
+	if err := file.Close(); err != nil {
 		context.CancelWithError(err)
 	}
 

@@ -15,7 +15,7 @@ type RoundTripperUnixSocket struct {
 }
 
 func (roundTripper *RoundTripperUnixSocket) Initialize(
-	remote Server,
+	remote *Server,
 ) (err error) {
 	if roundTripper.UnixSocket, err = remote.InitializeUnixSocket(
 		net.ListenConfig{},

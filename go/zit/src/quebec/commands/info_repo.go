@@ -21,6 +21,7 @@ type InfoRepo struct {
 func (cmd InfoRepo) Run(req command.Request) {
 	args := req.Args()
 	repo := cmd.MakeEnvRepo(req, false)
+
 	configLoaded := repo.GetConfig()
 	c := configLoaded.ImmutableConfig
 
@@ -34,12 +35,12 @@ func (cmd InfoRepo) Run(req command.Request) {
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
 		case "config-immutable":
-      if _, err := (config_immutable_io.Coder{}).EncodeTo(
-        &configLoaded,
-        repo.GetUIFile(),
-      ); err != nil {
-        repo.CancelWithError(err)
-      }
+			if _, err := (config_immutable_io.Coder{}).EncodeTo(
+				&configLoaded,
+				repo.GetUIFile(),
+			); err != nil {
+				repo.CancelWithError(err)
+			}
 
 		case "store-version":
 			repo.GetUI().Print(c.GetStoreVersion())
@@ -65,7 +66,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 				XDG: &ecksDeeGee,
 			}
 
-			if _, err := dotenv.WriteTo(repo.GetOutFile()); err != nil {
+			if _, err := dotenv.WriteTo(repo.GetUIFile()); err != nil {
 				repo.CancelWithError(err)
 			}
 		}

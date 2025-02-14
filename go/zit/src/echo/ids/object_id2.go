@@ -500,20 +500,19 @@ func (oid *objectId2) Set(v string) (err error) {
 		return
 	}
 
-	if strings.HasPrefix(v, "/") {
-		els := strings.SplitAfterN(v[1:], "/", 2)
+	var els []string
 
-		if len(els) != 2 {
-			err = errors.Errorf("invalid object id format: %q", v)
-			return
-		}
+	if len(v) > 0 {
+		els = strings.SplitAfterN(v[1:], "/", 2)
+	}
 
-		v = els[1]
-
+	if strings.HasPrefix(v, "/") && len(els) == 2 {
 		if err = oid.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		v = els[1]
 	}
 
 	var k interfaces.ObjectId

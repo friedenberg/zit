@@ -16,10 +16,10 @@ func (cmd *LocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c LocalWorkingCopy) MakeLocalWorkingCopy(
-	dep command.Request,
+	req command.Request,
 ) *local_working_copy.Repo {
 	return c.MakeLocalWorkingCopyWithOptions(
-		dep,
+		req,
 		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)

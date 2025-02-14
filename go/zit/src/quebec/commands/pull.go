@@ -37,7 +37,7 @@ func (cmd Pull) Run(req command.Request) {
 
 	remoteArg := req.Args()[0]
 
-	remote := cmd.MakeRemoteWorkingCopy(req, remoteArg, localWorkingCopy)
+	remote := cmd.MakeRemoteWorkingCopyFromArg(req, remoteArg, localWorkingCopy)
 
 	qg := cmd.MakeQueryGroup(
 		req,

@@ -48,7 +48,7 @@ func (cmd Clone) Run(req command.Request) {
 
 	local := cmd.OnTheFirstDay(req, req.Args()[0])
 
-	remote := cmd.MakeRemoteWorkingCopy(
+	remote := cmd.MakeRemoteWorkingCopyFromArg(
 		req,
 		req.Args()[1],
 		local,

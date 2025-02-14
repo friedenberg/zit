@@ -13,12 +13,27 @@ type Request struct {
 	*flag.FlagSet
 }
 
-func (req Request) LastArg() (arg string, ok bool) {
-	argc := len(req.Args())
+func (req Request) Argc() int {
+	return len(req.Args())
+}
 
-	if argc > 0 {
+func (req Request) Argv(idx int, argName string) string {
+	if req.Argc()-1 < idx {
+		req.CancelWithBadRequestf(
+			"expected %s at position %d, but only received %q",
+			argName,
+			idx,
+			req.Args(),
+		)
+	}
+
+	return req.Args()[idx]
+}
+
+func (req Request) LastArg() (arg string, ok bool) {
+	if req.Argc() > 0 {
 		ok = true
-		arg = req.Args()[argc-1]
+		arg = req.Args()[req.Argc()-1]
 	}
 
 	return

@@ -3,22 +3,22 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type RepoStore struct {
-	dirLayout           env_repo.Env
+	envRepo             env_repo.Env
 	v0                  TypedStore[repo_blobs.V0, *repo_blobs.V0]
-	toml_relay_local_v0 TypedStore[repo_blobs.TomlRelayLocalV0, *repo_blobs.TomlRelayLocalV0]
+	toml_relay_local_v0 TypedStore[repo_blobs.TomlLocalPathV0, *repo_blobs.TomlLocalPathV0]
 }
 
 func MakeRepoStore(
 	dirLayout env_repo.Env,
 ) RepoStore {
 	return RepoStore{
-		dirLayout: dirLayout,
+		envRepo: dirLayout,
 		v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
@@ -35,74 +35,73 @@ func MakeRepoStore(
 		toml_relay_local_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.TomlRelayLocalV0](
+				MakeTomlDecoderIgnoreTomlErrors[repo_blobs.TomlLocalPathV0](
 					dirLayout,
 				),
-				TomlBlobEncoder[repo_blobs.TomlRelayLocalV0, *repo_blobs.TomlRelayLocalV0]{},
+				TomlBlobEncoder[repo_blobs.TomlLocalPathV0, *repo_blobs.TomlLocalPathV0]{},
 				dirLayout,
 			),
-			func(a *repo_blobs.TomlRelayLocalV0) {
+			func(a *repo_blobs.TomlLocalPathV0) {
 				a.Reset()
 			},
 		),
 	}
 }
 
-func (a RepoStore) GetCommonStore() interfaces.TypedBlobStore[repo_blobs.Blob] {
-	return a
-}
+// func (a RepoStore) GetCommonStore() interfaces.TypedBlobStore[repo_blobs.Blob] {
+// 	return a
+// }
 
-func (a RepoStore) ParseTypedBlob(
+func (a RepoStore) ReadTypedBlob(
 	tipe interfaces.ObjectId,
 	blobSha interfaces.Sha,
 ) (common repo_blobs.Blob, n int64, err error) {
-	switch tipe.String() {
-	case "":
-		store := a.v0
-		var blob *repo_blobs.V0
+	var reader interfaces.ShaReadCloser
 
-		if blob, err = store.GetBlob(blobSha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		common = blob
-	case builtin_types.RepoTypeLocalRelay:
-		store := a.toml_relay_local_v0
-		var blob *repo_blobs.TomlRelayLocalV0
-
-		if blob, err = store.GetBlob(blobSha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		common = blob
+	if reader, err = a.envRepo.BlobReader(blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	defer errors.DeferredCloser(&err, reader)
+
+	var blob repo_blobs.TypeWithBlob
+
+	if n, err = repo_blobs.Coder.DecodeFrom(&blob, reader); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	common = *blob.Object
 
 	return
 }
 
-func (a RepoStore) PutTypedBlob(
-	tipe interfaces.ObjectId,
-	common repo_blobs.Blob,
-) (err error) {
-	switch tipe.String() {
-	case "":
-		if blob, ok := common.(*repo_blobs.V0); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
-			return
-		} else {
-			a.v0.PutBlob(blob)
-		}
+func (store RepoStore) WriteTypedBlob(
+	tipe ids.Type,
+	blob repo_blobs.Blob,
+) (sh interfaces.Sha, n int64, err error) {
+	var writer interfaces.ShaWriteCloser
 
-	case builtin_types.RepoTypeLocalRelay:
-		if blob, ok := common.(*repo_blobs.TomlRelayLocalV0); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
-			return
-		} else {
-			a.toml_relay_local_v0.PutBlob(blob)
-		}
+	if writer, err = store.envRepo.BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	defer errors.DeferredCloser(&err, writer)
+
+	if n, err = repo_blobs.Coder.EncodeTo(
+		&repo_blobs.TypeWithBlob{
+			Type:   &tipe,
+			Object: &blob,
+		},
+		writer,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = writer.GetShaLike()
 
 	return
 }

@@ -4,10 +4,17 @@ import (
 	"flag"
 	"fmt"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 )
 
@@ -25,7 +32,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 }
 
 // TODO
-func (cmd Remote) MakeArchive(
+func (cmd Remote) MakeArchiveFromArg(
 	req command.Request,
 	remoteArg string,
 	local repo.Repo,
@@ -71,7 +78,90 @@ func (cmd Remote) MakeArchive(
 	return
 }
 
-func (cmd Remote) MakeRemoteWorkingCopy(
+func (cmd Remote) AddRemote(
+	req command.Request,
+	local *local_working_copy.Repo,
+	proto sku.Proto,
+) (sk *sku.Transacted) {
+	env := cmd.MakeEnv(req)
+
+	sk = sku.GetTransactedPool().Get()
+	proto.Apply(sk.GetMetadata(), genres.Repo)
+
+	var id ids.RepoId
+	var blob repo_blobs.Blob
+
+	switch cmd.RemoteType {
+	default:
+		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
+
+	case repo.RemoteTypeNativeDotenvXDG:
+		xdgDotenvPath := req.Argv(0, "xdg-dotenv-path")
+
+		if err := id.Set(req.Argv(1, "repo-id")); err != nil {
+			req.CancelWithError(err)
+		}
+
+		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
+			req,
+			xdgDotenvPath,
+			env.GetOptions(),
+		)
+
+		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
+		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
+	}
+
+	var blobSha interfaces.Sha
+
+	{
+		var err error
+
+		if blobSha, _, err = local.GetStore().GetTypedBlobStore().Repo.WriteTypedBlob(
+			sk.Metadata.Type,
+			blob,
+		); err != nil {
+			req.CancelWithError(err)
+		}
+	}
+
+	sk.Metadata.Blob.ResetWithShaLike(blobSha)
+
+	if err := sk.ObjectId.SetWithIdLike(&id); err != nil {
+		req.CancelWithError(err)
+	}
+
+	if err := local.GetStore().CreateOrUpdate(
+		sk,
+		sku.StoreOptions{
+			ApplyProto: true,
+		},
+	); err != nil {
+		req.CancelWithError(err)
+	}
+
+	return
+}
+
+func (cmd Remote) MakeRemote(
+	req command.Request,
+	local *local_working_copy.Repo,
+	repoId ids.RepoId,
+) (remote repo.Repo) {
+	sk := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(sk)
+
+	if err := local.GetStore().ReadOneInto(repoId, sk); err != nil {
+		req.CancelWithError(err)
+		return
+	}
+
+	// TODO get sku type and initialize remote from blob
+
+	return
+}
+
+func (cmd Remote) MakeRemoteWorkingCopyFromArg(
 	req command.Request,
 	remoteArg string,
 	local repo.Repo,
@@ -131,7 +221,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 
 	remote := cmd.MakeLocalArchive(envRepo)
 
-	server := remote_http.Server{
+	server := &remote_http.Server{
 		EnvLocal: envLocal,
 		Repo:     remote,
 	}

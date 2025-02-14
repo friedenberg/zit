@@ -121,6 +121,7 @@ function complete_subcmd { # @test
 		push
 		read-blob
 		reindex
+		remote-add
 		revert
 		save
 		serve

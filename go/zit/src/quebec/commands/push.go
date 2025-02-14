@@ -33,7 +33,7 @@ func (cmd Push) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	remoteArg := req.Args()[0]
-	remote := cmd.MakeArchive(req, remoteArg, localWorkingCopy)
+	remote := cmd.MakeArchiveFromArg(req, remoteArg, localWorkingCopy)
 
 	repoType := remote.GetImmutableConfig().ImmutableConfig.GetRepoType()
 

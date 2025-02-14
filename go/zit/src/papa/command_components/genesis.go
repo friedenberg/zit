@@ -30,17 +30,6 @@ func (cmd Genesis) OnTheFirstDay(req command.Request, repoId string) repo.Repo {
 		env_ui.Options{},
 	)
 
-	// switch len(req.Args()) {
-	// case 0:
-	// 	ui.CancelWithBadRequestf("expected a repo id, but got nothing")
-
-	// default:
-	// 	ui.CancelWithBadRequestf("only acceptable argument is a repo id, but got %q", req.Args())
-
-	// case 1:
-	// 	break
-	// }
-
 	if err := cmd.Config.RepoId.Set(repoId); err != nil {
 		ui.CancelWithError(err)
 	}
