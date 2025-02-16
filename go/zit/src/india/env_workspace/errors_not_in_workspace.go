@@ -27,15 +27,17 @@ func (err ErrNotInWorkspace) GetRetryableError() errors.Retryable {
 	return err
 }
 
-func (err ErrNotInWorkspace) Recover(context errors.Context, in error) {
+func (err ErrNotInWorkspace) Recover(ctx errors.RetryableContext, in error) {
 	if err.offerToCreate &&
 		err.Confirm("a workspace is necessary to run this command. create one?") {
 		blob := &workspace_config_blobs.V0{}
 
 		if err := err.CreateWorkspace(blob); err != nil {
-			context.CancelWithError(err)
+			ctx.CancelWithError(err)
 		}
+
+		ctx.Retry()
 	} else {
-		context.CancelWithBadRequestf("not creating a workspace. aborting.")
+		ctx.CancelWithBadRequestf("not creating a workspace. aborting.")
 	}
 }

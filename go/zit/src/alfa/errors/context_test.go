@@ -2,6 +2,7 @@ package errors
 
 import (
 	ConTeXT "context"
+	"fmt"
 	"testing"
 )
 
@@ -59,5 +60,43 @@ func TestContextCancelled(t *testing.T) {
 
 	if !must1 || !must2 || !after1 {
 		t.Errorf("expected all must and after functions to execute")
+	}
+}
+
+type errTestRecover struct{}
+
+func (errTestRecover) Error() string {
+	return "test recover error"
+}
+
+func (err errTestRecover) GetRetryableError() Retryable {
+	return err
+}
+
+func (errTestRecover) Recover(ctx RetryableContext, in error) {
+	ctx.Retry()
+}
+
+func TestContextCancelledRetry(t *testing.T) {
+	ctx := MakeContext(ConTeXT.Background())
+
+	tryCount := 0
+
+	if err := ctx.Run(
+		func(ctx Context) {
+			fmt.Printf("%d\n", tryCount)
+			if tryCount == 0 {
+				tryCount++
+				ctx.CancelWithError(errTestRecover{})
+			}
+
+			tryCount++
+		},
+	); err != nil {
+		t.Errorf("expected no error but got: %s", err)
+	}
+
+	if tryCount != 2 {
+		t.Errorf("expected try count 2 but got: %d", tryCount)
 	}
 }

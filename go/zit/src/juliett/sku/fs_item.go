@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
@@ -59,6 +60,11 @@ func (ef *FSItem) WriteToExternalObjectId(
 
 	case !ef.Conflict.IsEmpty():
 		anchorFD = &ef.Conflict
+
+	default:
+    // [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer during organize in workspace
+		ui.Err().Printf("item has no anchor FDs. %q", ef.Debug())
+		return
 	}
 
 	relPath = dirLayout.RelToCwdOrSame(anchorFD.GetPath())

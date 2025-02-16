@@ -33,6 +33,8 @@ func (err errContextCancelledExpected) Is(target error) bool {
 	return ok
 }
 
+var errContextRetry = New("context retry")
+
 type Context interface {
 	ConTeXT.Context
 
@@ -67,13 +69,20 @@ type Context interface {
 	CancelWithNotImplemented()
 }
 
+type RetryableContext interface {
+	Context
+	Retry()
+}
+
 type context struct {
 	ConTeXT.Context
-	cancelFunc ConTeXT.CancelCauseFunc
+	funcCancel ConTeXT.CancelCauseFunc
+	funcRun    func(Context)
 
 	signals chan os.Signal
 
-	lock          sync.Mutex
+	lockRun       sync.Mutex
+	lockConc      sync.Mutex
 	doAfter       []FuncWithStackInfo
 	doAfterErrors []error // TODO expose and use
 
@@ -89,7 +98,7 @@ func MakeContext(in ConTeXT.Context) *context {
 
 	return &context{
 		Context:    ctx,
-		cancelFunc: cancel,
+		funcCancel: cancel,
 		signals:    make(chan os.Signal, 1),
 	}
 }
@@ -134,69 +143,92 @@ func (c *context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(c.signals, signals...)
 }
 
-func (context *context) Run(f func(Context)) error {
+func (ctx *context) Run(funcRun func(Context)) error {
+	if !ctx.lockRun.TryLock() {
+		return Errorf("Context.Run called before previous run completed.")
+	}
+
+	defer ctx.lockRun.Unlock()
+
+	ctx.funcRun = funcRun
+
 	go func() {
 		select {
-		case <-context.Done():
-		case sig := <-context.signals:
-			context.cancel(errContextCancelledExpected{Signal{Signal: sig}})
+		case <-ctx.Done():
+		case sig := <-ctx.signals:
+			ctx.cancel(errContextCancelledExpected{Signal{Signal: sig}})
 		}
 
-		signal.Stop(context.signals)
+		signal.Stop(ctx.signals)
 	}()
 
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				// TODO capture panic stack trace and add to custom error objects
-				switch err := r.(type) {
-				default:
-					fmt.Printf("%s", debug.Stack())
-					panic(r)
+	retry := true
 
-				case runtime.Error:
-					fmt.Printf("%s", debug.Stack())
-					panic(r)
+	for retry {
+		retry = false
 
-				case error:
-					context.cancel(err)
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					if r == errContextRetry {
+						retry = true
+            return
+					}
+
+					// TODO capture panic stack trace and add to custom error objects
+					switch err := r.(type) {
+					default:
+						fmt.Printf("%s", debug.Stack())
+						panic(r)
+
+					case runtime.Error:
+						fmt.Printf("%s", debug.Stack())
+						panic(r)
+
+					case error:
+						ctx.cancel(err)
+					}
 				}
-			}
+			}()
+
+			ctx.funcRun(ctx)
 		}()
+	}
 
-		f(context)
-	}()
+	ctx.cancel(errContextCancelled)
 
-	context.cancel(errContextCancelled)
-
-	for i := len(context.doAfter) - 1; i >= 0; i-- {
-		doAfter := context.doAfter[i]
+	for i := len(ctx.doAfter) - 1; i >= 0; i-- {
+		doAfter := ctx.doAfter[i]
 		err := doAfter.Func()
 		if err != nil {
-			context.doAfterErrors = append(
-				context.doAfterErrors,
+			ctx.doAfterErrors = append(
+				ctx.doAfterErrors,
 				doAfter.Wrap(err),
 			)
 		}
 	}
 
-	return context.Cause()
+	return ctx.Cause()
 }
 
-func (c *context) cancel(err error) {
+func (ctx *context) Retry() {
+  panic(errContextRetry)
+}
+
+func (ctx *context) cancel(err error) {
 	var retryable Retryable
 
-	if !c.retriesDisabled && As(err, &retryable) {
-		retryable.Recover(c, err)
+	if !ctx.retriesDisabled && As(err, &retryable) {
+		retryable.Recover(ctx, err)
 	} else {
-		c.cancelFunc(err)
+		ctx.funcCancel(err)
 	}
 }
 
 //go:noinline
 func (c *context) after(skip int, f func() error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
+	c.lockConc.Lock()
+	defer c.lockConc.Unlock()
 
 	si, _ := MakeStackInfo(skip + 1)
 

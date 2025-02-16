@@ -13,7 +13,7 @@ type Helpful interface {
 
 type Retryable interface {
 	GetRetryableError() Retryable
-	Recover(Context, error)
+	Recover(RetryableContext, error)
 }
 
 func PrintHelpful(printer interfaces.Printer, helpful Helpful) {

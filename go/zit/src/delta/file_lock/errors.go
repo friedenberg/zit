@@ -59,13 +59,18 @@ func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
 	}
 }
 
-func (err ErrUnableToAcquireLock) Recover(ctx errors.Context, in error) {
+func (err ErrUnableToAcquireLock) Recover(
+	ctx errors.RetryableContext,
+	in error,
+) {
 	errors.PrintHelpful(err.envUI.GetErr(), err)
 
 	if err.envUI.Confirm("delete the existing lock?") {
 		if err := os.Remove(err.Path); err != nil {
 			ctx.CancelWithError(err)
 		}
+
+    ctx.Retry()
 	} else {
 		ctx.CancelWithBadRequestf("not deleting the lock. aborting.")
 	}
