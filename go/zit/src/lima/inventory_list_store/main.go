@@ -460,14 +460,15 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	return
 }
 
+// TODO switch to using append-only log
 func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var p string
+		var dir string
 
 		{
 			var err error
 
-			if p, err = s.envRepo.DirObjectGenre(
+			if dir, err = s.envRepo.DirObjectGenre(
 				genres.InventoryList,
 			); err != nil {
 				yield(nil, errors.Wrap(err))
@@ -475,7 +476,7 @@ func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 			}
 		}
 
-		for path, err := range files.DirNamesLevel2(p) {
+		for path, err := range files.DirNamesLevel2(dir) {
 			if err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
@@ -527,10 +528,10 @@ func (s *Store) ReadAllSorted(
 	return
 }
 
-func (s *Store) ReadAllSkus(
+func (store *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
-	for list, iterErr := range s.IterAllInventoryLists() {
+	for list, iterErr := range store.IterAllInventoryLists() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
@@ -548,7 +549,7 @@ func (s *Store) ReadAllSkus(
 			return
 		}
 
-		iter := s.IterInventoryList(
+		iter := store.IterInventoryList(
 			t.GetBlobSha(),
 		)
 
