@@ -11,6 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 )
 
@@ -28,37 +30,27 @@ func (env *Env) Genesis(bb BigBang) {
 		env.CancelWithError(err)
 	}
 
-	writeFile(env.FileInventoryListLog(), "")
+	env.writeInventoryListLog()
 
 	{
-		// if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
-		// 	bb.AgeIdentity,
-		// ); err != nil {
-		// 	if !errors.IsExist(err) {
-		// 		s.CancelWithError(err)
-		// 	}
-		// }
+		var f *os.File
 
 		{
-			var f *os.File
+			var err error
 
-			{
-				var err error
-
-				if f, err = files.CreateExclusiveWriteOnly(
-					env.FileConfigPermanent(),
-				); err != nil {
-					env.CancelWithError(err)
-				}
-
-				defer env.MustClose(f)
-			}
-
-			encoder := config_immutable_io.Coder{}
-
-			if _, err := encoder.EncodeTo(&env.ConfigLoaded, f); err != nil {
+			if f, err = files.CreateExclusiveWriteOnly(
+				env.FileConfigPermanent(),
+			); err != nil {
 				env.CancelWithError(err)
 			}
+
+			defer env.MustClose(f)
+		}
+
+		encoder := config_immutable_io.Coder{}
+
+		if _, err := encoder.EncodeTo(&env.ConfigLoaded, f); err != nil {
+			env.CancelWithError(err)
 		}
 	}
 
@@ -82,6 +74,36 @@ func (env *Env) Genesis(bb BigBang) {
 	}
 
 	if err := env.setupStores(); err != nil {
+		env.CancelWithError(err)
+	}
+}
+
+func (env Env) writeInventoryListLog() {
+	var f *os.File
+
+	{
+		var err error
+
+		if f, err = files.CreateExclusiveWriteOnly(
+			env.FileInventoryListLog(),
+		); err != nil {
+			env.CancelWithError(err)
+		}
+
+		defer env.MustClose(f)
+	}
+
+	encoder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedStruct[struct{}]]{
+		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
+	}
+
+	tipe := builtin_types.GetOrPanic(builtin_types.InventoryListTypeV1).Type
+
+	subject := triple_hyphen_io.TypedStruct[struct{}]{
+		Type: &tipe,
+	}
+
+	if _, err := encoder.EncodeTo(&subject, f); err != nil {
 		env.CancelWithError(err)
 	}
 }

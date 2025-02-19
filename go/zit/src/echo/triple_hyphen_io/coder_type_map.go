@@ -8,13 +8,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-// TODO rename and make clearer
-type TypedStruct[O any] struct {
+type TypedStruct[S any] struct {
 	Type   *ids.Type
-	Struct O
+	Struct S
 }
 
-func (typedStruct *TypedStruct[O]) GetType() *ids.Type {
+func (typedStruct *TypedStruct[S]) GetType() *ids.Type {
 	if typedStruct.Type == nil {
 		typedStruct.Type = &ids.Type{}
 	}
@@ -22,10 +21,10 @@ func (typedStruct *TypedStruct[O]) GetType() *ids.Type {
 	return typedStruct.Type
 }
 
-type CoderTypeMap[O any] map[string]interfaces.Coder[*TypedStruct[O]]
+type CoderTypeMap[S any] map[string]interfaces.Coder[*TypedStruct[S]]
 
-func (c CoderTypeMap[O]) DecodeFrom(
-	subject *TypedStruct[O],
+func (c CoderTypeMap[S]) DecodeFrom(
+	subject *TypedStruct[S],
 	reader io.Reader,
 ) (n int64, err error) {
 	t := subject.GetType()
@@ -44,11 +43,11 @@ func (c CoderTypeMap[O]) DecodeFrom(
 	return
 }
 
-func (c CoderTypeMap[O]) EncodeTo(
-	typedStruct *TypedStruct[O],
+func (c CoderTypeMap[S]) EncodeTo(
+	subject *TypedStruct[S],
 	writer io.Writer,
 ) (n int64, err error) {
-	t := typedStruct.GetType()
+	t := subject.GetType()
 	coder, ok := c[t.String()]
 
 	if !ok {
@@ -56,7 +55,7 @@ func (c CoderTypeMap[O]) EncodeTo(
 		return
 	}
 
-	if n, err = coder.EncodeTo(typedStruct, writer); err != nil {
+	if n, err = coder.EncodeTo(subject, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -64,10 +63,10 @@ func (c CoderTypeMap[O]) EncodeTo(
 	return
 }
 
-type TypedDecodersWithoutType[O any] map[string]interfaces.DecoderFrom[O]
+type DecoderTypeMapWithoutType[S any] map[string]interfaces.DecoderFrom[S]
 
-func (c TypedDecodersWithoutType[O]) DecodeFrom(
-	subject *TypedStruct[O],
+func (c DecoderTypeMapWithoutType[S]) DecodeFrom(
+	subject *TypedStruct[S],
 	reader io.Reader,
 ) (n int64, err error) {
 	t := subject.GetType()
@@ -86,10 +85,10 @@ func (c TypedDecodersWithoutType[O]) DecodeFrom(
 	return
 }
 
-type TypedCodersWithoutType[O any] map[string]interfaces.Coder[O]
+type CoderTypeMapWithoutType[S any] map[string]interfaces.Coder[S]
 
-func (c TypedCodersWithoutType[O]) DecodeFrom(
-	subject *TypedStruct[O],
+func (c CoderTypeMapWithoutType[S]) DecodeFrom(
+	subject *TypedStruct[S],
 	reader io.Reader,
 ) (n int64, err error) {
 	t := subject.GetType()
@@ -108,8 +107,8 @@ func (c TypedCodersWithoutType[O]) DecodeFrom(
 	return
 }
 
-func (c TypedCodersWithoutType[O]) EncodeTo(
-	subject *TypedStruct[O],
+func (c CoderTypeMapWithoutType[S]) EncodeTo(
+	subject *TypedStruct[S],
 	writer io.Writer,
 ) (n int64, err error) {
 	t := subject.Type

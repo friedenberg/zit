@@ -64,6 +64,7 @@ func (client client) ImportInventoryList(
 	var sbListSkuBox strings.Builder
 
 	if _, err = client.typedBlobStore.WriteObjectToWriter(
+    listSku.GetType(),
 		listSku,
 		&sbListSkuBox,
 	); err != nil {

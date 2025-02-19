@@ -175,6 +175,53 @@ func (s V1) StreamInventoryListBlobSkus(
 	return
 }
 
+type V1ObjectCoder struct {
+	V1
+}
+
+func (s V1ObjectCoder) EncodeTo(
+	o *sku.Transacted,
+	w1 io.Writer,
+) (n int64, err error) {
+	bw := bufio.NewWriter(w1)
+	defer errors.DeferredFlusher(&err, bw)
+
+	var n1 int64
+	var n2 int
+
+	n1, err = s.Box.EncodeStringTo(o, bw)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = fmt.Fprintf(bw, "\n")
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s V1ObjectCoder) DecodeFrom(
+	o *sku.Transacted,
+	r1 io.Reader,
+) (n int64, err error) {
+	r := bufio.NewReader(r1)
+
+	if n, err = s.Box.ReadStringFormat(o, r); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 type V1IterDecoder struct {
 	V1
 }

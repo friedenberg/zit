@@ -17,11 +17,13 @@ import (
 )
 
 type InventoryList struct {
-	envRepo        env_repo.Env
-	objectFormat   object_inventory_format.Format
-	boxFormat      *box_format.BoxTransacted
-	v0             inventory_list_blobs.V0
-	v1             inventory_list_blobs.V1
+	envRepo      env_repo.Env
+	objectFormat object_inventory_format.Format
+	boxFormat    *box_format.BoxTransacted
+	v0           inventory_list_blobs.V0
+	v1           inventory_list_blobs.V1
+
+	objectCoders   triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted]
 	streamDecoders map[string]interfaces.DecoderFrom[func(*sku.Transacted) bool]
 }
 
@@ -44,6 +46,15 @@ func MakeInventoryStore(
 			Box: boxFormat,
 		},
 	}
+
+	s.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted](map[string]interfaces.Coder[*sku.Transacted]{
+		"": inventory_list_blobs.V0ObjectCoder{
+			V0: s.v0,
+		},
+		builtin_types.InventoryListTypeV1: inventory_list_blobs.V1ObjectCoder{
+			V1: s.v1,
+		},
+	})
 
 	s.streamDecoders = map[string]interfaces.DecoderFrom[func(*sku.Transacted) bool]{
 		"": inventory_list_blobs.V0IterDecoder{
@@ -125,32 +136,17 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 }
 
 func (a InventoryList) WriteObjectToWriter(
+	tipe ids.Type,
 	sk *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
-	tipe := sk.GetType()
-
-	switch tipe.String() {
-	case "", builtin_types.InventoryListTypeV0:
-		if n, err = a.v0.WriteInventoryListObject(
-			sk,
-			w,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case builtin_types.InventoryListTypeV1:
-		if n, err = a.v1.WriteInventoryListObject(
-			sk,
-			w,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
+	return a.objectCoders.EncodeTo(
+		&triple_hyphen_io.TypedStruct[*sku.Transacted]{
+			Type:   &tipe,
+			Struct: sk,
+		},
+		w,
+	)
 }
 
 func (a InventoryList) WriteBlobToWriter(
@@ -238,7 +234,7 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedStruct[iterSku]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
-			Blob: triple_hyphen_io.TypedDecodersWithoutType[iterSku](
+			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
 				a.streamDecoders,
 			),
 		}
@@ -276,7 +272,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		decoder := triple_hyphen_io.TypedDecodersWithoutType[iterSku](
+		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
 			a.streamDecoders,
 		)
 
@@ -300,7 +296,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.TypedDecodersWithoutType[iterSku](
+		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
 			a.streamDecoders,
 		)
 

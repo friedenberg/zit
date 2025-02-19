@@ -29,7 +29,7 @@ function generate { # @test
 
 	run_zit info store-version
 	assert_success
-	assert_output 8
+	assert_output 9
 
 	run_zit show "${cmd_def[@]}" !md:t :konfig
 	assert_success

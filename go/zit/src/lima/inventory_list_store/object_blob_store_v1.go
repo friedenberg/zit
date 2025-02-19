@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
+// TODO add triple_hyphen_io coder
 type objectBlobStoreV1 struct {
 	pathLog        string
 	blobType       ids.Type
@@ -81,6 +82,7 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	}
 
 	if _, err = store.typedBlobStore.WriteObjectToWriter(
+    store.blobType,
 		object,
 		io.MultiWriter(blobStoreWriteCloser, file),
 	); err != nil {

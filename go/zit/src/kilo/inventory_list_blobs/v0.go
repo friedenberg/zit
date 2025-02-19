@@ -160,6 +160,46 @@ func (s V0) StreamInventoryListBlobSkus(
 	return
 }
 
+type V0ObjectCoder struct {
+	V0
+}
+
+func (s V0ObjectCoder) EncodeTo(
+	o *sku.Transacted,
+	w io.Writer,
+) (n int64, err error) {
+	if n, err = s.Format.FormatPersistentMetadata(
+		w,
+		o,
+		object_inventory_format.Options{Tai: true},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s V0ObjectCoder) DecodeFrom(
+	o *sku.Transacted,
+	r io.Reader,
+) (n int64, err error) {
+	if n, err = s.Format.ParsePersistentMetadata(
+		catgut.MakeRingBuffer(r, 0),
+		o,
+		s.Options,
+	); err != nil {
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 type V0IterDecoder struct {
 	V0
 }

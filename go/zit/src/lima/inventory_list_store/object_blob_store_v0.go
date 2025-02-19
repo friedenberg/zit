@@ -75,6 +75,7 @@ func (store *objectBlobStoreV0) WriteInventoryListObject(
 	object.Metadata.Type = store.blobType
 
 	if _, err = store.typedBlobStore.WriteObjectToWriter(
+		store.blobType,
 		object,
 		blobStoreWriteCloser,
 	); err != nil {

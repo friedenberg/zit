@@ -125,24 +125,24 @@ LINE_READ_LOOP:
 	return
 }
 
-func (w1 Coder[O]) EncodeTo(
+func (coder Coder[O]) EncodeTo(
 	object O,
-	w2 io.Writer,
+	writer io.Writer,
 ) (n int64, err error) {
-	w := bufio.NewWriter(w2)
-	defer errors.DeferredFlusher(&err, w)
+	bufferedWriter := bufio.NewWriter(writer)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	var n1 int64
 	var n2 int
 
 	hasMetadataContent := true
 
-	if mwt, ok := w1.Metadata.(MetadataWriterTo); ok {
+	if mwt, ok := coder.Metadata.(MetadataWriterTo); ok {
 		hasMetadataContent = mwt.HasMetadataContent()
 	}
 
-	if w1.Metadata != nil && hasMetadataContent {
-		n2, err = w.WriteString(Boundary + "\n")
+	if coder.Metadata != nil && hasMetadataContent {
+		n2, err = bufferedWriter.WriteString(Boundary + "\n")
 		n += int64(n2)
 
 		if err != nil {
@@ -150,7 +150,7 @@ func (w1 Coder[O]) EncodeTo(
 			return
 		}
 
-		n1, err = w1.Metadata.EncodeTo(object, w)
+		n1, err = coder.Metadata.EncodeTo(object, bufferedWriter)
 		n += n1
 
 		if err != nil {
@@ -158,7 +158,7 @@ func (w1 Coder[O]) EncodeTo(
 			return
 		}
 
-		w.WriteString(Boundary + "\n")
+		bufferedWriter.WriteString(Boundary + "\n")
 		n += n1
 
 		if err != nil {
@@ -166,19 +166,17 @@ func (w1 Coder[O]) EncodeTo(
 			return
 		}
 
-		if w1.Blob != nil {
-			w.WriteString("\n")
-			n += n1
+		bufferedWriter.WriteString("\n")
+		n += n1
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 
-	if w1.Blob != nil {
-		n1, err = w1.Blob.EncodeTo(object, w)
+	if coder.Blob != nil {
+		n1, err = coder.Blob.EncodeTo(object, bufferedWriter)
 		n += n1
 
 		if err != nil {

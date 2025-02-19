@@ -26,7 +26,7 @@ function info_config_immutable { # @test
 		! toml-config-immutable-v1
 		---
 
-		store-version = 8
+		store-version = 9
 		repo-type = 'working-copy'
 		id = 'test-repo-id'
 

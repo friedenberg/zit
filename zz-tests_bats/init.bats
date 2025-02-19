@@ -20,7 +20,7 @@ function init_compression { # @test
 			! toml-config-immutable-v1
 			---
 
-			store-version = 8
+			store-version = 9
 			repo-type = 'working-copy'
 			id = 'test-repo-id'
 
@@ -178,7 +178,7 @@ function init_and_init { # @test
 
 	run_zit init -lock-internal-files=false -override-xdg-with-cwd test-repo-id
 	assert_failure
-	assert_output --partial '.zit/local/share/config-permanent: file exists'
+	assert_output --partial ': file exists'
 
 	run_zit show one/uno
 	assert_success

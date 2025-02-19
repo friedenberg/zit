@@ -455,12 +455,12 @@ func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	}
 }
 
-func (s *Store) ReadAllSorted(
-	f interfaces.FuncIter[*sku.Transacted],
+func (store *Store) ReadAllSorted(
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var skus []*sku.Transacted
 
-	for list, iterErr := range s.IterAllInventoryLists() {
+	for list, iterErr := range store.IterAllInventoryLists() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
@@ -472,7 +472,7 @@ func (s *Store) ReadAllSorted(
 	sort.Slice(skus, func(i, j int) bool { return skus[i].Less(skus[j]) })
 
 	for _, o := range skus {
-		if err = f(o); err != nil {
+		if err = output(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
