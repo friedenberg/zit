@@ -29,7 +29,6 @@ type Env struct {
 	local, remote blobStore
 
 	CopyingBlobStore
-	ObjectStore
 }
 
 func Make(
@@ -127,45 +126,11 @@ func (s *Env) setupStores() (err error) {
 
 	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
-	s.ObjectStore = ObjectStore{
-		basePath: s.basePath,
-		Config: env_dir.MakeConfigFromImmutableBlobConfig(
-			s.ImmutableConfig.GetBlobStoreConfigImmutable(),
-		),
-		DirectoryPaths: s.DirectoryPaths,
-		TemporaryFS:    s.GetTempLocal(),
-	}
-
 	return
 }
 
 func (a Env) GetEnv() env_ui.Env {
 	return a.Env
-}
-
-func (a Env) SansObjectAge() (b Env) {
-	b = a
-
-	b.ObjectStore.Config = env_dir.MakeConfig(
-		a.ObjectStore.Config.GetBlobCompression(),
-		nil,
-		a.ObjectStore.Config.GetLockInternalFiles(),
-	)
-
-	return
-}
-
-func (a Env) SansObjectCompression() (b Env) {
-	b = a
-	compression := config_immutable.CompressionTypeNone
-
-	b.Config = env_dir.MakeConfig(
-		&compression,
-		a.Config.GetBlobEncryption(),
-		a.Config.GetLockInternalFiles(),
-	)
-
-	return
 }
 
 func (s Env) GetConfig() config_immutable_io.ConfigLoaded {

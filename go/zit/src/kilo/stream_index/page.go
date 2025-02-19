@@ -38,7 +38,7 @@ func (pt *Page) initialize(
 	pid PageId,
 	i *Index,
 ) {
-	pt.repoLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
+	pt.repoLayout = i.directoryLayout
 	pt.sunrise = i.sunrise
 	pt.PageId = pid
 	pt.added = sku.MakeList()

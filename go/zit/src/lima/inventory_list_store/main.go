@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
@@ -469,18 +468,7 @@ func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 // TODO switch to using append-only log
 func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var dir string
-
-		{
-			var err error
-
-			if dir, err = s.envRepo.DirObjectGenre(
-				genres.InventoryList,
-			); err != nil {
-				yield(nil, errors.Wrap(err))
-				return
-			}
-		}
+		dir := s.envRepo.DirInventoryLists()
 
 		for path, err := range files.DirNamesLevel2(dir) {
 			if err != nil {

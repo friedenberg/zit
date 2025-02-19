@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 )
 
@@ -60,21 +59,6 @@ func (s directoryV0) DirZit(p ...string) string {
 	return s.Dir(stringSliceJoin(".zit", p)...)
 }
 
-func (s directoryV0) DirObjectGenre(
-	g1 interfaces.GenreGetter,
-) (p string, err error) {
-	g := g1.GetGenre()
-
-	if g == genres.None {
-		err = genres.MakeErrUnsupportedGenre(g)
-		return
-	}
-
-	p = s.DirObjects(g.GetGenreStringPlural(s.sv))
-
-	return
-}
-
 func (s directoryV0) DirCache(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }
@@ -112,11 +96,11 @@ func (s directoryV0) FileCacheObjectId() string {
 }
 
 func (s directoryV0) DirInventoryLists() string {
-  return s.DirObjects("inventory_lists")
+	return s.DirObjects("inventory_lists")
 }
 
 func (s directoryV0) DirBlobs() string {
-  return s.DirObjects("blobs")
+	return s.DirObjects("blobs")
 }
 
 func (s directoryV0) FileInventoryListLog() string {

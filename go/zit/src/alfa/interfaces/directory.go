@@ -7,7 +7,6 @@ type DirectoryPaths interface {
 	DirCacheObjects() string
 	DirCacheRepo(p ...string) string
 	DirLostAndFound() string
-	DirObjectGenre(g GenreGetter) (p string, err error)
 	DirObjectId() string
 	DirObjects(p ...string) string
 	DirInventoryLists() string
