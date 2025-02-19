@@ -5,7 +5,7 @@ import (
 )
 
 type TomlXDGV0 struct {
-	tomlPublicKeyV0
+	TomlPublicKeyV0
 	Data    string `toml:"data"`
 	Config  string `toml:"config"`
 	State   string `toml:"state"`

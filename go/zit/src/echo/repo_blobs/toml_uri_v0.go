@@ -5,7 +5,7 @@ import (
 )
 
 type TomlUriV0 struct {
-	tomlPublicKeyV0
+	TomlPublicKeyV0
 	Uri values.Uri `toml:"uri"`
 }
 

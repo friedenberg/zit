@@ -48,6 +48,7 @@ function remote_add_dotenv_xdg { # @test
 		! toml-repo-dotenv_xdg-v0
 		---
 
+		public-key = 'zit-repo-public_key-v1.*'
 		data = '/tmp/bats-run-\w+/test/.+/them/\.xdg/data/zit'
 		config = '/tmp/bats-run-\w+/test/.+/\.xdg/config/zit'
 		state = '/tmp/bats-run-\w+/test/.+/them/\.xdg/state/zit'
@@ -85,6 +86,7 @@ function remote_add_local_path { # @test
 		! toml-repo-local_path-v0
 		---
 
+		public-key = 'zit-repo-public_key-v1.*'
 		path = '/tmp/bats-run-\w+/test/.+/them'
 	EOM
 }

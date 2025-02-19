@@ -1,7 +1,7 @@
 package repo_blobs
 
 type TomlLocalPathV0 struct {
-	tomlPublicKeyV0
+	TomlPublicKeyV0
 	Path string `toml:"path"`
 }
 
