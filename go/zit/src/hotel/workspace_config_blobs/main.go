@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
@@ -23,15 +22,15 @@ type (
 	}
 )
 
-type TypeWithBlob = *ids.TypeWithObject[*Blob]
+type TypeWithBlob = *triple_hyphen_io.TypeWithObject[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[TypeWithBlob]{
 	TypeV0: blobV0Coder{},
 }
 
 var Coder = triple_hyphen_io.Coder[TypeWithBlob]{
-	Metadata: ids.TypedMetadataCoder[*Blob]{},
-	Blob:     ids.TypedCoders[*Blob](typedCoders),
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*Blob]{},
+	Blob:     triple_hyphen_io.TypedCoders[*Blob](typedCoders),
 }
 
 func DecodeFromFile(

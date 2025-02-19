@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
@@ -34,7 +35,7 @@ func Make(
 		configMutable: configMutableBlob,
 	}
 
-	object := ids.TypeWithObject[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypeWithObject[*workspace_config_blobs.Blob]{
 		Type: &ids.Type{},
 	}
 
@@ -116,7 +117,7 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
-	object := ids.TypeWithObject[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypeWithObject[*workspace_config_blobs.Blob]{
 		Type:   &tipe,
 		Object: &env.blob,
 	}

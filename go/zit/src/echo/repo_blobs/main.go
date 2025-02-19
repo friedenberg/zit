@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
@@ -16,7 +16,7 @@ type Blob interface {
 	// GetSupportedConnectionTypes() []connection_type.Type
 }
 
-type TypeWithBlob = ids.TypeWithObject[*Blob]
+type TypeWithBlob = triple_hyphen_io.TypeWithObject[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
@@ -25,7 +25,7 @@ var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
 	"":                                coderToml[TomlUriV0]{},
 }
 
-var Coder = interfaces.Coder[*TypeWithBlob](ids.TypedCoders[*Blob](typedCoders))
+var Coder = interfaces.Coder[*TypeWithBlob](triple_hyphen_io.TypedCoders[*Blob](typedCoders))
 
 type coderToml[T Blob] struct {
 	Blob T

@@ -1,21 +1,22 @@
-package ids
+package triple_hyphen_io
 
 import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 // TODO rename and make clearer
 type TypeWithObject[O any] struct {
-	Type   *Type
+	Type   *ids.Type
 	Object O
 }
 
-func (typeWithObject TypeWithObject[O]) GetType() *Type {
+func (typeWithObject TypeWithObject[O]) GetType() *ids.Type {
 	if typeWithObject.Type == nil {
-		typeWithObject.Type = &Type{}
+		typeWithObject.Type = &ids.Type{}
 	}
 
 	return typeWithObject.Type

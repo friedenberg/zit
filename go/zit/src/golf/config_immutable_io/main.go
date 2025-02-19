@@ -9,12 +9,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type typeWithConfigLoaded = *ids.TypeWithObject[*ConfigLoaded]
+type typeWithConfigLoaded = *triple_hyphen_io.TypeWithObject[*ConfigLoaded]
 
 var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
 	builtin_types.ImmutableConfigV1: blobV1Coder{},
@@ -22,8 +21,8 @@ var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
 }
 
 var coder = triple_hyphen_io.Coder[typeWithConfigLoaded]{
-	Metadata: ids.TypedMetadataCoder[*ConfigLoaded]{},
-	Blob:     ids.TypedCoders[*ConfigLoaded](typedCoders),
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoaded]{},
+	Blob:     triple_hyphen_io.TypedCoders[*ConfigLoaded](typedCoders),
 }
 
 type Coder struct{}
@@ -65,7 +64,7 @@ func (Coder) DecodeFrom(
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coder.DecodeFrom(
-		&ids.TypeWithObject[*ConfigLoaded]{
+		&triple_hyphen_io.TypeWithObject[*ConfigLoaded]{
 			Type:   &subject.Type,
 			Object: subject,
 		},
@@ -87,7 +86,7 @@ func (Coder) EncodeTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coder.EncodeTo(
-		&ids.TypeWithObject[*ConfigLoaded]{
+		&triple_hyphen_io.TypeWithObject[*ConfigLoaded]{
 			Type:   &subject.Type,
 			Object: subject,
 		},

@@ -1,4 +1,4 @@
-package ids
+package triple_hyphen_io
 
 import (
 	"bufio"

@@ -236,15 +236,15 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*ids.TypeWithObject[iterSku]]{
-			Metadata: ids.TypedMetadataCoder[iterSku]{},
-			Blob: ids.TypedDecodersWithoutType[iterSku](
+		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypeWithObject[iterSku]]{
+			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
+			Blob: triple_hyphen_io.TypedDecodersWithoutType[iterSku](
 				a.streamDecoders,
 			),
 		}
 
 		if _, err := decoder.DecodeFrom(
-			&ids.TypeWithObject[iterSku]{
+			&triple_hyphen_io.TypeWithObject[iterSku]{
 				Object: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
@@ -276,12 +276,12 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		decoder := ids.TypedDecodersWithoutType[iterSku](
+		decoder := triple_hyphen_io.TypedDecodersWithoutType[iterSku](
 			a.streamDecoders,
 		)
 
 		if _, err := decoder.DecodeFrom(
-			&ids.TypeWithObject[iterSku]{
+			&triple_hyphen_io.TypeWithObject[iterSku]{
 				Type: &tipe,
 				Object: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
@@ -300,12 +300,12 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := ids.TypedDecodersWithoutType[iterSku](
+		decoder := triple_hyphen_io.TypedDecodersWithoutType[iterSku](
 			a.streamDecoders,
 		)
 
 		if _, err := decoder.DecodeFrom(
-			&ids.TypeWithObject[iterSku]{
+			&triple_hyphen_io.TypeWithObject[iterSku]{
 				Type: &tipe,
 				Object: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
