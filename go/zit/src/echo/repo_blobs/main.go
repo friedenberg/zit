@@ -1,6 +1,7 @@
 package repo_blobs
 
 import (
+	"crypto/ed25519"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -12,6 +13,7 @@ import (
 
 type Blob interface {
 	GetRepoBlob() Blob
+	GetPublicKey() ed25519.PublicKey
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
 }

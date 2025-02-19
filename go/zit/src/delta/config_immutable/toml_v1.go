@@ -11,7 +11,7 @@ import (
 )
 
 type TomlV1 struct {
-	PrivateKey   bech32.Value    `toml:"private-key"`
+	PrivateKey   bech32.Value    `toml:"private-key,omitempty"`
 	StoreVersion StoreVersion    `toml:"store-version"`
 	RepoType     repo_type.Type  `toml:"repo-type"`
 	RepoId       ids.RepoId      `toml:"id"`

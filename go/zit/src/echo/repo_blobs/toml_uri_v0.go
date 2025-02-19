@@ -1,15 +1,23 @@
 package repo_blobs
 
 import (
+	"crypto/ed25519"
+
+	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
 
 type TomlUriV0 struct {
-	Uri values.Uri `toml:"uri"`
+	PublicKey bech32.Value `toml:"public-key,omitempty"`
+	Uri       values.Uri   `toml:"uri"`
 }
 
 func (b TomlUriV0) GetRepoBlob() Blob {
 	return b
+}
+
+func (b TomlUriV0) GetPublicKey() ed25519.PublicKey {
+	return b.PublicKey.Data
 }
 
 func (b TomlUriV0) GetRepoType() {

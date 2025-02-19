@@ -8,6 +8,10 @@ type Value struct {
 }
 
 func (value Value) MarshalText() (text []byte, err error) {
+	if len(value.Data) == 0 {
+		return
+	}
+
 	if text, err = Encode(value.HRP, value.Data); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -17,6 +21,10 @@ func (value Value) MarshalText() (text []byte, err error) {
 }
 
 func (value *Value) UnmarshalText(text []byte) (err error) {
+	if len(text) == 0 {
+		return
+	}
+
 	if value.HRP, value.Data, err = Decode(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
