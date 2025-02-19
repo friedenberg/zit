@@ -190,6 +190,17 @@ func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
 	return
 }
 
+func OpenReadOnly(s string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = os.OpenFile(s, os.O_RDONLY, 0o666); err != nil {
+		err = errors.Wrapf(err, "Path: %q", s)
+		return
+	}
+
+	return
+}
+
 func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 

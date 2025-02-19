@@ -82,21 +82,14 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 		return
 	}
 
+	defer errors.DeferredCloser(&err, file)
+	defer errors.Deferred(&err, file.Sync)
+
 	if _, err = store.typedBlobStore.WriteObjectToWriter(
 		store.blobType,
 		object,
 		io.MultiWriter(blobStoreWriteCloser, file),
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = file.Sync(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = file.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -114,27 +107,38 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	return
 }
 
-// TODO switch to using append-only log
-func (s *objectBlobStoreV1) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+func (store *objectBlobStoreV1) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		for sh, err := range s.blobStore.AllBlobs() {
+		var file *os.File
+
+		{
+			var err error
+
+			if file, err = files.OpenReadOnly(store.pathLog); err != nil {
+				yield(nil, err)
+				return
+			}
+		}
+
+		seq := store.typedBlobStore.AllDecodedObjectsFromStream(
+			file,
+		)
+
+		for sk, err := range seq {
 			if err != nil {
 				if !yield(nil, err) {
 					return
 				}
 			}
 
-			var decodedList *sku.Transacted
-
-			if decodedList, err = s.ReadOneSha(sh); err != nil {
-				if !yield(nil, errors.Wrap(err)) {
-					return
-				}
-			}
-
-			if !yield(decodedList, nil) {
+			if !yield(sk, nil) {
 				return
 			}
+		}
+
+		if err := file.Close(); err != nil {
+			yield(nil, err)
+			return
 		}
 	}
 }

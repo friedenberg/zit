@@ -241,6 +241,7 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedStruct[iterSku]{
+				Type: &ids.Type{},
 				Struct: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
