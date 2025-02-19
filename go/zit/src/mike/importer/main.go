@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -284,7 +285,7 @@ func (c importer) ImportBlobIfNecessary(
 
 	var n int64
 
-	if n, err = env_repo.CopyBlobIfNecessary(
+	if n, err = blob_store.CopyBlobIfNecessary(
 		c.envRepo,
 		c.envRepo,
 		c.remoteBlobStore,

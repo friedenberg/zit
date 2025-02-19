@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 )
 
@@ -26,9 +27,9 @@ type Env struct {
 
 	interfaces.DirectoryPaths
 
-	local, remote blobStore
+	local, remote interfaces.LocalBlobStore
 
-	CopyingBlobStore
+	blob_store.CopyingBlobStore
 }
 
 func Make(
@@ -119,12 +120,8 @@ func Make(
 }
 
 func (s *Env) setupStores() (err error) {
-	if s.local, err = MakeBlobStoreFromLayout(*s); err != nil {
-		errors.Wrap(err)
-		return
-	}
-
-	s.CopyingBlobStore = MakeCopyingBlobStore(s.Env, s.local, s.remote)
+	s.local = s.MakeBlobStore()
+	s.CopyingBlobStore = blob_store.MakeCopyingBlobStore(s.Env, s.local, s.remote)
 
 	return
 }
@@ -184,4 +181,14 @@ func (h Env) GetStoreVersion() interfaces.StoreVersion {
 	} else {
 		return h.ConfigLoaded.ImmutableConfig.GetStoreVersion()
 	}
+}
+
+func (s Env) MakeBlobStore() interfaces.LocalBlobStore {
+	return blob_store.MakeBlobStore(
+		s.DirBlobs(),
+		env_dir.MakeConfigFromImmutableBlobConfig(
+			s.GetConfig().ImmutableConfig.GetBlobStoreConfigImmutable(),
+		),
+		s.GetTempLocal(),
+	)
 }

@@ -18,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -57,7 +58,7 @@ func (s *Store) Initialize(
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
-		objectBlobStore: env_repo.MakeBlobStore(
+		objectBlobStore: blob_store.MakeBlobStore(
 			envRepo.DirInventoryLists(),
 			env_dir.Config{},
 			envRepo.GetTempLocal(),
@@ -332,7 +333,7 @@ func (s *Store) ImportInventoryList(
 			return
 		}
 
-		if _, err = env_repo.CopyBlobIfNecessary(
+		if _, err = blob_store.CopyBlobIfNecessary(
 			s.GetEnvRepo().GetEnv(),
 			s.GetEnvRepo(),
 			bs,
