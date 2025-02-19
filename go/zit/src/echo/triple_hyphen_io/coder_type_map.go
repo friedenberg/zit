@@ -14,7 +14,7 @@ type TypeWithObject[O any] struct {
 	Object O
 }
 
-func (typeWithObject TypeWithObject[O]) GetType() *ids.Type {
+func (typeWithObject *TypeWithObject[O]) GetType() *ids.Type {
 	if typeWithObject.Type == nil {
 		typeWithObject.Type = &ids.Type{}
 	}
