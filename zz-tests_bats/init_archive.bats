@@ -20,16 +20,17 @@ function init_archive { # @test
 	EOM
 
 	function output_immutable_config() {
-		cat - <<-EOM
+		cat - <<-'EOM'
 			---
 			! toml-config-immutable-v1
 			---
 
+			private-key = 'zit-repo-private_key-v1.*'
 			store-version = 9
 			repo-type = 'archive'
 			id = ''
 
-			[blob-store]
+			\[blob-store]
 			compression-type = 'zstd'
 			lock-internal-files = false
 		EOM
@@ -37,11 +38,11 @@ function init_archive { # @test
 
 	run_zit info-repo config-immutable
 	assert_success
-	output_immutable_config | assert_output -
+	output_immutable_config | assert_output --regexp -
 
 	run cat .xdg/data/zit/config-permanent
 	assert_success
-	output_immutable_config | assert_output -
+	output_immutable_config | assert_output --regexp -
 
 	run_zit cat-blob "$(get_konfig_sha)"
 	assert_success

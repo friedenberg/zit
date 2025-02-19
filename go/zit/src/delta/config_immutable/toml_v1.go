@@ -1,14 +1,17 @@
 package config_immutable
 
 import (
+	"crypto/ed25519"
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type TomlV1 struct {
+	PrivateKey   bech32.Value    `toml:"private-key"`
 	StoreVersion StoreVersion    `toml:"store-version"`
 	RepoType     repo_type.Type  `toml:"repo-type"`
 	RepoId       ids.RepoId      `toml:"id"`
@@ -27,6 +30,10 @@ func (k *TomlV1) GetImmutableConfig() Config {
 
 func (k *TomlV1) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return &k.BlobStore
+}
+
+func (k *TomlV1) GetPrivateKey() ed25519.PrivateKey {
+	return ed25519.NewKeyFromSeed(k.PrivateKey.Data)
 }
 
 func (k *TomlV1) GetStoreVersion() interfaces.StoreVersion {

@@ -21,16 +21,17 @@ teardown() {
 function info_config_immutable { # @test
 	run_zit info-repo config-immutable
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-'EOM'
 		---
 		! toml-config-immutable-v1
 		---
 
+		private-key = 'zit-repo-private_key-v1.*'
 		store-version = 9
 		repo-type = 'working-copy'
 		id = 'test-repo-id'
 
-		[blob-store]
+		\[blob-store]
 		compression-type = 'zstd'
 		lock-internal-files = false
 	EOM

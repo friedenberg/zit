@@ -1,8 +1,10 @@
 package config_immutable
 
 import (
+	"crypto/ed25519"
 	"flag"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -52,6 +54,10 @@ func (k V0) GetStoreVersion() interfaces.StoreVersion {
 
 func (k V0) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
+}
+
+func (k V0) GetPrivateKey() ed25519.PrivateKey {
+	panic(errors.Errorf("not supported"))
 }
 
 func (k V0) GetRepoId() ids.RepoId {
