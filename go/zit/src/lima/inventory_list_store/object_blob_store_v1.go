@@ -2,6 +2,7 @@ package inventory_list_store
 
 import (
 	"io"
+	"iter"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -82,7 +83,7 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	}
 
 	if _, err = store.typedBlobStore.WriteObjectToWriter(
-    store.blobType,
+		store.blobType,
 		object,
 		io.MultiWriter(blobStoreWriteCloser, file),
 	); err != nil {
@@ -111,4 +112,29 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	)
 
 	return
+}
+
+// TODO switch to using append-only log
+func (s *objectBlobStoreV1) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for sh, err := range s.blobStore.AllBlobs() {
+			if err != nil {
+				if !yield(nil, err) {
+					return
+				}
+			}
+
+			var decodedList *sku.Transacted
+
+			if decodedList, err = s.ReadOneSha(sh); err != nil {
+				if !yield(nil, errors.Wrap(err)) {
+					return
+				}
+			}
+
+			if !yield(decodedList, nil) {
+				return
+			}
+		}
+	}
 }

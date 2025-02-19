@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -52,6 +51,8 @@ type objectBlobStore interface {
 	WriteInventoryListObject(
 		object *sku.Transacted,
 	) (err error)
+
+	IterAllInventoryLists() iter.Seq2[*sku.Transacted, error]
 }
 
 func (s *Store) Initialize(
@@ -356,45 +357,6 @@ func (s *Store) ImportInventoryList(
 	return
 }
 
-func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
-	var sh *sha.Sha
-
-	if sh, err = sha.MakeShaFromPath(p); err != nil {
-		err = errors.Wrapf(err, "Path: %q", p)
-		return
-	}
-
-	if o, err = s.ReadOneSha(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = o.CalculateObjectShas(); err != nil {
-		if errors.Is(err, object_inventory_format.ErrEmptyTai) {
-			var t ids.Tai
-			err1 := t.Set(o.ObjectId.String())
-
-			if err1 != nil {
-				err = errors.Wrapf(err, "%s", sku.StringTaiGenreObjectIdShaBlob(o))
-				return
-			}
-
-			o.SetTai(t)
-
-			if err = o.CalculateObjectShas(); err != nil {
-				err = errors.Wrapf(err, "%#v", o)
-				return
-			}
-		} else {
-			err = errors.Wrapf(err, "%#v", o)
-		}
-
-		return
-	}
-
-	return
-}
-
 func (s *Store) IterInventoryList(
 	blobSha interfaces.Sha,
 ) iter.Seq2[*sku.Transacted, error] {
@@ -422,37 +384,6 @@ func (store *Store) ReadLast() (max *sku.Transacted, err error) {
 	max = &maxSku
 
 	return
-}
-
-// TODO switch to using append-only log
-func (s *Store) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
-	return func(yield func(*sku.Transacted, error) bool) {
-		dir := s.envRepo.DirInventoryLists()
-
-		for path, err := range files.DirNamesLevel2(dir) {
-			if err != nil {
-				if !yield(nil, errors.Wrap(err)) {
-					return
-				}
-			}
-
-			var decodedList *sku.Transacted
-
-			{
-				var err error
-
-				if decodedList, err = s.readOnePath(path); err != nil {
-					if !yield(nil, errors.Wrap(err)) {
-						return
-					}
-				}
-			}
-
-			if !yield(decodedList, nil) {
-				return
-			}
-		}
-	}
 }
 
 func (store *Store) ReadAllSorted(

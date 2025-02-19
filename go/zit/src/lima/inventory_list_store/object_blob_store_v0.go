@@ -1,6 +1,7 @@
 package inventory_list_store
 
 import (
+	"iter"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -8,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
@@ -94,4 +96,67 @@ func (store *objectBlobStoreV0) WriteInventoryListObject(
 	)
 
 	return
+}
+
+func (s *objectBlobStoreV0) readOnePath(p string) (o *sku.Transacted, err error) {
+	var sh *sha.Sha
+
+	if sh, err = sha.MakeShaFromPath(p); err != nil {
+		err = errors.Wrapf(err, "Path: %q", p)
+		return
+	}
+
+	if o, err = s.ReadOneSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = o.CalculateObjectShas(); err != nil {
+		if errors.Is(err, object_inventory_format.ErrEmptyTai) {
+			var t ids.Tai
+			err1 := t.Set(o.ObjectId.String())
+
+			if err1 != nil {
+				err = errors.Wrapf(err, "%s", sku.StringTaiGenreObjectIdShaBlob(o))
+				return
+			}
+
+			o.SetTai(t)
+
+			if err = o.CalculateObjectShas(); err != nil {
+				err = errors.Wrapf(err, "%#v", o)
+				return
+			}
+		} else {
+			err = errors.Wrapf(err, "%#v", o)
+		}
+
+		return
+	}
+
+	return
+}
+
+func (s *objectBlobStoreV0) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for sh, err := range s.blobStore.AllBlobs() {
+			if err != nil {
+				if !yield(nil, err) {
+					return
+				}
+			}
+
+			var decodedList *sku.Transacted
+
+			if decodedList, err = s.ReadOneSha(sh); err != nil {
+				if !yield(nil, errors.Wrap(err)) {
+					return
+				}
+			}
+
+			if !yield(decodedList, nil) {
+				return
+			}
+		}
+	}
 }
