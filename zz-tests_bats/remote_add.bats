@@ -57,8 +57,13 @@ function remote_add_dotenv_xdg { # @test
 }
 
 function remote_add_local_path { # @test
-	set_xdg them
-	run_zit_init -override-xdg-with-cwd test-repo-remote
+	{
+		set_xdg them
+		mkdir -p them
+		pushd them || exit 1
+		run_zit_init -override-xdg-with-cwd test-repo-remote
+		popd || exit 1
+	}
 
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_zit remote-add -remote-type stdio-local them test-repo-id-them

@@ -31,7 +31,7 @@ type Remote struct {
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%s", repo.GetAllRemoteTypes()))
+	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteTypes()))
 }
 
 func (cmd Remote) CreateRemoteObject(
@@ -43,7 +43,7 @@ func (cmd Remote) CreateRemoteObject(
 
 	sk = sku.GetTransactedPool().Get()
 
-	var blob repo_blobs.Blob
+	var blob repo_blobs.BlobMutable
 
 	switch cmd.RemoteType {
 	default:
@@ -65,8 +65,12 @@ func (cmd Remote) CreateRemoteObject(
 		path := req.PopArg("path")
 
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
-		blob = repo_blobs.TomlLocalPathV0{Path: envRepo.AbsFromCwdOrSame(path)}
+		blob = &repo_blobs.TomlLocalPathV0{Path: envRepo.AbsFromCwdOrSame(path)}
 	}
+
+	remote := cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
+	remoteConfig := remote.GetImmutableConfig().ImmutableConfig
+	blob.SetPublicKey(remoteConfig.GetPrivateKey().Public())
 
 	var blobSha interfaces.Sha
 
@@ -107,6 +111,14 @@ func (cmd Remote) MakeRemote(
 		}
 	}
 
+	return cmd.MakeRemoteFromBlob(req, local, blob)
+}
+
+func (cmd Remote) MakeRemoteFromBlob(
+	req command.Request,
+	local repo.Repo,
+	blob repo_blobs.Blob,
+) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
 
 	switch blob := blob.(type) {

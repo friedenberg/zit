@@ -1,6 +1,7 @@
 package repo_blobs
 
 import (
+	"crypto"
 	"crypto/ed25519"
 	"io"
 
@@ -16,6 +17,11 @@ type Blob interface {
 	GetPublicKey() ed25519.PublicKey
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
+}
+
+type BlobMutable interface {
+	Blob
+	SetPublicKey(crypto.PublicKey)
 }
 
 type TypeWithBlob = triple_hyphen_io.TypedStruct[*Blob]

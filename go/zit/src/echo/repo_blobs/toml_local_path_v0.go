@@ -1,22 +1,12 @@
 package repo_blobs
 
-import (
-	"crypto/ed25519"
-
-	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
-)
-
 type TomlLocalPathV0 struct {
-	PublicKey bech32.Value `toml:"public-key,omitempty"`
-	Path      string       `toml:"path"`
+	tomlPublicKeyV0
+	Path string `toml:"path"`
 }
 
 func (b TomlLocalPathV0) GetRepoBlob() Blob {
 	return b
-}
-
-func (b TomlLocalPathV0) GetPublicKey() ed25519.PublicKey {
-	return b.PublicKey.Data
 }
 
 func (a *TomlLocalPathV0) Reset() {

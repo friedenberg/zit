@@ -21,10 +21,13 @@ func (env *Env) Genesis(bb BigBang) {
 	{
 		var err error
 
-		if _, bb.Config.PrivateKey.Data, err = ed25519.GenerateKey(nil); err != nil {
+		var privateKey ed25519.PrivateKey
+
+		if _, privateKey, err = ed25519.GenerateKey(nil); err != nil {
 			env.CancelWithError(err)
 		}
 
+		bb.Config.PrivateKey.Data = privateKey.Seed()
 		bb.Config.PrivateKey.HRP = "zit-repo-private_key-v1"
 	}
 
