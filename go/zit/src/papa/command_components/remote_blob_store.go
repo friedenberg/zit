@@ -24,7 +24,7 @@ func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 	e env_local.Env,
 ) (blobStore interfaces.BlobStore, err error) {
-	blobStore = blob_store.MakeBlobStore(
+	blobStore = blob_store.MakeShardedFilesStore(
 		cmd.Blobs,
 		env_dir.MakeConfigFromImmutableBlobConfig(&cmd.Config),
 		e.GetTempLocal(),

@@ -16,7 +16,7 @@ func (store *Store) MakeImporter(
 		options,
 		storeOptions,
 		store.envRepo,
-		store.typedBlobStore,
+		store.getTypedBlobStore(),
 		nil,
 		nil,
 		store,

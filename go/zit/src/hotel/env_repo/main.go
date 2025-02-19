@@ -184,7 +184,7 @@ func (h Env) GetStoreVersion() interfaces.StoreVersion {
 }
 
 func (s Env) MakeBlobStore() interfaces.LocalBlobStore {
-	return blob_store.MakeBlobStore(
+	return blob_store.MakeShardedFilesStore(
 		s.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
 			s.GetConfig().ImmutableConfig.GetBlobStoreConfigImmutable(),

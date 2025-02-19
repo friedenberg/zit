@@ -30,21 +30,28 @@ import (
 type Store struct {
 	lock sync.Mutex
 
-	envRepo         env_repo.Env
-	lockSmith       interfaces.LockSmith
-	storeVersion    interfaces.StoreVersion
-	objectBlobStore interfaces.BlobStore
-	blobStore       interfaces.BlobStore
-	clock           ids.Clock
-	typedBlobStore  typed_blob_store.InventoryList
+	envRepo      env_repo.Env
+	lockSmith    interfaces.LockSmith
+	storeVersion interfaces.StoreVersion
+	objectBlobStore
+	blobStore interfaces.BlobStore
+	clock     ids.Clock
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
 	box           *box_format.BoxTransacted
 
-	blobType ids.Type
-
 	ui sku.UIStorePrinters
+}
+
+type objectBlobStore interface {
+	getType() ids.Type
+	getTypedBlobStore() typed_blob_store.InventoryList
+
+	ReadOneSha(id interfaces.Stringer) (object *sku.Transacted, err error)
+	WriteInventoryListObject(
+		object *sku.Transacted,
+	) (err error)
 }
 
 func (s *Store) Initialize(
@@ -58,29 +65,50 @@ func (s *Store) Initialize(
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
-		objectBlobStore: blob_store.MakeBlobStore(
-			envRepo.DirInventoryLists(),
-			env_dir.Config{},
-			envRepo.GetTempLocal(),
-		),
-		blobStore: envRepo,
-		clock:     clock,
+		blobStore:    envRepo,
+		clock:        clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
 			options_print.V0{}.WithPrintTai(true),
 		),
-		options:        op,
-		typedBlobStore: typedBlobStore,
+		options: op,
 	}
 
 	v := s.storeVersion.GetInt()
 
+	var blobType ids.Type
+
 	switch {
 	case v <= 6:
-		s.blobType = ids.MustType(builtin_types.InventoryListTypeV0)
+		blobType = ids.MustType(builtin_types.InventoryListTypeV0)
 
 	default:
-		s.blobType = ids.MustType(builtin_types.InventoryListTypeV1)
+		blobType = ids.MustType(builtin_types.InventoryListTypeV1)
+	}
+
+	switch {
+	case v <= 8:
+		s.objectBlobStore = &objectBlobStoreV0{
+			blobType: blobType,
+			blobStore: blob_store.MakeShardedFilesStore(
+				envRepo.DirInventoryLists(),
+				env_dir.Config{},
+				envRepo.GetTempLocal(),
+			),
+			typedBlobStore: typedBlobStore,
+		}
+
+	default:
+		s.objectBlobStore = &objectBlobStoreV1{
+			pathLog:  envRepo.FileInventoryListLog(),
+			blobType: blobType,
+			blobStore: blob_store.MakeShardedFilesStore(
+				envRepo.DirInventoryLists(),
+				env_dir.Config{},
+				envRepo.GetTempLocal(),
+			),
+			typedBlobStore: typedBlobStore,
+		}
 	}
 
 	return
@@ -103,7 +131,7 @@ func (s *Store) GetObjectStore() sku.ObjectStore {
 }
 
 func (s *Store) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
-	return s.typedBlobStore
+	return s.getTypedBlobStore()
 }
 
 func (s *Store) Flush() (err error) {
@@ -166,7 +194,7 @@ func (store *Store) Create(
 
 	t = sku.GetTransactedPool().Get()
 
-	t.Metadata.Type = store.blobType
+	t.Metadata.Type = store.getType()
 	t.Metadata.Description = description
 
 	tai := store.GetTai()
@@ -217,7 +245,7 @@ func (s *Store) WriteInventoryListBlob(
 
 	defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.typedBlobStore.WriteBlobToWriter(
+	if _, err = s.getTypedBlobStore().WriteBlobToWriter(
 		t.GetType(),
 		skus,
 		wc,
@@ -263,46 +291,6 @@ func (s *Store) WriteInventoryListBlob(
 
 // TODO split into public and private parts, where public includes writing the
 // skus AND the list, while private writes just the list
-func (store *Store) WriteInventoryListObject(
-	object *sku.Transacted,
-) (err error) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
-
-	var wc interfaces.ShaWriteCloser
-
-	// TODO also write to inventory_list_log
-
-	if wc, err = store.objectBlobStore.BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, wc)
-
-	object.Metadata.Type = store.blobType
-
-	if _, err = store.typedBlobStore.WriteObjectToWriter(
-		object,
-		wc,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = object.CalculateObjectShas(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ui.Log().Printf(
-		"saved inventory list: %q",
-		sku.String(object),
-	)
-
-	return
-}
-
 func (s *Store) ImportInventoryList(
 	bs interfaces.BlobStore,
 	t *sku.Transacted,
@@ -407,41 +395,11 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) ReadOneSha(
-	k interfaces.Stringer,
-) (o *sku.Transacted, err error) {
-	var sh sha.Sha
-
-	if err = sh.Set(k.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var or sha.ReadCloser
-
-	if or, err = s.objectBlobStore.BlobReader(&sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, or)
-
-	if o, err = s.typedBlobStore.ReadInventoryListObject(
-		s.blobType,
-		or,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) IterInventoryList(
 	blobSha interfaces.Sha,
 ) iter.Seq2[*sku.Transacted, error] {
-	return s.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
-		s.blobType,
+	return s.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
+		s.getType(),
 		s.blobStore,
 		blobSha,
 	)

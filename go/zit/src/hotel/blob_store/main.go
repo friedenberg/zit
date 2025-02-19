@@ -13,33 +13,33 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 )
 
-type shardedFileStore struct {
+type storeShardedFiles struct {
 	env_dir.Config
 	basePath string
 	tempFS   env_dir.TemporaryFS
 }
 
-func MakeBlobStore(
+func MakeShardedFilesStore(
 	basePath string,
 	config env_dir.Config,
 	tempFS env_dir.TemporaryFS,
-) shardedFileStore {
-	return shardedFileStore{
+) storeShardedFiles {
+	return storeShardedFiles{
 		Config:   config,
 		basePath: basePath,
 		tempFS:   tempFS,
 	}
 }
 
-func (s shardedFileStore) GetBlobStore() interfaces.BlobStore {
+func (s storeShardedFiles) GetBlobStore() interfaces.BlobStore {
 	return s
 }
 
-func (s shardedFileStore) GetLocalBlobStore() interfaces.LocalBlobStore {
+func (s storeShardedFiles) GetLocalBlobStore() interfaces.LocalBlobStore {
 	return s
 }
 
-func (s shardedFileStore) HasBlob(
+func (s storeShardedFiles) HasBlob(
 	sh interfaces.Sha,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
@@ -53,7 +53,7 @@ func (s shardedFileStore) HasBlob(
 	return
 }
 
-func (s shardedFileStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+func (s storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		var sh sha.Sha
 
@@ -78,7 +78,7 @@ func (s shardedFileStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	}
 }
 
-func (s shardedFileStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (s storeShardedFiles) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 	if w, err = s.blobWriterTo(s.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -87,7 +87,7 @@ func (s shardedFileStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) 
 	return
 }
 
-func (s shardedFileStore) BlobReader(
+func (s storeShardedFiles) BlobReader(
 	sh interfaces.Sha,
 ) (r interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
@@ -106,7 +106,7 @@ func (s shardedFileStore) BlobReader(
 	return
 }
 
-func (s shardedFileStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
+func (s storeShardedFiles) blobWriterTo(p string) (w sha.WriteCloser, err error) {
 	mo := env_dir.MoveOptions{
 		Config:                   s.Config,
 		FinalPath:                p,
@@ -122,7 +122,7 @@ func (s shardedFileStore) blobWriterTo(p string) (w sha.WriteCloser, err error) 
 	return
 }
 
-func (s shardedFileStore) blobReaderFrom(
+func (s storeShardedFiles) blobReaderFrom(
 	sh sha.ShaLike,
 	p string,
 ) (r sha.ReadCloser, err error) {
