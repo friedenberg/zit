@@ -9,7 +9,7 @@ import (
 )
 
 type ObjectStore struct {
-	env_dir.Config
+	Config env_dir.Config
 
 	basePath string
 	interfaces.DirectoryPaths

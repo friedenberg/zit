@@ -161,8 +161,8 @@ func (a Env) SansObjectCompression() (b Env) {
 
 	b.Config = env_dir.MakeConfig(
 		&compression,
-		a.GetBlobEncryption(),
-		a.GetLockInternalFiles(),
+		a.Config.GetBlobEncryption(),
+		a.Config.GetLockInternalFiles(),
 	)
 
 	return

@@ -27,8 +27,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 func (c CatBlobShas) Run(dep command.Request) {
 	repoLayout := c.MakeEnvRepo(dep, false)
 
-	if err := repoLayout.ReadAllShasForGenre(
-		genres.Blob,
+	if err := repoLayout.ReadAllShasForBlobs(
 		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(repoLayout.GetUIFile(), s)
 			return

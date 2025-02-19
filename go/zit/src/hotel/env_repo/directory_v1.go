@@ -102,3 +102,15 @@ func (s directoryV1) DirObjectId() string {
 func (s directoryV1) FileCacheObjectId() string {
 	return s.DirCache("object_id")
 }
+
+func (s directoryV1) FileInventoryListLog() string {
+	return s.DirObjects("inventory_lists")
+}
+
+func (s directoryV1) DirInventoryLists() string {
+	return s.DirObjects("inventory_lists")
+}
+
+func (s directoryV1) DirBlobs() string {
+	return s.DirObjects("blobs")
+}

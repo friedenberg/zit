@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
@@ -108,4 +109,16 @@ func (s directoryV0) DirObjectId() string {
 
 func (s directoryV0) FileCacheObjectId() string {
 	return s.DirCache("Kennung")
+}
+
+func (s directoryV0) DirInventoryLists() string {
+  return s.DirObjects("inventory_lists")
+}
+
+func (s directoryV0) DirBlobs() string {
+  return s.DirObjects("blobs")
+}
+
+func (s directoryV0) FileInventoryListLog() string {
+	panic(todo.Implement())
 }

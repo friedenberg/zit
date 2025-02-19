@@ -30,13 +30,13 @@ import (
 type Store struct {
 	lock sync.Mutex
 
-	envRepo        env_repo.Env
-	lockSmith      interfaces.LockSmith
-	storeVersion   interfaces.StoreVersion
-	objectStore    interfaces.ObjectIOFactory
-	blobStore      interfaces.BlobStore
-	clock          ids.Clock
-	typedBlobStore typed_blob_store.InventoryList
+	envRepo         env_repo.Env
+	lockSmith       interfaces.LockSmith
+	storeVersion    interfaces.StoreVersion
+	objectBlobStore interfaces.BlobStore
+	blobStore       interfaces.BlobStore
+	clock           ids.Clock
+	typedBlobStore  typed_blob_store.InventoryList
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -58,9 +58,13 @@ func (s *Store) Initialize(
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
-		objectStore:  envRepo.ObjectReaderWriterFactory(genres.InventoryList),
-		blobStore:    envRepo,
-		clock:        clock,
+		objectBlobStore: env_repo.MakeBlobStore(
+			envRepo.DirInventoryLists(),
+			env_dir.Config{},
+			envRepo.GetTempLocal(),
+		),
+		blobStore: envRepo,
+		clock:     clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
 			options_print.V0{}.WithPrintTai(true),
@@ -144,7 +148,7 @@ func (s *Store) GetInventoryListStore() sku.InventoryListStore {
 	return s
 }
 
-func (s *Store) Create(
+func (store *Store) Create(
 	skus *sku.List,
 	description descriptions.Description,
 ) (t *sku.Transacted, err error) {
@@ -152,7 +156,7 @@ func (s *Store) Create(
 		return
 	}
 
-	if !s.lockSmith.IsAcquired() {
+	if !store.lockSmith.IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "create inventory list",
 		}
@@ -162,10 +166,10 @@ func (s *Store) Create(
 
 	t = sku.GetTransactedPool().Get()
 
-	t.Metadata.Type = s.blobType
+	t.Metadata.Type = store.blobType
 	t.Metadata.Description = description
 
-	tai := s.GetTai()
+	tai := store.GetTai()
 
 	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
@@ -174,12 +178,12 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	if err = s.WriteInventoryListBlob(t, skus); err != nil {
+	if err = store.WriteInventoryListBlob(t, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.WriteInventoryListObject(t); err != nil {
+	if err = store.WriteInventoryListObject(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -259,39 +263,41 @@ func (s *Store) WriteInventoryListBlob(
 
 // TODO split into public and private parts, where public includes writing the
 // skus AND the list, while private writes just the list
-func (s *Store) WriteInventoryListObject(t *sku.Transacted) (err error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+func (store *Store) WriteInventoryListObject(
+	object *sku.Transacted,
+) (err error) {
+	store.lock.Lock()
+	defer store.lock.Unlock()
 
 	var wc interfaces.ShaWriteCloser
 
 	// TODO also write to inventory_list_log
 
-	if wc, err = s.objectStore.ObjectWriter(); err != nil {
+	if wc, err = store.objectBlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, wc)
 
-	t.Metadata.Type = s.blobType
+	object.Metadata.Type = store.blobType
 
-	if _, err = s.typedBlobStore.WriteObjectToWriter(
-		t,
+	if _, err = store.typedBlobStore.WriteObjectToWriter(
+		object,
 		wc,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = t.CalculateObjectShas(); err != nil {
+	if err = object.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	ui.Log().Printf(
 		"saved inventory list: %q",
-		sku.String(t),
+		sku.String(object),
 	)
 
 	return
@@ -413,7 +419,7 @@ func (s *Store) ReadOneSha(
 
 	var or sha.ReadCloser
 
-	if or, err = s.objectStore.ObjectReader(&sh); err != nil {
+	if or, err = s.objectBlobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

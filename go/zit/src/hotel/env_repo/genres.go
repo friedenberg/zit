@@ -52,16 +52,10 @@ func (s Env) ReadAllShas(
 	return
 }
 
-func (s Env) ReadAllShasForGenre(
-	g interfaces.GenreGetter,
+func (s Env) ReadAllShasForBlobs(
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
-	var p string
-
-	if p, err = s.DirObjectGenre(g); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	p := s.DirBlobs()
 
 	if err = s.ReadAllShas(p, w); err != nil {
 		err = errors.Wrap(err)

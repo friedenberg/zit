@@ -3,11 +3,12 @@ package inventory_list_store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (s *Store) Commit(
+func (store *Store) Commit(
 	externalLike sku.ExternalLike,
 	_ sku.CommitOptions,
 ) (err error) {
@@ -18,12 +19,12 @@ func (s *Store) Commit(
 		return
 	}
 
-	if err = s.WriteInventoryListObject(sk); err != nil {
+	if err = store.WriteInventoryListObject(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.ui.TransactedNew(sk); err != nil {
+	if err = store.ui.TransactedNew(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -31,7 +32,7 @@ func (s *Store) Commit(
 	return
 }
 
-func (s *Store) ReadOneInto(
+func (store *Store) ReadOneInto(
 	oid interfaces.ObjectId,
 	_ *sku.Transacted,
 ) (err error) {
@@ -40,6 +41,7 @@ func (s *Store) ReadOneInto(
 		return
 	}
 
+	err = todo.Implement()
 	// err = errors.BadRequestf("%q", oid)
 
 	return

@@ -10,6 +10,8 @@ type DirectoryPaths interface {
 	DirObjectGenre(g GenreGetter) (p string, err error)
 	DirObjectId() string
 	DirObjects(p ...string) string
+	DirInventoryLists() string
+	DirBlobs() string
 	DirZit(p ...string) string
 	FileCacheDormant() string
 	FileCacheObjectId() string
@@ -17,6 +19,7 @@ type DirectoryPaths interface {
 	FileConfigPermanent() string
 	FileLock() string
 	FileTags() string
+	FileInventoryListLog() string
 }
 
 type Directory interface {

@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 )
 
@@ -27,22 +26,8 @@ func (s *Env) Genesis(bb BigBang) {
 		s.CancelWithError(err)
 	}
 
-	for _, g := range []genres.Genre{genres.Blob, genres.InventoryList} {
-		var d string
-		var err error
-
-		if d, err = s.DirObjectGenre(g); err != nil {
-			if genres.IsErrUnsupportedGenre(err) {
-				err = nil
-				continue
-			} else {
-				s.CancelWithError(err)
-			}
-		}
-
-		if err := s.MakeDir(d); err != nil {
-			s.CancelWithError(err)
-		}
+	if err := s.MakeDir(s.DirInventoryLists(), s.DirBlobs()); err != nil {
+		s.CancelWithError(err)
 	}
 
 	{

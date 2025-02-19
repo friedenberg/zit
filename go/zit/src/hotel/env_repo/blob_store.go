@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
@@ -33,10 +32,7 @@ func MakeBlobStoreFromLayout(
 		tempFS: s.GetTempLocal(),
 	}
 
-	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	bs.basePath = s.DirBlobs()
 
 	return
 }
