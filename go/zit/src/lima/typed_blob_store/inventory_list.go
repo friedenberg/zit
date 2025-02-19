@@ -236,7 +236,7 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypeWithObject[iterSku]]{
+		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedStruct[iterSku]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
 			Blob: triple_hyphen_io.TypedDecodersWithoutType[iterSku](
 				a.streamDecoders,
@@ -244,8 +244,8 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 		}
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypeWithObject[iterSku]{
-				Object: func(sk *sku.Transacted) bool {
+			&triple_hyphen_io.TypedStruct[iterSku]{
+				Struct: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},
@@ -281,9 +281,9 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 		)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypeWithObject[iterSku]{
+			&triple_hyphen_io.TypedStruct[iterSku]{
 				Type: &tipe,
-				Object: func(sk *sku.Transacted) bool {
+				Struct: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},
@@ -305,9 +305,9 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 		)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypeWithObject[iterSku]{
+			&triple_hyphen_io.TypedStruct[iterSku]{
 				Type: &tipe,
-				Object: func(sk *sku.Transacted) bool {
+				Struct: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},

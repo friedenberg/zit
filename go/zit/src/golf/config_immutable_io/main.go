@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type typeWithConfigLoaded = *triple_hyphen_io.TypeWithObject[*ConfigLoaded]
+type typeWithConfigLoaded = *triple_hyphen_io.TypedStruct[*ConfigLoaded]
 
 var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
 	builtin_types.ImmutableConfigV1: blobV1Coder{},
@@ -22,7 +22,7 @@ var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
 
 var coder = triple_hyphen_io.Coder[typeWithConfigLoaded]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoaded]{},
-	Blob:     triple_hyphen_io.TypedCoders[*ConfigLoaded](typedCoders),
+	Blob:     triple_hyphen_io.CoderTypeMap[*ConfigLoaded](typedCoders),
 }
 
 type Coder struct{}
@@ -64,9 +64,9 @@ func (Coder) DecodeFrom(
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coder.DecodeFrom(
-		&triple_hyphen_io.TypeWithObject[*ConfigLoaded]{
+		&triple_hyphen_io.TypedStruct[*ConfigLoaded]{
 			Type:   &subject.Type,
-			Object: subject,
+			Struct: subject,
 		},
 		reader,
 	); err != nil {
@@ -86,9 +86,9 @@ func (Coder) EncodeTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coder.EncodeTo(
-		&triple_hyphen_io.TypeWithObject[*ConfigLoaded]{
+		&triple_hyphen_io.TypedStruct[*ConfigLoaded]{
 			Type:   &subject.Type,
-			Object: subject,
+			Struct: subject,
 		},
 		writer,
 	); err != nil {

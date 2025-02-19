@@ -16,7 +16,7 @@ type Blob interface {
 	// GetSupportedConnectionTypes() []connection_type.Type
 }
 
-type TypeWithBlob = triple_hyphen_io.TypeWithObject[*Blob]
+type TypeWithBlob = triple_hyphen_io.TypedStruct[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
@@ -25,7 +25,7 @@ var typedCoders = map[string]interfaces.Coder[*TypeWithBlob]{
 	"":                                coderToml[TomlUriV0]{},
 }
 
-var Coder = interfaces.Coder[*TypeWithBlob](triple_hyphen_io.TypedCoders[*Blob](typedCoders))
+var Coder = interfaces.Coder[*TypeWithBlob](triple_hyphen_io.CoderTypeMap[*Blob](typedCoders))
 
 type coderToml[T Blob] struct {
 	Blob T
@@ -47,7 +47,7 @@ func (coder coderToml[T]) DecodeFrom(
 	}
 
 	blob := Blob(coder.Blob)
-	subject.Object = &blob
+	subject.Struct = &blob
 
 	return
 }
@@ -58,7 +58,7 @@ func (coderToml[_]) EncodeTo(
 ) (n int64, err error) {
 	encoder := toml.NewEncoder(writer)
 
-	if err = encoder.Encode(subject.Object); err != nil {
+	if err = encoder.Encode(subject.Struct); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

@@ -22,7 +22,7 @@ type (
 	}
 )
 
-type TypeWithBlob = *triple_hyphen_io.TypeWithObject[*Blob]
+type TypeWithBlob = *triple_hyphen_io.TypedStruct[*Blob]
 
 var typedCoders = map[string]interfaces.Coder[TypeWithBlob]{
 	TypeV0: blobV0Coder{},
@@ -30,7 +30,7 @@ var typedCoders = map[string]interfaces.Coder[TypeWithBlob]{
 
 var Coder = triple_hyphen_io.Coder[TypeWithBlob]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[*Blob]{},
-	Blob:     triple_hyphen_io.TypedCoders[*Blob](typedCoders),
+	Blob:     triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
 }
 
 func DecodeFromFile(

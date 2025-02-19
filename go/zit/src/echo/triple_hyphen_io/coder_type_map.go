@@ -9,26 +9,26 @@ import (
 )
 
 // TODO rename and make clearer
-type TypeWithObject[O any] struct {
+type TypedStruct[O any] struct {
 	Type   *ids.Type
-	Object O
+	Struct O
 }
 
-func (typeWithObject *TypeWithObject[O]) GetType() *ids.Type {
-	if typeWithObject.Type == nil {
-		typeWithObject.Type = &ids.Type{}
+func (typedStruct *TypedStruct[O]) GetType() *ids.Type {
+	if typedStruct.Type == nil {
+		typedStruct.Type = &ids.Type{}
 	}
 
-	return typeWithObject.Type
+	return typedStruct.Type
 }
 
-type TypedCoders[O any] map[string]interfaces.Coder[*TypeWithObject[O]]
+type CoderTypeMap[O any] map[string]interfaces.Coder[*TypedStruct[O]]
 
-func (c TypedCoders[O]) DecodeFrom(
-	object *TypeWithObject[O],
+func (c CoderTypeMap[O]) DecodeFrom(
+	subject *TypedStruct[O],
 	reader io.Reader,
 ) (n int64, err error) {
-	t := object.GetType()
+	t := subject.GetType()
 	coder, ok := c[t.String()]
 
 	if !ok {
@@ -36,7 +36,7 @@ func (c TypedCoders[O]) DecodeFrom(
 		return
 	}
 
-	if n, err = coder.DecodeFrom(object, reader); err != nil {
+	if n, err = coder.DecodeFrom(subject, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -44,11 +44,11 @@ func (c TypedCoders[O]) DecodeFrom(
 	return
 }
 
-func (c TypedCoders[O]) EncodeTo(
-	object *TypeWithObject[O],
+func (c CoderTypeMap[O]) EncodeTo(
+	typedStruct *TypedStruct[O],
 	writer io.Writer,
 ) (n int64, err error) {
-	t := object.GetType()
+	t := typedStruct.GetType()
 	coder, ok := c[t.String()]
 
 	if !ok {
@@ -56,7 +56,7 @@ func (c TypedCoders[O]) EncodeTo(
 		return
 	}
 
-	if n, err = coder.EncodeTo(object, writer); err != nil {
+	if n, err = coder.EncodeTo(typedStruct, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,10 +67,10 @@ func (c TypedCoders[O]) EncodeTo(
 type TypedDecodersWithoutType[O any] map[string]interfaces.DecoderFrom[O]
 
 func (c TypedDecodersWithoutType[O]) DecodeFrom(
-	object *TypeWithObject[O],
+	subject *TypedStruct[O],
 	reader io.Reader,
 ) (n int64, err error) {
-	t := object.GetType()
+	t := subject.GetType()
 	coder, ok := c[t.String()]
 
 	if !ok {
@@ -78,7 +78,7 @@ func (c TypedDecodersWithoutType[O]) DecodeFrom(
 		return
 	}
 
-	if n, err = coder.DecodeFrom(object.Object, reader); err != nil {
+	if n, err = coder.DecodeFrom(subject.Struct, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -89,10 +89,10 @@ func (c TypedDecodersWithoutType[O]) DecodeFrom(
 type TypedCodersWithoutType[O any] map[string]interfaces.Coder[O]
 
 func (c TypedCodersWithoutType[O]) DecodeFrom(
-	object *TypeWithObject[O],
+	subject *TypedStruct[O],
 	reader io.Reader,
 ) (n int64, err error) {
-	t := object.GetType()
+	t := subject.GetType()
 	coder, ok := c[t.String()]
 
 	if !ok {
@@ -100,7 +100,7 @@ func (c TypedCodersWithoutType[O]) DecodeFrom(
 		return
 	}
 
-	if n, err = coder.DecodeFrom(object.Object, reader); err != nil {
+	if n, err = coder.DecodeFrom(subject.Struct, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +109,7 @@ func (c TypedCodersWithoutType[O]) DecodeFrom(
 }
 
 func (c TypedCodersWithoutType[O]) EncodeTo(
-	subject *TypeWithObject[O],
+	subject *TypedStruct[O],
 	writer io.Writer,
 ) (n int64, err error) {
 	t := subject.Type
@@ -120,7 +120,7 @@ func (c TypedCodersWithoutType[O]) EncodeTo(
 		return
 	}
 
-	if n, err = coder.EncodeTo(subject.Object, writer); err != nil {
+	if n, err = coder.EncodeTo(subject.Struct, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

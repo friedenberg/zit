@@ -35,7 +35,7 @@ func Make(
 		configMutable: configMutableBlob,
 	}
 
-	object := triple_hyphen_io.TypeWithObject[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob]{
 		Type: &ids.Type{},
 	}
 
@@ -48,7 +48,7 @@ func Make(
 		err = errors.Wrap(err)
 		return
 	} else {
-		out.blob = *object.Object
+		out.blob = *object.Struct
 	}
 
 	defaults := out.configMutable.GetDefaults()
@@ -117,9 +117,9 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
-	object := triple_hyphen_io.TypeWithObject[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob]{
 		Type:   &tipe,
-		Object: &env.blob,
+		Struct: &env.blob,
 	}
 
 	if err = workspace_config_blobs.EncodeToFile(
