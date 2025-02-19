@@ -1,0 +1,11 @@
+---
+! toml-config-immutable-v1
+---
+
+store-version = 9
+repo-type = 'working-copy'
+id = 'test-repo-id'
+
+[blob-store]
+compression-type = 'zstd'
+lock-internal-files = false

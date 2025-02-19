@@ -14,21 +14,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 )
 
-func (s *Env) Genesis(bb BigBang) {
-	s.ConfigLoaded.Type = bb.Type
-	s.ConfigLoaded.ImmutableConfig = bb.Config
+func (env *Env) Genesis(bb BigBang) {
+	env.ConfigLoaded.Type = bb.Type
+	env.ConfigLoaded.ImmutableConfig = bb.Config
 
-	if err := s.MakeDir(
-		s.DirObjectId(),
-		s.DirCache(),
-		s.DirLostAndFound(),
+	if err := env.MakeDir(
+		env.DirObjectId(),
+		env.DirCache(),
+		env.DirLostAndFound(),
+		env.DirInventoryLists(),
+		env.DirBlobs(),
 	); err != nil {
-		s.CancelWithError(err)
+		env.CancelWithError(err)
 	}
 
-	if err := s.MakeDir(s.DirInventoryLists(), s.DirBlobs()); err != nil {
-		s.CancelWithError(err)
-	}
+	writeFile(env.FileInventoryListLog(), "")
 
 	{
 		// if err := s.config.ImmutableConfig.GetBlobStoreImmutableConfig().GetAgeEncryption().AddIdentityOrGenerateIfNecessary(
@@ -46,43 +46,43 @@ func (s *Env) Genesis(bb BigBang) {
 				var err error
 
 				if f, err = files.CreateExclusiveWriteOnly(
-					s.FileConfigPermanent(),
+					env.FileConfigPermanent(),
 				); err != nil {
-					s.CancelWithError(err)
+					env.CancelWithError(err)
 				}
 
-				defer s.MustClose(f)
+				defer env.MustClose(f)
 			}
 
 			encoder := config_immutable_io.Coder{}
 
-			if _, err := encoder.EncodeTo(&s.ConfigLoaded, f); err != nil {
-				s.CancelWithError(err)
+			if _, err := encoder.EncodeTo(&env.ConfigLoaded, f); err != nil {
+				env.CancelWithError(err)
 			}
 		}
 	}
 
-	if s.ConfigLoaded.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
-		if err := s.readAndTransferLines(
+	if env.ConfigLoaded.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
+		if err := env.readAndTransferLines(
 			bb.Yin,
-			filepath.Join(s.DirObjectId(), "Yin"),
+			filepath.Join(env.DirObjectId(), "Yin"),
 		); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 
-		if err := s.readAndTransferLines(
+		if err := env.readAndTransferLines(
 			bb.Yang,
-			filepath.Join(s.DirObjectId(), "Yang"),
+			filepath.Join(env.DirObjectId(), "Yang"),
 		); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 
-		writeFile(s.FileConfigMutable(), "")
-		writeFile(s.FileCacheDormant(), "")
+		writeFile(env.FileConfigMutable(), "")
+		writeFile(env.FileCacheDormant(), "")
 	}
 
-	if err := s.setupStores(); err != nil {
-		s.CancelWithError(err)
+	if err := env.setupStores(); err != nil {
+		env.CancelWithError(err)
 	}
 }
 

@@ -405,10 +405,10 @@ func (s *Store) IterInventoryList(
 	)
 }
 
-func (s *Store) ReadLast() (max *sku.Transacted, err error) {
+func (store *Store) ReadLast() (max *sku.Transacted, err error) {
 	var maxSku sku.Transacted
 
-	for b, iterErr := range s.IterAllInventoryLists() {
+	for b, iterErr := range store.IterAllInventoryLists() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return

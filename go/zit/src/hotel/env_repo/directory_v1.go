@@ -88,7 +88,7 @@ func (s directoryV1) FileCacheObjectId() string {
 }
 
 func (s directoryV1) FileInventoryListLog() string {
-	return s.DirObjects(s.DirInventoryLists(), "log")
+	return s.DirObjects("inventory_lists_log")
 }
 
 func (s directoryV1) DirInventoryLists() string {

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+// TODO rename and make clearer
 type TypeWithObject[O any] struct {
 	Type   *Type
 	Object O
