@@ -93,7 +93,9 @@ func (s *Store) Initialize(
 			blobType: blobType,
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
-				env_dir.Config{},
+				env_dir.MakeConfigFromImmutableBlobConfig(
+					envRepo.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+				),
 				envRepo.GetTempLocal(),
 			),
 			typedBlobStore: typedBlobStore,
@@ -105,7 +107,9 @@ func (s *Store) Initialize(
 			blobType: blobType,
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
-				env_dir.Config{},
+				env_dir.MakeConfigFromImmutableBlobConfig(
+					envRepo.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+				),
 				envRepo.GetTempLocal(),
 			),
 			typedBlobStore: typedBlobStore,

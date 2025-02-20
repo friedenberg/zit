@@ -38,7 +38,7 @@ func (client client) ImportInventoryList(
 	if err = client.logRemoteInventoryLists.Exists(
 		listSku.GetBlobSha(),
 	); collections.IsErrNotFound(err) {
-		err = nil
+    err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
 		return

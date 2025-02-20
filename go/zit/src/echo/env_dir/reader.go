@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -20,14 +21,24 @@ type reader struct {
 func NewReader(options ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
-	if r.decrypter, err = options.GetBlobEncryption().WrapReader(options.Reader); err != nil {
+	if r.decrypter, err = options.GetBlobEncryption().WrapReader(options.File); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if r.expander, err = options.GetBlobCompression().WrapReader(r.decrypter); err != nil {
-		err = errors.Wrap(err)
-		return
+    // TODO remove this when compression / encryption issues are resolved
+		if _, err = options.File.Seek(0, io.SeekStart); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if r.expander, err = config_immutable.CompressionTypeNone.WrapReader(
+			options.File,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	r.hash = sha256.New()

@@ -2,11 +2,12 @@ package env_dir
 
 import (
 	"io"
+	"os"
 )
 
 type ReadOptions struct {
 	Config
-	io.Reader
+	*os.File
 }
 
 type FileReadOptions struct {

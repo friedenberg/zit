@@ -149,7 +149,7 @@ func (s *objectBlobStoreV0) IterAllInventoryLists() iter.Seq2[*sku.Transacted, e
 			var decodedList *sku.Transacted
 
 			if decodedList, err = s.ReadOneSha(sh); err != nil {
-				if !yield(nil, errors.Wrap(err)) {
+				if !yield(nil, errors.Wrapf(err, "Sha: %q", sh)) {
 					return
 				}
 			}

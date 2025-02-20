@@ -30,7 +30,7 @@ func NewFileReader(
 			options.GetBlobEncryption(),
 			options.GetLockInternalFiles(),
 		),
-		Reader: objectReader.file,
+		File: objectReader.file,
 	}
 
 	if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
