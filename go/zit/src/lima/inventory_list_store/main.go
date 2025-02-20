@@ -124,7 +124,11 @@ func (s *Store) GetEnv() env_ui.Env {
 }
 
 func (s *Store) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
-	return s.GetEnvRepo().GetConfig()
+	return s.GetEnvRepo().GetConfigPublic()
+}
+
+func (s *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+	return s.GetEnvRepo().GetConfigPrivate()
 }
 
 func (s *Store) GetObjectStore() sku.ObjectStore {

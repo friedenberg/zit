@@ -26,7 +26,7 @@ function info_config_immutable { # @test
 		! toml-config-immutable-v1
 		---
 
-		private-key = 'zit-repo-private_key-v1.*'
+		public-key = 'zit-repo-public_key-v0.*'
 		store-version = 9
 		repo-type = 'working-copy'
 		id = 'test-repo-id'

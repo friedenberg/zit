@@ -11,6 +11,8 @@ import (
 
 type LatestPrivate = TomlV1Private
 
+// TODO make it impossible for private configs to be returned fy
+// GetImmutableConfigPublic
 type ConfigPublic interface {
 	GetImmutableConfigPublic() ConfigPublic
 	GetStoreVersion() interfaces.StoreVersion

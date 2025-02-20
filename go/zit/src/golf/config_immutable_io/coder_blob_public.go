@@ -15,7 +15,7 @@ func (blobV1CoderPublic) DecodeFrom(
 	subject typeWithConfigLoadedPublic,
 	r io.Reader,
 ) (n int64, err error) {
-	subject.Struct.ImmutableConfig = &config_immutable.TomlV1Private{}
+	subject.Struct.ImmutableConfig = &config_immutable.TomlV1Public{}
 	td := toml.NewDecoder(r)
 
 	if err = td.Decode(subject.Struct.ImmutableConfig); err != nil {

@@ -19,7 +19,7 @@ import (
 type Env struct {
 	env_local.Env
 
-	config_immutable_io.ConfigLoadedPublic
+	config config_immutable_io.ConfigLoadedPrivate
 
 	basePath              string
 	readOnlyBlobStorePath string
@@ -100,10 +100,10 @@ func Make(
 	}
 
 	{
-		decoder := config_immutable_io.CoderPublic{}
+		decoder := config_immutable_io.CoderPrivate{}
 
 		if err = decoder.DecodeFromFile(
-			&s.ConfigLoadedPublic,
+			&s.config,
 			s.FileConfigPermanent(),
 		); err != nil {
 			errors.Wrap(err)
@@ -130,8 +130,16 @@ func (a Env) GetEnv() env_ui.Env {
 	return a.Env
 }
 
-func (s Env) GetConfig() config_immutable_io.ConfigLoadedPublic {
-	return s.ConfigLoadedPublic
+func (s Env) GetConfigPublic() config_immutable_io.ConfigLoadedPublic {
+	return config_immutable_io.ConfigLoadedPublic{
+		Type:                     s.config.Type,
+		ImmutableConfig:          s.config.ImmutableConfig.GetImmutableConfigPublic(),
+		BlobStoreImmutableConfig: s.config.BlobStoreImmutableConfig,
+	}
+}
+
+func (s Env) GetConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+	return s.config
 }
 
 func (s Env) GetLockSmith() interfaces.LockSmith {
@@ -176,10 +184,10 @@ func (h Env) DataFileStoreVersion() string {
 }
 
 func (h Env) GetStoreVersion() interfaces.StoreVersion {
-	if h.ConfigLoadedPublic.ImmutableConfig == nil {
+	if h.config.ImmutableConfig == nil {
 		return config_immutable.CurrentStoreVersion
 	} else {
-		return h.ConfigLoadedPublic.ImmutableConfig.GetStoreVersion()
+		return h.config.ImmutableConfig.GetStoreVersion()
 	}
 }
 
@@ -187,7 +195,7 @@ func (s Env) MakeBlobStore() interfaces.LocalBlobStore {
 	return blob_store.MakeShardedFilesStore(
 		s.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
-			s.GetConfig().ImmutableConfig.GetBlobStoreConfigImmutable(),
+			s.GetConfigPublic().ImmutableConfig.GetBlobStoreConfigImmutable(),
 		),
 		s.GetTempLocal(),
 	)

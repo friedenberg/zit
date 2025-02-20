@@ -7,6 +7,17 @@ type Value struct {
 	Data []byte
 }
 
+func (value Value) String() string {
+	var text []byte
+	var err error
+
+	if text, err = Encode(value.HRP, value.Data); err != nil {
+		panic(err)
+	}
+
+	return string(text)
+}
+
 func (value Value) MarshalText() (text []byte, err error) {
 	if len(value.Data) == 0 {
 		return

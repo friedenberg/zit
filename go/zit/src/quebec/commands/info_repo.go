@@ -22,7 +22,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 	args := req.PopArgs()
 	repo := cmd.MakeEnvRepo(req, false)
 
-	configLoaded := repo.GetConfig()
+	configLoaded := repo.GetConfigPublic()
 	c := configLoaded.ImmutableConfig
 
 	if len(args) == 0 {

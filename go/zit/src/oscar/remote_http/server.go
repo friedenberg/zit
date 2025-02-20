@@ -181,7 +181,7 @@ func (server *Server) makeRouter(
 
 	router.Use(server.panicHandlingMiddleware)
 
-	if len(server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPrivateKey()) > 0 {
+	if len(server.Repo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()) > 0 {
 		router.Use(server.sigMiddleware)
 	}
 
@@ -207,7 +207,7 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 			}
 
 			if len(nonce) > 0 {
-				key := server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPrivateKey()
+				key := server.Repo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
 
 				var sig []byte
 

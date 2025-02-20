@@ -22,8 +22,8 @@ func (env *Env) Genesis(bb BigBang) {
 		return
 	}
 
-	env.ConfigLoadedPublic.Type = bb.Type
-	env.ConfigLoadedPublic.ImmutableConfig = bb.Config
+	env.config.Type = bb.Type
+	env.config.ImmutableConfig = bb.Config
 
 	if err := env.MakeDir(
 		env.DirObjectId(),
@@ -52,14 +52,14 @@ func (env *Env) Genesis(bb BigBang) {
 			defer env.MustClose(f)
 		}
 
-		encoder := config_immutable_io.CoderPublic{}
+		encoder := config_immutable_io.CoderPrivate{}
 
-		if _, err := encoder.EncodeTo(&env.ConfigLoadedPublic, f); err != nil {
+		if _, err := encoder.EncodeTo(&env.config, f); err != nil {
 			env.CancelWithError(err)
 		}
 	}
 
-	if env.ConfigLoadedPublic.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
+	if env.config.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := env.readAndTransferLines(
 			bb.Yin,
 			filepath.Join(env.DirObjectId(), "Yin"),

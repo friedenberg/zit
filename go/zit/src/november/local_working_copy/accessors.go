@@ -24,7 +24,11 @@ func (u *Repo) GetEnv() env_ui.Env {
 }
 
 func (u *Repo) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
-	return u.GetEnvRepo().GetConfig()
+	return u.GetEnvRepo().GetConfigPublic()
+}
+
+func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+	return u.GetEnvRepo().GetConfigPrivate()
 }
 
 func (repo *Repo) GetEnvLocal() env_local.Env {
