@@ -195,7 +195,7 @@ func (s Env) MakeBlobStore() interfaces.LocalBlobStore {
 	return blob_store.MakeShardedFilesStore(
 		s.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
-			s.GetConfigPublic().ImmutableConfig.GetBlobStoreConfigImmutable(),
+			s.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
 		),
 		s.GetTempLocal(),
 	)
