@@ -34,9 +34,6 @@ func (server *Server) writeInventoryList(
 
 	expected := sha.Make(listSku.GetBlobSha())
 
-	// TODO check if we already processed a blob where: key = pubBase64, value =
-	// actual blob sha (not expected)
-
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 
 	if pubBase64 != "" {
@@ -152,9 +149,6 @@ func (server *Server) writeInventoryList(
 		response.Error(err)
 		return
 	}
-
-	// TODO persist we just received and committed: key = pubBase64, value =
-	// actual blob sha (not expected)
 
 	return
 }

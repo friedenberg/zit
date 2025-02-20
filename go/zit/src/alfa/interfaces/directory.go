@@ -5,6 +5,7 @@ type DirectoryPaths interface {
 	DirCache(p ...string) string
 	DirCacheObjectPointers() string
 	DirCacheObjects() string
+	DirCacheInventoryListLog() string
 	DirCacheRepo(p ...string) string
 	DirLostAndFound() string
 	DirObjectId() string

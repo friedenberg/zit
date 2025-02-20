@@ -145,6 +145,21 @@ func OpenReadWrite(s string) (f *os.File, err error) {
 	return
 }
 
+func OpenCreate(s string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = os.OpenFile(
+		s,
+		os.O_RDWR|os.O_CREATE,
+		0o666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
@@ -194,6 +209,17 @@ func OpenReadOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
 	if f, err = os.OpenFile(s, os.O_RDONLY, 0o666); err != nil {
+		err = errors.Wrapf(err, "Path: %q", s)
+		return
+	}
+
+	return
+}
+
+func OpenExclusive(s string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = os.OpenFile(s, os.O_RDWR|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrapf(err, "Path: %q", s)
 		return
 	}

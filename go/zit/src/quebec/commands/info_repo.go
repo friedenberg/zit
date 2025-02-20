@@ -22,7 +22,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 	args := req.PopArgs()
 	repo := cmd.MakeEnvRepo(req, false)
 
-  // TODO should this be the private config flavor?
+	// TODO should this be the private config flavor?
 	configLoaded := repo.GetConfigPublic()
 	c := configLoaded.ImmutableConfig
 

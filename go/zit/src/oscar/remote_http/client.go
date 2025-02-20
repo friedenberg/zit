@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -34,8 +35,8 @@ func MakeClient(
 		http: http.Client{
 			Transport: transport,
 		},
-		localRepo: localInventoryListStore,
-		typedBlobStore:          typedBlobStore,
+		localRepo:      localInventoryListStore,
+		typedBlobStore: typedBlobStore,
 	}
 
 	client.Initialize()
@@ -44,11 +45,13 @@ func MakeClient(
 }
 
 type client struct {
-	envUI                   env_ui.Env
-	configImmutable         config_immutable_io.ConfigLoadedPublic
-	http                    http.Client
-	localRepo repo.LocalRepo
-	typedBlobStore          typed_blob_store.InventoryList
+	envUI           env_ui.Env
+	configImmutable config_immutable_io.ConfigLoadedPublic
+	http            http.Client
+	localRepo       repo.LocalRepo
+	typedBlobStore  typed_blob_store.InventoryList
+
+	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
 
 func (client *client) Initialize() {
@@ -85,6 +88,13 @@ func (client *client) Initialize() {
 	); err != nil {
 		client.envUI.CancelWithErrorAndFormat(err, "failed to read remote immutable config")
 	}
+
+	client.logRemoteInventoryLists = log_remote_inventory_lists.Make(
+		client.localRepo.GetEnvRepo(),
+    client.configImmutable.ImmutableConfig.GetPublicKey(),
+	)
+
+	client.envUI.After(client.logRemoteInventoryLists.Flush)
 }
 
 func (client *client) GetEnv() env_ui.Env {

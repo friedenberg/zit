@@ -24,8 +24,8 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Genesis) OnTheFirstDay(
-  req command.Request,
-  repoId string,
+	req command.Request,
+	repoId string,
 ) repo.LocalRepo {
 	ui := env_ui.Make(
 		req,

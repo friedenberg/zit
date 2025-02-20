@@ -79,6 +79,10 @@ func (s directoryV1) DirCacheObjectPointers() string {
 	return s.DirCache("object_pointers")
 }
 
+func (s directoryV1) DirCacheInventoryListLog() string {
+	return s.DirCache("inventory_list_logs")
+}
+
 func (s directoryV1) DirObjectId() string {
 	return s.DirZit("object_ids")
 }

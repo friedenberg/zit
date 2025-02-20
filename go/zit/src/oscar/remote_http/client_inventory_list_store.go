@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -34,6 +35,17 @@ func (client client) ImportInventoryList(
 	blobStore interfaces.BlobStore,
 	listSku *sku.Transacted,
 ) (err error) {
+	if err = client.logRemoteInventoryLists.Exists(
+		listSku.GetBlobSha(),
+	); collections.IsErrNotFound(err) {
+		err = nil
+	} else if err != nil {
+		err = errors.Wrap(err)
+		return
+	} else {
+		return
+	}
+
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
 	listFormat := client.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
@@ -100,15 +112,12 @@ func (client client) ImportInventoryList(
 
 		var sig string
 
-		{
-			var err error
-
-			if sig, err = repo_signing.SignBase64(
-				key,
-				listSku.GetBlobSha().GetShaBytes(),
-			); err != nil {
-				client.envUI.CancelWithError(err)
-			}
+		if sig, err = repo_signing.SignBase64(
+			key,
+			listSku.GetBlobSha().GetShaBytes(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		request.Header.Add(headerSha256Sig, sig)
@@ -156,6 +165,13 @@ func (client client) ImportInventoryList(
 	}
 
 	if err = response.Body.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = client.logRemoteInventoryLists.Append(
+		listSku.GetBlobSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
