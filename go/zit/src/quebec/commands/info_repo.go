@@ -35,7 +35,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
 		case "config-immutable":
-			if _, err := (config_immutable_io.Coder{}).EncodeTo(
+			if _, err := (config_immutable_io.CoderPublic{}).EncodeTo(
 				&configLoaded,
 				repo.GetUIFile(),
 			); err != nil {

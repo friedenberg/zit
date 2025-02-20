@@ -193,9 +193,9 @@ func TestQuery(t1 *testing.T) {
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
-      expectedOptimized: "/repo:Repo",
-      expected:          "/repo:Repo",
-      inputs:            []string{"/repo:k"},
+			expectedOptimized: "/repo:Repo",
+			expected:          "/repo:Repo",
+			inputs:            []string{"/repo:k"},
 		},
 	}
 

@@ -45,7 +45,7 @@ func MakeClient(
 
 type client struct {
 	envUI                   env_ui.Env
-	configImmutable         config_immutable_io.ConfigLoaded
+	configImmutable         config_immutable_io.ConfigLoadedPublic
 	http                    http.Client
 	localInventoryListStore sku.InventoryListStore
 	typedBlobStore          typed_blob_store.InventoryList
@@ -77,7 +77,7 @@ func (client *client) Initialize() {
 		}
 	}
 
-	decoder := config_immutable_io.Coder{}
+	decoder := config_immutable_io.CoderPublic{}
 
 	if _, err := decoder.DecodeFrom(
 		&client.configImmutable,
@@ -91,7 +91,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfig() config_immutable_io.ConfigLoaded {
+func (client *client) GetImmutableConfig() config_immutable_io.ConfigLoadedPublic {
 	return client.configImmutable
 }
 

@@ -265,7 +265,7 @@ func (s *Store) makeFuncIterFilterAndApply(
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	return func(co *sku.CheckedOut) (err error) {
 		if !query.ContainsExternalSku(
-      qg,
+			qg,
 			co.GetSkuExternal(),
 			co.GetState(),
 		) {

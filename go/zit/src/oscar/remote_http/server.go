@@ -764,12 +764,12 @@ func (server *Server) handlePostInventoryList(
 
 func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
 	config := server.Repo.GetImmutableConfig()
-	configLoaded := &config_immutable_io.ConfigLoaded{
+	configLoaded := &config_immutable_io.ConfigLoadedPublic{
 		Type:            config.Type,
 		ImmutableConfig: config.ImmutableConfig,
 	}
 
-	encoder := config_immutable_io.Coder{}
+	encoder := config_immutable_io.CoderPublic{}
 
 	var b bytes.Buffer
 

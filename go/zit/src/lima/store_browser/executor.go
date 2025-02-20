@@ -85,7 +85,7 @@ func (c *executor) tryToEmitOneUntracked(
 ) (err error) {
 	c.co.SetState(checked_out_state.Untracked)
 
-  if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
+	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
 		return
 	}
 

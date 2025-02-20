@@ -62,7 +62,7 @@ func (ef *FSItem) WriteToExternalObjectId(
 		anchorFD = &ef.Conflict
 
 	default:
-    // [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer during organize in workspace
+		// [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer during organize in workspace
 		ui.Err().Printf("item has no anchor FDs. %q", ef.Debug())
 		return
 	}

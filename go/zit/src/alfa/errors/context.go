@@ -172,7 +172,7 @@ func (ctx *context) Run(funcRun func(Context)) error {
 				if r := recover(); r != nil {
 					if r == errContextRetry {
 						retry = true
-            return
+						return
 					}
 
 					// TODO capture panic stack trace and add to custom error objects
@@ -212,7 +212,7 @@ func (ctx *context) Run(funcRun func(Context)) error {
 }
 
 func (ctx *context) Retry() {
-  panic(errContextRetry)
+	panic(errContextRetry)
 }
 
 func (ctx *context) cancel(err error) {

@@ -70,7 +70,7 @@ func (err ErrUnableToAcquireLock) Recover(
 			ctx.CancelWithError(err)
 		}
 
-    ctx.Retry()
+		ctx.Retry()
 	} else {
 		ctx.CancelWithBadRequestf("not deleting the lock. aborting.")
 	}

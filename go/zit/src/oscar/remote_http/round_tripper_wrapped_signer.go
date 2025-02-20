@@ -10,8 +10,8 @@ import (
 )
 
 const (
-  headerChallengeNonce = "X-Zit-Challenge-Nonce"
-  headerChallengeResponse = "X-Zit-Challenge-Response"
+	headerChallengeNonce    = "X-Zit-Challenge-Nonce"
+	headerChallengeResponse = "X-Zit-Challenge-Response"
 )
 
 type roundTripperWrappedSigner struct {

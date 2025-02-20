@@ -127,7 +127,7 @@ func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 }
 
 func (g Genre) GetGenreString() string {
-  return g.String()
+	return g.String()
 }
 
 func (g Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {

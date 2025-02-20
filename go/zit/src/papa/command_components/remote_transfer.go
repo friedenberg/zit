@@ -24,10 +24,10 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 	remoteInventoryListStore := remote.GetInventoryListStore()
 	localInventoryListStore := local.GetInventoryListStore()
 
-  // TODO fetch tais of inventory lists we've pushed
+	// TODO fetch tais of inventory lists we've pushed
 
 	for list, err := range localInventoryListStore.IterAllInventoryLists() {
-    // TODO continue to next if we pushed this list already
+		// TODO continue to next if we pushed this list already
 
 		if err != nil {
 			req.CancelWithError(err)
@@ -42,8 +42,8 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 			return
 		}
 
-    // TODO add this list's tai to the lists we've pushed so far
+		// TODO add this list's tai to the lists we've pushed so far
 	}
 
-  // TODO persist all the tais of lists we've pushed so far to a cache
+	// TODO persist all the tais of lists we've pushed so far to a cache
 }

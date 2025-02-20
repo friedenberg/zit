@@ -20,7 +20,7 @@ func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
 	pubkey ed25519.PublicKey,
 ) (err error) {
-  roundTripper.PublicKey = pubkey
+	roundTripper.PublicKey = pubkey
 
 	if roundTripper.UnixSocket, err = remote.InitializeUnixSocket(
 		net.ListenConfig{},

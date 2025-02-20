@@ -9,10 +9,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 )
 
-type blobV1Coder struct{}
+type blobV1CoderPrivate struct{}
 
-func (blobV1Coder) DecodeFrom(
-	subject typeWithConfigLoaded,
+func (blobV1CoderPrivate) DecodeFrom(
+	subject typeWithConfigLoadedPrivate,
 	r io.Reader,
 ) (n int64, err error) {
 	subject.Struct.ImmutableConfig = &config_immutable.TomlV1Private{}
@@ -30,8 +30,8 @@ func (blobV1Coder) DecodeFrom(
 	return
 }
 
-func (blobV1Coder) EncodeTo(
-	subject typeWithConfigLoaded,
+func (blobV1CoderPrivate) EncodeTo(
+	subject typeWithConfigLoadedPrivate,
 	w io.Writer,
 ) (n int64, err error) {
 	te := toml.NewEncoder(w)
@@ -48,10 +48,10 @@ func (blobV1Coder) EncodeTo(
 	return
 }
 
-type blobV0Coder struct{}
+type blobV0CoderPrivate struct{}
 
-func (blobV0Coder) DecodeFrom(
-	subject typeWithConfigLoaded,
+func (blobV0CoderPrivate) DecodeFrom(
+	subject typeWithConfigLoadedPrivate,
 	r io.Reader,
 ) (n int64, err error) {
 	subject.Struct.ImmutableConfig = &config_immutable.V0{}
@@ -70,8 +70,8 @@ func (blobV0Coder) DecodeFrom(
 	return
 }
 
-func (blobV0Coder) EncodeTo(
-	subject typeWithConfigLoaded,
+func (blobV0CoderPrivate) EncodeTo(
+	subject typeWithConfigLoadedPrivate,
 	w io.Writer,
 ) (n int64, err error) {
 	dec := gob.NewEncoder(w)

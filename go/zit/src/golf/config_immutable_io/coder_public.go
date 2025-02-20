@@ -13,22 +13,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
-type typeWithConfigLoaded = *triple_hyphen_io.TypedStruct[*ConfigLoaded]
+type typeWithConfigLoadedPublic = *triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]
 
-var typedCoders = map[string]interfaces.Coder[typeWithConfigLoaded]{
-	builtin_types.ImmutableConfigV1: blobV1Coder{},
-	"":                              blobV0Coder{},
+var typedCoders = map[string]interfaces.Coder[typeWithConfigLoadedPublic]{
+	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
+	"":                              blobV0CoderPublic{},
 }
 
-var coder = triple_hyphen_io.Coder[typeWithConfigLoaded]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoaded]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*ConfigLoaded](typedCoders),
+var coderPublic = triple_hyphen_io.Coder[typeWithConfigLoadedPublic]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoadedPublic]{},
+	Blob:     triple_hyphen_io.CoderTypeMap[*ConfigLoadedPublic](typedCoders),
 }
 
-type Coder struct{}
+type CoderPublic struct{}
 
-func (coder Coder) DecodeFromFile(
-	object *ConfigLoaded,
+func (coder CoderPublic) DecodeFromFile(
+	object *ConfigLoadedPublic,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -59,12 +59,12 @@ func (coder Coder) DecodeFromFile(
 	return
 }
 
-func (Coder) DecodeFrom(
-	subject *ConfigLoaded,
+func (CoderPublic) DecodeFrom(
+	subject *ConfigLoadedPublic,
 	reader io.Reader,
 ) (n int64, err error) {
-	if n, err = coder.DecodeFrom(
-		&triple_hyphen_io.TypedStruct[*ConfigLoaded]{
+	if n, err = coderPublic.DecodeFrom(
+		&triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]{
 			Type:   &subject.Type,
 			Struct: subject,
 		},
@@ -81,12 +81,12 @@ func (Coder) DecodeFrom(
 	return
 }
 
-func (Coder) EncodeTo(
-	subject *ConfigLoaded,
+func (CoderPublic) EncodeTo(
+	subject *ConfigLoadedPublic,
 	writer io.Writer,
 ) (n int64, err error) {
-	if n, err = coder.EncodeTo(
-		&triple_hyphen_io.TypedStruct[*ConfigLoaded]{
+	if n, err = coderPublic.EncodeTo(
+		&triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]{
 			Type:   &subject.Type,
 			Struct: subject,
 		},
