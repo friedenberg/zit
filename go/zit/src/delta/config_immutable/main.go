@@ -11,9 +11,14 @@ import (
 
 type LatestPrivate = TomlV1Private
 
+type (
+	public  struct{}
+	private struct{}
+)
+
 // TODO make it impossible for private configs to be returned fy
 // GetImmutableConfigPublic
-type ConfigPublic interface {
+type configCommon interface {
 	GetImmutableConfigPublic() ConfigPublic
 	GetStoreVersion() interfaces.StoreVersion
 	GetPublicKey() ed25519.PublicKey
@@ -22,8 +27,14 @@ type ConfigPublic interface {
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
+type ConfigPublic interface {
+	config() public
+	configCommon
+}
+
 type ConfigPrivate interface {
-	ConfigPublic
+	configCommon
+	config() private
 	GetImmutableConfig() ConfigPrivate
 	GetPrivateKey() ed25519.PrivateKey
 }

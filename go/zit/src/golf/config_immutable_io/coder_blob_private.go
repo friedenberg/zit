@@ -54,7 +54,7 @@ func (blobV0CoderPrivate) DecodeFrom(
 	subject typeWithConfigLoadedPrivate,
 	r io.Reader,
 ) (n int64, err error) {
-	subject.Struct.ImmutableConfig = &config_immutable.V0{}
+	subject.Struct.ImmutableConfig = &config_immutable.V0Private{}
 
 	dec := gob.NewDecoder(r)
 

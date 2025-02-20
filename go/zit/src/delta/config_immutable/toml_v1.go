@@ -33,6 +33,9 @@ func (k *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&k.RepoType, "repo-type", "")
 }
 
+func (k *TomlV1Public) config() public { return public{} }
+func (k *TomlV1Private) config() private { return private{} }
+
 func (k *TomlV1Private) GetImmutableConfig() ConfigPrivate {
 	return k
 }

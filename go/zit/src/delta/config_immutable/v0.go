@@ -11,14 +11,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type V0 struct {
+type v0Common struct {
 	StoreVersion      StoreVersion
 	Recipients        []string
 	CompressionType   CompressionType
 	LockInternalFiles bool
 }
 
-func (k *V0) SetFlagSet(f *flag.FlagSet) {
+type V0Public struct {
+  v0Common
+}
+
+type V0Private struct {
+  v0Common
+}
+
+func (k *V0Public) SetFlagSet(f *flag.FlagSet) {
 	k.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(
@@ -38,50 +46,59 @@ func (k *V0) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (k *V0) GetImmutableConfig() ConfigPrivate {
+func (k *V0Public) config() public { return public{} }
+func (k *V0Private) config() private { return private{} }
+
+func (k *V0Private) GetImmutableConfig() ConfigPrivate {
 	return k
 }
 
-func (k *V0) GetImmutableConfigPublic() ConfigPublic {
+func (k *V0Private) GetImmutableConfigPublic() ConfigPublic {
+	return &V0Public{
+    v0Common: k.v0Common,
+  }
+}
+
+func (k *V0Public) GetImmutableConfigPublic() ConfigPublic {
 	return k
 }
 
-func (k *V0) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+func (k *v0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return k
 }
 
-func (k V0) GetStoreVersion() interfaces.StoreVersion {
+func (k v0Common) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 
-func (k V0) GetRepoType() repo_type.Type {
+func (k v0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (k V0) GetPrivateKey() ed25519.PrivateKey {
+func (k v0Common) GetPrivateKey() ed25519.PrivateKey {
 	panic(errors.Errorf("not supported"))
 }
 
-func (k V0) GetPublicKey() ed25519.PublicKey {
+func (k v0Common) GetPublicKey() ed25519.PublicKey {
 	panic(errors.Errorf("not supported"))
 }
 
-func (k V0) GetRepoId() ids.RepoId {
+func (k v0Common) GetRepoId() ids.RepoId {
 	return ids.RepoId{}
 }
 
-func (k *V0) GetAgeEncryption() *age.Age {
+func (k *v0Common) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 
-func (k *V0) GetBlobCompression() interfaces.BlobCompression {
+func (k *v0Common) GetBlobCompression() interfaces.BlobCompression {
 	return &k.CompressionType
 }
 
-func (k *V0) GetBlobEncryption() interfaces.BlobEncryption {
+func (k *v0Common) GetBlobEncryption() interfaces.BlobEncryption {
 	return k.GetAgeEncryption()
 }
 
-func (k V0) GetLockInternalFiles() bool {
+func (k v0Common) GetLockInternalFiles() bool {
 	return k.LockInternalFiles
 }
