@@ -181,7 +181,7 @@ func (server *Server) makeRouter(
 
 	router.Use(server.panicHandlingMiddleware)
 
-	if len(server.Repo.GetImmutableConfig().ImmutableConfig.GetPrivateKey()) > 0 {
+	if len(server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPrivateKey()) > 0 {
 		router.Use(server.sigMiddleware)
 	}
 
@@ -207,7 +207,7 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 			}
 
 			if len(nonce) > 0 {
-				key := server.Repo.GetImmutableConfig().ImmutableConfig.GetPrivateKey()
+				key := server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPrivateKey()
 
 				var sig []byte
 
@@ -763,7 +763,7 @@ func (server *Server) handlePostInventoryList(
 }
 
 func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
-	config := server.Repo.GetImmutableConfig()
+	config := server.Repo.GetImmutableConfigPublic()
 	configLoaded := &config_immutable_io.ConfigLoadedPublic{
 		Type:            config.Type,
 		ImmutableConfig: config.ImmutableConfig,

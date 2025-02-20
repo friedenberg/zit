@@ -123,7 +123,7 @@ func (s *Store) GetEnv() env_ui.Env {
 	return s.GetEnvRepo()
 }
 
-func (s *Store) GetImmutableConfig() config_immutable_io.ConfigLoadedPublic {
+func (s *Store) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
 	return s.GetEnvRepo().GetConfig()
 }
 

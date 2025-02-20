@@ -70,7 +70,7 @@ func (cmd Remote) CreateRemoteObject(
 	}
 
 	remote := cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
-	remoteConfig := remote.GetImmutableConfig().ImmutableConfig
+	remoteConfig := remote.GetImmutableConfigPublic().ImmutableConfig
 	blob.SetPublicKey(remoteConfig.GetPrivateKey().Public())
 	// TODO validate public key with challenge
 

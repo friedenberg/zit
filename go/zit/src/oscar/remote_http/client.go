@@ -91,7 +91,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfig() config_immutable_io.ConfigLoadedPublic {
+func (client *client) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
 	return client.configImmutable
 }
 
@@ -163,7 +163,7 @@ func (remote *client) MakeInventoryList(
 	}
 
 	listFormat := remote.GetInventoryListStore().FormatForVersion(
-		remote.GetImmutableConfig().ImmutableConfig.GetStoreVersion(),
+		remote.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
