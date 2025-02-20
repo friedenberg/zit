@@ -10,7 +10,7 @@ import (
 
 type BigBang struct {
 	ids.Type
-	Config *config_immutable.Latest
+	Config *config_immutable.LatestPrivate
 
 	Yin                  string
 	Yang                 string

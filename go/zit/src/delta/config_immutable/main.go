@@ -9,16 +9,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type Latest = TomlV1
+type LatestPrivate = TomlV1Private
 
-// TODO split private key from interface
-type Config interface {
-	GetImmutableConfig() Config
+type ConfigPublic interface {
+	GetImmutableConfigPublic() ConfigPublic
 	GetStoreVersion() interfaces.StoreVersion
-	GetPrivateKey() ed25519.PrivateKey
+	GetPublicKey() ed25519.PublicKey
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
+}
+
+type ConfigPrivate interface {
+	ConfigPublic
+	GetImmutableConfig() ConfigPrivate
+	GetPrivateKey() ed25519.PrivateKey
 }
 
 type BlobStoreConfig interface {
@@ -28,13 +33,15 @@ type BlobStoreConfig interface {
 	GetLockInternalFiles() bool
 }
 
-func Default() *TomlV1 {
-	return &TomlV1{
-		StoreVersion: CurrentStoreVersion,
-		RepoType:     repo_type.TypeWorkingCopy,
-		BlobStore: BlobStoreTomlV1{
-			CompressionType:   CompressionTypeDefault,
-			LockInternalFiles: true,
+func Default() *TomlV1Private {
+	return &TomlV1Private{
+		TomlV1Common: TomlV1Common{
+			StoreVersion: CurrentStoreVersion,
+			RepoType:     repo_type.TypeWorkingCopy,
+			BlobStore: BlobStoreTomlV1{
+				CompressionType:   CompressionTypeDefault,
+				LockInternalFiles: true,
+			},
 		},
 	}
 }

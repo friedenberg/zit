@@ -39,18 +39,18 @@ func init() {
 }
 
 type (
-	immutable_config_private = config_immutable.Config
+	immutable_config_private = config_immutable.ConfigPrivate
 	cli                      = config_mutable_cli.Config
 	ApproximatedType         = typed_blob_store.ApproximatedType
 
 	Store interface {
 		interfaces.Config
-		config_immutable.Config
+		config_immutable.ConfigPrivate
 
 		ids.InlineTypeChecker
 		GetTypeExtension(string) string
 		GetCLIConfig() config_mutable_cli.Config
-		GetImmutableConfig() config_immutable.Config
+		GetImmutableConfig() config_immutable.ConfigPrivate
 		GetMutableConfig() config_mutable_blobs.Blob
 		GetFileExtensions() interfaces.FileExtensionGetter
 		HasChanges() (ok bool)

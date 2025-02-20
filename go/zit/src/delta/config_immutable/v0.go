@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-// TODO Split into repo and blob store configs
 type V0 struct {
 	StoreVersion      StoreVersion
 	Recipients        []string
@@ -33,14 +32,17 @@ func (k *V0) SetFlagSet(f *flag.FlagSet) {
 		"recipient",
 		"age recipients",
 		func(value string) (err error) {
-			// TODO-P2 validate age recipient
 			k.Recipients = append(k.Recipients, value)
 			return
 		},
 	)
 }
 
-func (k *V0) GetImmutableConfig() Config {
+func (k *V0) GetImmutableConfig() ConfigPrivate {
+	return k
+}
+
+func (k *V0) GetImmutableConfigPublic() ConfigPublic {
 	return k
 }
 
@@ -57,6 +59,10 @@ func (k V0) GetRepoType() repo_type.Type {
 }
 
 func (k V0) GetPrivateKey() ed25519.PrivateKey {
+	panic(errors.Errorf("not supported"))
+}
+
+func (k V0) GetPublicKey() ed25519.PublicKey {
 	panic(errors.Errorf("not supported"))
 }
 

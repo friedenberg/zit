@@ -12,14 +12,14 @@ import (
 )
 
 type Info struct {
-	config_immutable.Config
+	config_immutable.ConfigPrivate
 }
 
 func init() {
 	command.Register(
 		"info",
 		&Info{
-			Config: config_immutable.Default(),
+			ConfigPrivate: config_immutable.Default(),
 		},
 	)
 }
@@ -47,13 +47,13 @@ func (c Info) Run(req command.Request) {
 	for _, arg := range args {
 		switch strings.ToLower(arg) {
 		case "store-version":
-			ui.GetUI().Print(c.Config.GetStoreVersion())
+			ui.GetUI().Print(c.ConfigPrivate.GetStoreVersion())
 
 		case "compression-type":
-			ui.GetUI().Print(c.Config.GetBlobStoreConfigImmutable().GetBlobCompression())
+			ui.GetUI().Print(c.ConfigPrivate.GetBlobStoreConfigImmutable().GetBlobCompression())
 
 		case "age-encryption":
-			ui.GetUI().Print(c.Config.GetBlobStoreConfigImmutable().GetBlobEncryption())
+			ui.GetUI().Print(c.ConfigPrivate.GetBlobStoreConfigImmutable().GetBlobEncryption())
 
 		case "xdg":
 			ecksDeeGee := dir.GetXDG()
