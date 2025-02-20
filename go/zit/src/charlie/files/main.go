@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
@@ -79,21 +80,50 @@ func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
 	return
 }
 
-func CreateExclusiveWriteOnlyAndMaybeMakeDir(p string) (f *os.File, err error) {
-	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666); err != nil {
+func CreateExclusive(path string) (file *os.File, err error) {
+	if file, err = os.OpenFile(
+		path,
+		os.O_RDONLY|os.O_CREATE|os.O_EXCL,
+		0o666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func CreateOrOpenExclusive(path string) (file *os.File, err error) {
+	if file, err = CreateExclusive(path); err != nil {
+		if errors.IsExist(err) {
+			if file, err = OpenExclusive(path); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func MakeDirIfNecessary(
+	path string,
+	apply func(string) (*os.File, error),
+) (file *os.File, err error) {
+	if file, err = apply(path); err != nil {
 		if errors.IsNotExist(err) {
-			dir := path.Dir(p)
+			dir := filepath.Dir(path)
 
 			if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			return CreateExclusiveWriteOnly(p)
+			return apply(path)
 		}
-
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

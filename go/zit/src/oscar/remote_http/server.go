@@ -25,6 +25,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -34,13 +35,18 @@ import (
 )
 
 type Server struct {
-	EnvLocal  env_local.Env
-	Repo      repo.LocalRepo
-	blobCache serverBlobCache
+	EnvLocal                env_local.Env
+	Repo                    repo.LocalRepo
+	blobCache               serverBlobCache
+	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
 
 func (server *Server) init() (err error) {
 	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetLocalBlobStore()
+	server.logRemoteInventoryLists = log_remote_inventory_lists.Make(
+		server.Repo.GetEnvRepo(),
+	)
+
 	return
 }
 

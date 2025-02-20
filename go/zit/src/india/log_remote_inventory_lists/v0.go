@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
@@ -54,32 +54,23 @@ func (log *v0) Flush() (err error) {
 	return nil
 }
 
-func (log *v0) initialize(env env_repo.Env, pubkey repo_signing.PublicKey) {
+func (log *v0) initialize(env env_repo.Env) {
 	gob.Register(tridex.Make())
 
 	log.env = env
 	log.values = tridex.Make()
 	dir := env.DirCacheInventoryListLog()
-	log.path = filepath.Join(dir, base64.URLEncoding.EncodeToString(pubkey))
-
-	if err := log.env.MakeDir(dir); err != nil {
-		env.CancelWithError(err)
-		return
-	}
+	log.path = filepath.Join(dir, "log-v0")
 
 	{
 		var err error
 
-		if log.file, err = files.CreateExclusiveWriteOnly(log.path); err != nil {
-			if errors.IsExist(err) {
-				if log.file, err = files.OpenExclusive(log.path); err != nil {
-					env.CancelWithError(err)
-					return
-				}
-			} else {
-				env.CancelWithError(err)
-				return
-			}
+		if log.file, err = files.MakeDirIfNecessary(
+			log.path,
+			files.CreateOrOpenExclusive,
+		); err != nil {
+			env.CancelWithError(err)
+			return
 		}
 	}
 }
@@ -90,7 +81,34 @@ func (log *v0) Append(entry Entry) (err error) {
 		return
 	}
 
-	log.values.Add(entry.GetShaString())
+	var key string
+
+	if key, err = log.Key(entry); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	log.values.Add(key)
+
+	return
+}
+
+func (log *v0) Key(entry Entry) (key string, err error) {
+	if entry.EntryType == nil {
+		err = errors.Errorf("nil entry type")
+		return
+	}
+
+	sh := sha.FromFormatString(
+		"%s%s%s%s",
+		entry.EntryType,
+		base64.URLEncoding.EncodeToString(entry.PublicKey),
+		entry.GetObjectId(),
+		entry.GetBlobSha(),
+	)
+
+	key = sh.GetShaString()
+	sha.GetPool().Put(sh)
 
 	return
 }
@@ -101,7 +119,14 @@ func (log *v0) Exists(entry Entry) (err error) {
 		return
 	}
 
-	if !log.values.ContainsExpansion(entry.GetShaString()) {
+	var key string
+
+	if key, err = log.Key(entry); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !log.values.ContainsExpansion(key) {
 		return collections.ErrNotFound
 	}
 
@@ -116,7 +141,12 @@ func (log *v0) readIfNecessary() (err error) {
 			dec := gob.NewDecoder(bufferedReader)
 
 			if err = dec.Decode(log.values); err != nil {
-				err = errors.Wrap(err)
+				if errors.IsEOF(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
 				return
 			}
 		},

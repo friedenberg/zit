@@ -9,10 +9,12 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -36,26 +38,43 @@ func (server *Server) writeInventoryList(
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 
-	if pubBase64 != "" {
-		var pub []byte
+	var logEntry log_remote_inventory_lists.Entry
 
+	if pubBase64 != "" {
 		{
 			var err error
 
-			if pub, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
+			if logEntry.PublicKey, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
 				response.Error(err)
 				return
 			}
 		}
 
+		logEntry.EntryType = log_remote_inventory_lists.EntryTypeReceived
+		logEntry.Transacted = listSku
+
 		sig := request.request.Header.Get(headerSha256Sig)
 
 		if err := repo_signing.VerifyBase64Signature(
-			pub,
+			logEntry.PublicKey,
 			expected.GetShaBytes(),
 			sig,
 		); err != nil {
 			response.Error(err)
+			return
+		}
+	}
+
+	if len(logEntry.PublicKey) > 0 {
+		if err := server.logRemoteInventoryLists.Exists(
+			logEntry,
+		); collections.IsErrNotFound(err) && err != nil {
+			err = nil
+		} else if err != nil {
+			response.Error(err)
+			return
+		} else {
+			response.StatusCode = http.StatusFound
 			return
 		}
 	}

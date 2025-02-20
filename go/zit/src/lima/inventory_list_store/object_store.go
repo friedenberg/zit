@@ -19,6 +19,8 @@ func (store *Store) Commit(
 		return
 	}
 
+	// TODO transform this inventory list into a local inventory list and update
+	// its tai
 	if err = store.WriteInventoryListObject(sk); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -2,21 +2,40 @@ package log_remote_inventory_lists
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-type Entry = interfaces.Sha
+type EntryType interface {
+	entryType()
+}
+
+//go:generate stringer -type=entryType
+type entryType byte
+
+func (entryType) entryType() {}
+
+const (
+	EntryTypeSent = entryType(iota)
+	EntryTypeReceived
+)
+
+type Entry struct {
+	EntryType
+	repo_signing.PublicKey
+	*sku.Transacted
+}
 
 type Log interface {
 	errors.Flusher
-	initialize(env_repo.Env, repo_signing.PublicKey)
+	initialize(env_repo.Env)
+	Key(Entry) (string, error)
 	Append(Entry) error
 	Exists(Entry) error
 }
 
-func Make(env env_repo.Env, pubkey repo_signing.PublicKey) Log {
+func Make(env env_repo.Env) (log Log) {
 	sv := env.GetConfigPrivate().ImmutableConfig.GetStoreVersion()
 
 	switch sv := sv.GetInt(); {
@@ -25,8 +44,11 @@ func Make(env env_repo.Env, pubkey repo_signing.PublicKey) Log {
 		return nil
 
 	default:
-		log := &v0{}
-		log.initialize(env, pubkey)
-		return log
+		log = &v0{}
 	}
+
+	log.initialize(env)
+	env.After(log.Flush)
+
+	return
 }

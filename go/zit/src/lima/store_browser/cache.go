@@ -81,14 +81,15 @@ func (c *Store) resetCacheIfNecessary(
 }
 
 func (c *Store) flushCache() (err error) {
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.OpenExclusiveWriteOnly(
+	if file, err = files.OpenExclusiveWriteOnly(
 		c.getCachePath(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			if f, err = files.CreateExclusiveWriteOnlyAndMaybeMakeDir(
+			if file, err = files.MakeDirIfNecessary(
 				c.getCachePath(),
+				files.CreateExclusiveWriteOnly,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -99,9 +100,9 @@ func (c *Store) flushCache() (err error) {
 		}
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	bw := bufio.NewWriter(f)
+	bw := bufio.NewWriter(file)
 	defer errors.DeferredFlusher(&err, bw)
 
 	dec := gob.NewEncoder(bw)

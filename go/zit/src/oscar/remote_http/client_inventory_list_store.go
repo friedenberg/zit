@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
@@ -35,10 +36,16 @@ func (client client) ImportInventoryList(
 	blobStore interfaces.BlobStore,
 	listSku *sku.Transacted,
 ) (err error) {
+	logEntry := log_remote_inventory_lists.Entry{
+		EntryType:  log_remote_inventory_lists.EntryTypeSent,
+		PublicKey:  client.configImmutable.ImmutableConfig.GetPublicKey(),
+		Transacted: listSku,
+	}
+
 	if err = client.logRemoteInventoryLists.Exists(
-		listSku.GetBlobSha(),
+		logEntry,
 	); collections.IsErrNotFound(err) {
-    err = nil
+		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -170,7 +177,7 @@ func (client client) ImportInventoryList(
 	}
 
 	if err = client.logRemoteInventoryLists.Append(
-		listSku.GetBlobSha(),
+		logEntry,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

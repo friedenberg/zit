@@ -91,10 +91,7 @@ func (client *client) Initialize() {
 
 	client.logRemoteInventoryLists = log_remote_inventory_lists.Make(
 		client.localRepo.GetEnvRepo(),
-    client.configImmutable.ImmutableConfig.GetPublicKey(),
 	)
-
-	client.envUI.After(client.logRemoteInventoryLists.Flush)
 }
 
 func (client *client) GetEnv() env_ui.Env {
