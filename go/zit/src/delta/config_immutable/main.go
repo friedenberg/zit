@@ -11,6 +11,7 @@ import (
 
 type Latest = TomlV1
 
+// TODO split private key from interface
 type Config interface {
 	GetImmutableConfig() Config
 	GetStoreVersion() interfaces.StoreVersion

@@ -2,6 +2,7 @@ package remote_http
 
 import (
 	"bufio"
+	"crypto/ed25519"
 	"io"
 	"os"
 	"os/exec"
@@ -21,6 +22,7 @@ type RoundTripperStdio struct {
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envUI env_ui.Env,
+	pubkey ed25519.PublicKey,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
 		err = errors.Wrap(err)

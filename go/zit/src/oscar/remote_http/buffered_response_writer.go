@@ -18,9 +18,12 @@ func (responseWriter *BufferedResponseWriter) GetResponseWriter() http.ResponseW
 
 func (responseWriter *BufferedResponseWriter) Reset() {
 	responseWriter.Dirty = false
-	responseWriter.Response = http.Response{
-		Header: make(http.Header),
+
+	if responseWriter.Response.Header == nil {
+		responseWriter.Response.Header = make(http.Header)
 	}
+
+	clear(responseWriter.Response.Header)
 	responseWriter.Buffer.Reset()
 }
 
@@ -42,6 +45,12 @@ func (responseWriter *BufferedResponseWriter) Write(p []byte) (int, error) {
 func (responseWriter *BufferedResponseWriter) WriteResponse(
 	writer io.Writer,
 ) error {
+	defer responseWriter.Reset()
+
+	if responseWriter.Dirty {
+		return nil
+	}
+
 	responseWriter.Response.Body = io.NopCloser(&responseWriter.Buffer)
 	responseWriter.Response.ContentLength = int64(responseWriter.Buffer.Len())
 	return responseWriter.Response.Write(writer)

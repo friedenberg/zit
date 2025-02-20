@@ -14,6 +14,7 @@ type RoundTripperUnixSocket struct {
 	roundTripperBufio
 }
 
+// TODO add public key
 func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
 ) (err error) {

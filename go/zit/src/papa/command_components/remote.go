@@ -1,6 +1,7 @@
 package command_components
 
 import (
+	"crypto/ed25519"
 	"flag"
 	"fmt"
 
@@ -71,6 +72,7 @@ func (cmd Remote) CreateRemoteObject(
 	remote := cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
 	remoteConfig := remote.GetImmutableConfig().ImmutableConfig
 	blob.SetPublicKey(remoteConfig.GetPrivateKey().Public())
+	// TODO validate public key with challenge
 
 	var blobSha interfaces.Sha
 
@@ -152,6 +154,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 			env,
 			blob.Path,
 			local,
+			blob.GetPublicKey(),
 		)
 
 	// case repo.RemoteTypeStdioSSH:
@@ -255,6 +258,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	env env_local.Env,
 	dir string,
 	localRepo repo.Repo,
+	pubkey ed25519.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
@@ -262,7 +266,10 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 
 	httpRoundTripper.Dir = dir
 
-	if err := httpRoundTripper.InitializeWithLocal(envRepo); err != nil {
+	if err := httpRoundTripper.InitializeWithLocal(
+		envRepo,
+		pubkey,
+	); err != nil {
 		env.CancelWithError(err)
 	}
 

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/ed25519"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"net"
@@ -179,7 +181,45 @@ func (server *Server) makeRouter(
 
 	router.Use(server.panicHandlingMiddleware)
 
+	if len(server.Repo.GetImmutableConfig().ImmutableConfig.GetPrivateKey()) > 0 {
+		router.Use(server.sigMiddleware)
+	}
+
 	return router
+}
+
+func (server *Server) sigMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(responseWriter http.ResponseWriter, request *http.Request) {
+			nonceString := request.Header.Get("x-zit-challenge-nonce")
+
+			if nonceString != "" {
+				// TODO write sig
+				key := server.Repo.GetImmutableConfig().ImmutableConfig.GetPrivateKey()
+
+				var sig []byte
+
+				{
+					var err error
+
+					if sig, err = key.Sign(
+						nil,
+						[]byte(nonceString),
+						&ed25519.Options{},
+					); err != nil {
+						server.EnvLocal.CancelWithError(err)
+					}
+				}
+
+				responseWriter.Header().Set(
+					"x-zit-challenge-response",
+					base64.URLEncoding.EncodeToString(sig),
+				)
+			}
+
+			next.ServeHTTP(responseWriter, request)
+		},
+	)
 }
 
 func (server *Server) loggerMiddleware(next http.Handler) http.Handler {
@@ -331,7 +371,7 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 	handler funcHandler,
 	out *bufio.Writer,
 ) http.HandlerFunc {
-	return func(responseWriter http.ResponseWriter, req *http.Request) {
+	return func(_ http.ResponseWriter, req *http.Request) {
 		request := Request{
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
@@ -345,12 +385,7 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 			response.StatusCode = http.StatusOK
 		}
 
-		if response.StatusCode == 0 {
-			response.StatusCode = http.StatusOK
-		}
-
-		responseModified := &http.Response{
-			// ContentLength:    -1,
+		responseModified := http.Response{
 			TransferEncoding: []string{"chunked"},
 			ProtoMajor:       req.ProtoMajor,
 			ProtoMinor:       req.ProtoMinor,
@@ -381,16 +416,19 @@ func (server *Server) makeHandler(
 		}
 
 		response := handler(request)
+		// header := responseWriter.Header()
 
-		if response.StatusCode == 0 {
-			response.StatusCode = http.StatusOK
-		}
-
-		if response.StatusCode == 0 {
-			response.StatusCode = http.StatusOK
-		}
+		// for key, values := range response.Headers {
+		// 	for _, value := range values {
+		// 		header.Add(key, value)
+		// 	}
+		// }
 
 		responseWriter.WriteHeader(response.StatusCode)
+
+		if response.Body == nil {
+			return
+		}
 
 		if _, err := io.Copy(responseWriter, response.Body); err != nil {
 			if errors.IsEOF(err) {
