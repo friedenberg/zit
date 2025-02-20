@@ -1,4 +1,4 @@
-package repo_blobs
+package repo_signing
 
 import (
 	"crypto"
@@ -16,6 +16,6 @@ func (b TomlPublicKeyV0) GetPublicKey() ed25519.PublicKey {
 }
 
 func (b *TomlPublicKeyV0) SetPublicKey(key crypto.PublicKey) {
-	b.PublicKey.HRP = "zit-repo-public_key-v1"
+	b.PublicKey.HRP = "zit-repo-public_key-v0"
 	b.PublicKey.Data = key.(ed25519.PublicKey)
 }

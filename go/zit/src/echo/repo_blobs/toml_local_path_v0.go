@@ -1,7 +1,9 @@
 package repo_blobs
 
+import "code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
+
 type TomlLocalPathV0 struct {
-	TomlPublicKeyV0
+	repo_signing.TomlPublicKeyV0
 	Path string `toml:"path"`
 }
 

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -18,12 +18,12 @@ type TomlV1Common struct {
 }
 
 type TomlV1Private struct {
-	PrivateKey bech32.Value `toml:"private-key,omitempty"`
+	repo_signing.TomlPrivateKeyV0
 	TomlV1Common
 }
 
 type TomlV1Public struct {
-	PublicKey bech32.Value `toml:"public-key,omitempty"`
+	repo_signing.TomlPublicKeyV0
 	TomlV1Common
 }
 
@@ -39,11 +39,8 @@ func (k *TomlV1Private) GetImmutableConfig() ConfigPrivate {
 
 func (k *TomlV1Private) GetImmutableConfigPublic() ConfigPublic {
 	return &TomlV1Public{
-		TomlV1Common: k.TomlV1Common,
-		PublicKey: bech32.Value{
-			HRP:  "zit-repo-public_key-v1",
-			Data: k.GetPublicKey(),
-		},
+		TomlV1Common:    k.TomlV1Common,
+		TomlPublicKeyV0: k.TomlPrivateKeyV0.GetPublicKey(),
 	}
 }
 

@@ -1,11 +1,12 @@
 package repo_blobs
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 )
 
 type TomlXDGV0 struct {
-	TomlPublicKeyV0
+	repo_signing.TomlPublicKeyV0
 	Data    string `toml:"data"`
 	Config  string `toml:"config"`
 	State   string `toml:"state"`

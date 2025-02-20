@@ -2,10 +2,11 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 )
 
 type TomlUriV0 struct {
-	TomlPublicKeyV0
+	repo_signing.TomlPublicKeyV0
 	Uri values.Uri `toml:"uri"`
 }
 

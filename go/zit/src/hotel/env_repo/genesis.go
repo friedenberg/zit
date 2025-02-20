@@ -2,7 +2,6 @@ package env_repo
 
 import (
 	"bufio"
-	"crypto/ed25519"
 	"encoding/gob"
 	"io"
 	"os"
@@ -18,17 +17,9 @@ import (
 )
 
 func (env *Env) Genesis(bb BigBang) {
-	{
-		var err error
-
-		var privateKey ed25519.PrivateKey
-
-		if _, privateKey, err = ed25519.GenerateKey(nil); err != nil {
-			env.CancelWithError(err)
-		}
-
-		bb.Config.PrivateKey.Data = privateKey.Seed()
-		bb.Config.PrivateKey.HRP = "zit-repo-private_key-v1"
+	if err := bb.Config.GeneratePrivateKey(); err != nil {
+		env.CancelWithError(err)
+		return
 	}
 
 	env.ConfigLoaded.Type = bb.Type
