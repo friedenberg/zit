@@ -1,12 +1,12 @@
 package config_immutable
 
 import (
-	"crypto/ed25519"
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/repo_type"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -19,11 +19,11 @@ type v0Common struct {
 }
 
 type V0Public struct {
-  v0Common
+	v0Common
 }
 
 type V0Private struct {
-  v0Common
+	v0Common
 }
 
 func (k *V0Public) SetFlagSet(f *flag.FlagSet) {
@@ -46,7 +46,7 @@ func (k *V0Public) SetFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (k *V0Public) config() public { return public{} }
+func (k *V0Public) config() public   { return public{} }
 func (k *V0Private) config() private { return private{} }
 
 func (k *V0Private) GetImmutableConfig() ConfigPrivate {
@@ -55,8 +55,8 @@ func (k *V0Private) GetImmutableConfig() ConfigPrivate {
 
 func (k *V0Private) GetImmutableConfigPublic() ConfigPublic {
 	return &V0Public{
-    v0Common: k.v0Common,
-  }
+		v0Common: k.v0Common,
+	}
 }
 
 func (k *V0Public) GetImmutableConfigPublic() ConfigPublic {
@@ -75,11 +75,11 @@ func (k v0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (k v0Common) GetPrivateKey() ed25519.PrivateKey {
+func (k v0Common) GetPrivateKey() repo_signing.PrivateKey {
 	panic(errors.Errorf("not supported"))
 }
 
-func (k v0Common) GetPublicKey() ed25519.PublicKey {
+func (k v0Common) GetPublicKey() repo_signing.PublicKey {
 	panic(errors.Errorf("not supported"))
 }
 

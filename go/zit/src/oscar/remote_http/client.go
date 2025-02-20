@@ -26,7 +26,7 @@ import (
 func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
-	localInventoryListStore sku.InventoryListStore,
+	localInventoryListStore repo.LocalRepo,
 	typedBlobStore typed_blob_store.InventoryList,
 ) *client {
 	client := &client{
@@ -34,7 +34,7 @@ func MakeClient(
 		http: http.Client{
 			Transport: transport,
 		},
-		localInventoryListStore: localInventoryListStore,
+		localRepo: localInventoryListStore,
 		typedBlobStore:          typedBlobStore,
 	}
 
@@ -47,7 +47,7 @@ type client struct {
 	envUI                   env_ui.Env
 	configImmutable         config_immutable_io.ConfigLoadedPublic
 	http                    http.Client
-	localInventoryListStore sku.InventoryListStore
+	localRepo repo.LocalRepo
 	typedBlobStore          typed_blob_store.InventoryList
 }
 

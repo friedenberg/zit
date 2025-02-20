@@ -2,7 +2,6 @@ package remote_http
 
 import (
 	"bufio"
-	"crypto/ed25519"
 	"io"
 	"os"
 	"os/exec"
@@ -10,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
 
@@ -22,7 +22,7 @@ type RoundTripperStdio struct {
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envUI env_ui.Env,
-	pubkey ed25519.PublicKey,
+	pubkey repo_signing.PublicKey,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

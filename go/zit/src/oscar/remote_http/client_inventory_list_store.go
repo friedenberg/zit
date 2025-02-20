@@ -3,6 +3,7 @@ package remote_http
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"iter"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -20,7 +22,7 @@ import (
 func (client client) FormatForVersion(
 	sv interfaces.StoreVersion,
 ) sku.ListFormat {
-	return client.localInventoryListStore.FormatForVersion(sv)
+	return client.localRepo.GetInventoryListStore().FormatForVersion(sv)
 }
 
 func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
@@ -82,6 +84,34 @@ func (client client) ImportInventoryList(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	{
+		key := client.localRepo.GetImmutableConfigPrivate().ImmutableConfig.GetPublicKey()
+
+		request.Header.Add(
+			headerRepoPublicKey,
+			base64.URLEncoding.EncodeToString(key),
+		)
+	}
+
+	{
+		key := client.localRepo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
+
+		var sig string
+
+		{
+			var err error
+
+			if sig, err = repo_signing.SignBase64(
+				key,
+				listSku.GetBlobSha().GetShaBytes(),
+			); err != nil {
+				client.envUI.CancelWithError(err)
+			}
+		}
+
+		request.Header.Add(headerSha256Sig, sig)
 	}
 
 	// TODO ensure that conflicts were addressed prior to importing

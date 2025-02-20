@@ -1,21 +1,23 @@
 package remote_http
 
 import (
-	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 )
 
 const (
 	headerChallengeNonce    = "X-Zit-Challenge-Nonce"
 	headerChallengeResponse = "X-Zit-Challenge-Response"
+	headerRepoPublicKey     = "X-Zit-Repo-Public_Key"
+	headerSha256Sig         = "X-Zit-Sha256-Sig"
 )
 
 type roundTripperWrappedSigner struct {
-	ed25519.PublicKey
+	repo_signing.PublicKey
 	roundTripperBufio
 }
 
@@ -41,22 +43,12 @@ func (roundTripper *roundTripperWrappedSigner) RoundTrip(
 	}
 
 	if len(roundTripper.PublicKey) > 0 {
-		sigBase64 := response.Header.Get(headerChallengeResponse)
-
-		var sig []byte
-
-		if sig, err = base64.URLEncoding.DecodeString(sigBase64); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = ed25519.VerifyWithOptions(
+		if err = repo_signing.VerifyBase64Signature(
 			roundTripper.PublicKey,
 			nonceBytes,
-			sig,
-			&ed25519.Options{},
+			response.Header.Get(headerChallengeResponse),
 		); err != nil {
-			err = errors.Wrapf(err, "invalid signature: %q", sigBase64)
+			err = errors.Wrap(err)
 			return
 		}
 	}

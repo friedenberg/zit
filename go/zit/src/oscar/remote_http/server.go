@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/ed25519"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -19,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -209,24 +209,17 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 			if len(nonce) > 0 {
 				key := server.Repo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
 
-				var sig []byte
+				var sig string
 
 				{
 					var err error
 
-					if sig, err = key.Sign(
-						nil,
-						nonce,
-						&ed25519.Options{},
-					); err != nil {
+					if sig, err = repo_signing.SignBase64(key, nonce); err != nil {
 						server.EnvLocal.CancelWithError(err)
 					}
 				}
 
-				responseWriter.Header().Set(
-					headerChallengeResponse,
-					base64.URLEncoding.EncodeToString(sig),
-				)
+				responseWriter.Header().Set(headerChallengeResponse, sig)
 			}
 
 			next.ServeHTTP(responseWriter, request)

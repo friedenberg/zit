@@ -3,11 +3,13 @@ package remote_http
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -28,6 +30,37 @@ func (server *Server) writeInventoryList(
 	if blobStore.HasBlob(listSku.GetBlobSha()) {
 		response.StatusCode = http.StatusFound
 		return
+	}
+
+	expected := sha.Make(listSku.GetBlobSha())
+
+	// TODO check if we already processed a blob where: key = pubBase64, value =
+	// actual blob sha (not expected)
+
+	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
+
+	if pubBase64 != "" {
+		var pub []byte
+
+		{
+			var err error
+
+			if pub, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
+				response.Error(err)
+				return
+			}
+		}
+
+		sig := request.request.Header.Get(headerSha256Sig)
+
+		if err := repo_signing.VerifyBase64Signature(
+			pub,
+			expected.GetShaBytes(),
+			sig,
+		); err != nil {
+			response.Error(err)
+			return
+		}
 	}
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
@@ -92,7 +125,6 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	expected := sha.Make(listSku.GetBlobSha())
 	actual := blobWriter.GetShaLike()
 
 	if err := expected.AssertEqualsShaLike(actual); err != nil {
@@ -120,6 +152,9 @@ func (server *Server) writeInventoryList(
 		response.Error(err)
 		return
 	}
+
+	// TODO persist we just received and committed: key = pubBase64, value =
+	// actual blob sha (not expected)
 
 	return
 }

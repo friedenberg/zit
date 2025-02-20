@@ -37,7 +37,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Remote) CreateRemoteObject(
 	req command.Request,
-	local repo.Repo,
+	local repo.LocalRepo,
 ) (sk *sku.Transacted) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
@@ -93,7 +93,7 @@ func (cmd Remote) CreateRemoteObject(
 
 func (cmd Remote) MakeRemote(
 	req command.Request,
-	local repo.Repo,
+	local repo.LocalRepo,
 	sk *sku.Transacted,
 ) (remote repo.Repo) {
 	envRepo := cmd.MakeEnvRepo(req, false)
@@ -117,7 +117,7 @@ func (cmd Remote) MakeRemote(
 
 func (cmd Remote) MakeRemoteFromBlob(
 	req command.Request,
-	local repo.Repo,
+	local repo.LocalRepo,
 	blob repo_blobs.Blob,
 ) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
@@ -186,7 +186,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env_ui.Options,
-	localRepo repo.Repo,
+	localRepo repo.LocalRepo,
 	pubkey ed25519.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
@@ -222,7 +222,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	remoteHTTP = remote_http.MakeClient(
 		envLocal,
 		&httpRoundTripper,
-		localRepo.GetInventoryListStore(),
+		localRepo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
@@ -233,7 +233,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	req command.Request,
 	env env_local.Env,
 	arg string,
-	local repo.Repo,
+	local repo.LocalRepo,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
@@ -249,7 +249,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	remoteHTTP = remote_http.MakeClient(
 		envRepo,
 		&httpRoundTripper,
-		local.GetInventoryListStore(),
+		local,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
@@ -260,7 +260,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	req command.Request,
 	env env_local.Env,
 	dir string,
-	localRepo repo.Repo,
+	localRepo repo.LocalRepo,
 	pubkey ed25519.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
@@ -279,7 +279,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	remoteHTTP = remote_http.MakeClient(
 		env,
 		&httpRoundTripper,
-		localRepo.GetInventoryListStore(),
+		localRepo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 

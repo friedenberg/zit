@@ -1,7 +1,6 @@
 package config_immutable
 
 import (
-	"crypto/ed25519"
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -33,7 +32,7 @@ func (k *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&k.RepoType, "repo-type", "")
 }
 
-func (k *TomlV1Public) config() public { return public{} }
+func (k *TomlV1Public) config() public   { return public{} }
 func (k *TomlV1Private) config() private { return private{} }
 
 func (k *TomlV1Private) GetImmutableConfig() ConfigPrivate {
@@ -47,19 +46,19 @@ func (k *TomlV1Private) GetImmutableConfigPublic() ConfigPublic {
 	}
 }
 
-func (k *TomlV1Private) GetPrivateKey() ed25519.PrivateKey {
-	return ed25519.NewKeyFromSeed(k.PrivateKey.Data)
+func (k *TomlV1Private) GetPrivateKey() repo_signing.PrivateKey {
+	return repo_signing.NewKeyFromSeed(k.PrivateKey.Data)
 }
 
-func (k *TomlV1Private) GetPublicKey() ed25519.PublicKey {
-	return k.GetPrivateKey().Public().(ed25519.PublicKey)
+func (k *TomlV1Private) GetPublicKey() repo_signing.PublicKey {
+	return k.GetPrivateKey().Public().(repo_signing.PublicKey)
 }
 
 func (k *TomlV1Public) GetImmutableConfigPublic() ConfigPublic {
 	return k
 }
 
-func (k TomlV1Public) GetPublicKey() ed25519.PublicKey {
+func (k TomlV1Public) GetPublicKey() repo_signing.PublicKey {
 	return k.PublicKey.Data
 }
 

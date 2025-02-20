@@ -23,7 +23,10 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 	cmd.BigBang.SetFlagSet(f)
 }
 
-func (cmd Genesis) OnTheFirstDay(req command.Request, repoId string) repo.Repo {
+func (cmd Genesis) OnTheFirstDay(
+  req command.Request,
+  repoId string,
+) repo.LocalRepo {
 	ui := env_ui.Make(
 		req,
 		req.Config,

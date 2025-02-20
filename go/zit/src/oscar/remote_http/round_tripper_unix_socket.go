@@ -2,10 +2,10 @@ package remote_http
 
 import (
 	"bufio"
-	"crypto/ed25519"
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
@@ -18,7 +18,7 @@ type RoundTripperUnixSocket struct {
 // TODO add public key
 func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
-	pubkey ed25519.PublicKey,
+	pubkey repo_signing.PublicKey,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

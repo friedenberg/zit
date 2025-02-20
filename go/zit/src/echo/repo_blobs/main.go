@@ -2,19 +2,19 @@ package repo_blobs
 
 import (
 	"crypto"
-	"crypto/ed25519"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
 type Blob interface {
 	GetRepoBlob() Blob
-	GetPublicKey() ed25519.PublicKey
+	GetPublicKey() repo_signing.PublicKey
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
 }
