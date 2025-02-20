@@ -9,9 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
+const (
+  headerChallengeNonce = "X-Zit-Challenge-Nonce"
+  headerChallengeResponse = "X-Zit-Challenge-Response"
+)
+
 type roundTripperWrappedSigner struct {
 	ed25519.PublicKey
-	http.RoundTripper
+	roundTripperBufio
 }
 
 func (roundTripper *roundTripperWrappedSigner) RoundTrip(
@@ -27,24 +32,31 @@ func (roundTripper *roundTripperWrappedSigner) RoundTrip(
 	nonceString := base64.URLEncoding.EncodeToString(nonceBytes)
 
 	if len(roundTripper.PublicKey) > 0 {
-		request.Header.Add("X-Zit-Challenge-Nonce", nonceString)
+		request.Header.Add(headerChallengeNonce, nonceString)
 	}
 
-	if response, err = roundTripper.RoundTripper.RoundTrip(request); err != nil {
+	if response, err = roundTripper.roundTripperBufio.RoundTrip(request); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if len(roundTripper.PublicKey) > 0 && false {
-		sig := response.Header.Get("X-Zit-Challenge-Response")
+	if len(roundTripper.PublicKey) > 0 {
+		sigBase64 := response.Header.Get(headerChallengeResponse)
+
+		var sig []byte
+
+		if sig, err = base64.URLEncoding.DecodeString(sigBase64); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = ed25519.VerifyWithOptions(
 			roundTripper.PublicKey,
 			nonceBytes,
-			[]byte(sig),
+			sig,
 			&ed25519.Options{},
 		); err != nil {
-			err = errors.Wrapf(err, "invalid signature: %q", sig)
+			err = errors.Wrapf(err, "invalid signature: %q", sigBase64)
 			return
 		}
 	}

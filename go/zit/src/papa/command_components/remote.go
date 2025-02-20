@@ -188,6 +188,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	xdgDotenvPath string,
 	options env_ui.Options,
 	localRepo repo.Repo,
+	pubkey ed25519.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
@@ -206,7 +207,10 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 
 	var httpRoundTripper remote_http.RoundTripperUnixSocket
 
-	if err := httpRoundTripper.Initialize(server); err != nil {
+	if err := httpRoundTripper.Initialize(
+		server,
+		pubkey,
+	); err != nil {
 		req.CancelWithError(err)
 	}
 

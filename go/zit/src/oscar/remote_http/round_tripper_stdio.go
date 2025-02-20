@@ -17,13 +17,15 @@ type RoundTripperStdio struct {
 	exec.Cmd
 	io.WriteCloser
 	io.ReadCloser
-	roundTripperBufio
+	roundTripperWrappedSigner
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envUI env_ui.Env,
 	pubkey ed25519.PublicKey,
 ) (err error) {
+  roundTripper.PublicKey = pubkey
+
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
 		err = errors.Wrap(err)
 		return

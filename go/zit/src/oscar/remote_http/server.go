@@ -191,10 +191,22 @@ func (server *Server) makeRouter(
 func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, request *http.Request) {
-			nonceString := request.Header.Get("x-zit-challenge-nonce")
+			nonceStringBase64 := request.Header.Get(headerChallengeNonce)
 
-			if nonceString != "" {
-				// TODO write sig
+			var nonce []byte
+
+			{
+				var err error
+
+				if nonce, err = base64.URLEncoding.DecodeString(
+					nonceStringBase64,
+				); err != nil {
+					http.Error(responseWriter, err.Error(), http.StatusBadRequest)
+					return
+				}
+			}
+
+			if len(nonce) > 0 {
 				key := server.Repo.GetImmutableConfig().ImmutableConfig.GetPrivateKey()
 
 				var sig []byte
@@ -204,7 +216,7 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 
 					if sig, err = key.Sign(
 						nil,
-						[]byte(nonceString),
+						nonce,
 						&ed25519.Options{},
 					); err != nil {
 						server.EnvLocal.CancelWithError(err)
@@ -212,7 +224,7 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 				}
 
 				responseWriter.Header().Set(
-					"x-zit-challenge-response",
+					headerChallengeResponse,
 					base64.URLEncoding.EncodeToString(sig),
 				)
 			}
@@ -371,7 +383,7 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 	handler funcHandler,
 	out *bufio.Writer,
 ) http.HandlerFunc {
-	return func(_ http.ResponseWriter, req *http.Request) {
+	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
@@ -381,10 +393,6 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 
 		response := handler(request)
 
-		if response.StatusCode == 0 {
-			response.StatusCode = http.StatusOK
-		}
-
 		responseModified := http.Response{
 			TransferEncoding: []string{"chunked"},
 			ProtoMajor:       req.ProtoMajor,
@@ -392,6 +400,14 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 			Request:          req,
 			StatusCode:       response.StatusCode,
 			Body:             response.Body,
+		}
+
+		// TODO determine why iterating thru the headers and setting them manually
+		// doesn't work
+		responseModified.Header = responseWriter.Header().Clone()
+
+		if responseModified.StatusCode == 0 {
+			responseModified.StatusCode = http.StatusOK
 		}
 
 		if err := responseModified.Write(out); err != nil {

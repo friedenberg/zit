@@ -2,6 +2,7 @@ package remote_http
 
 import (
 	"bufio"
+	"crypto/ed25519"
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -11,13 +12,16 @@ import (
 type RoundTripperUnixSocket struct {
 	repo.UnixSocket
 	net.Conn
-	roundTripperBufio
+	roundTripperWrappedSigner
 }
 
 // TODO add public key
 func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
+	pubkey ed25519.PublicKey,
 ) (err error) {
+  roundTripper.PublicKey = pubkey
+
 	if roundTripper.UnixSocket, err = remote.InitializeUnixSocket(
 		net.ListenConfig{},
 		"",
