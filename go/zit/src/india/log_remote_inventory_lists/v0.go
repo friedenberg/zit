@@ -52,6 +52,11 @@ func (log *v0) Flush() (err error) {
 		return
 	}
 
+	if err = log.lockSmith.Unlock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return nil
 }
 
@@ -59,17 +64,25 @@ func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
 	gob.Register(tridex.Make())
 
 	log.values = tridex.Make()
-	dir := env.DirCacheInventoryListLog()
-	log.path = filepath.Join(dir, "log-v0")
-	log.lockSmith = file_lock.New(env, filepath.Join(dir, "log-v0.lock"))
 
-	// ctx.Must(log.lockSmith.Lock)
-	// ctx.After(log.lockSmith.Unlock)
+	dir := env.DirCacheInventoryListLog()
+
+	log.path = filepath.Join(dir, "log-v0")
+	log.lockSmith = file_lock.New(
+		env,
+		filepath.Join(dir, "log-v0.lock"),
+		"log_remote_inventory_lists",
+	)
+
+	if err := log.lockSmith.Lock(); err != nil {
+		ctx.CancelWithError(err)
+		return
+	}
 
 	{
 		var err error
 
-		if log.file, err = files.MakeDirIfNecessary(
+		if log.file, err = files.TryOrMakeDirIfNecessary(
 			log.path,
 			files.OpenCreate,
 		); err != nil {

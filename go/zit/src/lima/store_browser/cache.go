@@ -87,7 +87,7 @@ func (c *Store) flushCache() (err error) {
 		c.getCachePath(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			if file, err = files.MakeDirIfNecessary(
+			if file, err = files.TryOrMakeDirIfNecessary(
 				c.getCachePath(),
 				files.CreateExclusiveWriteOnly,
 			); err != nil {

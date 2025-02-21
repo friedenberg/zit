@@ -25,12 +25,13 @@ func (e ErrLockRequired) Error() string {
 }
 
 type ErrUnableToAcquireLock struct {
-	envUI env_ui.Env
-	Path  string
+	envUI       env_ui.Env
+	Path        string
+	description string
 }
 
 func (e ErrUnableToAcquireLock) Error() string {
-	return fmt.Sprintf("repo is currently locked")
+	return fmt.Sprintf("%s is currently locked", e.description)
 }
 
 func (e ErrUnableToAcquireLock) Is(target error) bool {
@@ -48,7 +49,7 @@ func (e ErrUnableToAcquireLock) GetRetryableError() errors.Retryable {
 
 func (e ErrUnableToAcquireLock) ErrorCause() []string {
 	return []string{
-		"A previous operation that acquired the repo lock failed.",
+		fmt.Sprintf("A previous operation that acquired the %s lock failed.", e.description),
 		"The lock is intentionally left behind in case recovery is necessary.",
 	}
 }

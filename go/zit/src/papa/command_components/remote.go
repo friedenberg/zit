@@ -38,7 +38,7 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 func (cmd Remote) CreateRemoteObject(
 	req command.Request,
 	local repo.LocalRepo,
-) (sk *sku.Transacted) {
+) (remote repo.Repo, sk *sku.Transacted) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
 
@@ -69,7 +69,7 @@ func (cmd Remote) CreateRemoteObject(
 		blob = &repo_blobs.TomlLocalPathV0{Path: envRepo.AbsFromCwdOrSame(path)}
 	}
 
-	remote := cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
+	remote = cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
 	remoteConfig := remote.GetImmutableConfigPublic().ImmutableConfig
 	blob.SetPublicKey(remoteConfig.GetPublicKey())
 

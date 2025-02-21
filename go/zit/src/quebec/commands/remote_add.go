@@ -43,7 +43,7 @@ func (cmd *RemoteAdd) SetFlagSet(flagSet *flag.FlagSet) {
 
 func (cmd RemoteAdd) Run(req command.Request) {
 	local := cmd.MakeLocalWorkingCopy(req)
-	remoteObject := cmd.CreateRemoteObject(req, local)
+	_, remoteObject := cmd.CreateRemoteObject(req, local)
 
 	var id ids.RepoId
 

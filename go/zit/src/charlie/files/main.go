@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
@@ -36,7 +37,47 @@ func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
 	return
 }
 
-func MakeDirIfNecessary(
+func TryOrTimeout(
+	path string,
+	timeout time.Duration,
+	apply func(string) (*os.File, error),
+  explainApply string,
+) (*os.File, error) {
+	chSuccess := make(chan *os.File)
+	chError := make(chan error)
+	timer := time.NewTimer(timeout)
+
+	go func() {
+		<-timer.C
+		chError <- errors.Errorf("timeout while %s: %q", explainApply, path)
+	}()
+
+	go func() {
+		file, err := apply(path)
+
+		if err != nil {
+			chError <- err
+		} else {
+			chSuccess <- file
+		}
+	}()
+
+  defer func() {
+    timer.Stop()
+    close(chSuccess)
+    close(chError)
+  }()
+
+	select {
+	case file := <-chSuccess:
+		return file, nil
+
+	case err := <-chError:
+		return nil, err
+	}
+}
+
+func TryOrMakeDirIfNecessary(
 	path string,
 	apply func(string) (*os.File, error),
 ) (file *os.File, err error) {

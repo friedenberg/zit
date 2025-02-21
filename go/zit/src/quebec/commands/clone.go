@@ -45,11 +45,7 @@ func (cmd Clone) Run(req command.Request) {
 	local := cmd.OnTheFirstDay(req, req.PopArg("new repo id"))
 
 	// TODO offer option to persist remote object, if supported
-	remote := cmd.MakeRemote(
-		req,
-		local,
-		cmd.CreateRemoteObject(req, local),
-	)
+	remote, _ := cmd.CreateRemoteObject(req, local)
 
 	switch local := local.(type) {
 	default:

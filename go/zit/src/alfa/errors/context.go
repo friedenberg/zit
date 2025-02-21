@@ -155,6 +155,8 @@ func (ctx *context) Run(funcRun func(Context)) error {
 
 	defer ctx.lockRun.Unlock()
 
+	defer ctx.runAfter()
+
 	ctx.funcRun = funcRun
 
 	go func() {
@@ -202,6 +204,10 @@ func (ctx *context) Run(funcRun func(Context)) error {
 
 	ctx.cancel(errContextCancelled)
 
+	return ctx.Cause()
+}
+
+func (ctx *context) runAfter() {
 	for i := len(ctx.doAfter) - 1; i >= 0; i-- {
 		doAfter := ctx.doAfter[i]
 		err := doAfter.Func()
@@ -212,8 +218,6 @@ func (ctx *context) Run(funcRun func(Context)) error {
 			)
 		}
 	}
-
-	return ctx.Cause()
 }
 
 func (ctx *context) Retry() {

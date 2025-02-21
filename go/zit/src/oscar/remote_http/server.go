@@ -385,9 +385,15 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 			Body:       req.Body,
 		}
 
-		defer request.context.Cancel()
+		var response Response
 
-		response := handler(request)
+		if err := request.context.Run(
+			func(ctx errors.Context) {
+				response = handler(request)
+			},
+		); err != nil {
+			server.EnvLocal.CancelWithError(err)
+		}
 
 		responseModified := http.Response{
 			TransferEncoding: []string{"chunked"},
@@ -428,9 +434,15 @@ func (server *Server) makeHandler(
 			Body:       req.Body,
 		}
 
-		defer request.context.Cancel()
+		var response Response
 
-		response := handler(request)
+		if err := request.context.Run(
+			func(ctx errors.Context) {
+				response = handler(request)
+			},
+		); err != nil {
+			server.EnvLocal.CancelWithError(err)
+		}
 		// header := responseWriter.Header()
 
 		// for key, values := range response.Headers {
