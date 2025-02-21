@@ -35,6 +35,11 @@ func (err errContextCancelledExpected) Is(target error) bool {
 
 var errContextRetry = New("context retry")
 
+type ContextWithEnv[T any] struct {
+	Context
+	Env T
+}
+
 type Context interface {
 	ConTeXT.Context
 

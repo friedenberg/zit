@@ -10,77 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-const (
-	buffer = 10
-	limit  = 256
-)
-
-// TODO-P5 add exponential backoff for too many files open error
-// TODO-P3 move away from openFilesGuard and honor too many files open error with
-// exponential backoffs instead
-type openFilesGuard struct {
-	channel chan struct{}
-}
-
-var openFilesGuardInstance *openFilesGuard
-
-func init() {
-	// limitCmd := exec.Command("ulimit", "-S", "-n")
-	// output, err := limitCmd.Output()
-
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// limitStr := strings.TrimSpace(string(output))
-
-	// limit, err := strconv.ParseInt(string(limitStr), 10, 64)
-
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	openFilesGuardInstance = &openFilesGuard{
-		channel: make(chan struct{}, limit-buffer),
-	}
-
-	close(openFilesGuardInstance.channel)
-}
-
-func Len() int {
-	return len(openFilesGuardInstance.channel)
-}
-
-func (g *openFilesGuard) Lock() {
-	// g.channel <- struct{}{}
-}
-
-func (g *openFilesGuard) LockN(n int) {
-	for i := 0; i < n; i++ {
-		g.Lock()
-	}
-}
-
-func (g *openFilesGuard) Unlock() {
-	<-g.channel
-}
-
-func (g *openFilesGuard) UnlockN(n int) {
-	for i := 0; i < n; i++ {
-		g.Unlock()
-	}
-}
-
-func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
-	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func CreateExclusive(path string) (file *os.File, err error) {
+func CreateExclusiveReadOnly(path string) (file *os.File, err error) {
 	if file, err = os.OpenFile(
 		path,
 		os.O_RDONLY|os.O_CREATE|os.O_EXCL,
@@ -93,17 +23,14 @@ func CreateExclusive(path string) (file *os.File, err error) {
 	return
 }
 
-func CreateOrOpenExclusive(path string) (file *os.File, err error) {
-	if file, err = CreateExclusive(path); err != nil {
-		if errors.IsExist(err) {
-			if file, err = OpenExclusive(path); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
+func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
+	if f, err = os.OpenFile(
+		p,
+		os.O_WRONLY|os.O_CREATE|os.O_EXCL,
+		0o666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -130,39 +57,33 @@ func MakeDirIfNecessary(
 }
 
 func Create(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.Create(s); err != nil {
-		openFilesGuardInstance.Unlock()
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
 func OpenFile(name string, flag int, perm os.FileMode) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(name, flag, perm); err != nil {
 		err = errors.Wrapf(err, "Mode: %d, Perm: %d", flag, perm)
-		openFilesGuardInstance.Unlock()
+		return
 	}
 
 	return
 }
 
 func Open(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.Open(s); err != nil {
-		openFilesGuardInstance.Unlock()
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
 func OpenReadWrite(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(
 		s,
 		os.O_RDWR|os.O_CREATE,
@@ -176,8 +97,6 @@ func OpenReadWrite(s string) (f *os.File, err error) {
 }
 
 func OpenCreate(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(
 		s,
 		os.O_RDWR|os.O_CREATE,
@@ -191,8 +110,6 @@ func OpenCreate(s string) (f *os.File, err error) {
 }
 
 func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(
 		s,
 		os.O_WRONLY|os.O_TRUNC|os.O_CREATE,
@@ -206,8 +123,6 @@ func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
 }
 
 func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(
 		s,
 		os.O_WRONLY|os.O_EXCL|os.O_TRUNC,
@@ -221,8 +136,6 @@ func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
 }
 
 func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(
 		s,
 		os.O_WRONLY|os.O_EXCL|os.O_APPEND,
@@ -236,8 +149,6 @@ func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
 }
 
 func OpenReadOnly(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(s, os.O_RDONLY, 0o666); err != nil {
 		err = errors.Wrapf(err, "Path: %q", s)
 		return
@@ -247,8 +158,6 @@ func OpenReadOnly(s string) (f *os.File, err error) {
 }
 
 func OpenExclusive(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(s, os.O_RDWR|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrapf(err, "Path: %q", s)
 		return
@@ -258,8 +167,6 @@ func OpenExclusive(s string) (f *os.File, err error) {
 }
 
 func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrapf(err, "Path: %q", s)
 		return
@@ -269,8 +176,6 @@ func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 }
 
 func OpenExclusiveWriteOnly(s string) (f *os.File, err error) {
-	openFilesGuardInstance.Lock()
-
 	if f, err = os.OpenFile(s, os.O_WRONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -280,14 +185,10 @@ func OpenExclusiveWriteOnly(s string) (f *os.File, err error) {
 }
 
 func Close(f *os.File) error {
-	defer openFilesGuardInstance.Unlock()
 	return f.Close()
 }
 
 func CombinedOutput(c *exec.Cmd) ([]byte, error) {
-	openFilesGuardInstance.LockN(3)
-	defer openFilesGuardInstance.UnlockN(3)
-
 	return c.CombinedOutput()
 }
 

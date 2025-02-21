@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -164,7 +163,7 @@ func (cmd *Organize) Run(req command.Request) {
 		{
 			var err error
 
-			if f, err = files.TempFileWithPattern(
+			if f, err = localWorkingCopy.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
 				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
 				localWorkingCopy.CancelWithError(err)

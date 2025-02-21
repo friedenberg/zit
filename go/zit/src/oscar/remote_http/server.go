@@ -25,7 +25,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
-	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -35,18 +34,13 @@ import (
 )
 
 type Server struct {
-	EnvLocal                env_local.Env
-	Repo                    repo.LocalRepo
-	blobCache               serverBlobCache
-	logRemoteInventoryLists log_remote_inventory_lists.Log
+	EnvLocal  env_local.Env
+	Repo      repo.LocalRepo
+	blobCache serverBlobCache
 }
 
 func (server *Server) init() (err error) {
 	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetLocalBlobStore()
-	server.logRemoteInventoryLists = log_remote_inventory_lists.Make(
-		server.Repo.GetEnvRepo(),
-	)
-
 	return
 }
 
@@ -384,11 +378,14 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 ) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
+			context:    errors.MakeContext(server.EnvLocal),
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
 			Body:       req.Body,
 		}
+
+		defer request.context.Cancel()
 
 		response := handler(request)
 
@@ -424,11 +421,14 @@ func (server *Server) makeHandler(
 ) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
+			context:    errors.MakeContext(server.EnvLocal),
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
 			Body:       req.Body,
 		}
+
+		defer request.context.Cancel()
 
 		response := handler(request)
 		// header := responseWriter.Header()

@@ -22,6 +22,11 @@ func (server *Server) writeInventoryList(
 	request Request,
 	listSku *sku.Transacted,
 ) (response Response) {
+	logRemoteInventoryLists := log_remote_inventory_lists.Make(
+		request.context,
+		server.Repo.GetEnvRepo(),
+	)
+
 	if listSku.GetGenre() != genres.InventoryList {
 		response.Error(genres.MakeErrUnsupportedGenre(listSku.GetGenre()))
 		return
@@ -66,7 +71,7 @@ func (server *Server) writeInventoryList(
 	}
 
 	if len(logEntry.PublicKey) > 0 {
-		if err := server.logRemoteInventoryLists.Exists(
+		if err := logRemoteInventoryLists.Exists(
 			logEntry,
 		); collections.IsErrNotFound(err) && err != nil {
 			err = nil
@@ -167,6 +172,15 @@ func (server *Server) writeInventoryList(
 	); err != nil {
 		response.Error(err)
 		return
+	}
+
+	if len(logEntry.PublicKey) > 0 {
+		if err := logRemoteInventoryLists.Append(
+			logEntry,
+		); err != nil {
+			response.Error(err)
+			return
+		}
 	}
 
 	return

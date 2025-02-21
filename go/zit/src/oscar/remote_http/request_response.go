@@ -16,6 +16,7 @@ type MethodPath struct {
 }
 
 type Request struct {
+	context errors.Context
 	request *http.Request
 	MethodPath
 	Headers http.Header

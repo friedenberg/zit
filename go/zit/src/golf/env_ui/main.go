@@ -14,6 +14,7 @@ import (
 )
 
 type Env interface {
+  // TODO remove and keep separate
 	errors.Context
 
 	GetOptions() Options

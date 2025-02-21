@@ -8,6 +8,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+func (store *Store) Lock() error {
+	return store.envRepo.GetLockSmith().Lock()
+}
+
+func (store *Store) Unlock() error {
+	return store.envRepo.GetLockSmith().Unlock()
+}
+
 func (store *Store) Commit(
 	externalLike sku.ExternalLike,
 	_ sku.CommitOptions,

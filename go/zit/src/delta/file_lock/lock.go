@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 )
@@ -14,19 +13,18 @@ import (
 type Lock struct {
 	envUI env_ui.Env
 	path  string
-	mutex sync.Locker
-	f     *os.File
+	mutex sync.Mutex
+	file  *os.File
 }
 
 func New(envUI env_ui.Env, path string) (l *Lock) {
 	return &Lock{
 		envUI: envUI,
 		path:  path,
-		mutex: &sync.Mutex{},
 	}
 }
 
-func (l Lock) Path() string {
+func (l *Lock) Path() string {
 	return l.path
 }
 
@@ -34,24 +32,38 @@ func (l *Lock) IsAcquired() (acquired bool) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	acquired = l.f != nil
+	acquired = l.file != nil
 
 	return
 }
 
-func (l *Lock) Lock() (err error) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
+func (lock *Lock) Lock() (err error) {
+	if !lock.mutex.TryLock() {
+		err = errors.Errorf("attempting concurrent locks")
+		return
+	}
 
-	if l.f != nil {
+	defer lock.mutex.Unlock()
+
+	if lock.file != nil {
 		err = errors.Errorf("already locked")
 		return
 	}
 
-	ui.Log().Caller(2, "locking "+l.Path())
-	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 0o755); err != nil {
+	createLock := func(path string) (*os.File, error) {
+		return files.OpenFile(
+			path,
+			os.O_RDONLY|os.O_EXCL|os.O_CREATE,
+			0o755,
+		)
+	}
+
+	if lock.file, err = files.MakeDirIfNecessary(
+		lock.Path(),
+		createLock,
+	); err != nil {
 		if errors.Is(err, fs.ErrExist) {
-			err = ErrUnableToAcquireLock{envUI: l.envUI, Path: l.Path()}
+			err = ErrUnableToAcquireLock{envUI: lock.envUI, Path: lock.Path()}
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -62,21 +74,22 @@ func (l *Lock) Lock() (err error) {
 	return
 }
 
-func (l *Lock) Unlock() (err error) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	// TODO-P4 determine if there's some way for error.Deferred to correctly log
-	// the location of this
-	ui.Log().Caller(2, "unlocking "+l.Path())
-	if err = files.Close(l.f); err != nil {
-		err = errors.Wrapf(err, "File: %v", l.f)
+func (lock *Lock) Unlock() (err error) {
+	if !lock.mutex.TryLock() {
+		err = errors.Errorf("attempting concurrent locks")
 		return
 	}
 
-	l.f = nil
+	defer lock.mutex.Unlock()
 
-	if err = os.Remove(l.Path()); err != nil {
+	if err = files.Close(lock.file); err != nil {
+		err = errors.Wrapf(err, "File: %v", lock.file)
+		return
+	}
+
+	lock.file = nil
+
+	if err = os.Remove(lock.Path()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

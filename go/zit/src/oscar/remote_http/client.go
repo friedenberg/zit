@@ -91,6 +91,7 @@ func (client *client) Initialize() {
 
 	client.logRemoteInventoryLists = log_remote_inventory_lists.Make(
 		client.localRepo.GetEnvRepo(),
+		client.localRepo.GetEnvRepo(),
 	)
 }
 

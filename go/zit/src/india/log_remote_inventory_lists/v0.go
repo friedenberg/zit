@@ -14,16 +14,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
+	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type v0 struct {
-	env    env_repo.Env
-	once   sync.Once
-	path   string
-	file   *os.File
-	values interfaces.MutableTridex
+	once      sync.Once
+	path      string
+	lockSmith interfaces.LockSmith
+	file      *os.File
+	values    interfaces.MutableTridex
 }
 
 func (log *v0) Flush() (err error) {
@@ -54,22 +55,25 @@ func (log *v0) Flush() (err error) {
 	return nil
 }
 
-func (log *v0) initialize(env env_repo.Env) {
+func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
 	gob.Register(tridex.Make())
 
-	log.env = env
 	log.values = tridex.Make()
 	dir := env.DirCacheInventoryListLog()
 	log.path = filepath.Join(dir, "log-v0")
+	log.lockSmith = file_lock.New(env, filepath.Join(dir, "log-v0.lock"))
+
+	// ctx.Must(log.lockSmith.Lock)
+	// ctx.After(log.lockSmith.Unlock)
 
 	{
 		var err error
 
 		if log.file, err = files.MakeDirIfNecessary(
 			log.path,
-			files.CreateOrOpenExclusive,
+			files.OpenCreate,
 		); err != nil {
-			env.CancelWithError(err)
+			ctx.CancelWithError(err)
 			return
 		}
 	}
