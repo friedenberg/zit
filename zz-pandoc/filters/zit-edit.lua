@@ -1,6 +1,9 @@
 package.path = package.path .. string.format(";%s/.local/share/pandoc/filters/?.lua", os.getenv("HOME"))
 
+local pandoc = require("pandoc")
 local common = require("zit-common")
+
+Image = common.try_to_replace_image_with_new_or_added_object_link
 
 function CodeBlock(el)
   local classes = el.classes
@@ -22,12 +25,7 @@ function CodeBlock(el)
   return el
 end
 
-function Image(el)
-  common.UnescapeIfSku(el, "src")
-  return el
-end
-
 function Link(el)
-  common.UnescapeIfSku(el, "target")
+  common.unescape_if_sku(el, "target")
   return el
 end

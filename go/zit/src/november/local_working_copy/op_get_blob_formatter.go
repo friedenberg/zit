@@ -12,19 +12,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (u *Repo) GetBlobFormatter(
+// TODO add support for checked out types
+func (repo *Repo) GetBlobFormatter(
 	tipe ids.Type,
 	formatId string,
 	utiGroup string,
 ) (blobFormatter script_config.RemoteScript, err error) {
 	if tipe.GetType().IsEmpty() {
-		ui.Err().Print("empty type")
+		err = errors.Errorf("empty type")
 		return
 	}
 
 	var typeObject *sku.Transacted
 
-	if typeObject, err = u.GetStore().ReadTransactedFromObjectId(
+	if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(
 		tipe.GetType(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -33,7 +34,7 @@ func (u *Repo) GetBlobFormatter(
 
 	var typeBlob type_blobs.Blob
 
-	if typeBlob, _, err = u.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
+	if typeBlob, _, err = repo.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
 		typeObject.GetType(),
 		typeObject.GetBlobSha(),
 	); err != nil {
@@ -41,7 +42,7 @@ func (u *Repo) GetBlobFormatter(
 		return
 	}
 
-	defer u.GetStore().GetTypedBlobStore().Type.PutTypedBlob(
+	defer repo.GetStore().GetTypedBlobStore().Type.PutTypedBlob(
 		typeObject.GetType(),
 		typeBlob,
 	)

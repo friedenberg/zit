@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -69,6 +70,7 @@ func (cmd Complete) Run(req command.Request) {
 
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
+	(&config_mutable_cli.Config{}).SetFlagSet(flagSet)
 	subcmd.SetFlagSet(flagSet)
 
 	if cmd.completeSubcommandFlags(

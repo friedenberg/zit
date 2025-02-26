@@ -14,7 +14,7 @@ import (
 
 type CreateFromPaths struct {
 	*local_working_copy.Repo
-	sku.Proto
+	Proto      sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue
 	Delete     bool
@@ -122,6 +122,8 @@ func (c CreateFromPaths) Run(
 		if z.Metadata.IsEmpty() {
 			return
 		}
+
+    c.Proto.Apply(z, genres.Zettel)
 
 		if err = c.GetStore().CreateOrUpdate(
 			z,

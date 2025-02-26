@@ -42,44 +42,44 @@ func (c Config) GetCLIFlags() (flags []string) {
 	return
 }
 
-func (c *Config) SetFlagSet(f *flag.FlagSet) {
-	f.StringVar(&c.BasePath, "dir-zit", "", "")
+func (c *Config) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.StringVar(&c.BasePath, "dir-zit", "", "")
 
-	f.Var(&c.Debug, "debug", "debugging options")
-	f.BoolVar(&c.Todo, "todo", false, "")
-	f.BoolVar(&c.dryRun, "dry-run", false, "")
-	f.BoolVar(&c.Verbose, "verbose", false, "")
-	f.BoolVar(&c.Quiet, "quiet", false, "")
+	flagSet.Var(&c.Debug, "debug", "debugging options")
+	flagSet.BoolVar(&c.Todo, "todo", false, "")
+	flagSet.BoolVar(&c.dryRun, "dry-run", false, "")
+	flagSet.BoolVar(&c.Verbose, "verbose", false, "")
+	flagSet.BoolVar(&c.Quiet, "quiet", false, "")
 
-	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
+	flagSet.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&c.PredictableZettelIds,
 		"predictable-zettel-ids",
 		false,
 		"generate new zettel ids in order",
 	)
 
-	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
-	c.ToolOptions.AddToFlags(f)
+	c.PrintOptions.AddToFlags(flagSet, &c.maskPrintOptions)
+	c.ToolOptions.AddToFlags(flagSet)
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&c.PrintOptions.ZittishNewlines,
 		"zittish-newlines",
 		false,
 		"add extra newlines to zittish to improve readability",
 	)
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&c.IgnoreHookErrors,
 		"ignore-hook-errors",
 		false,
 		"ignores errors coming out of hooks",
 	)
 
-	f.StringVar(&c.Hooks, "hooks", "", "")
+	flagSet.StringVar(&c.Hooks, "hooks", "", "")
 
-	f.Var(&c.Description, "komment", "Comment for Bestandsaufnahme")
+	flagSet.Var(&c.Description, "komment", "Comment for Bestandsaufnahme")
 }
 
 func Default() (c Config) {

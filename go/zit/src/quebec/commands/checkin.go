@@ -2,10 +2,13 @@ package commands
 
 import (
 	"flag"
+	"path/filepath"
 
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -21,6 +24,8 @@ func init() {
 
 type Checkin struct {
 	command_components.LocalWorkingCopyWithQueryGroup
+
+	complete command_components.Complete
 
 	IgnoreBlob bool
 	Proto      sku.Proto
@@ -48,8 +53,58 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 		"checkout each Blob and run a utility",
 	)
 
-	cmd.Proto.SetFlagSet(f)
+	f.Var(
+		cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
+		"tags",
+		"tags added for new objects in `checkin`, `new`, `organize`",
+	)
+
+	f.Var(
+		cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
+		"type",
+		"type used for new objects in `new` and `organize`",
+	)
+
 	cmd.Checkout.SetFlagSet(f)
+}
+
+func (cmd *Checkin) Complete(
+	_ command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	searchDir := envLocal.GetCwd()
+
+	if commandLine.InProgress != "" && files.Exists(commandLine.InProgress) {
+		var err error
+
+		if commandLine.InProgress, err = filepath.Abs(commandLine.InProgress); err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+
+		if searchDir, err = filepath.Rel(searchDir, commandLine.InProgress); err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+	}
+
+	for dirEntry, err := range files.WalkDir(searchDir) {
+		if err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+
+		if files.WalkDirIgnoreFuncHidden(dirEntry) {
+			continue
+		}
+
+		if !dirEntry.IsDir() {
+			envLocal.GetUI().Printf("%s\tfile", dirEntry.RelPath)
+		} else {
+			envLocal.GetUI().Printf("%s/\tdirectory", dirEntry.RelPath)
+		}
+	}
 }
 
 func (c *Checkin) ModifyBuilder(b *query.Builder) {

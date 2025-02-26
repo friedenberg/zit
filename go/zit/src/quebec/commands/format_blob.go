@@ -8,9 +8,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -23,22 +26,41 @@ func init() {
 type FormatBlob struct {
 	command_components.LocalWorkingCopy
 
-	Stdin  bool
-	Format string
-	ids.RepoId
+	complete command_components.Complete
+
+	Stdin    bool
 	UTIGroup string
 }
 
 func (cmd *FormatBlob) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&cmd.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
 
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
-
 	f.StringVar(
 		&cmd.UTIGroup,
 		"uti-group",
 		"",
 		"lookup format from UTI group",
+	)
+}
+
+func (cmd *FormatBlob) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+
+	args := commandLine.Args[1:]
+
+	if commandLine.InProgress != "" {
+		args = args[:len(args)-1]
+	}
+
+	cmd.complete.CompleteObjects(
+		req,
+		localWorkingCopy,
+		query.BuilderOptionDefaultGenres(genres.Zettel),
+		args...,
 	)
 }
 
@@ -94,11 +116,15 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 			formatId,
 			cmd.UTIGroup,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.CancelWithErrorAndFormat(
+				err,
+				"objectIdString: %q, Object: %q",
+				objectIdString, sku.String(object),
+			)
 		}
 	}
 
-	f := typed_blob_store.MakeTextFormatterWithBlobFormatter(
+	format := typed_blob_store.MakeTextFormatterWithBlobFormatter(
 		localWorkingCopy.GetEnvRepo(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
@@ -111,7 +137,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	if _, err := f.WriteStringFormatWithMode(
+	if _, err := format.WriteStringFormatWithMode(
 		localWorkingCopy.GetUIFile(),
 		object,
 		checkout_mode.BlobOnly,

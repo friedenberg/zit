@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -24,6 +25,8 @@ func init() {
 
 type Edit struct {
 	command_components.LocalWorkingCopyWithQueryGroup
+
+	complete command_components.Complete
 
 	// TODO-P3 add force
 	IgnoreWorkspace bool
@@ -46,6 +49,27 @@ func (c Edit) CompletionGenres() ids.Genre {
 		genres.Zettel,
 		genres.Type,
 		genres.Repo,
+	)
+}
+
+func (cmd *Edit) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+
+	args := commandLine.Args[1:]
+
+	if commandLine.InProgress != "" {
+		args = args[:len(args)-1]
+	}
+
+	cmd.complete.CompleteObjects(
+		req,
+		localWorkingCopy,
+		query.BuilderOptionDefaultGenres(genres.Zettel),
+		args...,
 	)
 }
 

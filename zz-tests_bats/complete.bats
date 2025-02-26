@@ -144,11 +144,13 @@ function complete_complete { # @test
 function complete_init_workspace { # @test
 	run_zit complete init-workspace
 	assert_success
-	assert_output_unsorted --regexp - <<-'EOM'
-		-query.*default query for `show`
-		-tags.*tags added for new objects in `checkin`, `new`, `organize`
-		-type.*type used for new objects in `new` and `organize`
-	EOM
+
+	# shellcheck disable=SC2016
+	assert_output --regexp -- '-query.*default query for `show`'
+	# shellcheck disable=SC2016
+	assert_output --regexp -- '-tags.*tags added for new objects in `checkin`, `new`, `organize`'
+	# shellcheck disable=SC2016
+	assert_output --regexp -- '-type.*type used for new objects in `new` and `organize`'
 
 	run_zit complete init-workspace -tags
 	assert_success
@@ -190,10 +192,13 @@ function complete_init_workspace { # @test
 
 	run_zit complete -in-progress="workspaces" init-workspace -tags tag workspaces
 	assert_success
-	assert_output_unsorted --regexp - <<-'EOM'
-		-query.*default query for `show`
-		-tags.*tags added for new objects in `checkin`, `new`, `organize`
-		test/.*directory
-		-type.*type used for new objects in `new` and `organize`
-	EOM
+
+	# shellcheck disable=SC2016
+	assert_output_unsorted --regexp -- '-query.*default query for `show`'
+	# shellcheck disable=SC2016
+	assert_output_unsorted --regexp -- '-tags.*tags added for new objects in `checkin`, `new`, `organize`'
+	# shellcheck disable=SC2016
+	assert_output_unsorted --regexp -- 'test/.*directory'
+	# shellcheck disable=SC2016
+	assert_output_unsorted --regexp -- '-type.*type used for new objects in `new` and `organize`'
 }

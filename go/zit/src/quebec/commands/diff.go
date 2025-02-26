@@ -2,12 +2,15 @@ package commands
 
 import (
 	"flag"
+	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -25,6 +28,45 @@ type Diff struct {
 
 func (cmd *Diff) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+}
+
+// TODO filter to checked out objects, tags, and types
+func (cmd *Diff) Complete(
+	_ command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	searchDir := envLocal.GetCwd()
+
+	if commandLine.InProgress != "" && files.Exists(commandLine.InProgress) {
+		var err error
+
+		if commandLine.InProgress, err = filepath.Abs(commandLine.InProgress); err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+
+		if searchDir, err = filepath.Rel(searchDir, commandLine.InProgress); err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+	}
+
+	for dirEntry, err := range files.WalkDir(searchDir) {
+		if err != nil {
+			envLocal.CancelWithError(err)
+			return
+		}
+		if dirEntry.IsDir() {
+			continue
+		}
+
+		if files.WalkDirIgnoreFuncHidden(dirEntry) {
+			continue
+		}
+
+		envLocal.GetUI().Printf("%s\tfile", dirEntry.RelPath)
+	}
 }
 
 func (c Diff) ModifyBuilder(

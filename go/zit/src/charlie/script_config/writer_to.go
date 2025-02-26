@@ -63,17 +63,17 @@ func MakeWriterTo(
 }
 
 func MakeWriterToWithStdin(
-	rs RemoteScript,
+	script RemoteScript,
 	env map[string]string,
-	r io.Reader,
+	reader io.Reader,
 	args ...string,
-) (wt *writerTo, err error) {
-	if wt, err = MakeWriterTo(rs, env, args...); err != nil {
+) (writerTo *writerTo, err error) {
+	if writerTo, err = MakeWriterTo(script, env, args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	wt.cmd.Stdin = r
+	writerTo.cmd.Stdin = reader
 
 	return
 }

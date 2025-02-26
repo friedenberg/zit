@@ -1,5 +1,6 @@
 package.path = package.path .. string.format(";%s/.local/share/pandoc/filters/?.lua", os.getenv("HOME"))
 
+local pandoc = require("pandoc")
 local common = require("zit-common")
 
 -- if common.IsBinary then
