@@ -7,9 +7,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 type serverBlobCache struct {
+	ui             fd.Std
 	localBlobStore interfaces.LocalBlobStore
 	shas           interfaces.MutableTridex
 	init           sync.Once

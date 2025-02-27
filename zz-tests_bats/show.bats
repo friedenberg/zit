@@ -246,6 +246,19 @@ function show_zettel_etikett { # @test
 	EOM
 }
 
+function show_zettels_with_tag_no_workspace_folder { # @test
+	skip
+	mkdir -p tag
+	echo "wow1" >tag/test1
+	echo "wow2" >tag/test2
+	run_zit show tag
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
 function show_zettel_etikett_complex { # @test
 	run_zit init-workspace
 	assert_success

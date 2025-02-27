@@ -40,19 +40,30 @@ type BuilderOptionWorkspace struct {
 }
 
 func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
-	if options.Env != nil {
-		workspaceConfig := options.GetWorkspaceConfig()
-
-		if workspaceConfig != nil {
-			defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
-
-			// TODO add after parsing as an independent query group, rather than as a
-			// literal
-			if defaultQueryGroup != "" {
-				builder.defaultQuery = defaultQueryGroup
-			}
-		}
+	if options.Env == nil {
+		return builder
 	}
+
+	if options.Env == nil {
+		return builder
+	}
+
+	workspaceConfig := options.GetWorkspaceConfig()
+
+	if workspaceConfig == nil {
+		return builder
+	}
+
+	builder.workspaceEnabled = true
+	defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
+
+	if defaultQueryGroup == "" {
+		return builder
+	}
+
+	// TODO add after parsing as an independent query group, rather than as a
+	// literal
+	builder.defaultQuery = defaultQueryGroup
 
 	return builder
 }

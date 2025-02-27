@@ -41,6 +41,7 @@ type Server struct {
 
 func (server *Server) init() (err error) {
 	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetLocalBlobStore()
+	server.blobCache.ui = server.Repo.GetEnv().GetUI()
 	return
 }
 

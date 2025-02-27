@@ -46,6 +46,7 @@ type Builder struct {
 	debug                   bool
 	requireNonEmptyQuery    bool
 	defaultQuery            string
+	workspaceEnabled        bool
 
 	options options
 }
@@ -77,8 +78,14 @@ func (builder *Builder) makeState() *buildState {
 }
 
 func (b *Builder) WithOptions(options BuilderOption) *Builder {
-	if options != nil {
-		b = options.Apply(b)
+	if options == nil {
+		return b
+	}
+
+	applied := options.Apply(b)
+
+	if applied != nil {
+		return applied
 	}
 
 	return b
