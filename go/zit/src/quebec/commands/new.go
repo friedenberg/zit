@@ -197,7 +197,9 @@ func (cmd *New) Run(req command.Request) {
 			}
 		}
 
-		if _, err := repo.LockAndCommitOrganizeResults(results); err != nil {
+		if _, err := repo.LockAndCommitOrganizeResults(
+			results,
+		); err != nil {
 			repo.CancelWithError(err)
 		}
 	}

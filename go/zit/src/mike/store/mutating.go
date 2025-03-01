@@ -32,6 +32,11 @@ func (s *Store) tryPrecommit(
 		s.protoZettel.Apply(kinder, kinder)
 	}
 
+	// TODO decide if the type proto should actually be applied every time
+	if o.ApplyProtoType {
+		s.protoZettel.ApplyType(kinder, kinder)
+	}
+
 	if genres.Type == el.GetSku().GetGenre() {
 		if el.GetSku().GetType().IsEmpty() {
 			el.GetSku().GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)

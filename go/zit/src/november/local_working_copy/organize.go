@@ -51,9 +51,10 @@ func (repo *Repo) LockAndCommitOrganizeResults(
 	}
 
 	for _, changed := range changeResults.Changed.AllSkuAndIndex() {
-		if err = repo.GetStore().CreateOrUpdate(
+		if err = repo.GetStore().CreateOrUpdateNoProto(
 			changed.GetSkuExternal(),
 			sku.StoreOptions{
+				ApplyProtoType:  true,
 				MergeCheckedOut: true,
 			},
 		); err != nil {

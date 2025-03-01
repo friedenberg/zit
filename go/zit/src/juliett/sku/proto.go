@@ -58,36 +58,49 @@ func (pz Proto) Make() (z *Transacted) {
 	return
 }
 
-func (pz Proto) Apply(
-	ml object_metadata.MetadataLike,
-	gg interfaces.GenreGetter,
+func (proto Proto) ApplyType(
+	metadataLike object_metadata.MetadataLike,
+	genreGetter interfaces.GenreGetter,
 ) (ok bool) {
-	z := ml.GetMetadata()
+	metadata := metadataLike.GetMetadata()
 
-	g := gg.GetGenre()
-	ui.Log().Print(ml, g)
+	g := genreGetter.GetGenre()
+	ui.Log().Print(metadataLike, g)
 
 	switch g {
 	case genres.Zettel, genres.None:
-		if ids.IsEmpty(z.GetType()) &&
-			!ids.IsEmpty(pz.Metadata.Type) &&
-			!z.GetType().Equals(pz.Metadata.Type) {
+		if ids.IsEmpty(metadata.GetType()) &&
+			!ids.IsEmpty(proto.Metadata.Type) &&
+			!metadata.GetType().Equals(proto.Metadata.Type) {
 			ok = true
-			z.Type = pz.Metadata.Type
+			metadata.Type = proto.Metadata.Type
 		}
 	}
 
-	if pz.Metadata.Description.WasSet() &&
-		!z.Description.Equals(pz.Metadata.Description) {
+	return
+}
+
+func (proto Proto) Apply(
+	metadataLike object_metadata.MetadataLike,
+	genreGetter interfaces.GenreGetter,
+) (ok bool) {
+	metadata := metadataLike.GetMetadata()
+
+	if proto.ApplyType(metadataLike, genreGetter) {
 		ok = true
-		z.Description = pz.Metadata.Description
 	}
 
-	if pz.Metadata.GetTags().Len() > 0 {
+	if proto.Metadata.Description.WasSet() &&
+		!metadata.Description.Equals(proto.Metadata.Description) {
+		ok = true
+		metadata.Description = proto.Metadata.Description
+	}
+
+	if proto.Metadata.GetTags().Len() > 0 {
 		ok = true
 	}
 
-	errors.PanicIfError(pz.Metadata.GetTags().EachPtr(z.AddTagPtr))
+	errors.PanicIfError(proto.Metadata.GetTags().EachPtr(metadata.AddTagPtr))
 
 	return
 }

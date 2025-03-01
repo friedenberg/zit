@@ -22,6 +22,7 @@ type StoreOptions struct {
 	StreamIndexOptions StreamIndexOptions
 	AddToInventoryList bool
 	ApplyProto         bool
+	ApplyProtoType     bool
 	MergeCheckedOut    bool
 	RunHooks           bool
 	UpdateTai          bool

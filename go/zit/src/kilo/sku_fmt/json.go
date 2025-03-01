@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
@@ -22,6 +23,7 @@ type Json struct {
 	Sha         string   `json:"sha"`
 	Type        string   `json:"type"`
 	Tai         string   `json:"tai"`
+	Date        string   `json:"date"`
 }
 
 func (j *Json) FromStringAndMetadata(
@@ -52,7 +54,9 @@ func (j *Json) FromStringAndMetadata(
 	j.ObjectId = k
 	j.Sha = m.SelfMetadataWithoutTai.String()
 	j.Tai = m.Tai.String()
+	j.Date = m.Tai.Format(string_format_writer.StringFormatDateTime)
 	j.Type = m.Type.String()
+  // TODO add support for "preview"
 
 	return
 }

@@ -70,6 +70,28 @@ func (s *Store) CreateOrUpdate(
 	return
 }
 
+func (s *Store) CreateOrUpdateNoProto(
+	in sku.ExternalLike,
+	storeOptions sku.StoreOptions,
+) (err error) {
+	storeOptions.AddToInventoryList = true
+	storeOptions.UpdateTai = true
+	storeOptions.RunHooks = true
+	storeOptions.Validate = true
+
+	if err = s.Commit(
+		in,
+		sku.CommitOptions{
+			StoreOptions: storeOptions,
+		},
+	); err != nil {
+		err = errors.WrapExcept(err, collections.ErrExists)
+		return
+	}
+
+	return
+}
+
 func (s *Store) CreateOrUpdateBlobSha(
 	k interfaces.ObjectId,
 	sh interfaces.Sha,
