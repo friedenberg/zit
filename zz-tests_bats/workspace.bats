@@ -97,15 +97,21 @@ function workspace_organize { # @test
 	run_zit organize -mode output-only :
 	assert_success
 	assert_output - <<-EOM
+		---
+		- tag-3
+		---
 
-		- [one/dos !md tag-3 tag-4] wow ok again
-		- [one/uno !md tag-3 tag-4] wow the first
+		- [one/dos !md tag-4] wow ok again
+		- [one/uno !md tag-4] wow the first
 	EOM
 
 	run_zit organize -mode output-only one/uno
 	assert_success
 	assert_output - <<-EOM
+		---
+		- tag-3
+		---
 
-		- [one/uno !md tag-3 tag-4] wow the first
+		- [one/uno !md tag-4] wow the first
 	EOM
 }

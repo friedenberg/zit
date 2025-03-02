@@ -145,7 +145,7 @@ func (cmd *Organize) Run(req command.Request) {
 
 	createOrganizeFileOp.Skus = skus
 
-	if createOrganizeFileOp.Skus.Len() == 0 && createOrganizeFileOp.TagSet.Len() == 0 {
+	if createOrganizeFileOp.TagSet.Len() == 0 {
 		createOrganizeFileOp.TagSet = ids.MakeTagSet(
 			localWorkingCopy.GetEnvWorkspace().GetDefaults().GetTags()...,
 		)
