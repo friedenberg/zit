@@ -1302,6 +1302,7 @@ function tags_with_extended_tags_noop { # @test
 	assert_output ''
 }
 
+# bats test_tags=user_story:default_tags
 function organize_new_objects_default_tags { # @test
 	# shellcheck disable=SC2317
 	function editor() (
@@ -1419,5 +1420,67 @@ function organize_untracked_fs_blob_with_spaces() { # @test
 	assert_output_unsorted - <<-EOM
 
 		- ["test with spaces.txt"]
+	EOM
+}
+
+# bats test_tags=user_story:organize,user_story:workspace,user_story:default_tags
+function organize_default_tags_workspace { # @test
+	# shellcheck disable=SC2317
+	function editor() (
+		sed -i "s/tags = \\[]/tags = ['zz-inbox']/" "$0"
+		# sed -i "/type = '!md'/a tags = 'hello'" "$0"
+	)
+
+	export -f editor
+
+	export EDITOR="/bin/bash -c 'editor \$0'"
+	run_zit edit-config
+	assert_success
+	assert_output - <<-EOM
+		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+	EOM
+
+	cat >.zit-workspace <<-EOM
+		---
+		! toml-workspace_config-v0
+		---
+
+		query = "today"
+	EOM
+
+	run_zit info-workspace query
+	assert_success
+	assert_output 'today'
+
+	run_zit new -edit=false - <<-EOM
+		---
+		# test default tags
+		- tag-3
+		- today
+		- zz-inbox
+		! md
+		---
+
+		body
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[today @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "test default tags" tag-3 today zz-inbox]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+
+	actual="$(mktemp)"
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by tag :z,e,t >"$actual"
+	assert_success
+	assert_output - <<-EOM
+		---
+		- today
+		---
+
+		    # tag-3
+
+		- [two/uno !md zz-inbox] test default tags
 	EOM
 }

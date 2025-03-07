@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-type constructor struct {
+type constructor2 struct {
 	Text
 	all PrefixSet
 }
 
-func (c *constructor) collectExplicitAndImplicitFor(
+func (c *constructor2) collectExplicitAndImplicitFor(
 	skus sku.SkuTypeSet,
 	re ids.Tag,
 ) (explicitCount, implicitCount int, err error) {
@@ -53,7 +53,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	return
 }
 
-func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
+func (c *constructor2) preparePrefixSetsAndRootsAndExtras() (err error) {
 	anchored := ids.MakeMutableTagSet()
 	extras := ids.MakeMutableTagSet()
 
@@ -72,16 +72,17 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
 
 			// TODO [radi/du !task project-2021-zit-etiketten_and_organize zz-inbox] fix issue with `zit organize project-2021-zit` causing an extra tag…
-			if err = anchored.Add(re); err != nil {
-				err = errors.Wrap(err)
-				return
+			if explicitCount == c.Options.Skus.Len() {
+				if err = anchored.Add(re); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else if explicitCount > 0 {
+				if err = extras.Add(re); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
-			// if explicitCount == c.Options.Skus.Len() {
-			// 	if err = extras.Add(re); err != nil {
-			// 		err = errors.Wrap(err)
-			// 		return
-			// 	}
-			// }
 
 			return
 		},
@@ -96,7 +97,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	return
 }
 
-func (c *constructor) populate() (err error) {
+func (c *constructor2) populate() (err error) {
 	allUsed := makeObjSet()
 
 	for e := range c.ExtraTags.All() {
@@ -139,7 +140,7 @@ func (c *constructor) populate() (err error) {
 	return
 }
 
-func (c *constructor) makeChildrenWithoutGroups(
+func (c *constructor2) makeChildrenWithoutGroups(
 	parent *Assignment,
 	fi func(interfaces.FuncIter[*obj]) error,
 	used objSet,
@@ -157,7 +158,7 @@ func (c *constructor) makeChildrenWithoutGroups(
 	return
 }
 
-func (c *constructor) makeChildrenWithPossibleGroups(
+func (c *constructor2) makeChildrenWithPossibleGroups(
 	parent *Assignment,
 	prefixSet PrefixSet,
 	groupingTags ids.TagSlice,
@@ -205,7 +206,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 	return
 }
 
-func (c *constructor) addGroupedChildren(
+func (c *constructor2) addGroupedChildren(
 	parent *Assignment,
 	grouped PrefixSet,
 	groupingTags ids.TagSlice,
@@ -252,7 +253,7 @@ func (c *constructor) addGroupedChildren(
 	return
 }
 
-func (c *constructor) makeAndAddUngrouped(
+func (c *constructor2) makeAndAddUngrouped(
 	parent *Assignment,
 	fi func(interfaces.FuncIter[*obj]) error,
 ) (err error) {
@@ -276,7 +277,7 @@ func (c *constructor) makeAndAddUngrouped(
 	return
 }
 
-func (c *constructor) cloneObj(
+func (c *constructor2) cloneObj(
 	named *obj,
 ) (z *obj, err error) {
 	z = &obj{

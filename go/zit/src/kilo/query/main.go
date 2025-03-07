@@ -23,6 +23,10 @@ type Query struct {
 	defaultQuery *Query
 }
 
+func (q *Query) GetDefaultQuery() *Query {
+	return q.defaultQuery
+}
+
 func (qg *Query) isDotOperatorActive() bool {
 	if qg.dotOperatorActive {
 		return true

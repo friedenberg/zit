@@ -114,20 +114,6 @@ func (cmd *Organize) Run(req command.Request) {
 
 	localWorkingCopy.ApplyToOrganizeOptions(&cmd.Options)
 
-	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Repo: localWorkingCopy,
-		Options: localWorkingCopy.MakeOrganizeOptionsWithQueryGroup(
-			cmd.Flags,
-			queryGroup,
-		),
-	}
-
-	types := query.GetTypes(queryGroup)
-
-	if types.Len() == 1 {
-		createOrganizeFileOp.Type = types.Any()
-	}
-
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
@@ -143,13 +129,40 @@ func (cmd *Organize) Run(req command.Request) {
 		localWorkingCopy.CancelWithError(err)
 	}
 
+	defaultQuery := queryGroup.GetDefaultQuery()
+
+	if queryGroup.IsEmpty() && defaultQuery != nil {
+		queryGroup = defaultQuery
+	}
+
+	createOrganizeFileOp := user_ops.CreateOrganizeFile{
+		Repo: localWorkingCopy,
+		Options: localWorkingCopy.MakeOrganizeOptionsWithQueryGroup(
+			cmd.Flags,
+			queryGroup,
+		),
+	}
+
 	createOrganizeFileOp.Skus = skus
 
-	if createOrganizeFileOp.TagSet.Len() == 0 {
-		createOrganizeFileOp.TagSet = ids.MakeTagSet(
-			localWorkingCopy.GetEnvWorkspace().GetDefaults().GetTags()...,
-		)
+	types := query.GetTypes(queryGroup)
+
+	if types.Len() == 1 {
+		createOrganizeFileOp.Type = types.Any()
 	}
+
+	tags := query.GetTags(queryGroup)
+
+	if skus.Len() == 0 {
+		workspace := localWorkingCopy.GetEnvWorkspace()
+		workspaceTags := workspace.GetDefaults().GetTags()
+
+		for t := range workspaceTags.All() {
+			tags.Add(t)
+		}
+	}
+
+	createOrganizeFileOp.TagSet = tags
 
 	switch cmd.Mode {
 	case organize_text_mode.ModeCommitDirectly:

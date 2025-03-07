@@ -83,7 +83,7 @@ function workspace_checkout { # @test
 }
 
 function workspace_organize { # @test
-	run_zit init-workspace -tags tag-3
+	run_zit init-workspace -tags tag-3 -query tag-3
 	assert_success
 
 	run_zit organize -mode output-only
