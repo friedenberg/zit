@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
@@ -213,16 +214,32 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "text":
-		fo := typed_blob_store.MakeTextFormatter(
+		formatter := typed_blob_store.MakeTextFormatter(
 			repo.GetStore().GetEnvRepo(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
 			repo.GetConfig(),
+			checkout_mode.None,
 		)
 
 		output = func(tl *sku.Transacted) (err error) {
-			_, err = fo.EncodeStringTo(tl, writer)
+			_, err = formatter.EncodeStringTo(tl, writer)
+			return
+		}
+
+	case "text-metadata_only":
+		formatter := typed_blob_store.MakeTextFormatter(
+			repo.GetStore().GetEnvRepo(),
+			checkout_options.TextFormatterOptions{
+				DoNotWriteEmptyDescription: true,
+			},
+			repo.GetConfig(),
+			checkout_mode.MetadataOnly,
+		)
+
+		output = func(tl *sku.Transacted) (err error) {
+			_, err = formatter.EncodeStringTo(tl, writer)
 			return
 		}
 
@@ -359,6 +376,12 @@ func (repo *Repo) MakeFormatFunc(
 
 		output = func(e *sku.Transacted) (err error) {
 			_, err = fo.WriteMetadataTo(writer, e)
+			return
+		}
+
+	case "genre":
+		output = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintf(writer, "%s", e.GetObjectId().GetGenre())
 			return
 		}
 

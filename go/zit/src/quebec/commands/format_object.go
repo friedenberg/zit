@@ -103,20 +103,21 @@ func (cmd *FormatObject) Run(dep command.Request) {
 		}
 	}
 
-	f := typed_blob_store.MakeTextFormatterWithBlobFormatter(
+	formatter := typed_blob_store.MakeTextFormatterWithBlobFormatter(
 		localWorkingCopy.GetEnvRepo(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
 		},
 		localWorkingCopy.GetConfig(),
 		blobFormatter,
+		checkout_mode.None,
 	)
 
 	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
 		localWorkingCopy.CancelWithError(err)
 	}
 
-	if _, err := f.WriteStringFormatWithMode(
+	if _, err := formatter.WriteStringFormatWithMode(
 		localWorkingCopy.GetUIFile(),
 		object,
 		cmd.CheckoutMode,

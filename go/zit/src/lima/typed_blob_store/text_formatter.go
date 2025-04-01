@@ -14,52 +14,69 @@ import (
 )
 
 func MakeTextFormatter(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 	options checkout_options.TextFormatterOptions,
-	k ids.InlineTypeChecker,
+	inlineTypeChecker ids.InlineTypeChecker,
+	checkoutMode checkout_mode.Mode,
 ) textFormatter {
-	return MakeTextFormatterWithBlobFormatter(dirLayout, options, k, nil)
+	return MakeTextFormatterWithBlobFormatter(
+		envRepo,
+		options,
+		inlineTypeChecker,
+		nil,
+		checkoutMode,
+	)
 }
 
 func MakeTextFormatterWithBlobFormatter(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 	options checkout_options.TextFormatterOptions,
-	k ids.InlineTypeChecker,
+	inlineTypeChecker ids.InlineTypeChecker,
 	formatter script_config.RemoteScript,
+	checkoutMode checkout_mode.Mode,
 ) textFormatter {
 	return textFormatter{
-		options: options,
-		k:       k,
+		options:           options,
+		InlineTypeChecker: inlineTypeChecker,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir:        repoLayout,
-				BlobStore:     repoLayout,
+				EnvDir:        envRepo,
+				BlobStore:     envRepo,
 				BlobFormatter: formatter,
 			},
 		),
+		checkoutMode: checkoutMode,
 	}
 }
 
 type textFormatter struct {
-	k       ids.InlineTypeChecker
+	ids.InlineTypeChecker
 	options checkout_options.TextFormatterOptions
 	object_metadata.TextFormatterFamily
+	checkoutMode checkout_mode.Mode
 }
 
-func (tf textFormatter) EncodeStringTo(
-	z *sku.Transacted,
-	w io.Writer,
+func (formatter textFormatter) EncodeStringTo(
+	object *sku.Transacted,
+	writer io.Writer,
 ) (n int64, err error) {
-	s := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: z,
-		TextFormatterOptions:       tf.options,
+	context := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: object,
+		TextFormatterOptions:       formatter.options,
 	}
-	if genres.Config.EqualsGenre(z.GetGenre()) {
-		n, err = tf.BlobOnly.FormatMetadata(w, s)
-	} else if tf.k.IsInlineType(z.GetType()) {
-		n, err = tf.InlineBlob.FormatMetadata(w, s)
-	} else {
-		n, err = tf.MetadataOnly.FormatMetadata(w, s)
+
+	switch formatter.checkoutMode {
+	case checkout_mode.MetadataOnly:
+		n, err = formatter.MetadataOnly.FormatMetadata(writer, context)
+
+	default:
+		if genres.Config.EqualsGenre(object.GetGenre()) {
+			n, err = formatter.BlobOnly.FormatMetadata(writer, context)
+		} else if formatter.InlineTypeChecker.IsInlineType(object.GetType()) {
+			n, err = formatter.InlineBlob.FormatMetadata(writer, context)
+		} else {
+			n, err = formatter.MetadataOnly.FormatMetadata(writer, context)
+		}
 	}
 
 	return
@@ -77,7 +94,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 
 	if genres.Config.EqualsGenre(sk.GetGenre()) || mode == checkout_mode.BlobOnly {
 		n, err = tf.BlobOnly.FormatMetadata(w, ctx)
-	} else if tf.k.IsInlineType(sk.GetType()) {
+	} else if tf.InlineTypeChecker.IsInlineType(sk.GetType()) {
 		n, err = tf.InlineBlob.FormatMetadata(w, ctx)
 	} else {
 		n, err = tf.MetadataOnly.FormatMetadata(w, ctx)

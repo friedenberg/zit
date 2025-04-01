@@ -56,7 +56,7 @@ func (j *Json) FromStringAndMetadata(
 	j.Tai = m.Tai.String()
 	j.Date = m.Tai.Format(string_format_writer.StringFormatDateTime)
 	j.Type = m.Type.String()
-  // TODO add support for "preview"
+	// TODO add support for "preview"
 
 	return
 }

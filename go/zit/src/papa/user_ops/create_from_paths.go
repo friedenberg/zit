@@ -123,7 +123,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-    c.Proto.Apply(z, genres.Zettel)
+		c.Proto.Apply(z, genres.Zettel)
 
 		if err = c.GetStore().CreateOrUpdate(
 			z,

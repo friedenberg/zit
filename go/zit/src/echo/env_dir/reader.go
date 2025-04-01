@@ -27,7 +27,7 @@ func NewReader(options ReadOptions) (r *reader, err error) {
 	}
 
 	if r.expander, err = options.GetBlobCompression().WrapReader(r.decrypter); err != nil {
-    // TODO remove this when compression / encryption issues are resolved
+		// TODO remove this when compression / encryption issues are resolved
 		if _, err = options.File.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -41,7 +41,7 @@ func TryOrTimeout(
 	path string,
 	timeout time.Duration,
 	apply func(string) (*os.File, error),
-  explainApply string,
+	explainApply string,
 ) (*os.File, error) {
 	chSuccess := make(chan *os.File)
 	chError := make(chan error)
@@ -62,11 +62,11 @@ func TryOrTimeout(
 		}
 	}()
 
-  defer func() {
-    timer.Stop()
-    close(chSuccess)
-    close(chError)
-  }()
+	defer func() {
+		timer.Stop()
+		close(chSuccess)
+		close(chError)
+	}()
 
 	select {
 	case file := <-chSuccess:
