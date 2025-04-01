@@ -3,7 +3,9 @@ local url = require("url")
 local P = {}
 
 ---@diagnostic disable-next-line: undefined-global
-P.is_binary = FORMAT:find("^markdown") == nil
+function P.is_binary()
+  return FORMAT:find("^markdown") == nil
+end
 
 function P.format_object_image(imgSrc, format)
   local objectID = url.unescape(imgSrc)
