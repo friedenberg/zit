@@ -115,3 +115,19 @@ function workspace_organize { # @test
 		- [one/uno !md tag-4] wow the first
 	EOM
 }
+
+function workspace_add_no_organize { # @test
+	run_zit init-workspace -tags tag-3 -query tag-3
+	assert_success
+
+	echo "file to be added" >todo.wow.md
+
+	run_zit add -delete -tags new_tags -description "added file" todo.wow.md
+	assert_success
+	assert_output - <<-EOM
+		[two/uno @84b683398cc5974fa1e383573fb104d31312c20f6053ef422463f3522e15be15 !md "todo.wow" tag-3]
+		[new_tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @84b683398cc5974fa1e383573fb104d31312c20f6053ef422463f3522e15be15 !md "added file" new_tags tag-3]
+		          deleted [todo.wow.md]
+	EOM
+}
