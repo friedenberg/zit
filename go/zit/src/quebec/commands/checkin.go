@@ -53,17 +53,25 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 		"checkout each Blob and run a utility",
 	)
 
-	f.Var(
-		cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
-		"tags",
-		"tags added for new objects in `checkin`, `new`, `organize`",
+	cmd.complete.SetFlagsProto(
+		&cmd.Proto,
+		f,
+		"description to use for new zettels",
+		"tags added for new zettels",
+		"type used for new zettels",
 	)
 
-	f.Var(
-		cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
-		"type",
-		"type used for new objects in `new` and `organize`",
-	)
+	// f.Var(
+	// 	cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
+	// 	"tags",
+	// 	"tags added for new objects in `checkin`, `new`, `organize`",
+	// )
+
+	// f.Var(
+	// 	cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
+	// 	"type",
+	// 	"type used for new objects in `new` and `organize`",
+	// )
 
 	cmd.Checkout.SetFlagSet(f)
 }

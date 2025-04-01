@@ -39,7 +39,7 @@ func Run(ctx errors.Context, args ...string) {
 	configCli.SetFlagSet(flagSet)
 
 	if err := flagSet.Parse(args); err != nil {
-		ctx.CancelWithError(err)
+		ctx.CancelWithError(errors.BadRequest(err))
 	}
 
 	req := command.MakeRequest(

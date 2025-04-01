@@ -56,6 +56,16 @@ type FlagValueCompleter struct {
 	FuncCompleter
 }
 
+func (completer FlagValueCompleter) String() string {
+	// TODO still not sure why this condition can exist, but this makes the output
+	// nice
+	if completer.Value == nil {
+		return ""
+	} else {
+		return completer.Value.String()
+	}
+}
+
 func (completer FlagValueCompleter) Complete(
 	req Request,
 	envLocal env_local.Env,

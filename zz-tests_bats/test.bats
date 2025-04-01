@@ -316,3 +316,12 @@ function checkouts_dont_overwrite { # @test
 	assert_success
 	assert_output "$(cat "$expected")"
 }
+
+function invalid_flags_exit_false_cleanly { # @test
+	run_zit_init_disable_age
+	run_zit new -descriptionx="wow" -edit=false
+	assert_failure
+	assert_output --regexp - <<-EOM
+		flag provided but not defined: -descriptionx
+	EOM
+}
