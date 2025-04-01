@@ -167,7 +167,8 @@ func (cmd *New) Run(req command.Request) {
 					},
 				},
 			},
-			Edit: true,
+			Edit:            true,
+			RefreshCheckout: true,
 		}
 
 		if _, err := opCheckout.Run(zts); err != nil {

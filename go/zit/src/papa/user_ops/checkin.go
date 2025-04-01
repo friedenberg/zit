@@ -19,6 +19,7 @@ type Checkin struct {
 	// TODO make flag family disambiguate these options
 	// and use with other commands too
 	Delete             bool
+	RefreshCheckout    bool
 	Organize           bool
 	CheckoutBlobAndRun string
 	OpenBlob           bool
@@ -59,6 +60,7 @@ func (op Checkin) Run(
 		results,
 		op.Proto,
 		op.Delete,
+		op.RefreshCheckout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

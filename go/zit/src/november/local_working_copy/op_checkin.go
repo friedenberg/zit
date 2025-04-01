@@ -13,6 +13,7 @@ func (repo *Repo) Checkin(
 	skus sku.SkuTypeSetMutable,
 	proto sku.Proto,
 	delete bool,
+	refreshCheckout bool,
 ) (processed sku.TransactedMutableSet, err error) {
 	repo.Must(repo.Lock)
 
@@ -25,11 +26,13 @@ func (repo *Repo) Checkin(
 	)
 
 	for _, co := range sortedResults {
-		if err = repo.GetStore().GetStoreFS().RefreshCheckedOut(
-			co,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		if refreshCheckout {
+			if err = repo.GetStore().GetStoreFS().RefreshCheckedOut(
+				co,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		external := co.GetSkuExternal()

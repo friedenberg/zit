@@ -19,9 +19,10 @@ type Checkout struct {
 	*local_working_copy.Repo
 	Organize bool
 	checkout_options.Options
-	Open    bool
-	Edit    bool
-	Utility string
+	Open            bool
+	Edit            bool
+	Utility         string
+	RefreshCheckout bool
 }
 
 func (op Checkout) Run(
@@ -136,6 +137,7 @@ func (op Checkout) RunQuery(
 			checkedOut,
 			sku.Proto{},
 			false,
+			op.RefreshCheckout,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -131,3 +131,40 @@ function workspace_add_no_organize { # @test
 		          deleted [todo.wow.md]
 	EOM
 }
+
+function workspace_add_yes_organize { # @test
+	run_zit init-workspace -tags tag-3 -query tag-3
+	assert_success
+
+	echo "file to be added1" >1.md
+	echo "file to be added2" >2.md
+
+	function editor() {
+		# shellcheck disable=SC2317
+		cat - >"$1" <<-EOM
+			# tag-two
+
+			- [1.md]
+
+			# tag-one
+
+			- [2.md]
+		EOM
+	}
+
+	export -f editor
+
+	# shellcheck disable=SC2016
+	export EDITOR='bash -c "editor $0"'
+
+	run_zit add -organize -delete ./*.md
+	assert_success
+	assert_output - <<-EOM
+		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-3 tag-two]
+		[tag-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-3 tag-one]
+		          deleted [1.md]
+		          deleted [2.md]
+	EOM
+}

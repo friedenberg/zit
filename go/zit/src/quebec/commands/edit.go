@@ -101,6 +101,7 @@ func (cmd Edit) Run(req command.Request) {
 		Repo:    localWorkingCopy,
 		Options: options,
 		Edit:    true,
+    RefreshCheckout: true,
 	}
 
 	opEdit.Options.IgnoreWorkspace = cmd.IgnoreWorkspace || !envWorkspace.InWorkspace()

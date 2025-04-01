@@ -76,6 +76,7 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 	cmd.Checkout.SetFlagSet(f)
 }
 
+// TODO refactor into common
 func (cmd *Checkin) Complete(
 	_ command.Request,
 	envLocal env_local.Env,

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
+// TODO what does this even do
 func (s *Store) RefreshCheckedOut(
 	co *sku.CheckedOut,
 ) (err error) {

@@ -10,11 +10,11 @@ type WriteNewZettels struct {
 	*local_working_copy.Repo
 }
 
-func (c WriteNewZettels) RunMany(
-	z sku.Proto,
+func (op WriteNewZettels) RunMany(
+	proto sku.Proto,
 	count int,
 ) (results sku.TransactedMutableSet, err error) {
-	if err = c.Lock(); err != nil {
+	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -25,7 +25,7 @@ func (c WriteNewZettels) RunMany(
 	for i := 0; i < count; i++ {
 		var zt *sku.Transacted
 
-		if zt, err = c.runOneAlreadyLocked(z); err != nil {
+		if zt, err = op.runOneAlreadyLocked(proto); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -36,7 +36,7 @@ func (c WriteNewZettels) RunMany(
 		}
 	}
 
-	if err = c.Unlock(); err != nil {
+	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,12 +66,12 @@ func (c WriteNewZettels) RunOne(
 }
 
 func (c WriteNewZettels) runOneAlreadyLocked(
-	pz sku.Proto,
-) (zt *sku.Transacted, err error) {
-	zt = pz.Make()
+	proto sku.Proto,
+) (object *sku.Transacted, err error) {
+	object = proto.Make()
 
 	if err = c.GetStore().CreateOrUpdate(
-		zt,
+		object,
 		sku.StoreOptions{
 			ApplyProto: true,
 		},
