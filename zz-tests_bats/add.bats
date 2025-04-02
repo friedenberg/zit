@@ -379,7 +379,15 @@ function add_each_blob { # @test
 function add_organize { # @test
 	run_zit_init_disable_age
 
-	export EDITOR="/bin/bash -c 'cat \"\$0\"'"
+	function editor() {
+		# shellcheck disable=SC2317
+		cp "$1" organize.md
+	}
+
+	export -f editor
+
+	# shellcheck disable=SC2016
+	export EDITOR='bash -c "editor $0"'
 
 	f="to add.md"
 	{
@@ -395,14 +403,6 @@ function add_organize { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		---
-		% instructions: to prevent an object from being checked in, delete it entirely
-		% delete:true delete once checked in
-		- zz-inbox-2022-11-14
-		---
-
-		- ["to add.md"]
-
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -413,5 +413,17 @@ function add_organize { # @test
 		                   one/uno.md]
 		          deleted [to add.md]
 		test file
+	EOM
+
+	run cat organize.md
+	assert_success
+	assert_output - <<-EOM
+		---
+		% instructions: to prevent an object from being checked in, delete it entirely
+		% delete:true delete once checked in
+		- zz-inbox-2022-11-14
+		---
+
+		- ["to add.md"]
 	EOM
 }

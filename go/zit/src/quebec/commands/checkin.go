@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -17,8 +16,10 @@ import (
 )
 
 func init() {
-	cmd := &Checkin{}
-	object_metadata.Resetter.Reset(&cmd.Proto.Metadata)
+	cmd := &Checkin{
+		Proto: sku.MakeProto(nil),
+	}
+
 	command.Register("checkin", cmd)
 	command.Register("add", cmd)
 	command.Register("save", cmd)
@@ -62,18 +63,6 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 		"tags added for new zettels",
 		"type used for new zettels",
 	)
-
-	// f.Var(
-	// 	cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
-	// 	"tags",
-	// 	"tags added for new objects in `checkin`, `new`, `organize`",
-	// )
-
-	// f.Var(
-	// 	cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
-	// 	"type",
-	// 	"type used for new objects in `new` and `organize`",
-	// )
 
 	cmd.Checkout.SetFlagSet(f)
 }

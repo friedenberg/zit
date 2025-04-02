@@ -14,11 +14,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 )
 
-func MakeProto(defaults config_mutable_blobs.Defaults) (p Proto) {
-	ui.TodoP1("modify konfig to keep etiketten set")
+func MakeProto(defaults config_mutable_blobs.Defaults) (proto Proto) {
+	var tipe ids.Type
+	var tags ids.TagSet
 
-	p.Metadata.Type = defaults.GetType()
-	p.Metadata.SetTags(ids.MakeTagSet(defaults.GetTags()...))
+	if defaults != nil {
+		tipe = defaults.GetType()
+		tags = ids.MakeTagSet(defaults.GetTags()...)
+	}
+
+	proto.Metadata.Type = tipe
+	proto.Metadata.SetTags(tags)
 
 	return
 }

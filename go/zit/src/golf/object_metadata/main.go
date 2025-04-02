@@ -219,22 +219,22 @@ func (m *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
 	return
 }
 
-func (m *Metadata) SetTags(e ids.TagSet) {
-	if m.Tags == nil {
-		m.Tags = ids.MakeTagMutableSet()
+func (metadata *Metadata) SetTags(tags ids.TagSet) {
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	m.Tags.Reset()
+	metadata.Tags.Reset()
 
-	if e == nil {
+	if tags == nil {
 		return
 	}
 
-	if e.Len() == 1 && e.Any().String() == "" {
+	if tags.Len() == 1 && tags.Any().String() == "" {
 		panic("empty tag set")
 	}
 
-	errors.PanicIfError(e.EachPtr(m.AddTagPtr))
+	errors.PanicIfError(tags.EachPtr(metadata.AddTagPtr))
 }
 
 func (z *Metadata) GetType() ids.Type {
