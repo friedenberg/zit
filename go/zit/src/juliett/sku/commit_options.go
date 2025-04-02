@@ -8,7 +8,7 @@ type CommitOptions struct {
 	StoreOptions
 	ids.RepoId
 	ids.Clock
-	Proto              *Transacted
+	Proto
 	DontAddMissingTags bool
 	DontAddMissingType bool
 }
@@ -21,8 +21,8 @@ type StreamIndexOptions struct {
 type StoreOptions struct {
 	StreamIndexOptions StreamIndexOptions
 	AddToInventoryList bool
-	ApplyProto         bool
-	ApplyProtoType     bool
+	ApplyProto         bool // TODO remove
+	ApplyProtoType     bool // TODO remove
 	MergeCheckedOut    bool
 	RunHooks           bool
 	UpdateTai          bool

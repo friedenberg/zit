@@ -41,7 +41,7 @@ func NewMetadataWithOptionCommentLookup(
 // TODO replace with embedded *sku.Transacted
 type Metadata struct {
 	ids.TagSet
-	Matchers interfaces.SetLike[sku.Query]
+	Matchers interfaces.SetLike[sku.Query] // TODO remove
 	OptionCommentSet
 	Type   ids.Type
 	RepoId ids.RepoId
@@ -137,6 +137,10 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
+	for _, o := range m.OptionCommentSet.OptionComments {
+		w.WriteFormat("%% %s", o)
+	}
+
 	for _, e := range quiter.SortedStrings(m.TagSet) {
 		w.WriteFormat("- %s", e)
 	}
@@ -151,10 +155,6 @@ func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 		for _, c := range quiter.SortedStrings(m.Matchers) {
 			w.WriteFormat("%% Matcher:%s", c)
 		}
-	}
-
-	for _, o := range m.OptionCommentSet.OptionComments {
-		w.WriteFormat("%% %s", o)
 	}
 
 	return w.WriteTo(w1)

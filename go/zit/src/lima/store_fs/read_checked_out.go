@@ -7,7 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-// TODO what does this even do
+// TODO what does this even do. This caused [cervicis/marshall.zettel !task pom-2 project-2021-zit-bugs project-25q1-zit_workspaces-crit] fix issue with tags other than workspace in `checkin -organize` bei…
+// likely due to this method overriding tags that were set by organize. maybe
+// this bug existed before workspaces?
 func (s *Store) RefreshCheckedOut(
 	co *sku.CheckedOut,
 ) (err error) {

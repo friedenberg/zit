@@ -83,21 +83,21 @@ func (proto Proto) ApplyType(
 func (proto Proto) Apply(
 	metadataLike object_metadata.MetadataLike,
 	genreGetter interfaces.GenreGetter,
-) (ok bool) {
+) (changed bool) {
 	metadata := metadataLike.GetMetadata()
 
 	if proto.ApplyType(metadataLike, genreGetter) {
-		ok = true
+		changed = true
 	}
 
 	if proto.Metadata.Description.WasSet() &&
 		!metadata.Description.Equals(proto.Metadata.Description) {
-		ok = true
+		changed = true
 		metadata.Description = proto.Metadata.Description
 	}
 
 	if proto.Metadata.GetTags().Len() > 0 {
-		ok = true
+		changed = true
 	}
 
 	errors.PanicIfError(proto.Metadata.GetTags().EachPtr(metadata.AddTagPtr))
