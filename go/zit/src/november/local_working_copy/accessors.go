@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
@@ -77,12 +76,6 @@ func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
 
 func (u *Repo) GetStore() *store.Store {
 	return &u.store
-}
-
-func (u *Repo) GetExternalLikePoolForRepoId(
-	repoId ids.RepoId,
-) (of sku.ObjectFactory) {
-	return
 }
 
 func (u *Repo) GetFileEncoder() store_fs.FileEncoder {

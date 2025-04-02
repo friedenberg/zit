@@ -18,7 +18,7 @@ func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 		query.GetTags(qg),
 		e.SkuFormatBoxCheckedOutNoColor(),
 		e.GetStore().GetAbbrStore().GetAbbr(),
-		e.GetExternalLikePoolForRepoId(qg.RepoId),
+		sku.ObjectFactory{},
 	)
 }
 

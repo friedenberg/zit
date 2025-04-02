@@ -8,7 +8,7 @@ setup() {
 
 	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
-  run_zit_init_workspace
+	run_zit_init_workspace
 
 	run_zit checkout :z,t,e
 	assert_success

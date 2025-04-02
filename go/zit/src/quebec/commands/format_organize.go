@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -91,7 +92,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 		localWorkingCopy.GetConfig().GetCLIConfig().PrintOptions,
 		localWorkingCopy.SkuFormatBoxCheckedOutNoColor(),
 		localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
-		localWorkingCopy.GetExternalLikePoolForRepoId(repoId),
+		sku.ObjectFactory{},
 		ot.Metadata,
 	)
 
