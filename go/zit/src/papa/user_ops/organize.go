@@ -18,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
 
+// TODO migrate over to Organize2
 type Organize struct {
 	*local_working_copy.Repo
 	organize_text.Metadata

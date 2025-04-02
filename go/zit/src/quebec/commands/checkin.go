@@ -122,8 +122,6 @@ func (cmd Checkin) Run(dep command.Request) {
 		),
 	)
 
-	// envWorkspace := localWorkingCopy.GetEnvWorkspace()
-	// envWorkspace.AssertInWorkspace(localWorkingCopy)
 	workspace := localWorkingCopy.GetEnvWorkspace()
 	workspaceTags := workspace.GetDefaults().GetTags()
 

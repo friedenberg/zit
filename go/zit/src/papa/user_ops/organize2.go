@@ -1,6 +1,7 @@
 package user_ops
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -35,19 +36,24 @@ func (op Organize2) Run(
 		),
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-		"*." + op.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+	organizeFileTemplate := fmt.Sprintf(
+		"*.%s",
+		op.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+	)
+
+	if file, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+		organizeFileTemplate,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
 	if organizeResults.Before, err = createOrganizeFileOp.RunAndWrite(
-		f,
+		file,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -61,26 +67,21 @@ func (op Organize2) Run(
 				Build(),
 		}
 
-		if err = openVimOp.Run(op.Repo, f.Name()); err != nil {
+		if err = openVimOp.Run(op.Repo, file.Name()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		// if err = op.Reset(); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
-
 		readOrganizeTextOp := ReadOrganizeFile{}
 
-		if _, err = f.Seek(0, io.SeekStart); err != nil {
+		if _, err = file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if organizeResults.After, err = readOrganizeTextOp.Run(
 			op.Repo,
-			f,
+			file,
 			organize_text.NewMetadataWithOptionCommentLookup(
 				organizeResults.Before.Metadata.RepoId,
 				op.GetPrototypeOptionComments(),
