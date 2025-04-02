@@ -29,14 +29,14 @@ type Checkin struct {
 
 func (op Checkin) Run(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Query,
+	q *query.Query,
 ) (err error) {
 	var l sync.Mutex
 
 	results := sku.MakeSkuTypeSetMutable()
 
 	if err = repo.GetStore().QuerySkuType(
-		queryGroup,
+		q,
 		func(co sku.SkuType) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -49,7 +49,7 @@ func (op Checkin) Run(
 	}
 
 	if op.Organize {
-		if err = op.runOrganize(repo, queryGroup, results); err != nil {
+		if err = op.runOrganize(repo, q, results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -129,6 +129,13 @@ func (op Checkin) runOrganize(
 
 	for _, co := range changes.After.AllSkuAndIndex() {
 		if err = results.Add(co.Clone()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	for _, co := range changes.Removed.AllSkuAndIndex() {
+		if err = results.Del(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
