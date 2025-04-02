@@ -114,7 +114,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 	o.Metadata.Blob.ResetWithShaLike(sh)
 	o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
-	if err = repo.GetStore().CreateOrUpdate(
+	if err = repo.GetStore().CreateOrUpdateDefaultProto(
 		o,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
@@ -158,7 +158,7 @@ func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
 
 	newConfig.Metadata.Type.ResetWith(tipe)
 
-	if err = repo.GetStore().CreateOrUpdate(
+	if err = repo.GetStore().CreateOrUpdateDefaultProto(
 		newConfig,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {

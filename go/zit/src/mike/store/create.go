@@ -47,43 +47,30 @@ func (s *Store) Reindex() (err error) {
 	return
 }
 
-func (s *Store) CreateOrUpdate(
-	in sku.ExternalLike,
+func (store *Store) CreateOrUpdateDefaultProto(
+	external sku.ExternalLike,
 	storeOptions sku.StoreOptions,
 ) (err error) {
-	storeOptions.AddToInventoryList = true
-	storeOptions.UpdateTai = true
-	storeOptions.RunHooks = true
-	storeOptions.Validate = true
-	storeOptions.ApplyProto = true
-
-	if err = s.Commit(
-		in,
-		sku.CommitOptions{
-			StoreOptions: storeOptions,
-		},
-	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
-		return
+	options := sku.CommitOptions{
+		Proto:        store.protoZettel,
+		StoreOptions: storeOptions,
 	}
 
-	return
+	return store.CreateOrUpdate(external, options)
 }
 
-func (s *Store) CreateOrUpdateNoProto(
-	in sku.ExternalLike,
-	storeOptions sku.StoreOptions,
+func (store *Store) CreateOrUpdate(
+	external sku.ExternalLike,
+	options sku.CommitOptions,
 ) (err error) {
-	storeOptions.AddToInventoryList = true
-	storeOptions.UpdateTai = true
-	storeOptions.RunHooks = true
-	storeOptions.Validate = true
+	options.AddToInventoryList = true
+	options.UpdateTai = true
+	options.RunHooks = true
+	options.Validate = true
 
-	if err = s.Commit(
-		in,
-		sku.CommitOptions{
-			StoreOptions: storeOptions,
-		},
+	if err = store.Commit(
+		external,
+		options,
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return

@@ -63,7 +63,7 @@ func (cmd RemoteAdd) Run(req command.Request) {
 
 	req.Must(local.Lock)
 
-	if err := local.GetStore().CreateOrUpdate(
+	if err := local.GetStore().CreateOrUpdateDefaultProto(
 		remoteObject,
 		sku.StoreOptions{
 			ApplyProto: true,

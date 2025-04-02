@@ -48,7 +48,7 @@ func (cmd EditConfig) Run(
 	localWorkingCopy.Must(localWorkingCopy.Reset)
 	localWorkingCopy.Must(localWorkingCopy.Lock)
 
-	if err := localWorkingCopy.GetStore().CreateOrUpdate(
+	if err := localWorkingCopy.GetStore().CreateOrUpdateDefaultProto(
 		sk,
 		sku.StoreOptions{},
 	); err != nil {

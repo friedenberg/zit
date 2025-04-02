@@ -18,33 +18,34 @@ import (
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
 // runs the new hook, validates the blob, then calculates the sha for the object
 func (s *Store) tryPrecommit(
-	el sku.ExternalLike, mutter *sku.Transacted,
-	o sku.CommitOptions,
+	external sku.ExternalLike,
+	parent *sku.Transacted,
+	options sku.CommitOptions,
 ) (err error) {
-	if err = s.SaveBlob(el); err != nil {
+	if err = s.SaveBlob(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	kinder := el.GetSku()
+	kinder := external.GetSku()
 
-	if mutter == nil && o.ApplyProto {
-		s.protoZettel.Apply(kinder, kinder)
+	if parent == nil {
+		options.Proto.Apply(kinder, kinder)
 	}
 
 	// TODO decide if the type proto should actually be applied every time
-	if o.ApplyProtoType {
+	if options.ApplyProtoType {
 		s.protoZettel.ApplyType(kinder, kinder)
 	}
 
-	if genres.Type == el.GetSku().GetGenre() {
-		if el.GetSku().GetType().IsEmpty() {
-			el.GetSku().GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
+	if genres.Type == external.GetSku().GetGenre() {
+		if external.GetSku().GetType().IsEmpty() {
+			external.GetSku().GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 		}
 	}
 
 	// modify pre commit hooks to support import
-	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
+	if err = s.tryPreCommitHooks(kinder, parent, options); err != nil {
 		if s.config.GetCLIConfig().IgnoreHookErrors {
 			err = nil
 		} else {
@@ -54,8 +55,8 @@ func (s *Store) tryPrecommit(
 	}
 
 	// TODO just just mutter == nil
-	if mutter == nil {
-		if err = s.tryNewHook(kinder, o); err != nil {
+	if parent == nil {
+		if err = s.tryNewHook(kinder, options); err != nil {
 			if s.config.GetCLIConfig().IgnoreHookErrors {
 				err = nil
 			} else {
@@ -65,7 +66,7 @@ func (s *Store) tryPrecommit(
 		}
 	}
 
-	if err = s.validate(kinder, mutter, o); err != nil {
+	if err = s.validate(kinder, parent, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -80,15 +81,15 @@ func (s *Store) tryPrecommit(
 
 // TODO add RealizeAndOrStore result
 func (s *Store) Commit(
-	el sku.ExternalLike,
-	o sku.CommitOptions,
+	external sku.ExternalLike,
+	options sku.CommitOptions,
 ) (err error) {
-	child := el.GetSku()
+	child := external.GetSku()
 
-	ui.Log().Printf("%s -> %s", o, child)
+	ui.Log().Printf("%s -> %s", options, child)
 
 	if !s.GetEnvRepo().GetLockSmith().IsAcquired() &&
-		(o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex) {
+		(options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
 		})
@@ -97,15 +98,15 @@ func (s *Store) Commit(
 	}
 
 	// TAI must be set before calculating object sha
-	if o.UpdateTai {
-		if o.Clock == nil {
-			o.Clock = s
+	if options.UpdateTai {
+		if options.Clock == nil {
+			options.Clock = s
 		}
 
-		child.SetTai(o.Clock.GetTai())
+		child.SetTai(options.Clock.GetTai())
 	}
 
-	if o.AddToInventoryList && (child.ObjectId.IsEmpty() ||
+	if options.AddToInventoryList && (child.ObjectId.IsEmpty() ||
 		child.GetGenre() == genres.None ||
 		child.GetGenre() == genres.Blob) {
 		var zettelId *ids.ZettelId
@@ -133,19 +134,19 @@ func (s *Store) Commit(
 		child.Metadata.Cache.ParentTai = parent.GetTai()
 	}
 
-	if err = s.tryPrecommit(el, parent, o); err != nil {
+	if err = s.tryPrecommit(external, parent, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if o.AddToInventoryList {
-		if err = s.addMissingTypeAndTags(o, child); err != nil {
+	if options.AddToInventoryList {
+		if err = s.addMissingTypeAndTags(options, child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
 		if err = s.addObjectToAbbrStore(child); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -153,7 +154,7 @@ func (s *Store) Commit(
 	}
 
 	// short circuits if the parent is equal to the child
-	if o.AddToInventoryList &&
+	if options.AddToInventoryList &&
 		parent != nil &&
 		ids.Equals(child.GetObjectId(), parent.GetObjectId()) &&
 		child.Metadata.EqualsSansTai(&parent.Metadata) {
@@ -177,7 +178,7 @@ func (s *Store) Commit(
 		return
 	}
 
-	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
 		if err = s.config.AddTransacted(
 			child,
 			parent,
@@ -199,18 +200,18 @@ func (s *Store) Commit(
 		}
 	}
 
-	if o.AddToInventoryList {
-		ui.Log().Print("adding to bestandsaufnahme", o, child)
+	if options.AddToInventoryList {
+		ui.Log().Print("adding to bestandsaufnahme", options, child)
 		if err = s.commitTransacted(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if o.AddToInventoryList || o.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
 		if err = s.GetStreamIndex().Add(
 			child,
-			o,
+			options,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -244,11 +245,11 @@ func (s *Store) Commit(
 
 	}
 
-	if o.MergeCheckedOut {
+	if options.MergeCheckedOut {
 		if err = s.ReadExternalAndMergeIfNecessary(
 			child,
 			parent,
-			o,
+			options,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

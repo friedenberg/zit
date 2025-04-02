@@ -23,7 +23,6 @@ function add { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add"]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -69,7 +68,6 @@ function add_with_dupe_added { # @test
 		          deleted [to_add.md]
 		          deleted [to_add2.md]
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add to_add2" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add to_add2"]
 		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -107,7 +105,6 @@ function add_not_md { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!pdf @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add"]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -148,7 +145,6 @@ function add_1 { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add"]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -186,9 +182,7 @@ function add_2 { # @test
 		          deleted [to_add.md]
 		          deleted [to_add2.md]
 		[one/dos @6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
-		[one/dos @6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2"]
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add"]
 		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -224,9 +218,7 @@ function add_dot { # @test
 		          deleted [to_add.md]
 		          deleted [to_add2.md]
 		[one/dos @6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
-		[one/dos @6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2"]
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add"]
 		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -334,9 +326,7 @@ function add_several_with_spaces_in_filename { # @test
 		          deleted [to add.md]
 		          deleted [to add2.md]
 		[one/dos @c36af86311166fbaf9cd58f4a161f8dd14618b8242f64ced5b40acd5ed1d1c26 !md "to add2" zz-inbox-2022-11-14]
-		[one/dos @c36af86311166fbaf9cd58f4a161f8dd14618b8242f64ced5b40acd5ed1d1c26 !md "to add2"]
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
 		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -377,7 +367,6 @@ function add_each_blob { # @test
 		          deleted [to add.md]
 		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
 		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -413,7 +402,6 @@ function add_organize { # @test
 
 		- ["to add.md"]
 
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

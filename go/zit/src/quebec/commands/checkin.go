@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -17,6 +18,7 @@ import (
 
 func init() {
 	cmd := &Checkin{}
+	object_metadata.Resetter.Reset(&cmd.Proto.Metadata)
 	command.Register("checkin", cmd)
 	command.Register("add", cmd)
 	command.Register("save", cmd)
@@ -133,6 +135,12 @@ func (cmd Checkin) Run(dep command.Request) {
 
 	// envWorkspace := localWorkingCopy.GetEnvWorkspace()
 	// envWorkspace.AssertInWorkspace(localWorkingCopy)
+	workspace := localWorkingCopy.GetEnvWorkspace()
+	workspaceTags := workspace.GetDefaults().GetTags()
+
+	for t := range workspaceTags.All() {
+		cmd.Proto.Tags.Add(t)
+	}
 
 	op := user_ops.Checkin{
 		Delete:             cmd.Delete,

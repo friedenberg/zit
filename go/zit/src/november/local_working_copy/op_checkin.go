@@ -57,24 +57,16 @@ func (repo *Repo) Checkin(
 
 			external.ObjectId.Reset()
 
+			proto.Apply(external, genres.Zettel)
+
 			if err = repo.GetStore().CreateOrUpdate(
 				external,
-				sku.StoreOptions{
-					ApplyProto: true,
+				sku.CommitOptions{
+					Proto: proto,
 				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return
-			}
-
-			if proto.Apply(external, genres.Zettel) {
-				if err = repo.GetStore().CreateOrUpdate(
-					external.GetSku(),
-					sku.StoreOptions{},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
 			}
 		} else {
 			if err = repo.GetStore().CreateOrUpdateCheckedOut(

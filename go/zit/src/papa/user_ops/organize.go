@@ -76,16 +76,16 @@ func (op Organize) RunWithTransacted(
 }
 
 func (op Organize) RunWithSkuType(
-	qg *query.Query,
+	q *query.Query,
 	skus sku.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	organizeResults.Original = skus
-	organizeResults.QueryGroup = qg
+	organizeResults.QueryGroup = q
 
 	var repoId ids.RepoId
 
-	if qg != nil {
-		repoId = qg.RepoId
+	if q != nil {
+		repoId = q.RepoId
 	}
 
 	if organizeResults.QueryGroup == nil ||

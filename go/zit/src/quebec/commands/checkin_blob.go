@@ -157,7 +157,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 	req.Must(localWorkingCopy.Lock)
 
 	for _, z := range zettels {
-		if err := localWorkingCopy.GetStore().CreateOrUpdate(
+		if err := localWorkingCopy.GetStore().CreateOrUpdateDefaultProto(
 			z,
 			sku.StoreOptions{
 				MergeCheckedOut: true,

@@ -70,7 +70,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 ) (object *sku.Transacted, err error) {
 	object = proto.Make()
 
-	if err = c.GetStore().CreateOrUpdate(
+	if err = c.GetStore().CreateOrUpdateDefaultProto(
 		object,
 		sku.StoreOptions{
 			ApplyProto: true,

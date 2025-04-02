@@ -9,6 +9,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 )
 
+func (e *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
+	organizeFlags organize_text.Flags,
+	metadata organize_text.Metadata,
+) organize_text.Options {
+	options := organizeFlags.GetOptions(
+		e.GetConfig().GetCLIConfig().PrintOptions,
+		nil,
+		e.SkuFormatBoxCheckedOutNoColor(),
+		e.GetStore().GetAbbrStore().GetAbbr(),
+		sku.ObjectFactory{},
+	)
+
+	options.Metadata = metadata
+
+	return options
+}
+
 func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 	organizeFlags organize_text.Flags,
 	qg *query.Query,
@@ -50,12 +67,21 @@ func (repo *Repo) LockAndCommitOrganizeResults(
 		}
 	}
 
+	var proto sku.Proto
+
+	workspace := repo.GetEnvWorkspace()
+	workspaceType := workspace.GetDefaults().GetType()
+
+	proto.Type = workspaceType
+
 	for _, changed := range changeResults.Changed.AllSkuAndIndex() {
-		if err = repo.GetStore().CreateOrUpdateNoProto(
+		if err = repo.GetStore().CreateOrUpdate(
 			changed.GetSkuExternal(),
-			sku.StoreOptions{
-				ApplyProtoType:  true,
-				MergeCheckedOut: true,
+			sku.CommitOptions{
+				Proto: proto,
+				StoreOptions: sku.StoreOptions{
+					MergeCheckedOut: true,
+				},
 			},
 		); err != nil {
 			err = errors.Wrap(err)

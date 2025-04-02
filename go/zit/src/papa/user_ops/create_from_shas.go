@@ -64,7 +64,7 @@ func (c CreateFromShas) Run(
 	}
 
 	for _, z := range toCreate {
-		if err = c.GetStore().CreateOrUpdate(
+		if err = c.GetStore().CreateOrUpdateDefaultProto(
 			z,
 			sku.StoreOptions{
 				ApplyProto: true,

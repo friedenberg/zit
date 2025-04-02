@@ -125,7 +125,7 @@ func (c CreateFromPaths) Run(
 
 		c.Proto.Apply(z, genres.Zettel)
 
-		if err = c.GetStore().CreateOrUpdate(
+		if err = c.GetStore().CreateOrUpdateDefaultProto(
 			z,
 			sku.StoreOptions{
 				ApplyProto: true,
