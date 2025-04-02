@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
@@ -52,6 +53,8 @@ func (op Checkin) Run(
 			err = errors.Wrap(err)
 			return
 		}
+
+		object_metadata.Resetter.Reset(&op.Proto.Metadata)
 	}
 
 	var processed sku.TransactedMutableSet
@@ -76,7 +79,7 @@ func (op Checkin) Run(
 
 func (op Checkin) runOrganize(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Query,
+	query *query.Query,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{
@@ -84,10 +87,12 @@ func (op Checkin) runOrganize(
 		Comment: "delete once checked in",
 	}
 
-	opOrganize := Organize{
+	opOrganize := Organize2{
 		Repo: repo,
 		Metadata: organize_text.Metadata{
-			RepoId: queryGroup.RepoId,
+			TagSet: op.Proto.Tags,
+			Type:   op.Proto.Type,
+			RepoId: query.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				map[string]organize_text.OptionComment{
 					"delete": flagDelete,
@@ -101,17 +106,13 @@ func (op Checkin) runOrganize(
 				},
 			),
 		},
-		DontUseQueryGroupForOrganizeMetadata: true,
 	}
 
-	ui.Log().Print(queryGroup)
+	ui.Log().Print(query)
 
 	var organizeResults organize_text.OrganizeResults
 
-	// TODO switch to using SkuType?
-	if organizeResults, err = opOrganize.RunWithQueryGroup(
-		queryGroup,
-	); err != nil {
+	if organizeResults, err = opOrganize.Run(results); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

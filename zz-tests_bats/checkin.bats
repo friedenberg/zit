@@ -455,3 +455,68 @@ function checkin_dot_organize_include_untracked_fs_blob_with_spaces() { # @test
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !txt "test with spaces"]
 	EOM
 }
+
+# bats test_tags=user_story:organize,user_story:workspace
+function checkin_explicit_workspace_delete_files { # @test
+	# shellcheck disable=SC2317
+	function editor() (
+		sed -i "s/tags = \\[]/tags = ['zz-inbox']/" "$0"
+		# sed -i "/type = '!md'/a tags = 'hello'" "$0"
+	)
+
+	export -f editor
+
+	export EDITOR="/bin/bash -c 'editor \$0'"
+	run_zit edit-config
+	assert_success
+	assert_output - <<-EOM
+		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+	EOM
+
+	cat >.zit-workspace <<-EOM
+		---
+		! toml-workspace_config-v0
+		---
+
+		query = "today"
+
+		[defaults]
+		tags = ["today"]
+	EOM
+
+	run_zit info-workspace query
+	assert_success
+	assert_output 'today'
+
+	echo "file one" >1.md
+	echo "file two" >2.md
+
+	function editor() {
+		# shellcheck disable=SC2317
+		cat - >"$1" <<-EOM
+			---
+			% instructions: to prevent an object from being checked in, delete it entirely
+			% delete:true delete once checked in
+			- today
+			---
+
+			- [1.md]
+			- [2.md]
+		EOM
+	}
+
+	export -f editor
+
+	# shellcheck disable=SC2016
+	export EDITOR='bash -c "editor $0"'
+
+	run_zit checkin -organize -delete 1.md 2.md
+	assert_success
+	assert_output - <<-EOM
+		[today @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @198cef2c92e80b728ae28c9978e64381fa18d9b31adf2068ca63b1d53153cf95 !md "1" today]
+		[one/tres @7c78e911130103a9d7760788394a4467e20bf854810f915a99b9c244b266717e !md "2" today]
+		          deleted [1.md]
+		          deleted [2.md]
+	EOM
+}

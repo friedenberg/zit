@@ -160,9 +160,9 @@ function workspace_add_yes_organize { # @test
 	assert_success
 	assert_output - <<-EOM
 		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-3 tag-two]
+		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-two]
 		[tag-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-3 tag-one]
+		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-one]
 		          deleted [1.md]
 		          deleted [2.md]
 	EOM

@@ -394,10 +394,11 @@ function add_organize { # @test
 		"$f"
 
 	assert_success
-	assert_output_unsorted - <<-EOM
+	assert_output - <<-EOM
 		---
 		% instructions: to prevent an object from being checked in, delete it entirely
 		% delete:true delete once checked in
+		- zz-inbox-2022-11-14
 		---
 
 		- ["to add.md"]

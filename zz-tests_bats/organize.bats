@@ -1484,3 +1484,65 @@ function organize_default_tags_workspace { # @test
 		- [two/uno !md zz-inbox] test default tags
 	EOM
 }
+
+# bats test_tags=user_story:organize,user_story:workspace
+function organize_dot_operator_workspace_delete_files { # @test
+	skip
+	# shellcheck disable=SC2317
+	function editor() (
+		sed -i "s/tags = \\[]/tags = ['zz-inbox']/" "$0"
+		# sed -i "/type = '!md'/a tags = 'hello'" "$0"
+	)
+
+	export -f editor
+
+	export EDITOR="/bin/bash -c 'editor \$0'"
+	run_zit edit-config
+	assert_success
+	assert_output - <<-EOM
+		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+	EOM
+
+	cat >.zit-workspace <<-EOM
+		---
+		! toml-workspace_config-v0
+		---
+
+		query = "today"
+	EOM
+
+	run_zit info-workspace query
+	assert_success
+	assert_output 'today'
+
+	echo "file one" >1.md
+	echo "file two" >2.md
+
+	function editor() {
+		# shellcheck disable=SC2317
+		cat - >"$1" <<-EOM
+			---
+			- today
+			---
+
+			- ["1.md"]
+			- ["2.md"]
+		EOM
+	}
+
+	export -f editor
+
+	# shellcheck disable=SC2016
+	export EDITOR='bash -c "editor $0"'
+
+	run_zit organize .
+	assert_success
+	assert_output - <<-EOM
+		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-3 tag-two]
+		[tag-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-3 tag-one]
+		          deleted [1.md]
+		          deleted [2.md]
+	EOM
+}
