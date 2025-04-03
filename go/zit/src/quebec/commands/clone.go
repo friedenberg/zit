@@ -29,13 +29,13 @@ func init() {
 type Clone struct {
 	command_components.Genesis
 	command_components.RemoteTransfer
-	command_components.QueryGroup
+	command_components.Query
 }
 
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.Genesis.SetFlagSet(f)
 	cmd.RemoteTransfer.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
+	cmd.Query.SetFlagSet(f)
 
 	// must happen after genesis set flag set as cmd.Config is nil until then
 	cmd.Config.RepoType = repo_type.TypeWorkingCopy
@@ -56,7 +56,7 @@ func (cmd Clone) Run(req command.Request) {
 		)
 
 	case repo.WorkingCopy:
-		queryGroup := cmd.MakeQueryGroup(
+		queryGroup := cmd.MakeQuery(
 			req,
 			query.BuilderOptionsOld(
 				cmd,

@@ -48,7 +48,7 @@ func (cmd Checkout) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 
-	queryGroup := cmd.MakeQueryGroup(
+	queryGroup := cmd.MakeQuery(
 		req,
 		query.BuilderOptions(
 			query.BuilderOptionsOld(cmd),

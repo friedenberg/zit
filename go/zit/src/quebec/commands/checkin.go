@@ -39,17 +39,17 @@ type Checkin struct {
 	OpenBlob           bool
 }
 
-func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *Checkin) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&cmd.IgnoreBlob,
 		"ignore-blob",
 		false,
 		"do not change the blob",
 	)
 
-	f.StringVar(
+	flagSet.StringVar(
 		&cmd.CheckoutBlobAndRun,
 		"each-blob",
 		"",
@@ -58,13 +58,13 @@ func (cmd *Checkin) SetFlagSet(f *flag.FlagSet) {
 
 	cmd.complete.SetFlagsProto(
 		&cmd.Proto,
-		f,
+		flagSet,
 		"description to use for new zettels",
 		"tags added for new zettels",
 		"type used for new zettels",
 	)
 
-	cmd.Checkout.SetFlagSet(f)
+	cmd.Checkout.SetFlagSet(flagSet)
 }
 
 // TODO refactor into common

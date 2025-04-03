@@ -3,6 +3,7 @@ package repo
 import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
+	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 )
 
 type LocalRepo interface {
@@ -16,4 +17,5 @@ type LocalRepo interface {
 type LocalWorkingCopy interface {
 	WorkingCopy
 	LocalRepo
+	GetEnvWorkspace() env_workspace.Env
 }

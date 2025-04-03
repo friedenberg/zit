@@ -3,7 +3,7 @@ package.path = package.path .. string.format(";%s/.local/share/pandoc/filters/?.
 local pandoc = require("pandoc")
 local common = require("zit-common")
 
-Image = common.try_to_replace_image_with_new_or_added_object_link
+-- Image = common.try_to_replace_image_with_new_or_added_object_link
 
 function CodeBlock(el)
   local classes = el.classes

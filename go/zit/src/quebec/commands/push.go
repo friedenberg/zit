@@ -20,12 +20,12 @@ func init() {
 type Push struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteTransfer
-	command_components.QueryGroup
+	command_components.Query
 }
 
 func (cmd *Push) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(flagSet)
-	cmd.QueryGroup.SetFlagSet(flagSet)
+	cmd.Query.SetFlagSet(flagSet)
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 }
 
@@ -50,7 +50,7 @@ func (cmd Push) Run(req command.Request) {
 
 	switch repoType {
 	case repo_type.TypeWorkingCopy:
-		queryGroup := cmd.MakeQueryGroup(
+		queryGroup := cmd.MakeQuery(
 			req,
 			query.BuilderOptionsOld(
 				cmd,

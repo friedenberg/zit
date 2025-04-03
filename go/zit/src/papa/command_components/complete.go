@@ -15,7 +15,7 @@ import (
 
 type Complete struct {
 	ObjectMetadata
-	QueryGroup
+	Query
 }
 
 func (cmd Complete) GetFlagValueMetadataTags(
@@ -114,7 +114,7 @@ func (cmd Complete) CompleteObjects(
 ) {
 	printerCompletions := sku_fmt.MakePrinterComplete(local)
 
-	queryGroup := cmd.MakeQueryGroup(
+	queryGroup := cmd.MakeQuery(
 		req,
 		queryBuilderOptions,
 		local,

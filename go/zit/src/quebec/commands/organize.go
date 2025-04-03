@@ -35,7 +35,7 @@ func init() {
 // Refactor and fold components into userops
 type Organize struct {
 	command_components.LocalWorkingCopy
-	command_components.QueryGroup
+	command_components.Query
 
 	complete command_components.Complete
 
@@ -46,7 +46,7 @@ type Organize struct {
 }
 
 func (c *Organize) SetFlagSet(f *flag.FlagSet) {
-	c.QueryGroup.SetFlagSet(f)
+	c.Query.SetFlagSet(f)
 
 	c.Flags.SetFlagSet(f)
 
@@ -100,7 +100,7 @@ func (cmd *Organize) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 
-	queryGroup := cmd.MakeQueryGroup(
+	queryGroup := cmd.MakeQuery(
 		req,
 		query.BuilderOptionsOld(
 			cmd,

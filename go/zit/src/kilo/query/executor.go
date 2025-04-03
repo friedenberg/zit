@@ -13,8 +13,8 @@ import (
 type (
 	QueryCheckedOut interface {
 		QueryCheckedOut(
-			qg *Query,
-			f interfaces.FuncIter[sku.SkuType],
+			query *Query,
+			output interfaces.FuncIter[sku.SkuType],
 		) (err error)
 	}
 
@@ -41,62 +41,79 @@ type Executor struct {
 }
 
 func MakeExecutorWithExternalStore(
-	queryGroup *Query,
+	query *Query,
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
 	externalStore ExternalStore,
 	envWorkspace env_workspace.Env,
 ) Executor {
-	return Executor{
-		primitive: primitive{queryGroup},
+	executor := Executor{
+		primitive: primitive{query},
 		ExecutionInfo: ExecutionInfo{
 			FuncPrimitiveQuery: fpq,
 			FuncReadOneInto:    froi,
-			ExternalStore:      externalStore,
 			Env:                envWorkspace,
 		},
 	}
+
+	if envWorkspace.InWorkspace() {
+		executor.ExternalStore = externalStore
+	}
+
+	return executor
 }
 
 // TODO refactor into methods that have internal in the name
 func (executor *Executor) ExecuteExactlyOneExternalObject(
 	permitInternal bool,
-) (sk *sku.Transacted, err error) {
-	var externalObjectId ids.ObjectIdLike
+) (object *sku.Transacted, err error) {
+	if executor.ExternalStore != nil {
+		var externalObjectId ids.ObjectIdLike
 
-	if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
-		permitInternal,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
+			permitInternal,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	// if err = genres.Must(externalObjectId.GetGenre()).AssertGenre(
-	// 	genres.Zettel,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+		object = sku.GetTransactedPool().Get()
 
-	sk = sku.GetTransactedPool().Get()
+		var external sku.ExternalLike
 
-	var external sku.ExternalLike
-
-	if external, err = executor.ReadExternalLikeFromObjectIdLike(
-		sku.CommitOptions{
-			StoreOptions: sku.StoreOptions{
-				UpdateTai: true,
+		if external, err = executor.ReadExternalLikeFromObjectIdLike(
+			sku.CommitOptions{
+				StoreOptions: sku.StoreOptions{
+					UpdateTai: true,
+				},
 			},
-		},
-		externalObjectId,
-		sk,
-	); err != nil {
-		err = errors.Wrapf(err, "ExternalObjectId: %q", externalObjectId)
-		return
-	}
+			externalObjectId,
+			object,
+		); err != nil {
+			err = errors.Wrapf(err, "ExternalObjectId: %q", externalObjectId)
+			return
+		}
 
-	if external != nil {
-		sku.TransactedResetter.ResetWith(sk, external.GetSku())
+		if external != nil {
+			sku.TransactedResetter.ResetWith(object, external.GetSku())
+		}
+	} else {
+		var objectId *ids.ObjectId
+
+		if objectId, _, err = executor.Query.getExactlyOneObjectId(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		object = sku.GetTransactedPool().Get()
+
+		if err = executor.FuncReadOneInto(
+			objectId,
+			object,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -106,9 +123,7 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 	var objectId *ids.ObjectId
 	var sigil ids.Sigil
 
-	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(
-		genres.Zettel,
-	); err != nil {
+	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -146,18 +161,25 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 	return
 }
 
-func (e *Executor) ExecuteSkuType(
+func (executor *Executor) ExecuteSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	if err = e.applyDotOperatorIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	if executor.ExternalStore != nil {
+		if err = executor.applyDotOperatorIfNecessary(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if err = e.executeExternalQueryCheckedOut(out); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		if err = executor.executeExternalQueryCheckedOut(out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = executor.executeInternalQuerySkuType(out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+  }
 
 	return
 }
@@ -171,7 +193,7 @@ func (e *Executor) ExecuteTransacted(
 	}
 
 	// TODO tease apart the reliance on dotOperatorActive here
-	if e.dotOperatorActive {
+	if e.dotOperatorActive && e.ExternalStore != nil {
 		if err = e.executeExternalQuery(out); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -194,7 +216,7 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 		return
 	}
 
-	if e.isDotOperatorActive() {
+	if e.isDotOperatorActive() && e.ExternalStore != nil {
 		if err = e.executeExternalQueryCheckedOut(out); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -276,27 +298,28 @@ func (e *Executor) executeInternalQuery(
 func (e *Executor) makeEmitSkuSigilLatest(
 	out interfaces.FuncIter[*sku.Transacted],
 ) interfaces.FuncIter[*sku.Transacted] {
-	return func(z *sku.Transacted) (err error) {
-		g := genres.Must(z.GetGenre())
+	return func(object *sku.Transacted) (err error) {
+		g := genres.Must(object.GetGenre())
 
-		if !e.containsSku(z) {
+		if !e.containsSku(object) {
 			return
 		}
 
-		m, ok := e.Get(g)
+		// TODO cache query with sigil and object id
+		genreQuery, ok := e.Get(g)
 
 		if !ok {
 			return
 		}
 
-		if m.GetSigil().IncludesExternal() {
-			if err = e.UpdateTransacted(z); err != nil {
+		if genreQuery.GetSigil().IncludesExternal() && e.ExternalStore != nil {
+			if err = e.UpdateTransacted(object); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		if err = out(z); err != nil {
+		if err = out(object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

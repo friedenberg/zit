@@ -10,12 +10,12 @@ import (
 
 type LocalWorkingCopyWithQueryGroup struct {
 	LocalWorkingCopy
-	QueryGroup
+	Query
 }
 
 func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagSet(f *flag.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
+	cmd.Query.SetFlagSet(f)
 }
 
 func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
@@ -24,7 +24,7 @@ func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
 ) (*local_working_copy.Repo, *query.Query) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	queryGroup := cmd.MakeQueryGroup(
+	queryGroup := cmd.MakeQuery(
 		req,
 		builderOptions,
 		localWorkingCopy,

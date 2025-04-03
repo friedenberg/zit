@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	pkg_query "code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
@@ -28,7 +28,7 @@ func init() {
 type Show struct {
 	command_components.EnvRepo
 	command_components.LocalArchive
-	command_components.QueryGroup
+	command_components.Query
 
 	complete command_components.Complete
 
@@ -40,7 +40,7 @@ type Show struct {
 func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.EnvRepo.SetFlagSet(flagSet)
 	cmd.LocalArchive.SetFlagSet(flagSet)
-	cmd.QueryGroup.SetFlagSet(flagSet)
+	cmd.Query.SetFlagSet(flagSet)
 
 	flagSet.StringVar(&cmd.Format, "format", "log", "format")
 	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.Before), "before", "")
@@ -71,7 +71,7 @@ func (cmd Show) Complete(
 		cmd.complete.CompleteObjects(
 			req,
 			localWorkingCopy,
-			query.BuilderOptionDefaultGenres(genres.Tag),
+			pkg_query.BuilderOptionDefaultGenres(genres.Tag),
 			args...,
 		)
 	}
@@ -84,17 +84,17 @@ func (cmd Show) Run(req command.Request) {
 	args := req.PopArgs()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		queryGroup := cmd.MakeQueryGroup(
+		query := cmd.MakeQuery(
 			req,
-			query.BuilderOptions(
-				query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
-				query.BuilderOptionDefaultGenres(genres.Zettel),
+			pkg_query.BuilderOptions(
+				pkg_query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
+				pkg_query.BuilderOptionDefaultGenres(genres.Zettel),
 			),
 			localWorkingCopy,
 			args,
 		)
 
-		cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, queryGroup)
+		cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, query)
 	} else {
 		if len(args) != 0 {
 			ui.Err().Print("ignoring arguments for archive repo")
@@ -106,26 +106,26 @@ func (cmd Show) Run(req command.Request) {
 
 func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	repo *local_working_copy.Repo,
-	queryGroup *query.Query,
+	query *pkg_query.Query,
 ) {
-	var f interfaces.FuncIter[*sku.Transacted]
+	var output interfaces.FuncIter[*sku.Transacted]
 
-	if cmd.Format == "" && query.IsExactlyOneObjectId(queryGroup) {
+	if cmd.Format == "" && pkg_query.IsExactlyOneObjectId(query) {
 		cmd.Format = "text"
 	}
 
 	{
 		var err error
 
-		if f, err = repo.MakeFormatFunc(cmd.Format, repo.GetUIFile()); err != nil {
+		if output, err = repo.MakeFormatFunc(cmd.Format, repo.GetUIFile()); err != nil {
 			repo.CancelWithError(err)
 		}
 	}
 
 	if !cmd.Before.IsEmpty() {
-		old := f
+		old := output
 
-		f = func(sk *sku.Transacted) (err error) {
+		output = func(sk *sku.Transacted) (err error) {
 			if !sk.GetTai().Before(cmd.Before) {
 				return
 			}
@@ -140,9 +140,9 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	}
 
 	if !cmd.After.IsEmpty() {
-		old := f
+		old := output
 
-		f = func(sk *sku.Transacted) (err error) {
+		output = func(sk *sku.Transacted) (err error) {
 			if !sk.GetTai().After(cmd.After) {
 				return
 			}
@@ -157,8 +157,8 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	}
 
 	if err := repo.GetStore().QueryTransacted(
-		queryGroup,
-		quiter.MakeSyncSerializer(f),
+		query,
+		quiter.MakeSyncSerializer(output),
 	); err != nil {
 		repo.CancelWithError(err)
 	}

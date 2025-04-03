@@ -28,7 +28,7 @@ type buildState struct {
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
-	repo                    sku.ExternalStoreForQuery
+	externalStore           sku.ExternalStoreForQuery
 
 	externalStoreAcceptedQueryComponent bool
 
@@ -78,18 +78,18 @@ func (b *buildState) build(
 
 	var remaining []string
 
-	if b.repo == nil {
+	if b.externalStore == nil {
 		remaining = values
 	} else {
 		for _, value := range values {
-			if value == "." {
+			if value == "." && b.externalStore != nil {
 				b.group.dotOperatorActive = true
 				remaining = append(remaining, value)
 			}
 
 			var externalObjectIds []sku.ExternalObjectId
 
-			if externalObjectIds, err = b.repo.GetObjectIdsForString(
+			if externalObjectIds, err = b.externalStore.GetObjectIdsForString(
 				value,
 			); err != nil {
 				if value != "." {
@@ -307,7 +307,7 @@ LOOP:
 			// external object ID. And if that fails, try to remove the last two
 			// elements as per the above and read that and force the genre and sigils
 			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
-				err = errors.Wrap(err)
+				err = errors.BadRequestf("not a valid object id: %q", seq)
 				return
 			}
 

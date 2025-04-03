@@ -19,12 +19,12 @@ func init() {
 type Pull struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteTransfer
-	command_components.QueryGroup
+	command_components.Query
 }
 
 func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(f)
-	cmd.QueryGroup.SetFlagSet(f)
+	cmd.Query.SetFlagSet(f)
 	cmd.LocalWorkingCopy.SetFlagSet(f)
 }
 
@@ -45,7 +45,7 @@ func (cmd Pull) Run(req command.Request) {
 
 	remote := cmd.MakeRemote(req, localWorkingCopy, object)
 
-	qg := cmd.MakeQueryGroup(
+	qg := cmd.MakeQuery(
 		req,
 		query.BuilderOptionsOld(
 			cmd,

@@ -5,30 +5,39 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/golf/command"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	pkg_query "code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
-type QueryGroup struct {
+type Query struct {
 	sku.ExternalQueryOptions
 }
 
-func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Query) SetFlagSet(f *flag.FlagSet) {
 	// TODO switch to repo
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
 }
 
-func (cmd QueryGroup) MakeQueryGroup(
+func (cmd Query) MakeQuery(
 	req command.Request,
-	options query.BuilderOption,
-	repo repo.WorkingCopy,
+	options pkg_query.BuilderOption,
+	workingCopy repo.WorkingCopy,
 	args []string,
-) (queryGroup *query.Query) {
+) (query *pkg_query.Query) {
+	if repo, ok := workingCopy.(repo.LocalWorkingCopy); ok {
+		envWorkspace := repo.GetEnvWorkspace()
+
+		options = pkg_query.BuilderOptions(
+			options,
+			pkg_query.BuilderOptionWorkspace{Env: envWorkspace},
+		)
+	}
+
 	var err error
 
-	if queryGroup, err = repo.MakeExternalQueryGroup(
+	if query, err = workingCopy.MakeExternalQueryGroup(
 		options,
 		cmd.ExternalQueryOptions,
 		args...,

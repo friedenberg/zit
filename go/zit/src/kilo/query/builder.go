@@ -224,20 +224,23 @@ func (b *Builder) WithTransacted(
 func (b *Builder) BuildQueryGroupWithRepoId(
 	externalQueryOptions sku.ExternalQueryOptions,
 	values ...string,
-) (group *Query, err error) {
+) (query *Query, err error) {
 	state := b.makeState()
 
-	ok := false
-	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(
-		externalQueryOptions.RepoId,
-	)
+	if b.workspaceEnabled {
+		ok := false
 
-	state.group.RepoId = externalQueryOptions.RepoId
-	state.group.ExternalQueryOptions = externalQueryOptions
+		state.externalStore, ok = b.repoGetter.GetExternalStoreForQuery(
+			externalQueryOptions.RepoId,
+		)
 
-	if !ok {
-		err = errors.Errorf("kasten not found: %q", externalQueryOptions.RepoId)
-		return
+		state.group.RepoId = externalQueryOptions.RepoId
+		state.group.ExternalQueryOptions = externalQueryOptions
+
+		if !ok {
+			err = errors.Errorf("kasten not found: %q", externalQueryOptions.RepoId)
+			return
+		}
 	}
 
 	if err = b.build(state, values...); err != nil {
@@ -245,7 +248,7 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 		return
 	}
 
-	group = state.group
+	query = state.group
 
 	return
 }

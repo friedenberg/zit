@@ -34,13 +34,19 @@ type Edit struct {
 	CheckoutMode checkout_mode.Mode
 }
 
-func (cmd *Edit) SetFlagSet(f *flag.FlagSet) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *Edit) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
 
-	cmd.Checkout.SetFlagSet(f)
+	cmd.Checkout.SetFlagSet(flagSet)
 
-	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
-	f.BoolVar(&cmd.IgnoreWorkspace, "ignore-workspace", false, "ignore any workspaces that may be present and checkout the object in a temporary directory")
+	flagSet.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
+
+	flagSet.BoolVar(
+    &cmd.IgnoreWorkspace,
+    "ignore-workspace",
+    false,
+    "ignore any workspaces that may be present and checkout the object in a temporary workspace",
+  )
 }
 
 func (c Edit) CompletionGenres() ids.Genre {
@@ -77,7 +83,7 @@ func (cmd Edit) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 
-	queryGroup := cmd.MakeQueryGroup(
+	queryGroup := cmd.MakeQuery(
 		req,
 		query.BuilderOptions(
 			query.BuilderOptionsOld(cmd),
@@ -98,13 +104,18 @@ func (cmd Edit) Run(req command.Request) {
 	}
 
 	opEdit := user_ops.Checkout{
-		Repo:    localWorkingCopy,
-		Options: options,
-		Edit:    true,
-    RefreshCheckout: true,
+		Repo:            localWorkingCopy,
+		Options:         options,
+		Edit:            true,
+		RefreshCheckout: true,
 	}
 
-	opEdit.Options.IgnoreWorkspace = cmd.IgnoreWorkspace || !envWorkspace.InWorkspace()
+  if opEdit.Options.IgnoreWorkspace {
+  }
+
+	if cmd.IgnoreWorkspace || !envWorkspace.InWorkspace() {
+    // TODO set temporary workspace
+  }
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)

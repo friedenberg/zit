@@ -212,9 +212,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 	return
 }
 
-func (queryGroup *Query) getExactlyOneObjectId(
-	genre genres.Genre,
-) (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
+func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 genre query but got %d",
@@ -224,11 +222,10 @@ func (queryGroup *Query) getExactlyOneObjectId(
 		return
 	}
 
-	query, ok := queryGroup.optimizedQueries[genre]
+	var query *expSigilAndGenre
 
-	if !ok {
-		err = errors.Errorf("expected to have genre %q", genre)
-		return
+	for _, query = range queryGroup.optimizedQueries {
+		break
 	}
 
 	if query.Sigil.ContainsOneOf(ids.SigilHistory) {

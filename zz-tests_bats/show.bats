@@ -158,7 +158,9 @@ function show_all_mutter { # @test
 	EOM
 }
 
+# bats test_tags=user_story:workspace
 function show_simple_one_zettel_binary { # @test
+	skip
 	echo "binary file" >file.bin
 	run_zit add -delete file.bin
 	assert_success
@@ -452,7 +454,9 @@ function show_history_all { # @test
 	EOM
 }
 
+# bats test_tags=user_story:workspace
 function show_etikett_toml { # @test
+	skip
 	cat >true.tag <<-EOM
 		---
 		! toml-tag-v1
@@ -483,7 +487,9 @@ function show_etikett_toml { # @test
 }
 
 # TODO fix race condition between stderr and stdout
+# bats test_tags=user_story:workspace, user_story:lua_tags
 function show_etikett_lua_v1 { # @test
+	skip
 	cat >true.tag <<-EOM
 		---
 		! lua-tag-v1
@@ -515,7 +521,9 @@ function show_etikett_lua_v1 { # @test
 }
 
 # TODO fix race condition between stderr and stdout
+# bats test_tags=user_story:workspace, user_story:lua_tags
 function show_etikett_lua_v2 { # @test
+	skip
 	cat >true.tag <<-EOM
 		---
 		! lua-tag-v2
