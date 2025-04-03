@@ -18,7 +18,7 @@ type InfoWorkspace struct {
 func (cmd InfoWorkspace) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := repo.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(repo)
+	envWorkspace.AssertNotTemporary(repo)
 	args := req.PopArgs()
 
 	if len(args) == 0 {

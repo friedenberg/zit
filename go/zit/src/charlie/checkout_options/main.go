@@ -14,13 +14,12 @@ type Options struct {
 type OptionsWithoutMode struct {
 	Force                bool
 	AllowConflicted      bool
-	IgnoreWorkspace      bool
 	StoreSpecificOptions any
 }
 
-func (c *Options) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
-	f.BoolVar(
+func (c *Options) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
+	flagSet.BoolVar(
 		&c.Force,
 		"force",
 		false,

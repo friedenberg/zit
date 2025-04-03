@@ -35,7 +35,7 @@ func (cmd Mergetool) Run(req command.Request) {
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(req)
+	envWorkspace.AssertNotTemporary(req)
 
 	conflicted := sku.MakeSkuTypeSetMutable()
 

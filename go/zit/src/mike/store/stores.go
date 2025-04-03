@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	pkg_query "code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
 func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
@@ -51,15 +51,15 @@ func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
 	return
 }
 
-func (s *Store) CheckoutQuery(
+func (store *Store) CheckoutQuery(
 	options checkout_options.Options,
-	qg *query.Query,
-	f interfaces.FuncIter[sku.SkuType],
+	query *pkg_query.Query,
+	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	es, ok := s.externalStores[qg.RepoId]
+	externalStore, ok := store.externalStores[query.RepoId]
 
 	if !ok {
-		err = errors.Errorf("no kasten with id %q", qg.RepoId)
+		err = errors.Errorf("no kasten with id %q", query.RepoId)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *Store) CheckoutQuery(
 
 		// TODO include a "query complete" signal for the external store to batch
 		// the checkout if necessary
-		if co, err = es.CheckoutOne(options, t); err != nil {
+		if co, err = externalStore.CheckoutOne(options, t); err != nil {
 			if errors.Is(err, external_store.ErrUnsupportedType{}) {
 				err = nil
 			} else {
@@ -78,14 +78,14 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
-		if !options.IgnoreWorkspace {
-			if err = s.ui.CheckedOutCheckedOut(co); err != nil {
+		if !store.envWorkspace.IsTemporary() {
+			if err = store.ui.CheckedOutCheckedOut(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		if err = f(co); err != nil {
+		if err = out(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -93,7 +93,7 @@ func (s *Store) CheckoutQuery(
 		return
 	}
 
-	if err = s.QueryTransacted(qg, qf); err != nil {
+	if err = store.QueryTransacted(query, qf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,8 +169,8 @@ func (s *Store) Open(
 }
 
 func (store *Store) makeQueryExecutor(
-	queryGroup *query.Query,
-) (executor query.Executor, err error) {
+	queryGroup *pkg_query.Query,
+) (executor pkg_query.Executor, err error) {
 	if queryGroup == nil {
 		if queryGroup, err = store.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
@@ -180,7 +180,7 @@ func (store *Store) makeQueryExecutor(
 
 	externalStore := store.externalStores[queryGroup.RepoId]
 
-	executor = query.MakeExecutorWithExternalStore(
+	executor = pkg_query.MakeExecutorWithExternalStore(
 		queryGroup,
 		store.GetStreamIndex().ReadPrimitiveQuery,
 		store.ReadOneInto,

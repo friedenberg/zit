@@ -14,8 +14,8 @@ const (
 	PathOptionLeft
 	PathOptionMiddle
 	PathOptionRight
-	PathOptionTempLocal
-	PathOptionTempOS
+	PathOptionTempLocal // TODO remove
+	PathOptionTempOS    // TODO remove
 )
 
 type CheckoutOptions struct {
@@ -41,10 +41,6 @@ func GetCheckoutOptionsFromOptionsWithoutMode(
 
 	default:
 		panic(fmt.Sprintf("expected %T or nil but got %T", fsOptions, t))
-	}
-
-	if options.IgnoreWorkspace {
-		fsOptions.Path = PathOptionTempLocal
 	}
 
 	return

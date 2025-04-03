@@ -42,11 +42,11 @@ func (cmd *Edit) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
 
 	flagSet.BoolVar(
-    &cmd.IgnoreWorkspace,
-    "ignore-workspace",
-    false,
-    "ignore any workspaces that may be present and checkout the object in a temporary workspace",
-  )
+		&cmd.IgnoreWorkspace,
+		"ignore-workspace",
+		false,
+		"ignore any workspaces that may be present and checkout the object in a temporary workspace",
+	)
 }
 
 func (c Edit) CompletionGenres() ids.Genre {
@@ -110,12 +110,9 @@ func (cmd Edit) Run(req command.Request) {
 		RefreshCheckout: true,
 	}
 
-  if opEdit.Options.IgnoreWorkspace {
-  }
-
 	if cmd.IgnoreWorkspace || !envWorkspace.InWorkspace() {
-    // TODO set temporary workspace
-  }
+		// TODO set temporary workspace
+	}
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)

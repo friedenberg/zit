@@ -17,8 +17,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
-	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 

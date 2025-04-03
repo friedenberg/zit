@@ -152,8 +152,6 @@ func (cmd *New) Run(req command.Request) {
 		}
 	}
 
-	envWorkspace := repo.GetEnvWorkspace()
-
 	// TODO make mutually exclusive with organize
 	if cmd.Edit {
 		opCheckout := user_ops.Checkout{
@@ -161,7 +159,6 @@ func (cmd *New) Run(req command.Request) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
-					IgnoreWorkspace: !envWorkspace.InWorkspace(),
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						TextFormatterOptions: cotfo,
 					},

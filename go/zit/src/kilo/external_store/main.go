@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
@@ -67,6 +68,7 @@ type (
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {
+		Workspace env_workspace.Env
 		sku.ObjectStore
 		DirCache string
 		env_repo.Env

@@ -79,7 +79,7 @@ func (cmd Clean) Run(req command.Request) {
 	)
 
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
-	envWorkspace.AssertInWorkspace(req)
+	envWorkspace.AssertNotTemporary(req)
 
 	if cmd.organize {
 		if err := cmd.runOrganize(localWorkingCopy, queryGroup); err != nil {

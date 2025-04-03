@@ -3,7 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
 type QueryBuilderModifier interface {

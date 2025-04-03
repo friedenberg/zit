@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
@@ -73,7 +74,7 @@ func (s *Store) QueryCheckedOut(
 }
 
 func (es *Store) ReadAllExternalItems() (err error) {
-	esado, ok := es.StoreLike.(sku.ExternalStoreReadAllExternalItems)
+	esado, ok := es.StoreLike.(env_workspace.StoreReadAllExternalItems)
 
 	if !ok {
 		err = errors.Errorf("store does not support %T", &esado)

@@ -60,10 +60,6 @@ type (
 		) (e ExternalLike, err error)
 	}
 
-	ExternalStoreReadAllExternalItems interface {
-		ReadAllExternalItems() error
-	}
-
 	ExternalStoreForQuery interface {
 		GetObjectIdsForString(string) ([]ExternalObjectId, error)
 	}

@@ -10,10 +10,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
@@ -126,15 +126,17 @@ func (c *Store) Initialize(
 	return
 }
 
-func (s *Store) MakeSupplies() (es external_store.Supplies) {
-	es.ObjectStore = s
+// TODO add external_store.Supplies to Store and just use that
+func (store *Store) MakeSupplies() (supplies external_store.Supplies) {
+	supplies.Workspace = store.envWorkspace
+	supplies.ObjectStore = store
 
-	es.Env = s.GetEnvRepo()
+	supplies.Env = store.GetEnvRepo()
 	// es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
 
 	// es.RepoId = k
-	es.Clock = s.sunrise
-	es.BlobStore = s.typedBlobStore
+	supplies.Clock = store.sunrise
+	supplies.BlobStore = store.typedBlobStore
 
 	return
 }

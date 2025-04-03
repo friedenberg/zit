@@ -17,8 +17,9 @@ const FileWorkspace = ".zit-workspace"
 
 type Env interface {
 	env_dir.Env
-	AssertInWorkspace(errors.Context)
-	AssertInWorkspaceOrOfferToCreate(errors.Context)
+	AssertNotTemporary(errors.Context)
+	AssertNotTemporaryOrOfferToCreate(errors.Context)
+	IsTemporary() bool
 	InWorkspace() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() config_mutable_blobs.Defaults
@@ -84,14 +85,14 @@ func (env *env) GetWorkspacePath() string {
 	return filepath.Join(env.GetCwd(), FileWorkspace)
 }
 
-func (env *env) AssertInWorkspace(context errors.Context) {
-	if !env.InWorkspace() {
+func (env *env) AssertNotTemporary(context errors.Context) {
+	if env.IsTemporary() {
 		context.CancelWithError(ErrNotInWorkspace{env: env})
 	}
 }
 
-func (env *env) AssertInWorkspaceOrOfferToCreate(context errors.Context) {
-	if !env.InWorkspace() {
+func (env *env) AssertNotTemporaryOrOfferToCreate(context errors.Context) {
+	if env.IsTemporary() {
 		context.CancelWithError(
 			ErrNotInWorkspace{
 				env:           env,
@@ -99,6 +100,10 @@ func (env *env) AssertInWorkspaceOrOfferToCreate(context errors.Context) {
 			},
 		)
 	}
+}
+
+func (env *env) IsTemporary() bool {
+	return !env.InWorkspace()
 }
 
 func (env *env) InWorkspace() bool {

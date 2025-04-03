@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/india/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
 type (
@@ -19,7 +19,7 @@ type (
 	}
 
 	ExternalStore interface {
-		sku.ExternalStoreReadAllExternalItems
+		env_workspace.StoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
 		sku.ExternalStoreReadExternalLikeFromObjectIdLike
 		QueryCheckedOut
@@ -179,7 +179,7 @@ func (executor *Executor) ExecuteSkuType(
 			err = errors.Wrap(err)
 			return
 		}
-  }
+	}
 
 	return
 }
