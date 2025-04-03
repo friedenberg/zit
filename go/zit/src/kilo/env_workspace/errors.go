@@ -1,4 +1,4 @@
-package external_store
+package env_workspace
 
 import (
 	"fmt"

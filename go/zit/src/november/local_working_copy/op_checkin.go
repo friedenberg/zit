@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
 func (repo *Repo) Checkin(
@@ -47,7 +47,7 @@ func (repo *Repo) Checkin(
 			if err = repo.GetStore().UpdateTransactedFromBlobs(
 				co,
 			); err != nil {
-				if errors.Is(err, external_store.ErrUnsupportedOperation{}) {
+				if errors.Is(err, env_workspace.ErrUnsupportedOperation{}) {
 					err = nil
 				} else {
 					err = errors.Wrap(err)

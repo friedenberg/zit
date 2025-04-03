@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	pkg_query "code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
@@ -22,7 +22,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	}
 
 	if err = es.SaveBlob(el); err != nil {
-		if errors.Is(err, external_store.ErrUnsupportedOperation{}) {
+		if errors.Is(err, env_workspace.ErrUnsupportedOperation{}) {
 			err = nil
 		} else {
 			err = errors.Wrapf(err, "Sku: %s, RepoId: %s", el, repoId)
@@ -69,7 +69,7 @@ func (store *Store) CheckoutQuery(
 		// TODO include a "query complete" signal for the external store to batch
 		// the checkout if necessary
 		if co, err = externalStore.CheckoutOne(options, t); err != nil {
-			if errors.Is(err, external_store.ErrUnsupportedType{}) {
+			if errors.Is(err, env_workspace.ErrUnsupportedType{}) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

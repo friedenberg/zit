@@ -3,7 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 )
 
 type QueryBuilderModifier interface {
@@ -35,8 +35,12 @@ func (options builderOptions) Apply(builder *Builder) *Builder {
 	return builder
 }
 
+type BuilderOptionWorkspaceConfigGetter interface {
+	GetWorkspaceConfig() workspace_config_blobs.Blob
+}
+
 type BuilderOptionWorkspace struct {
-	env_workspace.Env
+	Env BuilderOptionWorkspaceConfigGetter
 }
 
 func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
@@ -48,7 +52,7 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 		return builder
 	}
 
-	workspaceConfig := options.GetWorkspaceConfig()
+	workspaceConfig := options.Env.GetWorkspaceConfig()
 
 	if workspaceConfig == nil {
 		return builder

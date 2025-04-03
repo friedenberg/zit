@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_abbr"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
@@ -49,7 +48,7 @@ type Repo struct {
 	storesInitialized bool
 	typedBlobStore    typed_blob_store.Stores
 	store             store.Store
-	externalStores    map[ids.RepoId]*external_store.Store
+	externalStores    map[ids.RepoId]*env_workspace.Store
 
 	DormantCounter query.DormantCounter
 
@@ -241,7 +240,7 @@ func (repo *Repo) initialize(
 		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
-	repo.externalStores = map[ids.RepoId]*external_store.Store{
+	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
 		{}: {
 			StoreLike: repo.storeFS,
 		},

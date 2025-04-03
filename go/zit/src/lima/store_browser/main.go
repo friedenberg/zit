@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
@@ -37,7 +37,7 @@ type checkedOutWithItem struct {
 
 type Store struct {
 	config            store_config.Store
-	externalStoreInfo external_store.Supplies
+	externalStoreInfo env_workspace.Supplies
 	typ               ids.Type
 	browser           browser_items.BrowserProxy
 
@@ -83,7 +83,7 @@ func Make(
 	return c
 }
 
-func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
+func (fs *Store) GetExternalStoreLike() env_workspace.StoreLike {
 	return fs
 }
 
@@ -154,7 +154,7 @@ func (c *Store) CheckoutOne(
 	sz := tg.GetSku()
 
 	if !sz.Metadata.Type.Equals(c.typ) {
-		err = errors.Wrap(external_store.ErrUnsupportedType(sz.Metadata.Type))
+		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.Metadata.Type))
 		return
 	}
 

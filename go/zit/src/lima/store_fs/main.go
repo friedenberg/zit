@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
 func init() {
@@ -79,7 +79,7 @@ type Store struct {
 	deletedInternal fd.MutableSet
 }
 
-func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
+func (fs *Store) GetExternalStoreLike() env_workspace.StoreLike {
 	return fs
 }
 
@@ -323,7 +323,7 @@ func (fs *Store) Get(
 	return fs.dirItems.probablyCheckedOut.Get(k.String())
 }
 
-func (s *Store) Initialize(esi external_store.Supplies) (err error) {
+func (s *Store) Initialize(esi env_workspace.Supplies) (err error) {
 	s.externalStoreSupplies = esi
 	return
 }

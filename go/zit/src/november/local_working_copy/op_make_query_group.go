@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
@@ -72,6 +72,6 @@ func (repo *Repo) MakeQueryBuilder(
 		WithOptions(options)
 }
 
-func (u *Repo) GetDefaultExternalStore() *external_store.Store {
+func (u *Repo) GetDefaultExternalStore() *env_workspace.Store {
 	return u.externalStores[ids.RepoId{}]
 }

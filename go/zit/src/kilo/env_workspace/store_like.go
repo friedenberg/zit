@@ -1,4 +1,4 @@
-package external_store
+package env_workspace
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -8,17 +8,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
+// public types that are not used publicly
 type (
-	QueryOptions struct {
-		ExcludeUntracked  bool
-		IncludeRecognized bool
-	}
-
 	CheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,
@@ -56,7 +51,10 @@ type (
 			sk *sku.Transacted,
 		) (co *sku.CheckedOut, err error)
 	}
+)
 
+// public types that are used publicly
+type (
 	MergeCheckedOut interface {
 		MergeCheckedOut(
 			co *sku.CheckedOut,
@@ -68,7 +66,7 @@ type (
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {
-		Workspace env_workspace.Env
+		Workspace Env
 		sku.ObjectStore
 		DirCache string
 		env_repo.Env
@@ -83,9 +81,5 @@ type (
 		QueryCheckedOut
 		errors.Flusher
 		sku.ExternalStoreForQuery
-	}
-
-	StoreGetter interface {
-		GetExternalStore(ids.RepoId) (*Store, bool)
 	}
 )

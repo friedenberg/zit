@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type fdSetWithError struct {
@@ -34,7 +33,7 @@ type dirItems struct {
 
 	interfaces.FileExtensionGetter
 	repoLayout            env_repo.Env
-	externalStoreSupplies external_store.Supplies
+	externalStoreSupplies env_workspace.Supplies
 
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData

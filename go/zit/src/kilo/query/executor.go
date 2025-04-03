@@ -5,9 +5,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
 type (
@@ -19,17 +21,29 @@ type (
 	}
 
 	ExternalStore interface {
-		env_workspace.StoreReadAllExternalItems
+		interfaces.WorkspaceStoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
 		sku.ExternalStoreReadExternalLikeFromObjectIdLike
 		QueryCheckedOut
+	}
+
+	WorkspaceEnv interface {
+		env_dir.Env
+		AssertNotTemporary(errors.Context)
+		AssertNotTemporaryOrOfferToCreate(errors.Context)
+		IsTemporary() bool
+		InWorkspace() bool
+		GetWorkspaceConfig() workspace_config_blobs.Blob
+		GetDefaults() config_mutable_blobs.Defaults
+		CreateWorkspace(workspace_config_blobs.Blob) (err error)
+		DeleteWorkspace() (err error)
 	}
 
 	ExecutionInfo struct {
 		ExternalStore
 		sku.FuncPrimitiveQuery
 		sku.FuncReadOneInto
-		env_workspace.Env
+		Env WorkspaceEnv
 	}
 )
 
@@ -45,7 +59,7 @@ func MakeExecutorWithExternalStore(
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
 	externalStore ExternalStore,
-	envWorkspace env_workspace.Env,
+	envWorkspace WorkspaceEnv,
 ) Executor {
 	executor := Executor{
 		primitive: primitive{query},
@@ -382,7 +396,7 @@ func (executor *Executor) applyDotOperatorIfNecessary() (err error) {
 }
 
 func (executor *Executor) readAllItemsIfNecessary() (err error) {
-	if !executor.InWorkspace() {
+	if !executor.Env.InWorkspace() {
 		return
 	}
 

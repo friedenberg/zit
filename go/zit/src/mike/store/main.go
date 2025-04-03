@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
@@ -31,7 +30,7 @@ type Store struct {
 	envWorkspace env_workspace.Env
 
 	storeFS            *store_fs.Store
-	externalStores     map[ids.RepoId]*external_store.Store
+	externalStores     map[ids.RepoId]*env_workspace.Store
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.AbbrStore
@@ -127,7 +126,7 @@ func (c *Store) Initialize(
 }
 
 // TODO add external_store.Supplies to Store and just use that
-func (store *Store) MakeSupplies() (supplies external_store.Supplies) {
+func (store *Store) MakeSupplies() (supplies env_workspace.Supplies) {
 	supplies.Workspace = store.envWorkspace
 	supplies.ObjectStore = store
 
@@ -142,7 +141,7 @@ func (store *Store) MakeSupplies() (supplies external_store.Supplies) {
 }
 
 func (s *Store) SetExternalStores(
-	stores map[ids.RepoId]*external_store.Store,
+	stores map[ids.RepoId]*env_workspace.Store,
 ) (err error) {
 	s.externalStores = stores
 

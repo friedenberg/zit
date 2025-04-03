@@ -8,10 +8,10 @@ import (
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 )
 
-func (s *Store) Initialize(esi external_store.Supplies) (err error) {
+func (s *Store) Initialize(esi env_workspace.Supplies) (err error) {
 	s.externalStoreInfo = esi
 
 	if err = s.browser.Read(); err != nil {
