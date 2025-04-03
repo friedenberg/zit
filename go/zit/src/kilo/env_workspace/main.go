@@ -17,6 +17,7 @@ const FileWorkspace = ".zit-workspace"
 
 type Env interface {
 	env_dir.Env
+	GetWorkspaceDir() string
 	AssertNotTemporary(errors.Context)
 	AssertNotTemporaryOrOfferToCreate(errors.Context)
 	IsTemporary() bool
@@ -42,7 +43,7 @@ func Make(
 
 	if err = workspace_config_blobs.DecodeFromFile(
 		&object,
-		out.GetWorkspacePath(),
+		out.GetWorkspaceConfigFilePath(),
 	); errors.IsNotExist(err) {
 		err = nil
 	} else if err != nil {
@@ -81,8 +82,19 @@ type env struct {
 	defaults      config_mutable_blobs.DefaultsV1
 }
 
-func (env *env) GetWorkspacePath() string {
-	return filepath.Join(env.GetCwd(), FileWorkspace)
+func (env *env) GetWorkspaceDir() string {
+	if env.IsTemporary() {
+		// TODO return temp dir
+		// return env.GetCwd()
+	} else {
+		return env.GetCwd()
+	}
+
+	return env.GetCwd()
+}
+
+func (env *env) GetWorkspaceConfigFilePath() string {
+	return filepath.Join(env.GetWorkspaceDir(), FileWorkspace)
 }
 
 func (env *env) AssertNotTemporary(context errors.Context) {
@@ -129,7 +141,7 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 
 	if err = workspace_config_blobs.EncodeToFile(
 		&object,
-		env.GetWorkspacePath(),
+		env.GetWorkspaceConfigFilePath(),
 	); errors.IsExist(err) {
 		err = errors.BadRequestf("workspace already exists")
 		return
@@ -142,7 +154,7 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 }
 
 func (env *env) DeleteWorkspace() (err error) {
-	if err = env.Delete(env.GetWorkspacePath()); errors.IsNotExist(err) {
+	if err = env.Delete(env.GetWorkspaceConfigFilePath()); errors.IsNotExist(err) {
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)

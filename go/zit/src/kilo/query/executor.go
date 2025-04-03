@@ -24,11 +24,6 @@ type (
 		QueryCheckedOut
 	}
 
-	WorkspaceEnv interface {
-		IsTemporary() bool
-		InWorkspace() bool
-	}
-
 	ExecutionInfo struct {
 		ExternalStore
 		sku.FuncPrimitiveQuery
@@ -48,21 +43,15 @@ func MakeExecutorWithExternalStore(
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
 	externalStore ExternalStore,
-	envWorkspace WorkspaceEnv,
 ) Executor {
-	executor := Executor{
+	return Executor{
 		primitive: primitive{query},
 		ExecutionInfo: ExecutionInfo{
+			ExternalStore:      externalStore,
 			FuncPrimitiveQuery: fpq,
 			FuncReadOneInto:    froi,
 		},
 	}
-
-	if envWorkspace.InWorkspace() {
-		executor.ExternalStore = externalStore
-	}
-
-	return executor
 }
 
 // TODO refactor into methods that have internal in the name

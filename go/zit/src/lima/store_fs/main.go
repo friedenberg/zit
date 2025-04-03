@@ -34,6 +34,7 @@ func Make(
 	envRepo env_repo.Env,
 	inventoryFormatOptions object_inventory_format.Options,
 	fileEncoder FileEncoder,
+	envWorkspace env_workspace.Env,
 ) (fs *Store, err error) {
 	fs = &Store{
 		config:         config,

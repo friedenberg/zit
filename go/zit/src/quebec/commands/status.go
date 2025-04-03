@@ -27,6 +27,7 @@ func (c Status) ModifyBuilder(
 
 func (cmd Status) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	localWorkingCopy.GetEnvWorkspace().AssertNotTemporary(req)
 
 	query := cmd.MakeQuery(
 		req,

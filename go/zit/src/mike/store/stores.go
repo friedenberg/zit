@@ -185,7 +185,6 @@ func (store *Store) makeQueryExecutor(
 		store.GetStreamIndex().ReadPrimitiveQuery,
 		store.ReadOneInto,
 		externalStore,
-		store.envWorkspace,
 	)
 
 	return

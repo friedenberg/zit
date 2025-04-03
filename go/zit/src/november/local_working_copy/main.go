@@ -177,6 +177,7 @@ func (repo *Repo) initialize(
 		repo.GetEnvRepo(),
 		objectInventoryFormatOptions,
 		repo.fileEncoder,
+		repo.envWorkspace,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
