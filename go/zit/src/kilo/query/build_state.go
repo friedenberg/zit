@@ -82,7 +82,7 @@ func (b *buildState) build(
 		remaining = values
 	} else {
 		for _, value := range values {
-			if value == "." && b.externalStore != nil {
+			if value == "." {
 				b.group.dotOperatorActive = true
 				remaining = append(remaining, value)
 			}

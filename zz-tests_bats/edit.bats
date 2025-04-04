@@ -57,7 +57,6 @@ function edit_and_dont_change_workspace { # @test
 # TODO fix no-workspace edits
 
 function edit_and_change_no_workspace { # @test
-	skip
 	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
 	run_zit edit one/uno
 	assert_success
@@ -73,7 +72,6 @@ function edit_and_change_no_workspace { # @test
 }
 
 function edit_and_dont_change_no_workspace { # @test
-	skip
 	export EDITOR="true"
 	run_zit edit one/uno
 	assert_success
@@ -88,7 +86,6 @@ function edit_and_dont_change_no_workspace { # @test
 }
 
 function edit_and_format_no_workspace { # @test
-	skip
 	export EDITOR="bash -c 'out=\"\$(mktemp)\"; zit format-object \$0 > \"\$out\"; mv \"\$out\" \"\$0\" || true'"
 	run_zit edit one/uno
 	assert_success

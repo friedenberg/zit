@@ -110,10 +110,6 @@ func (cmd Edit) Run(req command.Request) {
 		RefreshCheckout: true,
 	}
 
-	if cmd.IgnoreWorkspace || !envWorkspace.InWorkspace() {
-		// TODO set temporary workspace
-	}
-
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
 		localWorkingCopy.CancelWithError(err)
 	}

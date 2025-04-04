@@ -21,7 +21,6 @@ type Env interface {
 	AssertNotTemporary(errors.Context)
 	AssertNotTemporaryOrOfferToCreate(errors.Context)
 	IsTemporary() bool
-	InWorkspace() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() config_mutable_blobs.Defaults
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
@@ -41,10 +40,16 @@ func Make(
 		Type: &ids.Type{},
 	}
 
+	expectedWorkspaceConfigFilePath := filepath.Join(
+		out.GetCwd(),
+		FileWorkspace,
+	)
+
 	if err = workspace_config_blobs.DecodeFromFile(
 		&object,
-		out.GetWorkspaceConfigFilePath(),
+		expectedWorkspaceConfigFilePath,
 	); errors.IsNotExist(err) {
+		out.isTemporary = true
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
@@ -72,25 +77,38 @@ func Make(
 		}
 	}
 
+	if out.isTemporary {
+		if out.dir, err = out.GetTempLocal().DirTempWithTemplate(
+			"workspace-*",
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		out.dir = out.GetCwd()
+	}
+
 	return
 }
 
 type env struct {
 	env_local.Env
+
+	isTemporary bool
+
+  // dir is populated on init to either the cwd, or a temporary directory,
+  // depending on whether $PWD/.zit-workspace exists.
+  //
+  // Later, dir may be set to $PWD/.zit-workspace by CreateWorkspace
+	dir         string
+
 	configMutable config_mutable_blobs.Blob
 	blob          workspace_config_blobs.Blob
 	defaults      config_mutable_blobs.DefaultsV1
 }
 
 func (env *env) GetWorkspaceDir() string {
-	if env.IsTemporary() {
-		// TODO return temp dir
-		// return env.GetCwd()
-	} else {
-		return env.GetCwd()
-	}
-
-	return env.GetCwd()
+	return env.dir
 }
 
 func (env *env) GetWorkspaceConfigFilePath() string {
@@ -115,11 +133,7 @@ func (env *env) AssertNotTemporaryOrOfferToCreate(context errors.Context) {
 }
 
 func (env *env) IsTemporary() bool {
-	return !env.InWorkspace()
-}
-
-func (env *env) InWorkspace() bool {
-	return env.blob != nil
+	return env.isTemporary
 }
 
 func (env *env) GetWorkspaceConfig() workspace_config_blobs.Blob {
@@ -138,6 +152,8 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 		Type:   &tipe,
 		Struct: &env.blob,
 	}
+
+	env.dir = env.GetCwd()
 
 	if err = workspace_config_blobs.EncodeToFile(
 		&object,

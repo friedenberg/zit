@@ -23,12 +23,17 @@ type (
 	builderOptions      []BuilderOption
 )
 
+// nil options are permitted, they are just skipped during application
 func BuilderOptions(options ...BuilderOption) builderOptions {
 	return builderOptions(options)
 }
 
 func (options builderOptions) Apply(builder *Builder) *Builder {
 	for _, option := range options {
+		if option == nil {
+			continue
+		}
+
 		builder = option.Apply(builder)
 	}
 
@@ -48,9 +53,7 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 		return builder
 	}
 
-	if options.Env == nil {
-		return builder
-	}
+	builder.workspaceEnabled = true
 
 	workspaceConfig := options.Env.GetWorkspaceConfig()
 
@@ -58,7 +61,6 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 		return builder
 	}
 
-	builder.workspaceEnabled = true
 	defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
 
 	if defaultQueryGroup == "" {

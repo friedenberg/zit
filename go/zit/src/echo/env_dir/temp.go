@@ -27,7 +27,13 @@ type TemporaryFS struct {
 }
 
 func (s TemporaryFS) DirTemp() (d string, err error) {
-	if d, err = os.MkdirTemp(s.BasePath, ""); err != nil {
+	return s.DirTempWithTemplate("")
+}
+
+func (s TemporaryFS) DirTempWithTemplate(
+  template string,
+) (d string, err error) {
+	if d, err = os.MkdirTemp(s.BasePath, template); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

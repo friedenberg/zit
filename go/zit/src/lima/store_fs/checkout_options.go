@@ -15,7 +15,6 @@ const (
 	PathOptionMiddle
 	PathOptionRight
 	PathOptionTempLocal // TODO remove
-	PathOptionTempOS    // TODO remove
 )
 
 type CheckoutOptions struct {

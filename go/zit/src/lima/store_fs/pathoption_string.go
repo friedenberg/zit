@@ -13,12 +13,11 @@ func _() {
 	_ = x[PathOptionMiddle-2]
 	_ = x[PathOptionRight-3]
 	_ = x[PathOptionTempLocal-4]
-	_ = x[PathOptionTempOS-5]
 }
 
-const _PathOption_name = "PathOptionDefaultPathOptionLeftPathOptionMiddlePathOptionRightPathOptionTempLocalPathOptionTempOS"
+const _PathOption_name = "PathOptionDefaultPathOptionLeftPathOptionMiddlePathOptionRightPathOptionTempLocal"
 
-var _PathOption_index = [...]uint8{0, 17, 31, 47, 62, 81, 97}
+var _PathOption_index = [...]uint8{0, 17, 31, 47, 62, 81}
 
 func (i PathOption) String() string {
 	if i < 0 || i >= PathOption(len(_PathOption_index)-1) {
