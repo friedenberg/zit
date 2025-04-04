@@ -40,6 +40,7 @@ func Make(
 		config:         config,
 		deletedPrinter: deletedPrinter,
 		envRepo:        envRepo,
+		envWorkspace:   envWorkspace,
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
 		dir:            envRepo.GetCwd(),
@@ -71,6 +72,7 @@ type Store struct {
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	metadataTextParser  object_metadata.TextParser
 	envRepo             env_repo.Env
+	envWorkspace        env_workspace.Env
 	fileEncoder         FileEncoder
 	inlineTypeChecker   ids.InlineTypeChecker
 	fileExtensions      interfaces.FileExtensionGetter
@@ -249,6 +251,7 @@ func (s *Store) GetFSItemsForDir(
 
 // TODO confirm against actual Object Id
 func (s *Store) GetFSItemsForString(
+	baseDir string,
 	value string,
 	tryPattern bool,
 ) (items []*sku.FSItem, err error) {
@@ -263,7 +266,7 @@ func (s *Store) GetFSItemsForString(
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPath(value, s.envRepo); err != nil {
+	if fdee, err = fd.MakeFromPath(baseDir, value, s.envRepo); err != nil {
 		if errors.IsNotExist(err) && tryPattern {
 			if items, err = s.dirItems.processFDPattern(
 				value,
@@ -295,12 +298,12 @@ func (s *Store) GetFSItemsForString(
 	return
 }
 
-func (s *Store) GetObjectIdsForString(
+func (store *Store) GetObjectIdsForString(
 	v string,
 ) (k []sku.ExternalObjectId, err error) {
 	var items []*sku.FSItem
 
-	if items, err = s.GetFSItemsForString(v, false); err != nil {
+	if items, err = store.GetFSItemsForString(store.root, v, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -310,7 +313,7 @@ func (s *Store) GetObjectIdsForString(
 
 		if err = item.WriteToExternalObjectId(
 			&eoid,
-			s.envRepo,
+			store.envRepo,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

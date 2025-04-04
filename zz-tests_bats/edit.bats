@@ -86,7 +86,18 @@ function edit_and_dont_change_no_workspace { # @test
 }
 
 function edit_and_format_no_workspace { # @test
-	export EDITOR="bash -c 'out=\"\$(mktemp)\"; zit format-object \$0 > \"\$out\"; mv \"\$out\" \"\$0\" || true'"
+	# shellcheck disable=SC2317
+	function editor() {
+		out="$(mktemp)"
+		zit format-object "$0" >"$out"
+		mv "$out" "$0"
+	}
+
+	export -f editor
+
+	# shellcheck disable=SC2016
+	export EDITOR='bash -c "editor $0"'
+
 	run_zit edit one/uno
 	assert_success
 	assert_output - <<-EOM

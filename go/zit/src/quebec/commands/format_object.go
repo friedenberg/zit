@@ -45,9 +45,9 @@ func (cmd *FormatObject) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the zettel")
 }
 
-func (cmd *FormatObject) Run(dep command.Request) {
-	args := dep.PopArgs()
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+func (cmd *FormatObject) Run(req command.Request) {
+	args := req.PopArgs()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	if cmd.Stdin {
 		if err := cmd.FormatFromStdin(localWorkingCopy, args...); err != nil {

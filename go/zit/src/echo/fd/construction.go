@@ -4,7 +4,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
+	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -13,38 +13,38 @@ import (
 )
 
 func MakeFromDirPath(
-	p string,
+	path string,
 ) (fd *FD, err error) {
 	fd = &FD{}
 	fd.isDir = true
-	fd.path = p
+	fd.path = path
 
 	return
 }
 
 func MakeFromPathAndDirEntry(
-	p string,
-	de fs.DirEntry,
-	awf interfaces.BlobWriter,
+	path string,
+	dirEntry fs.DirEntry,
+	blobWriter interfaces.BlobWriter,
 ) (fd *FD, err error) {
-	if p == "" {
+	if path == "" {
 		err = errors.Errorf("nil file desriptor")
 		return
 	}
 
-	if p == "." {
+	if path == "." {
 		err = errors.Errorf("'.' not supported")
 		return
 	}
 
 	var fi os.FileInfo
 
-	if fi, err = de.Info(); err != nil {
+	if fi, err = dirEntry.Info(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if fd, err = MakeFromFileInfoWithDir(fi, path.Dir(p), awf); err != nil {
+	if fd, err = MakeFromFileInfoWithDir(fi, filepath.Dir(path), blobWriter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,30 +53,35 @@ func MakeFromPathAndDirEntry(
 }
 
 func MakeFromPath(
-	p string,
-	awf interfaces.BlobWriter,
+	baseDir string,
+	path string,
+	blobWriter interfaces.BlobWriter,
 ) (fd *FD, err error) {
-	if p == "" {
+	if path == "" {
 		err = errors.Errorf("nil file desriptor")
 		return
 	}
 
-	if p == "." {
+	if path == "." {
 		err = errors.Errorf("'.' not supported")
 		return
 	}
 
+	if !filepath.IsAbs(path) {
+		path = filepath.Clean(filepath.Join(baseDir, path))
+	}
+
 	var fi os.FileInfo
 
-	if fi, err = os.Stat(p); err != nil {
+	if fi, err = os.Stat(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if fd, err = MakeFromFileInfoWithDir(
 		fi,
-		path.Dir(p),
-		awf,
+		filepath.Dir(path),
+		blobWriter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -86,24 +91,24 @@ func MakeFromPath(
 }
 
 func MakeFromFileInfoWithDir(
-	fi os.FileInfo,
+	fileInfo os.FileInfo,
 	dir string,
-	awf interfaces.BlobWriter,
+	blobWriter interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	// TODO use pool
 	fd = &FD{}
 
-	if err = fd.SetFileInfoWithDir(fi, dir); err != nil {
+	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if fi.IsDir() {
+	if fileInfo.IsDir() {
 		return
 	}
 
 	// TODO eventually enforce requirement of blob writer factory
-	if awf == nil {
+	if blobWriter == nil {
 		return
 	}
 
@@ -118,7 +123,7 @@ func MakeFromFileInfoWithDir(
 
 	var aw sha.WriteCloser
 
-	if aw, err = awf.BlobWriter(); err != nil {
+	if aw, err = blobWriter.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

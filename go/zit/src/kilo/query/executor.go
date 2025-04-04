@@ -17,7 +17,7 @@ type (
 		) (err error)
 	}
 
-	ExternalStore interface {
+	WorkspaceStore interface {
 		interfaces.WorkspaceStoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
 		sku.ExternalStoreReadExternalLikeFromObjectIdLike
@@ -25,7 +25,7 @@ type (
 	}
 
 	ExecutionInfo struct {
-		ExternalStore
+		WorkspaceStore
 		sku.FuncPrimitiveQuery
 		sku.FuncReadOneInto
 	}
@@ -42,12 +42,12 @@ func MakeExecutorWithExternalStore(
 	query *Query,
 	fpq sku.FuncPrimitiveQuery,
 	froi sku.FuncReadOneInto,
-	externalStore ExternalStore,
+	workspaceStore WorkspaceStore,
 ) Executor {
 	return Executor{
 		primitive: primitive{query},
 		ExecutionInfo: ExecutionInfo{
-			ExternalStore:      externalStore,
+			WorkspaceStore:     workspaceStore,
 			FuncPrimitiveQuery: fpq,
 			FuncReadOneInto:    froi,
 		},
@@ -58,7 +58,7 @@ func MakeExecutorWithExternalStore(
 func (executor *Executor) ExecuteExactlyOneExternalObject(
 	permitInternal bool,
 ) (object *sku.Transacted, err error) {
-	if executor.ExternalStore != nil {
+	if executor.WorkspaceStore != nil {
 		var externalObjectId ids.ObjectIdLike
 
 		if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
@@ -155,7 +155,7 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 func (executor *Executor) ExecuteSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	if executor.ExternalStore != nil {
+	if executor.WorkspaceStore != nil {
 		if err = executor.applyDotOperatorIfNecessary(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -184,7 +184,7 @@ func (e *Executor) ExecuteTransacted(
 	}
 
 	// TODO tease apart the reliance on dotOperatorActive here
-	if e.dotOperatorActive && e.ExternalStore != nil {
+	if e.dotOperatorActive && e.WorkspaceStore != nil {
 		if err = e.executeExternalQuery(out); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -207,7 +207,7 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 		return
 	}
 
-	if e.isDotOperatorActive() && e.ExternalStore != nil {
+	if e.isDotOperatorActive() && e.WorkspaceStore != nil {
 		if err = e.executeExternalQueryCheckedOut(out); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -225,7 +225,7 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 func (e *Executor) executeExternalQueryCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	if err = e.ExternalStore.QueryCheckedOut(
+	if err = e.WorkspaceStore.QueryCheckedOut(
 		e.Query,
 		out,
 	); err != nil {
@@ -303,7 +303,7 @@ func (e *Executor) makeEmitSkuSigilLatest(
 			return
 		}
 
-		if genreQuery.GetSigil().IncludesExternal() && e.ExternalStore != nil {
+		if genreQuery.GetSigil().IncludesExternal() && e.WorkspaceStore != nil {
 			if err = e.UpdateTransacted(object); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -373,11 +373,11 @@ func (executor *Executor) applyDotOperatorIfNecessary() (err error) {
 }
 
 func (executor *Executor) readAllItemsIfNecessary() (err error) {
-	if executor.ExternalStore == nil {
+	if executor.WorkspaceStore == nil {
 		return
 	}
 
-	if err = executor.ExternalStore.ReadAllExternalItems(); err != nil {
+	if err = executor.WorkspaceStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

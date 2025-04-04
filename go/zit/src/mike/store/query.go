@@ -105,11 +105,11 @@ func (store *Store) QuerySkuType(
 }
 
 func (store *Store) QueryExactlyOneExternal(
-	queryGroup *pkg_query.Query,
+	query *pkg_query.Query,
 ) (sk *sku.Transacted, err error) {
 	var executor pkg_query.Executor
 
-	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
+	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

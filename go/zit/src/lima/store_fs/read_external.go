@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
 
-func (s *Store) ReadExternalLikeFromObjectIdLike(
+func (store *Store) ReadExternalLikeFromObjectIdLike(
 	commitOptions sku.CommitOptions,
 	objectIdMaybeExternal interfaces.Stringer,
 	internal *sku.Transacted,
@@ -18,10 +18,11 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 	_, isExternal := objectIdMaybeExternal.(ids.ExternalObjectIdLike)
 
 	if !isExternal {
-		oidString = s.keyForObjectIdString(oidString)
+		oidString = store.keyForObjectIdString(oidString)
 	}
 
-	if items, err = s.GetFSItemsForString(
+	if items, err = store.GetFSItemsForString(
+		store.envRepo.GetCwd(),
 		oidString,
 		true,
 	); err != nil {
@@ -41,7 +42,7 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 				return
 			}
 
-			if err = s.externalStoreSupplies.ReadOneInto(
+			if err = store.externalStoreSupplies.ReadOneInto(
 				&objectId,
 				external.GetSku(),
 			); err != nil {
@@ -67,7 +68,7 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 
 	item := items[0]
 
-	if external, err = s.ReadExternalFromItem(
+	if external, err = store.ReadExternalFromItem(
 		commitOptions,
 		item,
 		internal,
