@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/store_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
@@ -17,14 +18,14 @@ func MakeBuilder(
 	typedBlobStore typed_blob_store.Stores,
 	objectProbeIndex sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	repoGetter sku.ExternalStoreForQueryGetter,
+	workspaceStoreGetter store_workspace.StoreGetter,
 ) (b *Builder) {
 	b = &Builder{
-		envRepo:          envRepo,
-		typedBlobStore:   typedBlobStore,
-		objectProbeIndex: objectProbeIndex,
-		luaVMPoolBuilder: luaVMPoolBuilder,
-		repoGetter:       repoGetter,
+		envRepo:              envRepo,
+		typedBlobStore:       typedBlobStore,
+		objectProbeIndex:     objectProbeIndex,
+		luaVMPoolBuilder:     luaVMPoolBuilder,
+		workspaceStoreGetter: workspaceStoreGetter,
 	}
 
 	return
@@ -37,7 +38,7 @@ type Builder struct {
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
-	repoGetter              sku.ExternalStoreForQueryGetter
+	workspaceStoreGetter    store_workspace.StoreGetter
 	repoId                  ids.RepoId
 	fileExtensionGetter     interfaces.FileExtensionGetter
 	expanders               ids.Abbr
@@ -230,7 +231,7 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 	if b.workspaceEnabled {
 		ok := false
 
-		state.externalStore, ok = b.repoGetter.GetExternalStoreForQuery(
+		state.workspaceStore, ok = b.workspaceStoreGetter.GetWorkspaceStoreForQuery(
 			externalQueryOptions.RepoId,
 		)
 

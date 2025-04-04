@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/store_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/tag_blobs"
 )
@@ -28,7 +29,7 @@ type buildState struct {
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
-	externalStore           sku.ExternalStoreForQuery
+	workspaceStore          store_workspace.Store
 
 	externalStoreAcceptedQueryComponent bool
 
@@ -78,7 +79,7 @@ func (b *buildState) build(
 
 	var remaining []string
 
-	if b.externalStore == nil {
+	if b.workspaceStore == nil {
 		remaining = values
 	} else {
 		for _, value := range values {
@@ -89,7 +90,7 @@ func (b *buildState) build(
 
 			var externalObjectIds []sku.ExternalObjectId
 
-			if externalObjectIds, err = b.externalStore.GetObjectIdsForString(
+			if externalObjectIds, err = b.workspaceStore.GetObjectIdsForString(
 				value,
 			); err != nil {
 				if value != "." {

@@ -31,7 +31,7 @@ func (s TemporaryFS) DirTemp() (d string, err error) {
 }
 
 func (s TemporaryFS) DirTempWithTemplate(
-  template string,
+	template string,
 ) (d string, err error) {
 	if d, err = os.MkdirTemp(s.BasePath, template); err != nil {
 		err = errors.Wrap(err)

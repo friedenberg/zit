@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/store_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
@@ -309,9 +310,9 @@ func (u *Repo) GetMatcherDormant() query.DormantCounter {
 	return u.DormantCounter
 }
 
-func (u *Repo) GetExternalStoreForQuery(
+func (u *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
-) (sku.ExternalStoreForQuery, bool) {
+) (store_workspace.Store, bool) {
 	e, ok := u.externalStores[repoId]
 	return e, ok
 }

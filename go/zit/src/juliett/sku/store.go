@@ -60,14 +60,6 @@ type (
 		) (e ExternalLike, err error)
 	}
 
-	ExternalStoreForQuery interface {
-		GetObjectIdsForString(string) ([]ExternalObjectId, error)
-	}
-
-	ExternalStoreForQueryGetter interface {
-		GetExternalStoreForQuery(ids.RepoId) (ExternalStoreForQuery, bool)
-	}
-
 	BlobStore[T any] interface {
 		GetTransactedWithBlob(
 			sk TransactedGetter,

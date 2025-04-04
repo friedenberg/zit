@@ -96,11 +96,11 @@ type env struct {
 
 	isTemporary bool
 
-  // dir is populated on init to either the cwd, or a temporary directory,
-  // depending on whether $PWD/.zit-workspace exists.
-  //
-  // Later, dir may be set to $PWD/.zit-workspace by CreateWorkspace
-	dir         string
+	// dir is populated on init to either the cwd, or a temporary directory,
+	// depending on whether $PWD/.zit-workspace exists.
+	//
+	// Later, dir may be set to $PWD/.zit-workspace by CreateWorkspace
+	dir string
 
 	configMutable config_mutable_blobs.Blob
 	blob          workspace_config_blobs.Blob
