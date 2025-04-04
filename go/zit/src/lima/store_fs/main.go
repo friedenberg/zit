@@ -43,7 +43,11 @@ func Make(
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
 		dir:            envRepo.GetCwd(),
-		dirItems:       makeObjectsWithDir(envRepo.GetCwd(), fileExtensions, envRepo),
+		dirItems: makeObjectsWithDir(
+			envWorkspace.GetWorkspaceDir(),
+			fileExtensions,
+			envRepo,
+		),
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),

@@ -31,7 +31,7 @@ type buildState struct {
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	workspaceStore          store_workspace.Store
 
-	externalStoreAcceptedQueryComponent bool
+	workspaceStoreAcceptedQueryComponent bool
 
 	scanner box.Scanner
 }
@@ -103,7 +103,7 @@ func (b *buildState) build(
 				continue
 			}
 
-			b.externalStoreAcceptedQueryComponent = true
+			b.workspaceStoreAcceptedQueryComponent = true
 
 			for _, externalObjectId := range externalObjectIds {
 				if externalObjectId.GetGenre() == genres.None {
@@ -184,7 +184,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		return
 	}
 
-	if b.externalStoreAcceptedQueryComponent {
+	if b.workspaceStoreAcceptedQueryComponent {
 		return
 	}
 
@@ -304,7 +304,7 @@ LOOP:
 				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
-			// TODO if this fails, permit an external store to try to read this as an
+			// TODO if this fails, permit a workspace store to try to read this as an
 			// external object ID. And if that fails, try to remove the last two
 			// elements as per the above and read that and force the genre and sigils
 			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
