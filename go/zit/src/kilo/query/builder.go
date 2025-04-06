@@ -40,7 +40,7 @@ type Builder struct {
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	workspaceStoreGetter    store_workspace.StoreGetter
 	repoId                  ids.RepoId
-	fileExtensionGetter     interfaces.FileExtensionGetter
+	fileExtensions          interfaces.FileExtensions
 	expanders               ids.Abbr
 	hidden                  sku.Query
 	doNotMatchEmpty         bool
@@ -125,10 +125,10 @@ func (mb *Builder) WithRepoId(
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithFileExtensionGetter(
-	feg interfaces.FileExtensionGetter,
+func (mb *Builder) WithFileExtensions(
+	feg interfaces.FileExtensions,
 ) *Builder {
-	mb.fileExtensionGetter = feg
+	mb.fileExtensions = feg
 	return mb
 }
 

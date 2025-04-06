@@ -56,7 +56,7 @@ func (repo *Repo) MakeQueryBuilderExcludingHidden(
 	return repo.makeQueryBuilder().
 		WithDefaultGenres(genre).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(repo.GetConfig().GetFileExtensions()).
+		WithFileExtensions(repo.GetConfig().GetFileExtensions()).
 		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
 		WithHidden(repo.GetMatcherDormant()).
 		WithOptions(options)
@@ -80,7 +80,7 @@ func (repo *Repo) MakeQueryBuilder(
 	return repo.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(repo.GetConfig().GetFileExtensions()).
+		WithFileExtensions(repo.GetConfig().GetFileExtensions()).
 		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
 		WithOptions(options)
 }

@@ -17,11 +17,15 @@ const (
 )
 
 type (
+	Getter interface {
+		GetMutableConfig() Blob
+	}
+
 	Blob interface {
 		interfaces.MutableStoredConfig
 		GetBlob() Blob
 		GetDefaults() Defaults
-		GetFileExtensions() interfaces.FileExtensionGetter
+		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.V0
 	}
 

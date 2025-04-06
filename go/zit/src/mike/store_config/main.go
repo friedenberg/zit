@@ -47,12 +47,13 @@ type (
 		interfaces.Config
 		config_immutable.ConfigPrivate
 
+		config_mutable_blobs.Getter
+
 		ids.InlineTypeChecker
 		GetTypeExtension(string) string
 		GetCLIConfig() config_mutable_cli.Config
 		GetImmutableConfig() config_immutable.ConfigPrivate
-		GetMutableConfig() config_mutable_blobs.Blob
-		GetFileExtensions() interfaces.FileExtensionGetter
+		GetFileExtensions() interfaces.FileExtensions
 		HasChanges() (ok bool)
 		GetChanges() (out []string)
 

@@ -60,7 +60,7 @@ func (a V0) GetDefaults() Defaults {
 	return a.Defaults
 }
 
-func (a V0) GetFileExtensions() interfaces.FileExtensionGetter {
+func (a V0) GetFileExtensions() interfaces.FileExtensions {
 	return a.FileExtensions
 }
 

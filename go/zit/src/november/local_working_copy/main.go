@@ -147,14 +147,10 @@ func (repo *Repo) initialize(
 		}
 	}
 
-	config := repo.GetConfig()
-
 	if repo.envWorkspace, err = env_workspace.Make(
 		repo.envRepo,
-		repo.config.GetMutableConfig(),
-		config,
+    repo.config,
 		repo.PrinterFDDeleted(),
-		config.GetFileExtensions(),
 		repo.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -171,7 +167,7 @@ func (repo *Repo) initialize(
 	}
 
 	if repo.storeAbbr, err = store_abbr.NewIndexAbbr(
-		config.GetCLIConfig().PrintOptions,
+		repo.config.GetCLIConfig().PrintOptions,
 		repo.envRepo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
@@ -234,7 +230,7 @@ func (repo *Repo) initialize(
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
-				config,
+				repo.config,
 				repo.GetEnvRepo(),
 				repo.PrinterTransactedDeleted(),
 			),

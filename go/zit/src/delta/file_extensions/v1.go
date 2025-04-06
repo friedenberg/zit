@@ -40,7 +40,7 @@ func (a V1) GetFileExtensionForGenre(
 	}
 }
 
-func (a V1) GetFileExtensionGetter() interfaces.FileExtensionGetter {
+func (a V1) GetFileExtensions() interfaces.FileExtensions {
 	return a
 }
 

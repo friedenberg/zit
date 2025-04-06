@@ -45,7 +45,7 @@ func (a V1) GetDefaults() Defaults {
 	return a.Defaults
 }
 
-func (a V1) GetFileExtensions() interfaces.FileExtensionGetter {
+func (a V1) GetFileExtensions() interfaces.FileExtensions {
 	return a.FileExtensions
 }
 

@@ -32,17 +32,21 @@ type Env interface {
 	GetStoreFS() *store_fs.Store
 }
 
+type Config interface {
+	config_mutable_blobs.Getter
+	sku.Config
+	interfaces.FileExtensionsGetter
+}
+
 func Make(
 	envLocal env_local.Env,
-	configMutableBlob config_mutable_blobs.Blob,
-	skuConfig sku.Config,
+	config Config,
 	deletedPrinter interfaces.FuncIter[*fd.FD],
-	fileExtensions interfaces.FileExtensionGetter,
 	envRepo env_repo.Env,
 ) (out *env, err error) {
 	out = &env{
 		Env:           envLocal,
-		configMutable: configMutableBlob,
+		configMutable: config.GetMutableConfig(),
 	}
 
 	object := triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob]{
@@ -98,9 +102,9 @@ func Make(
 	}
 
 	if out.storeFS, err = store_fs.Make(
-		skuConfig,
+		config,
 		deletedPrinter,
-		fileExtensions,
+		config.GetFileExtensions(),
 		envRepo,
 	); err != nil {
 		err = errors.Wrap(err)

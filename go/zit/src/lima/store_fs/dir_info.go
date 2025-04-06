@@ -31,7 +31,7 @@ type dirInfo struct {
 	root          string
 	rootProcessed bool
 
-	interfaces.FileExtensionGetter
+	interfaces.FileExtensions
 	envRepo       env_repo.Env
 	storeSupplies store_workspace.Supplies
 
@@ -42,10 +42,10 @@ type dirInfo struct {
 }
 
 func makeObjectsWithDir(
-	fileExtensionGetter interfaces.FileExtensionGetter,
+	fileExtensions interfaces.FileExtensions,
 	envRepo env_repo.Env,
 ) (info dirInfo) {
-	info.FileExtensionGetter = fileExtensionGetter
+	info.FileExtensions = fileExtensions
 	info.envRepo = envRepo
 	info.probablyCheckedOut = makeFSItemData()
 	info.definitelyNotCheckedOut = makeFSItemData()

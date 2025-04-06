@@ -30,7 +30,7 @@ func init() {
 func Make(
 	config sku.Config,
 	deletedPrinter interfaces.FuncIter[*fd.FD],
-	fileExtensions interfaces.FileExtensionGetter,
+	fileExtensions interfaces.FileExtensions,
 	envRepo env_repo.Env,
 ) (fs *Store, err error) {
 	fs = &Store{
@@ -69,7 +69,7 @@ type Store struct {
 	envRepo             env_repo.Env
 	fileEncoder         FileEncoder
 	inlineTypeChecker   ids.InlineTypeChecker
-	fileExtensions      interfaces.FileExtensionGetter
+	fileExtensions      interfaces.FileExtensions
 	dir                 string
 	objectFormatOptions object_inventory_format.Options
 
