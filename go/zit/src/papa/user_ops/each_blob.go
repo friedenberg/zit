@@ -28,7 +28,7 @@ func (c EachBlob) Run(
 	for checkedOut := range skus.All() {
 		var fds *sku.FSItem
 
-		if fds, err = c.GetStore().GetStoreFS().ReadFSItemFromExternal(
+		if fds, err = c.GetEnvWorkspace().GetStoreFS().ReadFSItemFromExternal(
 			checkedOut.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)

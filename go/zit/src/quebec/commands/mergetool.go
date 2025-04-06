@@ -82,7 +82,7 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 	{
 		var err error
 
-		if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(
+		if conflict, err = u.GetEnvWorkspace().GetStoreFS().GetConflictOrError(
 			co.GetSkuExternal(),
 		); err != nil {
 			u.CancelWithError(err)

@@ -149,7 +149,7 @@ func (repo *Repo) initialize(
 
 	if repo.envWorkspace, err = env_workspace.Make(
 		repo.envRepo,
-    repo.config,
+		repo.config,
 		repo.PrinterFDDeleted(),
 		repo.GetEnvRepo(),
 	); err != nil {

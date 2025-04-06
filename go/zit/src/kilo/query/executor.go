@@ -72,7 +72,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 
 		var external sku.ExternalLike
 
-    // TODO determine if a nil return is ever valid
+		// TODO determine if a nil return is ever valid
 		if external, err = executor.ReadExternalLikeFromObjectIdLike(
 			sku.CommitOptions{
 				StoreOptions: sku.StoreOptions{

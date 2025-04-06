@@ -27,7 +27,7 @@ func (repo *Repo) Checkin(
 
 	for _, co := range sortedResults {
 		if refreshCheckout {
-			if err = repo.GetStore().GetStoreFS().RefreshCheckedOut(
+			if err = repo.GetEnvWorkspace().GetStoreFS().RefreshCheckedOut(
 				co,
 			); err != nil {
 				err = errors.Wrap(err)

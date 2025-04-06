@@ -154,7 +154,7 @@ func (c EditConfig) readTempConfigFile(
 
 	defer errors.DeferredCloser(&err, file)
 
-	if err = localWorkingCopy.GetStore().GetStoreFS().ReadOneExternalObjectReader(
+	if err = localWorkingCopy.GetEnvWorkspace().GetStoreFS().ReadOneExternalObjectReader(
 		file,
 		sk,
 	); err != nil {

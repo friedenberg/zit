@@ -35,7 +35,7 @@ func (op Diff) Run(
 	var localCheckedOut sku.SkuType
 
 	{
-		if localCheckedOut, err = op.GetStore().GetStoreFS().CheckoutOne(
+		if localCheckedOut, err = op.GetEnvWorkspace().GetStoreFS().CheckoutOne(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -51,7 +51,7 @@ func (op Diff) Run(
 		}
 
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetStoreFS().DeleteCheckedOutInternal(
+			if err = op.GetEnvWorkspace().GetStoreFS().DeleteCheckedOutInternal(
 				localCheckedOut,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -78,7 +78,7 @@ func (op Diff) Run(
 		TextFormatterOptions:       options,
 	}
 
-	if mode, err = op.GetStore().GetStoreFS().GetCheckoutModeOrError(
+	if mode, err = op.GetEnvWorkspace().GetStoreFS().GetCheckoutModeOrError(
 		remote,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -105,7 +105,7 @@ func (op Diff) Run(
 
 	var fds *sku.FSItem
 
-	if fds, err = op.GetStore().GetStoreFS().ReadFSItemFromExternal(remote); err != nil {
+	if fds, err = op.GetEnvWorkspace().GetStoreFS().ReadFSItemFromExternal(remote); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

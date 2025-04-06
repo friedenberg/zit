@@ -217,7 +217,7 @@ func (s *Store) RunMergeTool(
 	default:
 		var co sku.SkuType
 
-		if co, err = s.storeFS.RunMergeTool(tool, conflicted); err != nil {
+		if co, err = s.envWorkspace.GetStoreFS().RunMergeTool(tool, conflicted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
