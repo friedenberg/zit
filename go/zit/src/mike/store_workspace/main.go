@@ -1,4 +1,4 @@
-package store_workspace_supplies
+package store_workspace
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -13,8 +13,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 )
 
-// public types that are not used publicly
 type (
+	Supplies struct {
+		WorkspaceDir string
+		sku.ObjectStore
+		DirCache string
+		env_repo.Env
+		ids.RepoId
+		ids.TypeSet
+		ids.Clock
+		BlobStore typed_blob_store.Stores // TODO reduce this dependency
+	}
+
 	CheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,
@@ -51,20 +61,6 @@ type (
 		ReadCheckedOutFromTransacted(
 			sk *sku.Transacted,
 		) (co *sku.CheckedOut, err error)
-	}
-)
-
-// public types that are used publicly
-type (
-	Supplies struct {
-		WorkspaceDir string
-		sku.ObjectStore
-		DirCache string
-		env_repo.Env
-		ids.RepoId
-		ids.TypeSet
-		ids.Clock
-		BlobStore typed_blob_store.Stores
 	}
 
 	Merge interface {

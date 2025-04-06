@@ -28,6 +28,8 @@ type Env interface {
 	GetDefaults() config_mutable_blobs.Defaults
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
 	DeleteWorkspace() (err error)
+	GetStore() *Store
+	GetStoreFS() *store_fs.Store
 }
 
 func Make(
@@ -37,7 +39,6 @@ func Make(
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
 	envRepo env_repo.Env,
-	fileEncoder store_fs.FileEncoder,
 ) (out *env, err error) {
 	out = &env{
 		Env:           envLocal,
@@ -101,7 +102,6 @@ func Make(
 		deletedPrinter,
 		fileExtensions,
 		envRepo,
-		fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -166,6 +166,14 @@ func (env *env) GetWorkspaceConfig() workspace_config_blobs.Blob {
 
 func (env *env) GetDefaults() config_mutable_blobs.Defaults {
 	return env.defaults
+}
+
+func (env *env) GetStore() *Store {
+	return &env.store
+}
+
+func (env *env) GetStoreFS() *store_fs.Store {
+	return env.storeFS
 }
 
 func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {

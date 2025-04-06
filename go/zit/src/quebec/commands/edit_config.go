@@ -122,7 +122,7 @@ func (c EditConfig) makeTempConfigFile(
 
 	i.MutableSetLike.Add(&i.Object)
 
-	if err = repo.GetFileEncoder().Encode(
+	if err = repo.GetEnvWorkspace().GetStoreFS().GetFileEncoder().Encode(
 		checkout_options.TextFormatterOptions{},
 		k,
 		&i,

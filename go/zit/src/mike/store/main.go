@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
 type Store struct {
@@ -124,7 +124,7 @@ func (c *Store) Initialize(
 }
 
 // TODO add external_store.Supplies to Store and just use that
-func (store *Store) MakeSupplies() (supplies store_workspace_supplies.Supplies) {
+func (store *Store) MakeSupplies() (supplies store_workspace.Supplies) {
 	supplies.WorkspaceDir = store.envWorkspace.GetWorkspaceDir()
 	supplies.ObjectStore = store
 

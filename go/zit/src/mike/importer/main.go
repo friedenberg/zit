@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
 var ErrNeedsMerge = errors.NewNormal("needs merge")
@@ -26,7 +26,7 @@ func Make(
 	envRepo env_repo.Env,
 	typedInventoryListBlobStore typed_blob_store.InventoryList,
 	indexObject sku.IndexObject,
-	storeExternalMergeCheckedOut store_workspace_supplies.MergeCheckedOut,
+	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.ObjectStore,
 ) sku.Importer {
 	importer := &importer{
@@ -58,7 +58,7 @@ func Make(
 type importer struct {
 	typedInventoryListBlobStore typed_blob_store.InventoryList
 	indexObject                 sku.IndexObject
-	storeExternal               store_workspace_supplies.MergeCheckedOut
+	storeExternal               store_workspace.MergeCheckedOut
 	storeObject                 sku.ObjectStore
 	envRepo                     env_repo.Env
 	excludeObjects              bool

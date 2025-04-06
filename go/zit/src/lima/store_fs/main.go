@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
 func init() {
@@ -32,13 +32,12 @@ func Make(
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
 	envRepo env_repo.Env,
-	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
 	fs = &Store{
 		config:         config,
 		deletedPrinter: deletedPrinter,
 		envRepo:        envRepo,
-		fileEncoder:    fileEncoder,
+		fileEncoder:    MakeFileEncoder(envRepo, config),
 		fileExtensions: fileExtensions,
 		dir:            envRepo.GetCwd(),
 		dirInfo: makeObjectsWithDir(
@@ -81,7 +80,7 @@ type Store struct {
 	deletedInternal fd.MutableSet
 }
 
-func (fs *Store) GetExternalStoreLike() store_workspace_supplies.StoreLike {
+func (fs *Store) GetExternalStoreLike() store_workspace.StoreLike {
 	return fs
 }
 
@@ -327,7 +326,7 @@ func (fs *Store) Get(
 }
 
 func (store *Store) Initialize(
-	storeSupplies store_workspace_supplies.Supplies,
+	storeSupplies store_workspace.Supplies,
 ) (err error) {
 	store.root = storeSupplies.WorkspaceDir
 	store.storeSupplies = storeSupplies

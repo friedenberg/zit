@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_abbr"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/env_box"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -38,9 +37,8 @@ type Repo struct {
 
 	sunrise ids.Tai
 
-	envRepo     env_repo.Env
-	fileEncoder store_fs.FileEncoder
-	config      store_config.StoreMutable
+	envRepo env_repo.Env
+	config  store_config.StoreMutable
 
 	storeAbbr    sku.AbbrStore
 	dormantIndex dormant_index.Index
@@ -117,8 +115,6 @@ func (repo *Repo) initialize(
 	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
 	repo.sunrise = ids.NowTai()
 
-	repo.fileEncoder = store_fs.MakeFileEncoder(repo.envRepo, repo.config)
-
 	if err = repo.dormantIndex.Load(
 		repo.envRepo,
 	); err != nil {
@@ -156,11 +152,10 @@ func (repo *Repo) initialize(
 	if repo.envWorkspace, err = env_workspace.Make(
 		repo.envRepo,
 		repo.config.GetMutableConfig(),
-    config,
+		config,
 		repo.PrinterFDDeleted(),
 		config.GetFileExtensions(),
 		repo.GetEnvRepo(),
-		repo.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -175,20 +170,6 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	var storeFS *store_fs.Store
-
-	// TODO move this initialization to envWorkspace
-	if storeFS, err = store_fs.Make(
-		config,
-		repo.PrinterFDDeleted(),
-		config.GetFileExtensions(),
-		repo.GetEnvRepo(),
-		repo.fileEncoder,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if repo.storeAbbr, err = store_abbr.NewIndexAbbr(
 		config.GetCLIConfig().PrintOptions,
 		repo.envRepo,
@@ -199,7 +180,7 @@ func (repo *Repo) initialize(
 
 	repo.envBox = env_box.Make(
 		repo.envRepo,
-		storeFS,
+		repo.envWorkspace.GetStoreFS(),
 		repo.storeAbbr,
 	)
 
@@ -249,7 +230,7 @@ func (repo *Repo) initialize(
 	// TODO move this initialization to envWorkspace
 	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
 		{}: {
-			StoreLike: storeFS,
+			StoreLike: repo.envWorkspace.GetStoreFS(),
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(

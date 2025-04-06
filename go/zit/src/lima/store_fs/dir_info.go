@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
 type fdSetWithError struct {
@@ -33,7 +33,7 @@ type dirInfo struct {
 
 	interfaces.FileExtensionGetter
 	envRepo       env_repo.Env
-	storeSupplies store_workspace_supplies.Supplies
+	storeSupplies store_workspace.Supplies
 
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData

@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
@@ -76,8 +75,4 @@ func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
 
 func (u *Repo) GetStore() *store.Store {
 	return &u.store
-}
-
-func (u *Repo) GetFileEncoder() store_fs.FileEncoder {
-	return u.fileEncoder
 }
