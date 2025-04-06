@@ -249,7 +249,6 @@ function show_zettel_etikett { # @test
 }
 
 function show_zettels_with_tag_no_workspace_folder { # @test
-	skip
 	mkdir -p tag
 	echo "wow1" >tag/test1
 	echo "wow2" >tag/test2

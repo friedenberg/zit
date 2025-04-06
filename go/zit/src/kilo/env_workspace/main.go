@@ -237,6 +237,7 @@ func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
 	return
 }
 
+// TODO persist store types and bootstrap based on workspace config
 func (env *env) SetWorkspaceTypes(
 	stores map[string]*Store,
 ) (err error) {
