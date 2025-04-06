@@ -135,8 +135,8 @@ func (c EditConfig) makeTempConfigFile(
 }
 
 func (c EditConfig) readTempConfigFile(
-	u *local_working_copy.Repo,
-	p string,
+	localWorkingCopy *local_working_copy.Repo,
+	path string,
 ) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()
 
@@ -145,17 +145,17 @@ func (c EditConfig) readTempConfigFile(
 		return
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	if err = u.GetStore().GetStoreFS().ReadOneExternalObjectReader(
-		f,
+	if err = localWorkingCopy.GetStore().GetStoreFS().ReadOneExternalObjectReader(
+		file,
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)

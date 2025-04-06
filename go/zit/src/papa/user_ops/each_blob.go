@@ -17,25 +17,25 @@ type EachBlob struct {
 }
 
 func (c EachBlob) Run(
-	zsc sku.SkuTypeSet,
+	skus sku.SkuTypeSet,
 ) (err error) {
-	if zsc.Len() == 0 {
+	if skus.Len() == 0 {
 		return
 	}
 
-	var blob_store []string
+	var blobPaths []string
 
-	for col := range zsc.All() {
+	for checkedOut := range skus.All() {
 		var fds *sku.FSItem
 
 		if fds, err = c.GetStore().GetStoreFS().ReadFSItemFromExternal(
-			col.GetSkuExternal(),
+			checkedOut.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		blob_store = append(blob_store, fds.Blob.GetPath())
+		blobPaths = append(blobPaths, fds.Blob.GetPath())
 	}
 
 	v := fmt.Sprintf("running utility: %q", c.Utility)
@@ -52,14 +52,14 @@ func (c EachBlob) Run(
 		return
 	}
 
-	args = append(args, blob_store...)
+	args = append(args, blobPaths...)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdout = c.GetOutFile()
 	cmd.Stdin = c.GetInFile()
 	cmd.Stderr = c.GetErrFile()
 
-	if err = cmd.Start(); err != nil {
+	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

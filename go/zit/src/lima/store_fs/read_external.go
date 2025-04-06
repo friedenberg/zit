@@ -42,7 +42,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 				return
 			}
 
-			if err = store.externalStoreSupplies.ReadOneInto(
+			if err = store.storeSupplies.ReadOneInto(
 				&objectId,
 				external.GetSku(),
 			); err != nil {

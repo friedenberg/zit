@@ -80,7 +80,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			return
 		}
 
-		if err = s.externalStoreSupplies.ReadOneInto(
+		if err = s.storeSupplies.ReadOneInto(
 			&oid,
 			co.GetSku(),
 		); err != nil {
@@ -290,7 +290,7 @@ func (s *Store) queryUntracked(
 	qg *query.Query, // TODO use this to conditionally perform recognition
 	aco interfaces.FuncIter[any],
 ) (err error) {
-	definitelyNotCheckedOut := s.dirItems.definitelyNotCheckedOut.Clone()
+	definitelyNotCheckedOut := s.dirInfo.definitelyNotCheckedOut.Clone()
 
 	// TODO move to initial parse?
 	if err = definitelyNotCheckedOut.ConsolidateDuplicateBlobs(); err != nil {
@@ -327,7 +327,7 @@ func (s *Store) queryUntracked(
 		return
 	}
 
-	if err = s.externalStoreSupplies.ReadPrimitiveQuery(
+	if err = s.storeSupplies.ReadPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			var recognizedBlob, recognizedObject *fsItemRecognized

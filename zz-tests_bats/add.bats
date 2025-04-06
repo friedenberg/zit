@@ -113,8 +113,8 @@ function add_not_md { # @test
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add" zz-inbox-2022-11-14]
 		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add" zz-inbox-2022-11-14
 		                   one/uno.pdf]
-		          deleted [to_add.pdf]
 		uno.pdf
+		          deleted [to_add.pdf]
 	EOM
 
 	run_zit show -format text one/uno
@@ -411,8 +411,8 @@ function add_organize { # @test
 		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
 		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14
 		                   one/uno.md]
-		          deleted [to add.md]
 		test file
+		          deleted [to add.md]
 	EOM
 
 	run cat organize.md

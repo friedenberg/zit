@@ -27,13 +27,13 @@ type fdSetWithError struct {
 }
 
 // TODO support globs and ignores
-type dirItems struct {
+type dirInfo struct {
 	root          string
 	rootProcessed bool
 
 	interfaces.FileExtensionGetter
-	repoLayout            env_repo.Env
-	externalStoreSupplies env_workspace.Supplies
+	envRepo       env_repo.Env
+	storeSupplies env_workspace.Supplies
 
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData
@@ -42,16 +42,14 @@ type dirItems struct {
 }
 
 func makeObjectsWithDir(
-	p string,
-	fe interfaces.FileExtensionGetter,
-	fs_home env_repo.Env,
-) (d dirItems) {
-	d.root = p
-	d.FileExtensionGetter = fe
-	d.repoLayout = fs_home
-	d.probablyCheckedOut = makeFSItemData()
-	d.definitelyNotCheckedOut = makeFSItemData()
-	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
+	fileExtensionGetter interfaces.FileExtensionGetter,
+	envRepo env_repo.Env,
+) (info dirInfo) {
+	info.FileExtensionGetter = fileExtensionGetter
+	info.envRepo = envRepo
+	info.probablyCheckedOut = makeFSItemData()
+	info.definitelyNotCheckedOut = makeFSItemData()
+	info.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
 
 	return
 }
@@ -63,7 +61,7 @@ func makeObjectsWithDir(
 //     \_/\_/ \__,_|_|_|\_\_|_| |_|\__, |
 //                                 |___/
 
-func (d *dirItems) walkDir(
+func (d *dirInfo) walkDir(
 	cache map[string]*sku.FSItem,
 	dir string,
 	pattern string,
@@ -144,7 +142,7 @@ func (d *dirItems) walkDir(
 	return
 }
 
-func (d *dirItems) addPathAndDirEntry(
+func (d *dirInfo) addPathAndDirEntry(
 	cache map[string]*sku.FSItem,
 	path string,
 	dirEntry fs.DirEntry,
@@ -158,7 +156,7 @@ func (d *dirItems) addPathAndDirEntry(
 	if fdee, err = fd.MakeFromPathAndDirEntry(
 		path,
 		dirEntry,
-		d.repoLayout,
+		d.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -172,7 +170,7 @@ func (d *dirItems) addPathAndDirEntry(
 	return
 }
 
-func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
+func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 	if fdee.ExtSansDot() == d.GetFileExtensionConfig() {
 		key = "konfig"
 		return
@@ -207,7 +205,7 @@ func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 	return
 }
 
-func (d *dirItems) keyForObjectIdString(
+func (d *dirInfo) keyForObjectIdString(
 	oidString string,
 ) (key string) {
 	var ok bool
@@ -224,7 +222,7 @@ func (d *dirItems) keyForObjectIdString(
 	return
 }
 
-func (d *dirItems) addFD(
+func (d *dirInfo) addFD(
 	cache map[string]*sku.FSItem,
 	fileDescriptor *fd.FD,
 ) (key string, fds *sku.FSItem, err error) {
@@ -266,7 +264,7 @@ func (d *dirItems) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
-func (d *dirItems) processDir(path string) (results []*sku.FSItem, err error) {
+func (d *dirInfo) processDir(path string) (results []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
 
 	results = make([]*sku.FSItem, 0)
@@ -290,7 +288,7 @@ func (d *dirItems) processDir(path string) (results []*sku.FSItem, err error) {
 	return
 }
 
-func (d *dirItems) processFDPattern(
+func (d *dirInfo) processFDPattern(
 	objectIdString string,
 	pattern string,
 	dir string,
@@ -319,7 +317,7 @@ func (d *dirItems) processFDPattern(
 	return
 }
 
-func (d *dirItems) processFD(
+func (d *dirInfo) processFD(
 	fdee *fd.FD,
 ) (objectIdString string, fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
@@ -362,7 +360,7 @@ func (d *dirItems) processFD(
 	return
 }
 
-func (d *dirItems) processRootDir() (err error) {
+func (d *dirInfo) processRootDir() (err error) {
 	if d.rootProcessed {
 		return
 	}
@@ -377,7 +375,7 @@ func (d *dirItems) processRootDir() (err error) {
 	return
 }
 
-func (d *dirItems) processFDsOnItem(
+func (d *dirInfo) processFDsOnItem(
 	fds *sku.FSItem,
 ) (blobCount, objectCount int, err error) {
 	if err = fds.Each(
@@ -420,7 +418,7 @@ func (d *dirItems) processFDsOnItem(
 	return
 }
 
-func (d *dirItems) processFDSet(
+func (d *dirInfo) processFDSet(
 	objectIdString string,
 	fds *sku.FSItem,
 ) (results []*sku.FSItem, err error) {
@@ -437,7 +435,7 @@ func (d *dirItems) processFDSet(
 			return
 		}
 
-		if err = d.externalStoreSupplies.ReadOneInto(
+		if err = d.storeSupplies.ReadOneInto(
 			&oid,
 			recognized,
 		); err != nil {
@@ -507,7 +505,7 @@ func (d *dirItems) processFDSet(
 	return
 }
 
-func (d *dirItems) addOneUntracked(
+func (d *dirInfo) addOneUntracked(
 	f *fd.FD,
 ) (result *sku.FSItem, err error) {
 	result = &sku.FSItem{
@@ -522,7 +520,7 @@ func (d *dirItems) addOneUntracked(
 	}
 
 	if err = result.ExternalObjectId.SetBlob(
-		d.repoLayout.Rel(f.GetPath()),
+		d.envRepo.Rel(f.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -559,7 +557,7 @@ func (d *dirItems) addOneUntracked(
 	return
 }
 
-func (d *dirItems) addOneOrMoreBlobs(
+func (d *dirInfo) addOneOrMoreBlobs(
 	fds *sku.FSItem,
 ) (results []*sku.FSItem, err error) {
 	if fds.MutableSetLike.Len() == 1 {
@@ -601,7 +599,7 @@ func (d *dirItems) addOneOrMoreBlobs(
 	return
 }
 
-func (d *dirItems) addOneObject(
+func (d *dirInfo) addOneObject(
 	objectIdString string,
 	item *sku.FSItem,
 ) (err error) {
@@ -626,7 +624,7 @@ func (d *dirItems) addOneObject(
 //
 
 // TODO switch to seq.Iter2
-func (d *dirItems) All(
+func (d *dirInfo) All(
 	f interfaces.FuncIter[*sku.FSItem],
 ) (err error) {
 	wg := errors.MakeWaitGroupParallel()

@@ -34,18 +34,15 @@ func Make(
 	envRepo env_repo.Env,
 	inventoryFormatOptions object_inventory_format.Options,
 	fileEncoder FileEncoder,
-	envWorkspace env_workspace.Env,
 ) (fs *Store, err error) {
 	fs = &Store{
 		config:         config,
 		deletedPrinter: deletedPrinter,
 		envRepo:        envRepo,
-		envWorkspace:   envWorkspace,
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
 		dir:            envRepo.GetCwd(),
-		dirItems: makeObjectsWithDir(
-			envWorkspace.GetWorkspaceDir(),
+		dirInfo: makeObjectsWithDir(
 			fileExtensions,
 			envRepo,
 		),
@@ -72,14 +69,13 @@ type Store struct {
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	metadataTextParser  object_metadata.TextParser
 	envRepo             env_repo.Env
-	envWorkspace        env_workspace.Env
 	fileEncoder         FileEncoder
 	inlineTypeChecker   ids.InlineTypeChecker
 	fileExtensions      interfaces.FileExtensionGetter
 	dir                 string
 	objectFormatOptions object_inventory_format.Options
 
-	dirItems
+	dirInfo
 
 	deleteLock      sync.Mutex
 	deleted         fd.MutableSet
@@ -166,7 +162,7 @@ func (fs *Store) Flush() (err error) {
 
 func (fs *Store) String() (out string) {
 	if quiter.Len(
-		fs.dirItems.probablyCheckedOut,
+		fs.dirInfo.probablyCheckedOut,
 		fs.definitelyNotCheckedOut,
 	) == 0 {
 		return
@@ -189,7 +185,7 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.dirItems.probablyCheckedOut.Each(
+	fs.dirInfo.probablyCheckedOut.Each(
 		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -208,7 +204,7 @@ func (fs *Store) String() (out string) {
 }
 
 func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
-	if err = s.dirItems.processRootDir(); err != nil {
+	if err = s.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -241,7 +237,7 @@ func (s *Store) GetFSItemsForDir(
 		return
 	}
 
-	if items, err = s.dirItems.processDir(fd.GetPath()); err != nil {
+	if items, err = s.dirInfo.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -268,7 +264,7 @@ func (s *Store) GetFSItemsForString(
 
 	if fdee, err = fd.MakeFromPath(baseDir, value, s.envRepo); err != nil {
 		if errors.IsNotExist(err) && tryPattern {
-			if items, err = s.dirItems.processFDPattern(
+			if items, err = s.dirInfo.processFDPattern(
 				value,
 				filepath.Join(s.dir, fmt.Sprintf("%s*", value)),
 				s.dir,
@@ -289,7 +285,7 @@ func (s *Store) GetFSItemsForString(
 			return
 		}
 	} else {
-		if _, items, err = s.dirItems.processFD(fdee); err != nil {
+		if _, items, err = s.dirInfo.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -328,16 +324,19 @@ func (store *Store) GetObjectIdsForString(
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *sku.FSItem, ok bool) {
-	return fs.dirItems.probablyCheckedOut.Get(k.String())
+	return fs.dirInfo.probablyCheckedOut.Get(k.String())
 }
 
-func (s *Store) Initialize(esi env_workspace.Supplies) (err error) {
-	s.externalStoreSupplies = esi
+func (store *Store) Initialize(
+	storeSupplies env_workspace.Supplies,
+) (err error) {
+	store.root = storeSupplies.Workspace.GetWorkspaceDir()
+	store.storeSupplies = storeSupplies
 	return
 }
 
 func (s *Store) ReadAllExternalItems() (err error) {
-	if err = s.dirItems.processRootDir(); err != nil {
+	if err = s.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

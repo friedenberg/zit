@@ -366,6 +366,31 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	return
 }
 
+func (store *Store) Merge(
+	conflicted sku.Conflicted,
+) (err error) {
+	storeLike, ok := store.StoreLike.(Merge)
+
+	if !ok {
+		err = makeErrUnsupportedOperation(store, &store)
+		return
+	}
+
+	if err = store.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = storeLike.Merge(
+		conflicted,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) MergeCheckedOut(
 	co *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,

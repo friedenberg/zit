@@ -56,6 +56,10 @@ type (
 
 // public types that are used publicly
 type (
+	Merge interface {
+		Merge(conflicted sku.Conflicted) (err error)
+	}
+
 	MergeCheckedOut interface {
 		MergeCheckedOut(
 			co *sku.CheckedOut,

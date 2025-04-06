@@ -191,18 +191,15 @@ func (store *Store) makeQueryExecutor(
 }
 
 // TODO make this configgable
-func (s *Store) MergeConflicted(
+func (store *Store) MergeConflicted(
 	conflicted sku.Conflicted,
 ) (err error) {
-	switch conflicted.CheckedOut.GetSkuExternal().GetRepoId().GetRepoIdString() {
-	case "browser":
-		err = todo.Implement()
+	repoId := conflicted.CheckedOut.GetSkuExternal().GetRepoId()
+	externalStore := store.externalStores[repoId]
 
-	default:
-		if err = s.storeFS.Merge(conflicted); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = externalStore.Merge(conflicted); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

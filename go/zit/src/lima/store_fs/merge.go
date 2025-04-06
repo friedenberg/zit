@@ -319,7 +319,7 @@ func (s *Store) GenerateConflictMarker(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	blobStore := s.externalStoreSupplies.BlobStore.InventoryList
+	blobStore := s.storeSupplies.BlobStore.InventoryList
 
 	if _, err = blobStore.WriteBlobToWriter(
 		builtin_types.DefaultOrPanic(genres.InventoryList),
@@ -372,7 +372,7 @@ func (s *Store) GenerateConflictMarker(
 	return
 }
 
-func (s *Store) RunMergeTool(
+func (store *Store) RunMergeTool(
 	tool []string,
 	conflicted sku.Conflicted,
 ) (co *sku.CheckedOut, err error) {
@@ -383,7 +383,7 @@ func (s *Store) RunMergeTool(
 
 	co = conflicted.CheckedOut
 
-	inlineBlob := conflicted.IsAllInlineType(s.config)
+	inlineBlob := conflicted.IsAllInlineType(store.config)
 
 	mode := checkout_mode.MetadataAndBlob
 
@@ -393,7 +393,7 @@ func (s *Store) RunMergeTool(
 
 	var localItem, baseItem, remoteItem *sku.FSItem
 
-	if localItem, baseItem, remoteItem, err = s.checkoutConflictedForMerge(
+	if localItem, baseItem, remoteItem, err = store.checkoutConflictedForMerge(
 		conflicted,
 		mode,
 	); err != nil {
@@ -404,7 +404,7 @@ func (s *Store) RunMergeTool(
 	var skuReplacement *sku.Transacted
 	var replacement *sku.FSItem
 
-	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
+	if skuReplacement, err = store.MakeMergedTransacted(conflicted); err != nil {
 		var mergeConflict *sku.ErrMergeConflict
 
 		if errors.As(err, &mergeConflict) {
@@ -415,7 +415,7 @@ func (s *Store) RunMergeTool(
 			return
 		}
 	} else {
-		if replacement, err = s.ReadFSItemFromExternal(skuReplacement); err != nil {
+		if replacement, err = store.ReadFSItemFromExternal(skuReplacement); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -448,7 +448,7 @@ func (s *Store) RunMergeTool(
 
 	external.ObjectId.ResetWith(&co.GetSkuExternal().ObjectId)
 
-	if err = s.WriteFSItemToExternal(localItem, external); err != nil {
+	if err = store.WriteFSItemToExternal(localItem, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -464,12 +464,12 @@ func (s *Store) RunMergeTool(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if err = s.ReadOneExternalObjectReader(f, external); err != nil {
+	if err = store.ReadOneExternalObjectReader(f, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.DeleteCheckedOut(
+	if err = store.DeleteCheckedOut(
 		conflicted.CheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)

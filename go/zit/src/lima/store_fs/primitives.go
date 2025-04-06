@@ -82,7 +82,7 @@ func (s *Store) HydrateExternalFromItem(
 	// Don't apply the proto object as that would artificially create deltas
 	o.StoreOptions.ApplyProto = false
 
-	if err = s.externalStoreSupplies.Commit(
+	if err = s.storeSupplies.Commit(
 		external,
 		o,
 	); err != nil {
