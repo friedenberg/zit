@@ -114,11 +114,6 @@ func Make(
 
 	out.store.StoreLike = out.storeFS
 
-	if err = out.store.Initialize(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 

@@ -24,14 +24,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
-// TODO refactor in to object store and something else that isn't determined yet
 type Store struct {
 	sunrise      ids.Tai
 	config       store_config.StoreMutable
 	envRepo      env_repo.Env
 	envWorkspace env_workspace.Env
 
-	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*env_workspace.Store
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
@@ -148,9 +146,7 @@ func (s *Store) SetExternalStores(
 		supplies.DirCache = s.GetEnvRepo().DirCacheRepo(k.GetRepoIdString())
 		es.Supplies = supplies
 
-		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
-			s.storeFS = esfs
-
+		if _, ok := es.StoreLike.(*store_fs.Store); ok {
 			// TODO remove once store_fs.Store is fully ExternalStoreLike
 			if err = es.Initialize(); err != nil {
 				err = errors.Wrap(err)

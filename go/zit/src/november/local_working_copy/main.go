@@ -225,9 +225,7 @@ func (repo *Repo) initialize(
 
 	// TODO move this initialization to envWorkspace
 	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
-		{}: {
-			StoreLike: repo.envWorkspace.GetStoreFS(),
-		},
+		{}: repo.envWorkspace.GetStore(),
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				repo.config,
