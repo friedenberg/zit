@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
 )
 
 type ErrUnsupportedType ids.Type
@@ -30,7 +31,7 @@ func makeErrUnsupportedOperation(s *Store, op interface{}) error {
 
 type ErrUnsupportedOperation struct {
 	repoId             ids.RepoId
-	store              StoreLike
+	store              store_workspace_supplies.StoreLike
 	operationInterface interface{}
 }
 

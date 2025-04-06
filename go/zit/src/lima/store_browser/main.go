@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
 )
 
 const DefaultTimeout = 2e9
@@ -37,7 +38,7 @@ type checkedOutWithItem struct {
 
 type Store struct {
 	config            store_config.Store
-	externalStoreInfo env_workspace.Supplies
+	externalStoreInfo store_workspace_supplies.Supplies
 	typ               ids.Type
 	browser           browser_items.BrowserProxy
 
@@ -83,7 +84,7 @@ func Make(
 	return c
 }
 
-func (fs *Store) GetExternalStoreLike() env_workspace.StoreLike {
+func (fs *Store) GetExternalStoreLike() store_workspace_supplies.StoreLike {
 	return fs
 }
 

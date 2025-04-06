@@ -1,4 +1,4 @@
-package env_workspace
+package store_workspace_supplies
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -56,6 +56,17 @@ type (
 
 // public types that are used publicly
 type (
+	Supplies struct {
+		WorkspaceDir string
+		sku.ObjectStore
+		DirCache string
+		env_repo.Env
+		ids.RepoId
+		ids.TypeSet
+		ids.Clock
+		BlobStore typed_blob_store.Stores
+	}
+
 	Merge interface {
 		Merge(conflicted sku.Conflicted) (err error)
 	}
@@ -69,17 +80,6 @@ type (
 	}
 
 	QueryCheckedOut = query.QueryCheckedOut
-
-	Supplies struct {
-		Workspace Env
-		sku.ObjectStore
-		DirCache string
-		env_repo.Env
-		ids.RepoId
-		ids.TypeSet
-		ids.Clock
-		BlobStore typed_blob_store.Stores
-	}
 
 	StoreLike interface {
 		Initialize(Supplies) error

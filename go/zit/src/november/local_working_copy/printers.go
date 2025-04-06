@@ -14,12 +14,12 @@ import (
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
-	po := repo.config.GetCLIConfig().PrintOptions.
+	printOptions := repo.config.GetCLIConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false)
 
-	sw := repo.StringFormatWriterSkuBoxCheckedOut(
-		po,
+	stringEncoder := repo.StringFormatWriterSkuBoxCheckedOut(
+		printOptions,
 		repo.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
@@ -31,26 +31,29 @@ func (repo *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut
 		"\n",
 		repo.GetUIFile(),
 		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.CheckedOut) (n int64, err error) {
-				return sw.EncodeStringTo(o, w)
+			func(
+				writer interfaces.WriterAndStringWriter,
+				object *sku.CheckedOut,
+			) (n int64, err error) {
+				return stringEncoder.EncodeStringTo(object, writer)
 			},
 		),
 	)
 }
 
 // TODO make generic external version
-func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
+func (repo *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
-		u.GetConfig().GetCLIConfig().IsDryRun(),
+		repo.GetConfig().GetCLIConfig().IsDryRun(),
 		id_fmts.MakeFDCliFormat(
-			u.FormatColorOptionsOut(),
-			u.envRepo.MakeRelativePathStringFormatWriter(),
+			repo.FormatColorOptionsOut(),
+			repo.envRepo.MakeRelativePathStringFormatWriter(),
 		),
 	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
-		u.GetUIFile(),
+		repo.GetUIFile(),
 		p,
 	)
 }

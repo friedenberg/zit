@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
 )
 
 func init() {
@@ -81,7 +81,7 @@ type Store struct {
 	deletedInternal fd.MutableSet
 }
 
-func (fs *Store) GetExternalStoreLike() env_workspace.StoreLike {
+func (fs *Store) GetExternalStoreLike() store_workspace_supplies.StoreLike {
 	return fs
 }
 
@@ -327,9 +327,9 @@ func (fs *Store) Get(
 }
 
 func (store *Store) Initialize(
-	storeSupplies env_workspace.Supplies,
+	storeSupplies store_workspace_supplies.Supplies,
 ) (err error) {
-	store.root = storeSupplies.Workspace.GetWorkspaceDir()
+	store.root = storeSupplies.WorkspaceDir
 	store.storeSupplies = storeSupplies
 	return
 }

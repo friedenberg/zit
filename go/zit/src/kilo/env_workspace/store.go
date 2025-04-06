@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
 )
 
 // import "code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -22,8 +23,8 @@ import (
 // }
 
 type Store struct {
-	Supplies
-	StoreLike
+	store_workspace_supplies.Supplies
+	store_workspace_supplies.StoreLike
 
 	didInit   bool
 	onceInit  sync.Once
@@ -58,7 +59,7 @@ func (s *Store) QueryCheckedOut(
 	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	es, ok := s.StoreLike.(QueryCheckedOut)
+	es, ok := s.StoreLike.(store_workspace_supplies.QueryCheckedOut)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -164,7 +165,7 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (cz sku.SkuType, err error) {
-	es, ok := s.StoreLike.(CheckoutOne)
+	es, ok := s.StoreLike.(store_workspace_supplies.CheckoutOne)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -188,7 +189,7 @@ func (s *Store) CheckoutOne(
 }
 
 func (s *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
-	es, ok := s.StoreLike.(DeleteCheckedOut)
+	es, ok := s.StoreLike.(store_workspace_supplies.DeleteCheckedOut)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -211,7 +212,7 @@ func (s *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
 // Takes a given sku.Transacted (internal) and updates it with the state of its
 // checked out counterpart (external).
 func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
-	es, ok := s.StoreLike.(UpdateTransacted)
+	es, ok := s.StoreLike.(store_workspace_supplies.UpdateTransacted)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -232,7 +233,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 }
 
 func (s *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
-	es, ok := s.StoreLike.(UpdateTransactedFromBlobs)
+	es, ok := s.StoreLike.(store_workspace_supplies.UpdateTransactedFromBlobs)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &es)
@@ -278,7 +279,7 @@ func (s *Store) Open(
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
-	es, ok := s.StoreLike.(Open)
+	es, ok := s.StoreLike.(store_workspace_supplies.Open)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &es)
@@ -323,7 +324,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	es, ok := s.StoreLike.(UpdateCheckoutFromCheckedOut)
+	es, ok := s.StoreLike.(store_workspace_supplies.UpdateCheckoutFromCheckedOut)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -346,7 +347,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 func (s *Store) ReadCheckedOutFromTransacted(
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	es, ok := s.StoreLike.(ReadCheckedOutFromTransacted)
+	es, ok := s.StoreLike.(store_workspace_supplies.ReadCheckedOutFromTransacted)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -369,7 +370,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 func (store *Store) Merge(
 	conflicted sku.Conflicted,
 ) (err error) {
-	storeLike, ok := store.StoreLike.(Merge)
+	storeLike, ok := store.StoreLike.(store_workspace_supplies.Merge)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
@@ -396,7 +397,7 @@ func (s *Store) MergeCheckedOut(
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
-	es, ok := s.StoreLike.(MergeCheckedOut)
+	es, ok := s.StoreLike.(store_workspace_supplies.MergeCheckedOut)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)

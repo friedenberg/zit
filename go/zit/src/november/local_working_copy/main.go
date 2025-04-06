@@ -151,9 +151,16 @@ func (repo *Repo) initialize(
 		}
 	}
 
+	config := repo.GetConfig()
+
 	if repo.envWorkspace, err = env_workspace.Make(
 		repo.envRepo,
 		repo.config.GetMutableConfig(),
+    config,
+		repo.PrinterFDDeleted(),
+		config.GetFileExtensions(),
+		repo.GetEnvRepo(),
+		repo.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -167,8 +174,6 @@ func (repo *Repo) initialize(
 
 		return
 	}
-
-	config := repo.GetConfig()
 
 	var storeFS *store_fs.Store
 
@@ -241,6 +246,7 @@ func (repo *Repo) initialize(
 		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
+	// TODO move this initialization to envWorkspace
 	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
 		{}: {
 			StoreLike: storeFS,
@@ -270,10 +276,10 @@ func (repo *Repo) initialize(
 	return
 }
 
-func (u *Repo) Flush() (err error) {
+func (repo *Repo) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	for k, vs := range u.externalStores {
+	for k, vs := range repo.externalStores {
 		ui.Log().Printf("will flush virtual store: %s", k)
 		wg.Do(vs.Flush)
 	}
@@ -309,9 +315,9 @@ func (u *Repo) GetMatcherDormant() query.DormantCounter {
 	return u.DormantCounter
 }
 
-func (u *Repo) GetWorkspaceStoreForQuery(
+func (repo *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
-	e, ok := u.externalStores[repoId]
+	e, ok := repo.externalStores[repoId]
 	return e, ok
 }

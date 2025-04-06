@@ -16,6 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 )
 
+const FileWorkspace = ".zit-workspace"
+
 type Env struct {
 	env_local.Env
 

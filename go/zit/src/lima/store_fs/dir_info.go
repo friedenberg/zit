@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace_supplies"
 )
 
 type fdSetWithError struct {
@@ -33,7 +33,7 @@ type dirInfo struct {
 
 	interfaces.FileExtensionGetter
 	envRepo       env_repo.Env
-	storeSupplies env_workspace.Supplies
+	storeSupplies store_workspace_supplies.Supplies
 
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData
@@ -118,7 +118,7 @@ func (d *dirInfo) walkDir(
 			}
 
 			if dirEntry.IsDir() {
-				fileWorkspace := filepath.Join(path, env_workspace.FileWorkspace)
+				fileWorkspace := filepath.Join(path, env_repo.FileWorkspace)
 
 				if files.Exists(fileWorkspace) {
 					err = filepath.SkipDir

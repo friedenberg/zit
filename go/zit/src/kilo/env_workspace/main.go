@@ -4,16 +4,19 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
-
-const FileWorkspace = ".zit-workspace"
 
 type Env interface {
 	env_dir.Env
@@ -30,6 +33,11 @@ type Env interface {
 func Make(
 	envLocal env_local.Env,
 	configMutableBlob config_mutable_blobs.Blob,
+	skuConfig sku.Config,
+	deletedPrinter interfaces.FuncIter[*fd.FD],
+	fileExtensions interfaces.FileExtensionGetter,
+	envRepo env_repo.Env,
+	fileEncoder store_fs.FileEncoder,
 ) (out *env, err error) {
 	out = &env{
 		Env:           envLocal,
@@ -42,7 +50,7 @@ func Make(
 
 	expectedWorkspaceConfigFilePath := filepath.Join(
 		out.GetCwd(),
-		FileWorkspace,
+		env_repo.FileWorkspace,
 	)
 
 	if err = workspace_config_blobs.DecodeFromFile(
@@ -88,6 +96,19 @@ func Make(
 		out.dir = out.GetCwd()
 	}
 
+	if out.storeFS, err = store_fs.Make(
+		skuConfig,
+		deletedPrinter,
+		fileExtensions,
+		envRepo,
+		fileEncoder,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out.store.StoreLike = out.storeFS
+
 	return
 }
 
@@ -105,6 +126,9 @@ type env struct {
 	configMutable config_mutable_blobs.Blob
 	blob          workspace_config_blobs.Blob
 	defaults      config_mutable_blobs.DefaultsV1
+
+	storeFS *store_fs.Store
+	store   Store
 }
 
 func (env *env) GetWorkspaceDir() string {
@@ -112,7 +136,7 @@ func (env *env) GetWorkspaceDir() string {
 }
 
 func (env *env) GetWorkspaceConfigFilePath() string {
-	return filepath.Join(env.GetWorkspaceDir(), FileWorkspace)
+	return filepath.Join(env.GetWorkspaceDir(), env_repo.FileWorkspace)
 }
 
 func (env *env) AssertNotTemporary(context errors.Context) {
