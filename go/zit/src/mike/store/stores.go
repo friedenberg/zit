@@ -13,19 +13,13 @@ import (
 )
 
 func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
-	repoId := el.GetRepoId()
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.SaveBlob(el); err != nil {
 		if errors.Is(err, env_workspace.ErrUnsupportedOperation{}) {
 			err = nil
 		} else {
-			err = errors.Wrapf(err, "Sku: %s, RepoId: %s", el, repoId)
+			err = errors.Wrapf(err, "Sku: %s", el)
 			return
 		}
 	}
@@ -34,14 +28,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 }
 
 func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
-	repoId := col.GetSkuExternal().GetRepoId()
-
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.DeleteCheckedOut(col); err != nil {
 		err = errors.Wrap(err)
@@ -56,12 +43,7 @@ func (store *Store) CheckoutQuery(
 	query *pkg_query.Query,
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	externalStore, ok := store.externalStores[query.RepoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", query.RepoId)
-		return
-	}
+	externalStore := store.envWorkspace.GetStore()
 
 	qf := func(t *sku.Transacted) (err error) {
 		var co sku.SkuType
@@ -106,12 +88,7 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.SkuType, err error) {
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if cz, err = es.CheckoutOne(
 		options,
@@ -128,13 +105,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	repoId := col.GetSkuExternal().GetRepoId()
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no repo id with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.UpdateCheckoutFromCheckedOut(
 		options,
@@ -153,12 +124,7 @@ func (s *Store) Open(
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no repo id with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
@@ -178,7 +144,7 @@ func (store *Store) makeQueryExecutor(
 		}
 	}
 
-	externalStore := store.externalStores[queryGroup.RepoId]
+	externalStore := store.envWorkspace.GetStore()
 
 	executor = pkg_query.MakeExecutorWithExternalStore(
 		queryGroup,
@@ -194,10 +160,9 @@ func (store *Store) makeQueryExecutor(
 func (store *Store) MergeConflicted(
 	conflicted sku.Conflicted,
 ) (err error) {
-	repoId := conflicted.CheckedOut.GetSkuExternal().GetRepoId()
-	externalStore := store.externalStores[repoId]
+	es := store.envWorkspace.GetStore()
 
-	if err = externalStore.Merge(conflicted); err != nil {
+	if err = es.Merge(conflicted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -240,12 +205,7 @@ func (s *Store) UpdateTransactedWithExternal(
 	repoId ids.RepoId,
 	z *sku.Transacted,
 ) (err error) {
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.UpdateTransacted(z); err != nil {
 		err = errors.Wrap(err)
@@ -259,12 +219,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	repoId ids.RepoId,
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
 		err = errors.Wrap(err)
@@ -279,13 +234,7 @@ func (s *Store) UpdateTransactedFromBlobs(
 ) (err error) {
 	external := co.GetSkuExternal()
 
-	repoId := co.GetRepoId()
-	es, ok := s.externalStores[repoId]
-
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", repoId)
-		return
-	}
+	es := s.envWorkspace.GetStore()
 
 	if err = es.UpdateTransactedFromBlobs(external); err != nil {
 		err = errors.Wrap(err)

@@ -30,6 +30,7 @@ type Store struct {
 	envRepo      env_repo.Env
 	envWorkspace env_workspace.Env
 
+  // TODO remove in favor of envWorkspace
 	externalStores     map[ids.RepoId]*env_workspace.Store
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
