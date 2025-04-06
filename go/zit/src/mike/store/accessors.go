@@ -10,16 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
-
-func (u *Store) GetBrowserStore() *env_workspace.Store {
-	return u.externalStores[*(ids.MustRepoId("browser"))]
-}
 
 func (s *Store) GetTypedBlobStore() typed_blob_store.Stores {
 	return s.typedBlobStore

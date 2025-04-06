@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/env_lua"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
@@ -30,8 +29,6 @@ type Store struct {
 	envRepo      env_repo.Env
 	envWorkspace env_workspace.Env
 
-	// TODO remove in favor of envWorkspace
-	externalStores     map[ids.RepoId]*env_workspace.Store
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.AbbrStore
@@ -134,26 +131,6 @@ func (store *Store) MakeSupplies(
 	supplies.BlobStore = store.typedBlobStore
 	supplies.RepoId = repoId
 	supplies.DirCache = store.GetEnvRepo().DirCacheRepo(repoId.GetRepoIdString())
-
-	return
-}
-
-func (s *Store) SetExternalStores(
-	stores map[ids.RepoId]*env_workspace.Store,
-) (err error) {
-	s.externalStores = stores
-
-	for k, es := range s.externalStores {
-		es.Supplies = s.MakeSupplies(k)
-
-		if _, ok := es.StoreLike.(*store_fs.Store); ok {
-			// TODO remove once store_fs.Store is fully ExternalStoreLike
-			if err = es.Initialize(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
 
 	return
 }
