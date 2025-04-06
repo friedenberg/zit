@@ -30,7 +30,7 @@ type Store struct {
 	envRepo      env_repo.Env
 	envWorkspace env_workspace.Env
 
-  // TODO remove in favor of envWorkspace
+	// TODO remove in favor of envWorkspace
 	externalStores     map[ids.RepoId]*env_workspace.Store
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
@@ -124,13 +124,17 @@ func (c *Store) Initialize(
 }
 
 // TODO add external_store.Supplies to Store and just use that
-func (store *Store) MakeSupplies() (supplies store_workspace.Supplies) {
+func (store *Store) MakeSupplies(
+	repoId ids.RepoId,
+) (supplies store_workspace.Supplies) {
 	supplies.WorkspaceDir = store.envWorkspace.GetWorkspaceDir()
 	supplies.ObjectStore = store
 
 	supplies.Env = store.GetEnvRepo()
 	supplies.Clock = store.sunrise
 	supplies.BlobStore = store.typedBlobStore
+	supplies.RepoId = repoId
+	supplies.DirCache = store.GetEnvRepo().DirCacheRepo(repoId.GetRepoIdString())
 
 	return
 }
@@ -140,12 +144,8 @@ func (s *Store) SetExternalStores(
 ) (err error) {
 	s.externalStores = stores
 
-	supplies := s.MakeSupplies()
-
 	for k, es := range s.externalStores {
-		supplies.RepoId = k
-		supplies.DirCache = s.GetEnvRepo().DirCacheRepo(k.GetRepoIdString())
-		es.Supplies = supplies
+		es.Supplies = s.MakeSupplies(k)
 
 		if _, ok := es.StoreLike.(*store_fs.Store); ok {
 			// TODO remove once store_fs.Store is fully ExternalStoreLike
