@@ -36,6 +36,8 @@ type Env interface {
 
 	SetWorkspaceTypes(map[string]*Store) (err error)
 	SetSupplies(store_workspace.Supplies) (err error)
+
+	Flush() (err error)
 }
 
 type Config interface {
@@ -238,5 +240,18 @@ func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
 func (env *env) SetWorkspaceTypes(
 	stores map[string]*Store,
 ) (err error) {
+	return
+}
+
+func (env *env) Flush() (err error) {
+	waitGroup := errors.MakeWaitGroupParallel()
+
+	waitGroup.Do(env.store.Flush)
+
+	if err = waitGroup.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }

@@ -225,18 +225,6 @@ func (repo *Repo) initialize(
 		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
-	// TODO move this initialization to envWorkspace
-	repo.workspaceStores = map[ids.RepoId]*env_workspace.Store{
-		{}: repo.envWorkspace.GetStore(),
-		*(ids.MustRepoId("browser")): {
-			StoreLike: store_browser.Make(
-				repo.config,
-				repo.GetEnvRepo(),
-				repo.PrinterTransactedDeleted(),
-			),
-		},
-	}
-
 	if err = repo.envWorkspace.SetWorkspaceTypes(
 		map[string]*env_workspace.Store{
 			"browser": {
@@ -271,9 +259,8 @@ func (repo *Repo) initialize(
 func (repo *Repo) Flush() (err error) {
 	waitGroup := errors.MakeWaitGroupParallel()
 
-	for storeType, store := range repo.workspaceStores {
-		ui.Log().Printf("will flush virtual store: %s", storeType)
-		waitGroup.Do(store.Flush)
+	if repo.envWorkspace != nil {
+		waitGroup.Do(repo.envWorkspace.Flush)
 	}
 
 	if err = waitGroup.GetError(); err != nil {
@@ -310,5 +297,5 @@ func (u *Repo) GetMatcherDormant() query.DormantCounter {
 func (repo *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
-  return repo.envWorkspace.GetStore(), true
+	return repo.envWorkspace.GetStore(), true
 }
