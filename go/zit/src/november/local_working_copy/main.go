@@ -310,7 +310,5 @@ func (u *Repo) GetMatcherDormant() query.DormantCounter {
 func (repo *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
-	e, ok := repo.workspaceStores[repoId]
-  e, ok = repo.envWorkspace.GetStore(), true
-	return e, ok
+  return repo.envWorkspace.GetStore(), true
 }
