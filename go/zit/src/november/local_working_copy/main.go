@@ -42,7 +42,6 @@ type Repo struct {
 	fileEncoder store_fs.FileEncoder
 	config      store_config.StoreMutable
 
-	storeFS      *store_fs.Store
 	storeAbbr    sku.AbbrStore
 	dormantIndex dormant_index.Index
 
@@ -127,7 +126,9 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(repo.envRepo.GetStoreVersion())
+	objectFormat := object_inventory_format.FormatForVersion(
+		repo.envRepo.GetStoreVersion(),
+	)
 
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
 		repo.GetEnv(),
@@ -167,16 +168,16 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	objectInventoryFormatOptions := object_inventory_format.Options{Tai: true}
-
 	config := repo.GetConfig()
 
-	if repo.storeFS, err = store_fs.Make(
+	var storeFS *store_fs.Store
+
+	// TODO move this initialization to envWorkspace
+	if storeFS, err = store_fs.Make(
 		config,
 		repo.PrinterFDDeleted(),
 		config.GetFileExtensions(),
 		repo.GetEnvRepo(),
-		objectInventoryFormatOptions,
 		repo.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -193,7 +194,7 @@ func (repo *Repo) initialize(
 
 	repo.envBox = env_box.Make(
 		repo.envRepo,
-		repo.storeFS,
+		storeFS,
 		repo.storeAbbr,
 	)
 
@@ -226,7 +227,6 @@ func (repo *Repo) initialize(
 		repo.envLua,
 		repo.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.All()...)),
-		objectInventoryFormatOptions,
 		boxFormatArchive,
 		repo.typedBlobStore,
 		&repo.dormantIndex,
@@ -243,7 +243,7 @@ func (repo *Repo) initialize(
 
 	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
 		{}: {
-			StoreLike: repo.storeFS,
+			StoreLike: storeFS,
 		},
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(

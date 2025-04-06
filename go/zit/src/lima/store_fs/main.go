@@ -32,7 +32,6 @@ func Make(
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
 	envRepo env_repo.Env,
-	inventoryFormatOptions object_inventory_format.Options,
 	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
 	fs = &Store{
@@ -52,7 +51,7 @@ func Make(
 		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		objectFormatOptions: inventoryFormatOptions,
+		objectFormatOptions: object_inventory_format.Options{Tai: true},
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
 				EnvDir:    envRepo,

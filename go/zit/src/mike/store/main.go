@@ -36,7 +36,6 @@ type Store struct {
 	Abbr               sku.AbbrStore
 
 	inventoryList          *sku.List
-	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
 	configBlobFormat       interfaces.Format[config_mutable_blobs.Blob]
 	envLua                 env_lua.Env
@@ -60,7 +59,6 @@ func (c *Store) Initialize(
 	sunrise ids.Tai,
 	envLua env_lua.Env,
 	queryBuilder *query.Builder,
-	options object_inventory_format.Options,
 	box *box_format.BoxTransacted,
 	typedBlobStore typed_blob_store.Stores,
 	dormantIndex *dormant_index.Index,
@@ -71,7 +69,6 @@ func (c *Store) Initialize(
 	c.envWorkspace = envWorkspace
 	c.typedBlobStore = typedBlobStore
 	c.persistentObjectFormat = pmf
-	c.options = options
 	c.sunrise = sunrise
 	c.envLua = envLua
 	c.queryBuilder = queryBuilder
