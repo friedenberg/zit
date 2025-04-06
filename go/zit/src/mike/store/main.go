@@ -24,6 +24,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
+// TODO refactor in to object store and something else that isn't determined yet
 type Store struct {
 	sunrise      ids.Tai
 	config       store_config.StoreMutable
@@ -129,9 +130,6 @@ func (store *Store) MakeSupplies() (supplies store_workspace.Supplies) {
 	supplies.ObjectStore = store
 
 	supplies.Env = store.GetEnvRepo()
-	// es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
-
-	// es.RepoId = k
 	supplies.Clock = store.sunrise
 	supplies.BlobStore = store.typedBlobStore
 
@@ -143,11 +141,11 @@ func (s *Store) SetExternalStores(
 ) (err error) {
 	s.externalStores = stores
 
-	for k, es := range s.externalStores {
-		supplies := s.MakeSupplies()
-		supplies.DirCache = s.GetEnvRepo().DirCacheRepo(k.GetRepoIdString())
-		supplies.RepoId = k
+	supplies := s.MakeSupplies()
 
+	for k, es := range s.externalStores {
+		supplies.RepoId = k
+		supplies.DirCache = s.GetEnvRepo().DirCacheRepo(k.GetRepoIdString())
 		es.Supplies = supplies
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {

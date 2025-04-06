@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/env_workspace"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_config"
 )
@@ -28,10 +27,6 @@ func (s *Store) GetTypedBlobStore() typed_blob_store.Stores {
 
 func (s *Store) GetEnnui() object_probe_index.Index {
 	return nil
-}
-
-func (s *Store) GetStoreFS() *store_fs.Store {
-	return s.storeFS
 }
 
 func (s *Store) GetProtoZettel() sku.Proto {

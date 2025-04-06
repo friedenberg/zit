@@ -45,6 +45,7 @@ func Make(
 	envRepo env_repo.Env,
 ) (out *env, err error) {
 	out = &env{
+		envRepo:       envRepo,
 		Env:           envLocal,
 		configMutable: config.GetMutableConfig(),
 	}
@@ -113,10 +114,16 @@ func Make(
 
 	out.store.StoreLike = out.storeFS
 
+	if err = out.store.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
 type env struct {
+	envRepo env_repo.Env
 	env_local.Env
 
 	isTemporary bool
