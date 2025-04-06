@@ -1,7 +1,6 @@
 package store
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
 )
@@ -16,7 +15,7 @@ func (store *Store) MakeImporter(
 		store.GetEnvRepo(),
 		store.GetTypedBlobStore().InventoryList,
 		store.GetStreamIndex(),
-		store.externalStores[ids.RepoId{}],
+		store.envWorkspace.GetStore(),
 		store,
 	)
 

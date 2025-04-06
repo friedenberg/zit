@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
 
 type Env interface {
@@ -30,6 +31,8 @@ type Env interface {
 	DeleteWorkspace() (err error)
 	GetStore() *Store
 	GetStoreFS() *store_fs.Store
+
+	SetSupplies(store_workspace.Supplies) (err error)
 }
 
 type Config interface {
@@ -211,6 +214,17 @@ func (env *env) DeleteWorkspace() (err error) {
 	if err = env.Delete(env.GetWorkspaceConfigFilePath()); errors.IsNotExist(err) {
 		err = nil
 	} else if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
+	env.store.Supplies = supplies
+
+	if err = env.store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

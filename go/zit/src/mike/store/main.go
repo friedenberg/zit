@@ -123,7 +123,6 @@ func (c *Store) Initialize(
 	return
 }
 
-// TODO add external_store.Supplies to Store and just use that
 func (store *Store) MakeSupplies(
 	repoId ids.RepoId,
 ) (supplies store_workspace.Supplies) {

@@ -214,23 +214,25 @@ func (importer importer) importLeafSku(
 	var commitOptions sku.CommitOptions
 
 	// TODO extra commit option setting into its own function
-	if commitOptions, err = importer.storeExternal.MergeCheckedOut(
-		co,
-		importer.parentNegotiator,
-		importer.allowMergeConflicts,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	if importer.storeExternal != nil {
+		if commitOptions, err = importer.storeExternal.MergeCheckedOut(
+			co,
+			importer.parentNegotiator,
+			importer.allowMergeConflicts,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if co.GetState() == checked_out_state.Conflicted {
-		if !importer.allowMergeConflicts {
-			if err = importer.checkedOutPrinter(co); err != nil {
-				err = errors.Wrap(err)
+		if co.GetState() == checked_out_state.Conflicted {
+			if !importer.allowMergeConflicts {
+				if err = importer.checkedOutPrinter(co); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
-
-			return
 		}
 	}
 

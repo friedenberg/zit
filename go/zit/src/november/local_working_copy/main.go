@@ -46,7 +46,9 @@ type Repo struct {
 	storesInitialized bool
 	typedBlobStore    typed_blob_store.Stores
 	store             store.Store
-	externalStores    map[ids.RepoId]*env_workspace.Store
+
+	// TODO switch key to be workspace type
+	workspaceStores map[ids.RepoId]*env_workspace.Store
 
 	DormantCounter query.DormantCounter
 
@@ -224,7 +226,7 @@ func (repo *Repo) initialize(
 	)
 
 	// TODO move this initialization to envWorkspace
-	repo.externalStores = map[ids.RepoId]*env_workspace.Store{
+	repo.workspaceStores = map[ids.RepoId]*env_workspace.Store{
 		{}: repo.envWorkspace.GetStore(),
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
@@ -235,10 +237,10 @@ func (repo *Repo) initialize(
 		},
 	}
 
-	if err = repo.store.SetExternalStores(
-		repo.externalStores,
+	if err = repo.envWorkspace.SetSupplies(
+		repo.store.MakeSupplies(ids.RepoId{}),
 	); err != nil {
-		err = errors.Wrapf(err, "failed to set external stores")
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -254,7 +256,7 @@ func (repo *Repo) initialize(
 func (repo *Repo) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	for k, vs := range repo.externalStores {
+	for k, vs := range repo.workspaceStores {
 		ui.Log().Printf("will flush virtual store: %s", k)
 		wg.Do(vs.Flush)
 	}
@@ -293,6 +295,6 @@ func (u *Repo) GetMatcherDormant() query.DormantCounter {
 func (repo *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
-	e, ok := repo.externalStores[repoId]
+	e, ok := repo.workspaceStores[repoId]
 	return e, ok
 }
