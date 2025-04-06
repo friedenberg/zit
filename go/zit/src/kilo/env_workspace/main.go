@@ -30,8 +30,11 @@ type Env interface {
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
 	DeleteWorkspace() (err error)
 	GetStore() *Store
+
+	// TODO identify users of this and reduce / isolate them
 	GetStoreFS() *store_fs.Store
 
+	SetWorkspaceTypes(map[string]*Store) (err error)
 	SetSupplies(store_workspace.Supplies) (err error)
 }
 
@@ -229,5 +232,11 @@ func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
 		return
 	}
 
+	return
+}
+
+func (env *env) SetWorkspaceTypes(
+	stores map[string]*Store,
+) (err error) {
 	return
 }

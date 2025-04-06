@@ -236,6 +236,21 @@ func (repo *Repo) initialize(
 			),
 		},
 	}
+	
+	if err = repo.envWorkspace.SetWorkspaceTypes(
+		map[string]*env_workspace.Store{
+			"browser": {
+				StoreLike: store_browser.Make(
+					repo.config,
+					repo.GetEnvRepo(),
+					repo.PrinterTransactedDeleted(),
+				),
+			},
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = repo.envWorkspace.SetSupplies(
 		repo.store.MakeSupplies(ids.RepoId{}),
@@ -254,14 +269,14 @@ func (repo *Repo) initialize(
 }
 
 func (repo *Repo) Flush() (err error) {
-	wg := errors.MakeWaitGroupParallel()
+	waitGroup := errors.MakeWaitGroupParallel()
 
-	for k, vs := range repo.workspaceStores {
-		ui.Log().Printf("will flush virtual store: %s", k)
-		wg.Do(vs.Flush)
+	for storeType, store := range repo.workspaceStores {
+		ui.Log().Printf("will flush virtual store: %s", storeType)
+		waitGroup.Do(store.Flush)
 	}
 
-	if err = wg.GetError(); err != nil {
+	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
