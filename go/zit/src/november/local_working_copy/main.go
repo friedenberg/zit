@@ -236,7 +236,7 @@ func (repo *Repo) initialize(
 			),
 		},
 	}
-	
+
 	if err = repo.envWorkspace.SetWorkspaceTypes(
 		map[string]*env_workspace.Store{
 			"browser": {
@@ -311,5 +311,6 @@ func (repo *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
 	e, ok := repo.workspaceStores[repoId]
+  e, ok = repo.envWorkspace.GetStore(), true
 	return e, ok
 }
