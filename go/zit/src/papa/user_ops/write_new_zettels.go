@@ -22,7 +22,7 @@ func (op WriteNewZettels) RunMany(
 	results = sku.MakeTransactedMutableSet()
 
 	// TODO-P4 modify this to be run once
-	for i := 0; i < count; i++ {
+	for range count {
 		var zt *sku.Transacted
 
 		if zt, err = op.runOneAlreadyLocked(proto); err != nil {

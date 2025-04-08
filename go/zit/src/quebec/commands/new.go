@@ -103,7 +103,7 @@ func (cmd *New) Run(req command.Request) {
 		},
 	)
 
-	var zts sku.TransactedMutableSet
+	var objects sku.TransactedMutableSet
 
 	if len(args) == 0 {
 		emptyOp := user_ops.WriteNewZettels{
@@ -113,7 +113,7 @@ func (cmd *New) Run(req command.Request) {
 		{
 			var err error
 
-			if zts, err = emptyOp.RunMany(cmd.Proto, cmd.Count); err != nil {
+			if objects, err = emptyOp.RunMany(cmd.Proto, cmd.Count); err != nil {
 				repo.CancelWithError(err)
 			}
 		}
@@ -126,7 +126,7 @@ func (cmd *New) Run(req command.Request) {
 		{
 			var err error
 
-			if zts, err = opCreateFromShas.Run(args...); err != nil {
+			if objects, err = opCreateFromShas.Run(args...); err != nil {
 				repo.CancelWithError(err)
 			}
 		}
@@ -142,7 +142,7 @@ func (cmd *New) Run(req command.Request) {
 		{
 			var err error
 
-			if zts, err = opCreateFromPath.Run(args...); err != nil {
+			if objects, err = opCreateFromPath.Run(args...); err != nil {
 				if errors.IsNotExist(err) {
 					repo.CancelWithBadRequestf("Expected a valid file path. Did you mean to add `-description`?")
 				} else {
@@ -160,6 +160,7 @@ func (cmd *New) Run(req command.Request) {
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					StoreSpecificOptions: store_fs.CheckoutOptions{
+						ForceInlineBlob:      true,
 						TextFormatterOptions: cotfo,
 					},
 				},
@@ -168,7 +169,7 @@ func (cmd *New) Run(req command.Request) {
 			RefreshCheckout: true,
 		}
 
-		if _, err := opCheckout.Run(zts); err != nil {
+		if _, err := opCheckout.Run(objects); err != nil {
 			repo.CancelWithError(err)
 		}
 	}
@@ -190,7 +191,7 @@ func (cmd *New) Run(req command.Request) {
 		{
 			var err error
 
-			if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
+			if results, err = opOrganize.RunWithTransacted(nil, objects); err != nil {
 				repo.CancelWithError(err)
 			}
 		}

@@ -54,16 +54,16 @@ func (av writer) write(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	write := func(z *obj) (err error) {
+	write := func(object *obj) (err error) {
 		var sb strings.Builder
 
-		if z.tipe.IsDirectOrSelf() {
+		if object.tipe.IsDirectOrSelf() {
 			sb.WriteString("- ")
 		} else {
 			sb.WriteString("% ")
 		}
 
-		cursor := z.sku.Clone()
+		cursor := object.sku.Clone()
 		cursorExternal := cursor.GetSkuExternal()
 		cursorExternal.Metadata.Subtract(&av.Metadata)
 		mes := cursorExternal.GetMetadata().GetTags().CloneMutableSetPtrLike()

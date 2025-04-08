@@ -119,8 +119,7 @@ func (s *Store) setBlobIfNecessary(
 ) (err error) {
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
-	if info.inlineBlob && options.CheckoutMode.IncludesMetadata() ||
-		fsOptions.ForceInlineBlob ||
+	if fsOptions.ForceInlineBlob ||
 		!options.CheckoutMode.IncludesBlob() {
 		i.MutableSetLike.Del(&i.Blob)
 		i.Blob.Reset()

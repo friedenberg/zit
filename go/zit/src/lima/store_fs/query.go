@@ -59,7 +59,7 @@ func (s *Store) QueryCheckedOut(
 }
 
 func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
-	f interfaces.FuncIter[sku.SkuType],
+	out interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(item *sku.FSItem) (err error) {
 		co := GetCheckedOutPool().Get()
@@ -131,7 +131,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			return
 		}
 
-		if err = f(co); err != nil {
+		if err = out(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
