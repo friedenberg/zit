@@ -325,7 +325,7 @@ func (c *context) CancelWithErrorf(f string, values ...any) {
 
 func (c *context) CancelWithBadRequestf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
-	c.cancel(&errBadRequest{xerrors.Errorf(f, values...)})
+	c.cancel(&errBadRequestWrap{xerrors.Errorf(f, values...)})
 }
 
 func (c *context) CancelWithNotImplemented() {

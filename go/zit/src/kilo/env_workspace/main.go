@@ -74,7 +74,7 @@ func Make(
 		out.isTemporary = true
 		err = nil
 	} else if err != nil {
-		err = errors.Wrap(err)
+		err = errors.BadRequestPreamble("failed to decode `.zit-workspace`", err)
 		return
 	} else {
 		out.blob = *object.Struct

@@ -1,33 +1,80 @@
 package errors
 
-import "golang.org/x/xerrors"
+import (
+	"strings"
 
-func BadRequest(err error) *errBadRequest {
-	return &errBadRequest{err}
+	"golang.org/x/xerrors"
+)
+
+type ErrBadRequest interface {
+	IsBadRequest()
 }
 
-func BadRequestf(fmt string, args ...interface{}) *errBadRequest {
-	return &errBadRequest{xerrors.Errorf(fmt, args...)}
+func BadRequest(err error) *errBadRequestWrap {
+	return &errBadRequestWrap{err}
+}
+
+func BadRequestf(fmt string, args ...any) *errBadRequestWrap {
+	return &errBadRequestWrap{xerrors.Errorf(fmt, args...)}
+}
+
+func BadRequestPreamble(preamble string, err error) *errBadRequestPreamble {
+	return &errBadRequestPreamble{
+		preamble: preamble,
+		error:    err,
+	}
 }
 
 func IsBadRequest(err error) bool {
-	return Is(err, errBadRequest{})
+	return Is(err, errBadRequestWrap{}) || Is(err, errBadRequestPreamble{})
 }
 
-type errBadRequest struct {
+type errBadRequestPreamble struct {
+	preamble string
 	error
 }
 
-func (e errBadRequest) ShouldShowStackTrace() bool {
+func (err errBadRequestPreamble) IsBadRequest() {}
+
+func (e errBadRequestPreamble) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e errBadRequest) Is(target error) bool {
-	_, ok := target.(errBadRequest)
+func (e errBadRequestPreamble) Is(target error) bool {
+	_, ok := target.(ErrBadRequest)
 	return ok
 }
 
-func (e errBadRequest) Error() string {
+func (err errBadRequestPreamble) Error() string {
+	var sb strings.Builder
+	sb.WriteString(err.preamble)
+	sb.WriteString(": \n\n")
+
+	if stackWrapError, ok := err.error.(*stackWrapError); ok {
+		stackWrapError.writeErrorNoStack(&sb)
+	} else {
+		sb.WriteString(err.error.Error())
+	}
+
+	return sb.String()
+}
+
+type errBadRequestWrap struct {
+	error
+}
+
+func (err errBadRequestWrap) IsBadRequest() {}
+
+func (e errBadRequestWrap) ShouldShowStackTrace() bool {
+	return false
+}
+
+func (e errBadRequestWrap) Is(target error) bool {
+	_, ok := target.(ErrBadRequest)
+	return ok
+}
+
+func (e errBadRequestWrap) Error() string {
 	return e.error.Error()
 }
 

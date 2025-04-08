@@ -139,10 +139,10 @@ func (si StackInfo) Wrap(in error) (err error) {
 	}
 }
 
-func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err error) {
+func (si StackInfo) Wrapf(in error, f string, values ...any) (err error) {
 	return &stackWrapError{
 		StackInfo: si,
-		error:     fmt.Errorf(f, values...),
+		ExtraData: fmt.Sprintf(f, values...),
 		next: &stackWrapError{
 			StackInfo: si,
 			error:     in,
@@ -150,7 +150,7 @@ func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err error)
 	}
 }
 
-func (si StackInfo) Errorf(f string, values ...interface{}) (err error) {
+func (si StackInfo) Errorf(f string, values ...any) (err error) {
 	return &stackWrapError{
 		StackInfo: si,
 		error:     fmt.Errorf(f, values...),
@@ -158,6 +158,7 @@ func (si StackInfo) Errorf(f string, values ...interface{}) (err error) {
 }
 
 type stackWrapError struct {
+	ExtraData string
 	StackInfo
 	error
 
@@ -207,7 +208,26 @@ func (se *stackWrapError) writeError(sb *strings.Builder) {
 	}
 }
 
-func (se stackWrapError) Error() string {
+func (se *stackWrapError) writeErrorNoStack(sb *strings.Builder) {
+	if se.ExtraData != "" {
+		fmt.Fprintf(sb, "- %s\n", se.ExtraData)
+	}
+
+	if se.error != nil {
+		fmt.Fprintf(sb, "- %s\n", se.error.Error())
+	}
+
+	if se.next != nil {
+		se.next.writeErrorNoStack(sb)
+	}
+
+	if se.next == nil && se.error == nil {
+		sb.WriteString("zit/alfa/errors/stackWrapError: both next and error are nil.")
+		sb.WriteString("zit/alfa/errors/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
+	}
+}
+
+func (se *stackWrapError) Error() string {
 	sb := &strings.Builder{}
 	se.writeError(sb)
 	return sb.String()
