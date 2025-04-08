@@ -215,18 +215,20 @@ LOOP_AFTER_OID:
 			continue
 
 			// key=value key="value"
-		case seq.MatchAll(
+		case seq.MatchStart(
 			box.TokenTypeIdentifier,
 			box.TokenMatcherOp(box.OpExact),
-			box.TokenMatcherOr(
-				box.TokenTypeIdentifier,
-				box.TokenTypeLiteral,
-			),
+		) || seq.MatchStart(
+			box.TokenTypeIdentifier,
+			box.TokenMatcherOp(box.OpExact),
+			box.TokenTypeLiteral,
 		):
+
+			value := seq[2:]
 
 			field := string_format_writer.Field{
 				Key:   string(seq.At(0).Contents),
-				Value: string(seq.At(2).Contents),
+				Value: value.String(),
 			}
 
 			field.ColorType = string_format_writer.ColorTypeUserData

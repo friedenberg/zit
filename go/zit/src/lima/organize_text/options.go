@@ -121,7 +121,7 @@ func (o *Flags) GetOptionsWithMetadata(
 	printOptions options_print.V0,
 	skuFmt *box_format.BoxCheckedOut,
 	abbr ids.Abbr,
-	of sku.ObjectFactory,
+	objectFactory sku.ObjectFactory,
 	m Metadata,
 ) Options {
 	o.once.Do(
@@ -132,9 +132,9 @@ func (o *Flags) GetOptionsWithMetadata(
 
 	o.fmtBox = skuFmt
 
-	of.SetDefaultsIfNecessary()
+	objectFactory.SetDefaultsIfNecessary()
 
-	o.ObjectFactory = of
+	o.ObjectFactory = objectFactory
 	o.PrintOptions = printOptions
 	o.Abbr = abbr
 	o.Metadata = m
@@ -147,7 +147,7 @@ func (o *Flags) GetOptions(
 	tagSet ids.TagSet,
 	skuBoxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr, // TODO move Abbr as required arg
-	of sku.ObjectFactory,
+	objectFactory sku.ObjectFactory,
 ) Options {
 	m := o.Metadata
 	m.TagSet = tagSet
@@ -160,7 +160,7 @@ func (o *Flags) GetOptions(
 		printOptions,
 		skuBoxFormat,
 		abbr,
-		of,
+		objectFactory,
 		m,
 	)
 }

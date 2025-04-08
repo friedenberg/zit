@@ -112,6 +112,20 @@ func (seq Seq) MatchAll(tokens ...TokenMatcher) bool {
 	return true
 }
 
+func (seq Seq) MatchStart(tokens ...TokenMatcher) bool {
+	if len(tokens) > seq.Len() {
+		return false
+	}
+
+	for i, m := range tokens {
+		if !m.Match(seq.At(i)) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (seq Seq) MatchEnd(tokens ...TokenMatcher) (ok bool, left, right Seq) {
 	if len(tokens) > seq.Len() {
 		return
