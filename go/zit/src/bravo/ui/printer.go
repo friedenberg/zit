@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/primordial"
@@ -52,7 +53,21 @@ func (p printer) IsTty() bool {
 	return p.isTty
 }
 
-func (p printer) Print(a ...interface{}) (err error) {
+func (p printer) PrintDebug(a ...any) (err error) {
+	if !p.on {
+		return
+	}
+
+	_, err = fmt.Fprintf(
+		p.f,
+		strings.Repeat("%#v ", len(a)),
+		a...,
+	)
+
+	return
+}
+
+func (p printer) Print(a ...any) (err error) {
 	if !p.on {
 		return
 	}
@@ -65,7 +80,7 @@ func (p printer) Print(a ...interface{}) (err error) {
 	return
 }
 
-func (p printer) printfStack(depth int, f string, a ...interface{}) (err error) {
+func (p printer) printfStack(depth int, f string, a ...any) (err error) {
 	if !p.on {
 		return
 	}
@@ -82,7 +97,7 @@ func (p printer) printfStack(depth int, f string, a ...interface{}) (err error) 
 	return
 }
 
-func (p printer) Printf(f string, a ...interface{}) (err error) {
+func (p printer) Printf(f string, a ...any) (err error) {
 	if !p.on {
 		return
 	}

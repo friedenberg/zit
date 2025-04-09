@@ -11,6 +11,7 @@ type Printer interface {
 
 	GetFile() *os.File
 	IsTty() bool
-	Print(a ...interface{}) (err error)
-	Printf(f string, a ...interface{}) (err error)
+	Print(a ...any) (err error)
+	PrintDebug(a ...any) (err error)
+	Printf(f string, a ...any) (err error)
 }
