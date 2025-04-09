@@ -23,7 +23,7 @@ jobs:
           name: DeterminateSystems/flakehub-push
           rolling: true
           visibility: public
-          working-directory: ./go/zit
+          directory: ./go/zit
   build-nix-package:
     runs-on: ubuntu-22.04
     permissions:
