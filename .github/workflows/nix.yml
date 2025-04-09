@@ -5,11 +5,12 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    working-directory: ./go/zit
+
 jobs:
   flakehub-publish:
-    defaults:
-      run:
-        working-directory: ./go/zit
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -23,9 +24,6 @@ jobs:
           rolling: true
           visibility: public
   build-nix-package:
-    defaults:
-      run:
-        working-directory: ./go/zit
     runs-on: ubuntu-22.04
     permissions:
       contents: read
