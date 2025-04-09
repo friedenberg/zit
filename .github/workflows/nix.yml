@@ -10,20 +10,25 @@ defaults:
     working-directory: ./go/zit
 
 jobs:
+
   flakehub-publish:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     permissions:
-      id-token: write
-      contents: read
+      id-token: "write"
+      contents: "read"
     steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/flakehub-push@main
+      - uses: "actions/checkout@v4"
+      - uses: "DeterminateSystems/nix-installer-action@main"
         with:
-          name: DeterminateSystems/flakehub-push
+          determinate: true
+      - uses: "DeterminateSystems/flakehub-push@main"
+        with:
+          name: "friedenberg/zit-go"
           rolling: true
-          visibility: public
+          visibility: "public"
+          include-output-paths: true
           directory: ./go/zit
+
   build-nix-package:
     runs-on: ubuntu-22.04
     permissions:
