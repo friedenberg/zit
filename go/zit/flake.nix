@@ -35,18 +35,23 @@
             ];
           };
 
-        in
-        {
-          packages.default = pkgs.buildGoModule rec {
-            enableParallelBuilding = true;
-            doCheck = false;
+          callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
+
+          gomod2nix = pkgs.gomod2nix;
+
+        in rec {
+          packages.zit = pkgs.buildGoApplication {
             pname = "zit";
-            version = "0.0.0";
+            version = "0.0.1";
             src = ./.;
-            vendorHash = "sha256-SwHJKodmWUrkjw6tQ6SJ9tVoqXE4DPQukWTDAufW/Yw=";
+            modules = ./gomod2nix.toml;
           };
 
+          packages.default = packages.zit;
+
           devShells.default = pkgs.mkShell {
+            # inherit (gomod2nix.packages.${system}) mkGoEnv gomod2nix;
+
             packages = (with pkgs; [
               govulncheck
               bats

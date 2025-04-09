@@ -135,7 +135,10 @@ build-go-binary:
 
 build-go: build-go-generate build-go-binary
 
-build-nix:
+build-nix-gomod:
+  gomod2nix
+
+build-nix: build-nix-gomod
   nix build
 
 build: build-go #build-nix
