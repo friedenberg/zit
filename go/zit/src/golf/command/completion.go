@@ -11,23 +11,23 @@ type SupportsCompletion interface {
 }
 
 type CommandLine struct {
-	Args       []string
-	InProgress string
+	FlagsOrArgs []string
+	InProgress  string
 }
 
 func (commandLine CommandLine) LastArg() (arg string, ok bool) {
-	argc := len(commandLine.Args)
+	argc := len(commandLine.FlagsOrArgs)
 
 	if argc > 0 {
 		ok = true
-		arg = commandLine.Args[argc-1]
+		arg = commandLine.FlagsOrArgs[argc-1]
 	}
 
 	return
 }
 
 func (commandLine CommandLine) LastCompleteArg() (arg string, ok bool) {
-	argc := len(commandLine.Args)
+	argc := len(commandLine.FlagsOrArgs)
 
 	if commandLine.InProgress != "" {
 		argc -= 1
@@ -35,7 +35,7 @@ func (commandLine CommandLine) LastCompleteArg() (arg string, ok bool) {
 
 	if argc > 0 {
 		ok = true
-		arg = commandLine.Args[argc-1]
+		arg = commandLine.FlagsOrArgs[argc-1]
 	}
 
 	return

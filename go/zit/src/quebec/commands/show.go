@@ -62,7 +62,7 @@ func (cmd Show) Complete(
 	archive := cmd.MakeLocalArchive(envRepo)
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		args := commandLine.Args[1:]
+		args := commandLine.FlagsOrArgs[1:]
 
 		if commandLine.InProgress != "" {
 			args = args[:len(args)-1]

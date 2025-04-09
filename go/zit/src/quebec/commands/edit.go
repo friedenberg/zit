@@ -65,7 +65,7 @@ func (cmd *Edit) Complete(
 ) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	args := commandLine.Args[1:]
+	args := commandLine.FlagsOrArgs[1:]
 
 	if commandLine.InProgress != "" {
 		args = args[:len(args)-1]

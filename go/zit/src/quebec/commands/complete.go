@@ -41,9 +41,12 @@ func (cmd Complete) Run(req command.Request) {
 	cmds := command.Commands()
 	envLocal := cmd.MakeEnv(req)
 
+  // TODO extract into constructor
+  // TODO find double-hyphen
+  // TODO keep track of all args
 	commandLine := command.CommandLine{
-		Args:       req.PeekArgs(),
-		InProgress: cmd.inProgress,
+		FlagsOrArgs: req.PeekArgs(),
+		InProgress:  cmd.inProgress,
 	}
 
 	// TODO determine state:
@@ -73,14 +76,24 @@ func (cmd Complete) Run(req command.Request) {
 	(&config_mutable_cli.Config{}).SetFlagSet(flagSet)
 	subcmd.SetFlagSet(flagSet)
 
-	if cmd.completeSubcommandFlags(
-		req,
-		envLocal,
-		subcmd,
-		flagSet,
-		commandLine,
-		lastArg,
-	) {
+	var containsDoubleHyphen bool
+
+	for _, arg := range commandLine.FlagsOrArgs {
+		if arg == "--" {
+			containsDoubleHyphen = true
+			break
+		}
+	}
+
+	if !containsDoubleHyphen &&
+		cmd.completeSubcommandFlags(
+			req,
+			envLocal,
+			subcmd,
+			flagSet,
+			commandLine,
+			lastArg,
+		) {
 		return
 	}
 
@@ -142,17 +155,17 @@ func (cmd Complete) completeSubcommandFlags(
 	flagSet *flag.FlagSet,
 	commandLine command.CommandLine,
 	lastArg string,
-) (flagComplete bool) {
+) (shouldNotCompleteArgs bool) {
 	if subcmd == nil {
 		return
 	}
 
-	if strings.HasPrefix(lastArg, "-") {
-		flagComplete = true
-	} else if commandLine.InProgress != "" && len(commandLine.Args) > 1 {
-		lastArg = commandLine.Args[len(commandLine.Args)-2]
+	if strings.HasPrefix(lastArg, "-") && commandLine.InProgress != "" {
+		shouldNotCompleteArgs = true
+	} else if commandLine.InProgress != "" && len(commandLine.FlagsOrArgs) > 1 {
+		lastArg = commandLine.FlagsOrArgs[len(commandLine.FlagsOrArgs)-2]
 		commandLine.InProgress = ""
-		flagComplete = strings.HasPrefix(lastArg, "-")
+		shouldNotCompleteArgs = strings.HasPrefix(lastArg, "-")
 	}
 
 	if commandLine.InProgress != "" {

@@ -202,3 +202,19 @@ function complete_init_workspace { # @test
 	# shellcheck disable=SC2016
 	assert_output_unsorted --regexp -- '-type.*type used for new objects in `new` and `organize`'
 }
+
+function complete_checkin { # @test
+	touch wow.md
+	run_zit complete checkin -organize -delete
+	assert_success
+
+	# shellcheck disable=SC2016
+	assert_output --regexp -- 'wow.md.*file'
+
+	touch wow.md
+	run_zit complete checkin -organize -delete --
+	assert_success
+
+	# shellcheck disable=SC2016
+	assert_output --regexp -- 'wow.md.*file'
+}
