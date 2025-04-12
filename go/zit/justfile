@@ -1,7 +1,5 @@
 
-commit: \
-    build test \
-    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
+default: build
 
 git-add-and-commit *PATHS:
   #! /usr/bin/env fish
@@ -138,8 +136,12 @@ build-go: build-go-generate build-go-binary
 build-nix-gomod:
   gomod2nix
 
+# TODO improve performance of this
 build-nix: build-nix-gomod
   nix build
+
+build-docker:
+  docker load < "$(nix build ".#docker.x86_64-linux" --print-out-paths)"
 
 build: build-go #build-nix
 
@@ -195,3 +197,20 @@ test-bats: test-bats-generate \
 
 test: test-go test-bats
 
+#   ____             _
+#  |  _ \  ___ _ __ | | ___  _   _
+#  | | | |/ _ \ '_ \| |/ _ \| | | |
+#  | |_| |  __/ |_) | | (_) | |_| |
+#  |____/ \___| .__/|_|\___/ \__, |
+#             |_|            |___/
+
+deploy-docker: build-docker
+  docker tag zit:latest idealnesswagon5/zit:latest
+  docker push idealnesswagon5/zit:latest
+
+deploy-github: \
+    build-go \
+    test \
+    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
+
+deploy: deploy-github deploy-docker

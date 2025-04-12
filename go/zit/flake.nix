@@ -39,15 +39,28 @@
 
           gomod2nix = pkgs.gomod2nix;
 
-        in rec {
-          packages.zit = pkgs.buildGoApplication {
+          zit = pkgs.buildGoApplication {
             pname = "zit";
             version = "0.0.1";
             src = ./.;
             modules = ./gomod2nix.toml;
           };
 
-          packages.default = packages.zit;
+        in {
+
+          packages.zit = zit;
+          packages.default = zit;
+
+          docker = pkgs.dockerTools.buildImage {
+            name = "zit";
+            tag = "latest";
+            copyToRoot = [zit];
+            config = {
+              Cmd = ["${zit}/bin/zit"];
+              Env = [];
+              ExposedPorts = {"28669/tcp" = {};};
+            };
+          };
 
           devShells.default = pkgs.mkShell {
             # inherit (gomod2nix.packages.${system}) mkGoEnv gomod2nix;
