@@ -4,8 +4,10 @@ import (
 	"crypto/ed25519"
 	"flag"
 	"fmt"
+	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
@@ -61,6 +63,18 @@ func (cmd Remote) CreateRemoteObject(
 
 		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
+
+	case repo.RemoteTypeUrl:
+		url := req.PopArg("url")
+
+		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeUri).Type
+		var typedBlob repo_blobs.TomlUriV0
+
+		if err := typedBlob.Uri.Set(url); err != nil {
+			req.CancelWithBadRequestf("invalid url: %s", err)
+		}
+
+		blob = &typedBlob
 
 	case repo.RemoteTypeStdioLocal:
 		path := req.PopArg("path")
@@ -173,7 +187,12 @@ func (cmd Remote) MakeRemoteFromBlob(
 	// 	)
 
 	case repo_blobs.TomlUriV0:
-		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
+		remote = cmd.MakeRemoteUrl(
+			req,
+			env,
+			blob.Uri,
+			local,
+		)
 
 	default:
 		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
@@ -280,6 +299,27 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 		env,
 		&httpRoundTripper,
 		localRepo,
+		cmd.MakeTypedInventoryListBlobStore(envRepo),
+	)
+
+	return
+}
+
+func (cmd *Remote) MakeRemoteUrl(
+	req command.Request,
+	env env_local.Env,
+	uri values.Uri,
+	local repo.LocalRepo,
+) (remoteHTTP repo.WorkingCopy) {
+	envRepo := cmd.MakeEnvRepo(req, false)
+
+	remoteHTTP = remote_http.MakeClient(
+		envRepo,
+		&remote_http.RoundTripperHost{
+			UrlData:      remote_http.MakeUrlDataFromUri(uri),
+			RoundTripper: http.DefaultTransport,
+		},
+		local,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 

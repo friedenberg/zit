@@ -16,12 +16,13 @@ const (
 	headerSha256Sig         = "X-Zit-Sha256-Sig"
 )
 
-type roundTripperWrappedSigner struct {
+type RoundTripperBufioWrappedSigner struct {
 	repo_signing.PublicKey
 	roundTripperBufio
 }
 
-func (roundTripper *roundTripperWrappedSigner) RoundTrip(
+// TODO extract signing into an agnostic middleware
+func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	request *http.Request,
 ) (response *http.Response, err error) {
 	nonceBytes := make([]byte, 32)
@@ -37,7 +38,9 @@ func (roundTripper *roundTripperWrappedSigner) RoundTrip(
 		request.Header.Add(headerChallengeNonce, nonceString)
 	}
 
-	if response, err = roundTripper.roundTripperBufio.RoundTrip(request); err != nil {
+	if response, err = roundTripper.roundTripperBufio.RoundTrip(
+		request,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

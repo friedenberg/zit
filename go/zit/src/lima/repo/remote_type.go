@@ -15,7 +15,7 @@ const (
 	RemoteTypeUnspecified = RemoteType(iota)
 	RemoteTypeNativeDotenvXDG
 	RemoteTypeSocketUnix
-	RemoteTypePortHTTP
+	RemoteTypeUrl
 	RemoteTypeStdioLocal
 	RemoteTypeStdioSSH
 	_RemoteTypeMax
@@ -42,8 +42,8 @@ func (t *RemoteType) Set(v string) (err error) {
 	case "socket-unix":
 		*t = RemoteTypeSocketUnix
 
-	case "port-http":
-		*t = RemoteTypePortHTTP
+  case "url":
+		*t = RemoteTypeUrl
 
 	case "stdio-local":
 		*t = RemoteTypeStdioLocal

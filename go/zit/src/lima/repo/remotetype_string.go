@@ -11,15 +11,15 @@ func _() {
 	_ = x[RemoteTypeUnspecified-0]
 	_ = x[RemoteTypeNativeDotenvXDG-1]
 	_ = x[RemoteTypeSocketUnix-2]
-	_ = x[RemoteTypePortHTTP-3]
+	_ = x[RemoteTypeUrl-3]
 	_ = x[RemoteTypeStdioLocal-4]
 	_ = x[RemoteTypeStdioSSH-5]
 	_ = x[_RemoteTypeMax-6]
 }
 
-const _RemoteType_name = "RemoteTypeUnspecifiedRemoteTypeNativeDotenvXDGRemoteTypeSocketUnixRemoteTypePortHTTPRemoteTypeStdioLocalRemoteTypeStdioSSH_RemoteTypeMax"
+const _RemoteType_name = "RemoteTypeUnspecifiedRemoteTypeNativeDotenvXDGRemoteTypeSocketUnixRemoteTypeUrlRemoteTypeStdioLocalRemoteTypeStdioSSH_RemoteTypeMax"
 
-var _RemoteType_index = [...]uint8{0, 21, 46, 66, 84, 104, 122, 136}
+var _RemoteType_index = [...]uint8{0, 21, 46, 66, 79, 99, 117, 131}
 
 func (i RemoteType) String() string {
 	if i < 0 || i >= RemoteType(len(_RemoteType_index)-1) {

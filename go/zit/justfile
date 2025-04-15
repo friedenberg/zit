@@ -140,7 +140,7 @@ build-nix-gomod:
 build-nix: build-nix-gomod
   nix build
 
-build-docker:
+build-docker: build-nix-gomod
   docker load < "$(nix build ".#docker.x86_64-linux" --print-out-paths)"
 
 build: build-go #build-nix

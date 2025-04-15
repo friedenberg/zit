@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -37,6 +38,8 @@ type Server struct {
 	EnvLocal  env_local.Env
 	Repo      repo.LocalRepo
 	blobCache serverBlobCache
+
+	GetCertificate func(*tls.ClientHelloInfo) (*tls.Certificate, error)
 }
 
 func (server *Server) init() (err error) {
@@ -242,6 +245,8 @@ func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {
 		func(responseWriter http.ResponseWriter, request *http.Request) {
 			defer func() {
 				if r := recover(); r != nil {
+					ui.Log().Print("request handler panicked", request.URL)
+
 					switch err := r.(type) {
 					default:
 						panic(err)
@@ -270,6 +275,12 @@ func (server *Server) Serve(listener net.Listener) (err error) {
 
 	httpServer := http.Server{
 		Handler: server.makeRouter(server.makeHandler),
+	}
+
+	if server.GetCertificate != nil {
+		httpServer.TLSConfig = &tls.Config{
+			GetCertificate: server.GetCertificate,
+		}
 	}
 
 	go func() {
@@ -444,6 +455,7 @@ func (server *Server) makeHandler(
 		); err != nil {
 			server.EnvLocal.CancelWithError(err)
 		}
+
 		// header := responseWriter.Header()
 
 		// for key, values := range response.Headers {
@@ -451,6 +463,10 @@ func (server *Server) makeHandler(
 		// 		header.Add(key, value)
 		// 	}
 		// }
+
+		if response.StatusCode == 0 {
+			response.StatusCode = http.StatusOK
+		}
 
 		responseWriter.WriteHeader(response.StatusCode)
 

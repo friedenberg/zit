@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/oscar/remote_http"
 	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
+	"tailscale.com/client/local"
 )
 
 func init() {
@@ -18,11 +19,15 @@ type Serve struct {
 	command_components.Env
 	command_components.EnvRepo
 	command_components.LocalArchive
+
+	TailscaleTLS bool
 }
 
 func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
 	cmd.EnvRepo.SetFlagSet(f)
 	cmd.LocalArchive.SetFlagSet(f)
+
+	flag.BoolVar(&cmd.TailscaleTLS, "tailscale-tls", false, "use tailscale for TLS")
 }
 
 func (cmd Serve) Run(req command.Request) {
@@ -44,6 +49,11 @@ func (cmd Serve) Run(req command.Request) {
 	server := remote_http.Server{
 		EnvLocal: envLocal,
 		Repo:     repo,
+	}
+
+	if cmd.TailscaleTLS {
+		var lc local.Client
+		server.GetCertificate = lc.GetCertificate
 	}
 
 	// TODO switch network to be RemoteServeType

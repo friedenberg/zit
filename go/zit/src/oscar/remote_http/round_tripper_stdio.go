@@ -17,7 +17,7 @@ type RoundTripperStdio struct {
 	exec.Cmd
 	io.WriteCloser
 	io.ReadCloser
-	roundTripperWrappedSigner
+	RoundTripperBufioWrappedSigner
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(

@@ -10,6 +10,10 @@ type Uri struct {
 	url url.URL
 }
 
+func (u *Uri) GetUrl() url.URL {
+	return u.url
+}
+
 func (u *Uri) Set(v string) (err error) {
 	var u1 *url.URL
 

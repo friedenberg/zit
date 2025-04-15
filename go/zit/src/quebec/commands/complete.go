@@ -41,9 +41,9 @@ func (cmd Complete) Run(req command.Request) {
 	cmds := command.Commands()
 	envLocal := cmd.MakeEnv(req)
 
-  // TODO extract into constructor
-  // TODO find double-hyphen
-  // TODO keep track of all args
+	// TODO extract into constructor
+	// TODO find double-hyphen
+	// TODO keep track of all args
 	commandLine := command.CommandLine{
 		FlagsOrArgs: req.PeekArgs(),
 		InProgress:  cmd.inProgress,
@@ -214,7 +214,9 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 
 	var flagCompleter command.Completer
 
-	if flag := flagSet.Lookup(after); flag != nil {
+	var flag *flag.Flag
+
+	if flag = flagSet.Lookup(after); flag != nil {
 		flagCompleter, _ = flag.Value.(command.Completer)
 	}
 
@@ -223,5 +225,5 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	req.CancelWithBadRequestf("no completion available for flag: %q", after)
+	req.CancelWithBadRequestf("no completion available for flag: %q, %#v", after, flag)
 }

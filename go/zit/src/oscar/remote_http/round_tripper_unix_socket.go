@@ -12,7 +12,7 @@ import (
 type RoundTripperUnixSocket struct {
 	repo.UnixSocket
 	net.Conn
-	roundTripperWrappedSigner
+	RoundTripperBufioWrappedSigner
 }
 
 // TODO add public key
