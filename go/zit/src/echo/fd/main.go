@@ -3,7 +3,6 @@ package fd
 import (
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -67,22 +66,108 @@ func (a *FD) Equals(b *FD) bool {
 	return true
 }
 
-func (fd *FD) SetWithBlobWriterFactory(
-	p string,
-	awf interfaces.BlobWriter,
+func (fd *FD) SetFromPath(
+	baseDir string,
+	path string,
+	blobStore interfaces.BlobWriter,
 ) (err error) {
-	if p == "" {
+	if path == "" {
+		err = errors.Errorf("nil file desriptor")
+		return
+	}
+
+	if path == "." {
+		err = errors.Errorf("'.' not supported")
+		return
+	}
+
+	if !filepath.IsAbs(path) {
+		path = filepath.Clean(filepath.Join(baseDir, path))
+	}
+
+	var fileInfo os.FileInfo
+
+	if fileInfo, err = os.Stat(path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fd.SetFromFileInfoWithDir(
+		fileInfo,
+		filepath.Dir(path),
+		blobStore,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (fd *FD) SetFromFileInfoWithDir(
+	fileInfo os.FileInfo,
+	dir string,
+	blobStore interfaces.BlobWriter,
+) (err error) {
+	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if fileInfo.IsDir() {
+		return
+	}
+
+	// TODO eventually enforce requirement of blob writer factory
+	if blobStore == nil {
+		return
+	}
+
+	var file *os.File
+
+	if file, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, file)
+
+	var writer sha.WriteCloser
+
+	if writer, err = blobStore.BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, writer)
+
+	if _, err = io.Copy(writer, file); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fd.sha.SetShaLike(writer)
+	fd.state = StateStored
+
+	return
+}
+
+func (fd *FD) SetWithBlobWriterFactory(
+	path string,
+	blobStore interfaces.BlobWriter,
+) (err error) {
+	if path == "" {
 		err = errors.Errorf("empty path")
 		return
 	}
 
-	if awf == nil {
+	if blobStore == nil {
 		panic("BlobWriterFactory is nil")
 	}
 
 	var f *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+	if f, err = files.OpenExclusiveReadOnly(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -91,7 +176,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	var blobWriter sha.WriteCloser
 
-	if blobWriter, err = awf.BlobWriter(); err != nil {
+	if blobWriter, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -110,12 +195,12 @@ func (fd *FD) SetWithBlobWriterFactory(
 		return
 	}
 
-	if err = fd.SetFileInfoWithDir(fi, path.Dir(p)); err != nil {
+	if err = fd.SetFileInfoWithDir(fi, filepath.Dir(path)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	fd.path = p
+	fd.path = path
 	fd.sha.SetShaLike(blobWriter)
 	fd.state = StateStored
 
@@ -130,7 +215,7 @@ func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 	p := dir
 
 	if !f.isDir {
-		p = path.Join(dir, fi.Name())
+		p = filepath.Join(dir, fi.Name())
 	}
 
 	if f.path, err = filepath.Abs(p); err != nil {
@@ -186,7 +271,7 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	if err = fd.SetFileInfoWithDir(fi, path.Dir(v)); err != nil {
+	if err = fd.SetFileInfoWithDir(fi, filepath.Dir(v)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

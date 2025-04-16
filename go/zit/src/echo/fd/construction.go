@@ -93,7 +93,7 @@ func MakeFromPath(
 func MakeFromFileInfoWithDir(
 	fileInfo os.FileInfo,
 	dir string,
-	blobWriter interfaces.BlobWriter,
+	blobStore interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	// TODO use pool
 	fd = &FD{}
@@ -108,34 +108,34 @@ func MakeFromFileInfoWithDir(
 	}
 
 	// TODO eventually enforce requirement of blob writer factory
-	if blobWriter == nil {
+	if blobStore == nil {
 		return
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
+	if file, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	var aw sha.WriteCloser
+	var writer sha.WriteCloser
 
-	if aw, err = blobWriter.BlobWriter(); err != nil {
+	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, writer)
 
-	if _, err = io.Copy(aw, f); err != nil {
+	if _, err = io.Copy(writer, file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	fd.sha.SetShaLike(aw)
+	fd.sha.SetShaLike(writer)
 	fd.state = StateStored
 
 	return
