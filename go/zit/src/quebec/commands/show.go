@@ -84,7 +84,7 @@ func (cmd Show) Run(req command.Request) {
 	args := req.PopArgs()
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		query := cmd.MakeQuery(
+		query := cmd.MakeQueryIncludingWorkspace(
 			req,
 			pkg_query.BuilderOptions(
 				pkg_query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	pkg_query "code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
 )
@@ -33,7 +33,7 @@ func (cmd Complete) GetFlagValueMetadataTags(
 			cmd.CompleteObjects(
 				req,
 				local,
-				query.BuilderOptionDefaultGenres(genres.Tag),
+				pkg_query.BuilderOptionDefaultGenres(genres.Tag),
 			)
 		},
 	}
@@ -54,7 +54,7 @@ func (cmd Complete) GetFlagValueStringTags(
 			cmd.CompleteObjects(
 				req,
 				local,
-				query.BuilderOptionDefaultGenres(genres.Tag),
+				pkg_query.BuilderOptionDefaultGenres(genres.Tag),
 			)
 		},
 	}
@@ -75,7 +75,7 @@ func (cmd Complete) GetFlagValueMetadataType(
 			cmd.CompleteObjects(
 				req,
 				local,
-				query.BuilderOptionDefaultGenres(genres.Type),
+				pkg_query.BuilderOptionDefaultGenres(genres.Type),
 			)
 		},
 	}
@@ -106,15 +106,15 @@ func (cmd Complete) SetFlagsProto(
 	)
 }
 
-func (cmd Complete) CompleteObjects(
+func (cmd Complete) CompleteObjectsIncludingWorkspace(
 	req command.Request,
 	local *local_working_copy.Repo,
-	queryBuilderOptions query.BuilderOption,
+	queryBuilderOptions pkg_query.BuilderOption,
 	args ...string,
 ) {
 	printerCompletions := sku_fmt.MakePrinterComplete(local)
 
-	queryGroup := cmd.MakeQuery(
+	query := cmd.MakeQueryIncludingWorkspace(
 		req,
 		queryBuilderOptions,
 		local,
@@ -122,7 +122,30 @@ func (cmd Complete) CompleteObjects(
 	)
 
 	if err := local.GetStore().QueryTransacted(
-		queryGroup,
+		query,
+		printerCompletions.PrintOne,
+	); err != nil {
+		local.CancelWithError(err)
+	}
+}
+
+func (cmd Complete) CompleteObjects(
+	req command.Request,
+	local *local_working_copy.Repo,
+	queryBuilderOptions pkg_query.BuilderOption,
+	args ...string,
+) {
+	printerCompletions := sku_fmt.MakePrinterComplete(local)
+
+	query := cmd.MakeQuery(
+		req,
+		queryBuilderOptions,
+		local,
+		args,
+	)
+
+	if err := local.GetStore().QueryTransacted(
+		query,
 		printerCompletions.PrintOne,
 	); err != nil {
 		local.CancelWithError(err)

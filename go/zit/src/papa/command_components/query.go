@@ -20,7 +20,7 @@ func (cmd *Query) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
 }
 
-func (cmd Query) MakeQuery(
+func (cmd Query) MakeQueryIncludingWorkspace(
 	req command.Request,
 	options pkg_query.BuilderOption,
 	workingCopy repo.WorkingCopy,
@@ -35,6 +35,20 @@ func (cmd Query) MakeQuery(
 		)
 	}
 
+	return cmd.MakeQuery(
+		req,
+		options,
+		workingCopy,
+		args,
+	)
+}
+
+func (cmd Query) MakeQuery(
+	req command.Request,
+	options pkg_query.BuilderOption,
+	workingCopy repo.WorkingCopy,
+	args []string,
+) (query *pkg_query.Query) {
 	var err error
 
 	if query, err = workingCopy.MakeExternalQueryGroup(

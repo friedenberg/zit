@@ -100,7 +100,7 @@ func (cmd *Organize) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 
-	queryGroup := cmd.MakeQuery(
+	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptionsOld(
 			cmd,

@@ -56,7 +56,7 @@ func (cmd Clone) Run(req command.Request) {
 		)
 
 	case repo.WorkingCopy:
-		queryGroup := cmd.MakeQuery(
+		queryGroup := cmd.MakeQueryIncludingWorkspace(
 			req,
 			query.BuilderOptionsOld(
 				cmd,

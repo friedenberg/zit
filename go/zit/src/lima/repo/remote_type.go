@@ -42,7 +42,7 @@ func (t *RemoteType) Set(v string) (err error) {
 	case "socket-unix":
 		*t = RemoteTypeSocketUnix
 
-  case "url":
+	case "url":
 		*t = RemoteTypeUrl
 
 	case "stdio-local":

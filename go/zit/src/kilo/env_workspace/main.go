@@ -62,22 +62,42 @@ func Make(
 		Type: &ids.Type{},
 	}
 
-	expectedWorkspaceConfigFilePath := filepath.Join(
-		out.GetCwd(),
-		env_repo.FileWorkspace,
-	)
+	dir := out.GetCwd()
 
-	if err = workspace_config_blobs.DecodeFromFile(
-		&object,
-		expectedWorkspaceConfigFilePath,
-	); errors.IsNotExist(err) {
-		out.isTemporary = true
-		err = nil
-	} else if err != nil {
-		err = errors.BadRequestPreamble("failed to decode `.zit-workspace`", err)
-		return
-	} else {
-		out.blob = *object.Struct
+	// TODO add workspace parent tree height limit?
+	for {
+		expectedWorkspaceConfigFilePath := filepath.Join(
+			dir,
+			env_repo.FileWorkspace,
+		)
+
+		if err = workspace_config_blobs.DecodeFromFile(
+			&object,
+			expectedWorkspaceConfigFilePath,
+		); errors.IsNotExist(err) {
+			// if we hit the root, reset to empty so that we trigger the isTemporary
+			// path
+			if dir == string(filepath.Separator) {
+				dir = ""
+			}
+
+			dir = filepath.Dir(dir)
+
+			if dir != "." {
+				continue
+			}
+
+			out.isTemporary = true
+			err = nil
+			break
+
+		} else if err != nil {
+			err = errors.BadRequestPrefix("failed to decode `.zit-workspace`", err)
+			return
+		} else {
+			out.blob = *object.Struct
+			break
+		}
 	}
 
 	defaults := out.configMutable.GetDefaults()

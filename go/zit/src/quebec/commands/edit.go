@@ -71,7 +71,7 @@ func (cmd *Edit) Complete(
 		args = args[:len(args)-1]
 	}
 
-	cmd.complete.CompleteObjects(
+	cmd.complete.CompleteObjectsIncludingWorkspace(
 		req,
 		localWorkingCopy,
 		query.BuilderOptionDefaultGenres(genres.Zettel),
@@ -83,7 +83,7 @@ func (cmd Edit) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := localWorkingCopy.GetEnvWorkspace()
 
-	queryGroup := cmd.MakeQuery(
+	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptions(
 			query.BuilderOptionsOld(cmd),

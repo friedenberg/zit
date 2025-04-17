@@ -31,7 +31,7 @@ func (s *Store) QueryPrimitive(
 
 func (s *Store) QueryTransacted(
 	qg *pkg_query.Query,
-	f interfaces.FuncIter[*sku.Transacted],
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var e pkg_query.Executor
 
@@ -50,7 +50,7 @@ func (s *Store) QueryTransacted(
 			break
 		}
 
-		if err = f(sk); err != nil {
+		if err = output(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -58,7 +58,7 @@ func (s *Store) QueryTransacted(
 		return
 	}
 
-	if err = e.ExecuteTransacted(f); err != nil {
+	if err = e.ExecuteTransacted(output); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

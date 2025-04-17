@@ -24,7 +24,7 @@ func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
 ) (*local_working_copy.Repo, *query.Query) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	queryGroup := cmd.MakeQuery(
+	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		builderOptions,
 		localWorkingCopy,

@@ -197,3 +197,15 @@ function workspace_add_yes_organize_omit_one { # @test
 		          deleted [1.md]
 	EOM
 }
+
+function workspace_parent_directory { # @test
+	run_zit init-workspace -tags tag-3 -query tag-3
+	assert_success
+
+  mkdir -p child
+  pushd child || exit 1
+
+  run_zit info-workspace
+  assert_success
+  assert_output ''
+}

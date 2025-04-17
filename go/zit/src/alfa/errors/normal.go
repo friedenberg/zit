@@ -18,7 +18,7 @@ func BadRequestf(fmt string, args ...any) *errBadRequestWrap {
 	return &errBadRequestWrap{xerrors.Errorf(fmt, args...)}
 }
 
-func BadRequestPreamble(preamble string, err error) *errBadRequestPreamble {
+func BadRequestPrefix(preamble string, err error) *errBadRequestPreamble {
 	return &errBadRequestPreamble{
 		preamble: preamble,
 		error:    err,

@@ -50,7 +50,7 @@ func (cmd Push) Run(req command.Request) {
 
 	switch repoType {
 	case repo_type.TypeWorkingCopy:
-		queryGroup := cmd.MakeQuery(
+		queryGroup := cmd.MakeQueryIncludingWorkspace(
 			req,
 			query.BuilderOptionsOld(
 				cmd,

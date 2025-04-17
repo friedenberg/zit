@@ -45,7 +45,7 @@ func (cmd Pull) Run(req command.Request) {
 
 	remote := cmd.MakeRemote(req, localWorkingCopy, object)
 
-	qg := cmd.MakeQuery(
+	qg := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptionsOld(
 			cmd,

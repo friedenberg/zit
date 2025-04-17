@@ -29,7 +29,7 @@ func (cmd Status) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	localWorkingCopy.GetEnvWorkspace().AssertNotTemporary(req)
 
-	query := cmd.MakeQuery(
+	query := cmd.MakeQueryIncludingWorkspace(
 		req,
 		pkg_query.BuilderOptions(
 			pkg_query.BuilderOptionDefaultGenres(genres.All()...),
