@@ -689,6 +689,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 
 		response.Body = io.NopCloser(b)
 	} else {
+		response.StatusCode = http.StatusNotImplemented
 	}
 
 	return

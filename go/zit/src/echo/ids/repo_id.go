@@ -89,6 +89,10 @@ func (k RepoId) String() string {
 	return k.id
 }
 
+func (k RepoId) StringWithSlashPrefix() string {
+	return "/" + k.id
+}
+
 func (k RepoId) Parts() [3]string {
 	return [3]string{"", "/", k.id}
 }
