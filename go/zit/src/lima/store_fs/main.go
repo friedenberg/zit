@@ -293,11 +293,15 @@ func (s *Store) GetFSItemsForString(
 }
 
 func (store *Store) GetObjectIdsForString(
-	v string,
-) (k []sku.ExternalObjectId, err error) {
+	queryLiteral string,
+) (objectIds []sku.ExternalObjectId, err error) {
 	var items []*sku.FSItem
 
-	if items, err = store.GetFSItemsForString(store.root, v, false); err != nil {
+	if items, err = store.GetFSItemsForString(
+		store.root,
+		queryLiteral,
+		false,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -313,7 +317,7 @@ func (store *Store) GetObjectIdsForString(
 			return
 		}
 
-		k = append(k, &eoid)
+		objectIds = append(objectIds, &eoid)
 	}
 
 	return
