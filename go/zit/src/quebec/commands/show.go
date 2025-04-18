@@ -29,12 +29,14 @@ type Show struct {
 	command_components.EnvRepo
 	command_components.LocalArchive
 	command_components.Query
+	command_components.RemoteTransfer
 
 	complete command_components.Complete
 
-	After  ids.Tai
-	Before ids.Tai
-	Format string
+	After      ids.Tai
+	Before     ids.Tai
+	Format     string
+	RemoteRepo ids.RepoId
 }
 
 func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
@@ -45,12 +47,7 @@ func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&cmd.Format, "format", "log", "format")
 	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.Before), "before", "")
 	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.After), "after", "")
-}
-
-func (cmd Show) CompletionGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Tag,
-	)
+	flagSet.Var(&cmd.RemoteRepo, "repo", "the remote repo to query")
 }
 
 func (cmd Show) Complete(
@@ -94,7 +91,7 @@ func (cmd Show) Run(req command.Request) {
 			args,
 		)
 
-		cmd.runWithLocalWorkingCopyAndQuery(localWorkingCopy, query)
+		cmd.runWithLocalWorkingCopyAndQuery(req, localWorkingCopy, query)
 	} else {
 		if len(args) != 0 {
 			ui.Err().Print("ignoring arguments for archive repo")
@@ -105,9 +102,26 @@ func (cmd Show) Run(req command.Request) {
 }
 
 func (cmd Show) runWithLocalWorkingCopyAndQuery(
-	repo *local_working_copy.Repo,
+	req command.Request,
+	localWorkingCopy *local_working_copy.Repo,
 	query *pkg_query.Query,
 ) {
+	var remoteObject *sku.Transacted
+	var remoteWorkingCopy repo.WorkingCopy
+
+	if !cmd.RemoteRepo.IsEmpty() {
+		var err error
+
+		if remoteObject, err = localWorkingCopy.GetObjectFromObjectId(
+			cmd.RemoteRepo.StringWithSlashPrefix(),
+		); err != nil {
+			localWorkingCopy.CancelWithError(err)
+		}
+
+		remoteRepo := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
+		remoteWorkingCopy, _ = remoteRepo.(repo.WorkingCopy)
+	}
+
 	var output interfaces.FuncIter[*sku.Transacted]
 
 	if cmd.Format == "" && pkg_query.IsExactlyOneObjectId(query) {
@@ -117,8 +131,11 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	{
 		var err error
 
-		if output, err = repo.MakeFormatFunc(cmd.Format, repo.GetUIFile()); err != nil {
-			repo.CancelWithError(err)
+		if output, err = localWorkingCopy.MakeFormatFunc(
+			cmd.Format,
+			localWorkingCopy.GetUIFile(),
+		); err != nil {
+			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
@@ -156,11 +173,29 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 		}
 	}
 
-	if err := repo.GetStore().QueryTransacted(
-		query,
-		quiter.MakeSyncSerializer(output),
-	); err != nil {
-		repo.CancelWithError(err)
+	if remoteWorkingCopy != nil {
+		var list *sku.List
+
+		{
+			var err error
+
+			if list, err = remoteWorkingCopy.MakeInventoryList(query); err != nil {
+				localWorkingCopy.CancelWithError(err)
+			}
+		}
+
+		for sk := range list.All() {
+			if err := output(sk); err != nil {
+				localWorkingCopy.CancelWithError(err)
+			}
+		}
+	} else {
+		if err := localWorkingCopy.GetStore().QueryTransacted(
+			query,
+			quiter.MakeSyncSerializer(output),
+		); err != nil {
+			localWorkingCopy.CancelWithError(err)
+		}
 	}
 }
 

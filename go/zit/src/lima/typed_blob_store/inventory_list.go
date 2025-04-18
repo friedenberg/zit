@@ -47,14 +47,16 @@ func MakeInventoryStore(
 		},
 	}
 
-	s.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted](map[string]interfaces.Coder[*sku.Transacted]{
-		"": inventory_list_blobs.V0ObjectCoder{
-			V0: s.v0,
+	s.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted](
+		map[string]interfaces.Coder[*sku.Transacted]{
+			"": inventory_list_blobs.V0ObjectCoder{
+				V0: s.v0,
+			},
+			builtin_types.InventoryListTypeV1: inventory_list_blobs.V1ObjectCoder{
+				V1: s.v1,
+			},
 		},
-		builtin_types.InventoryListTypeV1: inventory_list_blobs.V1ObjectCoder{
-			V1: s.v1,
-		},
-	})
+	)
 
 	s.streamDecoders = map[string]interfaces.DecoderFrom[func(*sku.Transacted) bool]{
 		"": inventory_list_blobs.V0IterDecoder{

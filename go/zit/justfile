@@ -197,6 +197,19 @@ test-bats: test-bats-generate \
 
 test: test-go test-bats
 
+#   ____  _        _
+#  / ___|| |_ __ _| |_ ___
+#  \___ \| __/ _` | __/ __|
+#   ___) | || (_| | |_\__ \
+#  |____/ \__\__,_|\__|___/
+#
+
+@stats-bats-skipped:
+  echo -n "skipped bats tests: "
+  ag '^\s+skip' zz-tests_bats/ -c | cut -d: -f2 | paste -s -d + - | bc
+
+@stats: stats-bats-skipped
+
 #   ____             _
 #  |  _ \  ___ _ __ | | ___  _   _
 #  | | | |/ _ \ '_ \| |/ _ \| | | |

@@ -32,19 +32,19 @@ func (cmd *Push) SetFlagSet(flagSet *flag.FlagSet) {
 func (cmd Push) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	var object *sku.Transacted
+	var remoteObject *sku.Transacted
 
 	{
 		var err error
 
-		if object, err = localWorkingCopy.GetObjectFromObjectId(
+		if remoteObject, err = localWorkingCopy.GetObjectFromObjectId(
 			req.PopArg("repo-id"),
 		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	remote := cmd.MakeRemote(req, localWorkingCopy, object)
+	remote := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
 
 	repoType := remote.GetImmutableConfigPublic().ImmutableConfig.GetRepoType()
 
