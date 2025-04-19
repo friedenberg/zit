@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -81,10 +82,8 @@ func ReadErrorFromBodyOnNot(
 	response *http.Response,
 	statuses ...int,
 ) (err error) {
-	for _, status := range statuses {
-		if response.StatusCode == status {
-			return
-		}
+	if slices.Contains(statuses, response.StatusCode) {
+		return
 	}
 
 	err = ReadErrorFromBody(response)

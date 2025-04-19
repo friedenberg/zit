@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -29,12 +30,17 @@ func Make(
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.ObjectStore,
 ) sku.Importer {
+	if options.BlobGenres.IsEmpty() {
+		options.BlobGenres = ids.MakeGenreAll()
+	}
+
 	importer := &importer{
 		typedInventoryListBlobStore: typedInventoryListBlobStore,
 		indexObject:                 indexObject,
 		storeExternal:               storeExternalMergeCheckedOut,
 		storeObject:                 storeObject,
 		envRepo:                     envRepo,
+		blobGenres:                  options.BlobGenres,
 		excludeObjects:              options.ExcludeObjects,
 		remoteBlobStore:             options.RemoteBlobStore,
 		blobCopierDelegate:          options.BlobCopierDelegate,
@@ -61,6 +67,7 @@ type importer struct {
 	storeExternal               store_workspace.MergeCheckedOut
 	storeObject                 sku.ObjectStore
 	envRepo                     env_repo.Env
+	blobGenres                  ids.Genre
 	excludeObjects              bool
 	remoteBlobStore             interfaces.BlobStore
 	blobCopierDelegate          interfaces.FuncIter[sku.BlobCopyResult]
@@ -282,6 +289,10 @@ func (c importer) ImportBlobIfNecessary(
 			}
 		}
 
+		return
+	}
+
+	if !c.blobGenres.Contains(sk.GetGenre()) {
 		return
 	}
 

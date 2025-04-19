@@ -80,6 +80,7 @@ type (
 	}
 
 	ImporterOptions struct {
+		BlobGenres          ids.Genre
 		ExcludeObjects      bool
 		RemoteBlobStore     interfaces.BlobStore
 		PrintCopies         bool

@@ -1,10 +1,15 @@
 package repo
 
-import "flag"
+import (
+	"flag"
+
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+)
 
 // TODO add HTTP header options for these flags
 type RemoteTransferOptions struct {
 	PrintCopies         bool
+	BlobGenres          ids.Genre
 	IncludeObjects      bool
 	IncludeBlobs        bool
 	AllowMergeConflicts bool
@@ -30,6 +35,12 @@ func (options *RemoteTransferOptions) SetFlagSet(f *flag.FlagSet) {
 		"allow-merge-conflicts",
 		false,
 		"ignore merge conflicts and allow incompatible histories to coexist",
+	)
+
+	f.Var(
+		&options.BlobGenres,
+		"blob-genres",
+		"which blob genres should have their blobs copied",
 	)
 }
 

@@ -34,6 +34,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	importerOptions := sku.ImporterOptions{
 		CheckedOutPrinter:   local.PrinterCheckedOutConflictsForRemoteTransfers(),
 		AllowMergeConflicts: options.AllowMergeConflicts,
+		BlobGenres:          options.BlobGenres,
 		ExcludeObjects:      !options.IncludeObjects,
 	}
 
