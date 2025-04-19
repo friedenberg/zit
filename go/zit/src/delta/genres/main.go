@@ -300,6 +300,8 @@ func (g *Genre) Set(v string) (err error) {
 	case strings.EqualFold("konfig", v):
 		*g = Config
 
+	case hasPrefixOrEquals("inventorylist", v):
+    fallthrough
 	case hasPrefixOrEquals("inventory_list", v):
 		fallthrough
 	case hasPrefixOrEquals("inventory-list", v):

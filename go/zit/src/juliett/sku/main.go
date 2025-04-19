@@ -27,6 +27,10 @@ type (
 		GetSku() *Transacted
 	}
 
+	ObjectWithList struct {
+		Object, List *Transacted
+	}
+
 	TransactedWithBlob[T any] struct {
 		*Transacted
 		Blob T

@@ -58,8 +58,7 @@ func (cmd Clone) Run(req command.Request) {
 	case repo.WorkingCopy:
 		queryGroup := cmd.MakeQueryIncludingWorkspace(
 			req,
-			query.BuilderOptionsOld(
-				cmd,
+			query.BuilderOptions(
 				query.BuilderOptionDefaultSigil(
 					ids.SigilHistory,
 					ids.SigilHidden,

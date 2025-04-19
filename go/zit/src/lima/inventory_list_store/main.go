@@ -420,42 +420,73 @@ func (store *Store) ReadAllSorted(
 	return
 }
 
+func (store *Store) IterAllSkus() iter.Seq2[sku.ObjectWithList, error] {
+	return func(yield func(sku.ObjectWithList, error) bool) {
+		var objectWithList sku.ObjectWithList
+
+		for listObject, iterErr := range store.IterAllInventoryLists() {
+			objectWithList.List = listObject
+			objectWithList.Object = listObject
+
+			if iterErr != nil {
+				if !yield(objectWithList, iterErr) {
+					return
+				}
+			}
+
+			if !yield(objectWithList, nil) {
+				return
+			}
+
+			iter := store.IterInventoryList(
+				listObject.GetBlobSha(),
+			)
+
+			for object, iterErr := range iter {
+				objectWithList.Object = object
+
+				if !yield(objectWithList, iterErr) {
+					return
+				}
+			}
+		}
+	}
+}
+
 func (store *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
-	for list, iterErr := range store.IterAllInventoryLists() {
+	for listObject, iterErr := range store.IterAllInventoryLists() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
 		}
 
-		t := list
-
-		if err = f(t, t); err != nil {
+		if err = f(listObject, listObject); err != nil {
 			err = errors.Wrapf(
 				err,
 				"InventoryList: %s",
-				t.GetObjectId(),
+				listObject.GetObjectId(),
 			)
 
 			return
 		}
 
 		iter := store.IterInventoryList(
-			t.GetBlobSha(),
+			listObject.GetBlobSha(),
 		)
 
-		for sk, iterErr := range iter {
+		for object, iterErr := range iter {
 			if iterErr != nil {
-				err = errors.Wrap(iterErr)
+				err = errors.Wrapf(iterErr, "Sku: %s", sku.String(object))
 				return
 			}
 
-			if err = f(t, sk); err != nil {
+			if err = f(listObject, object); err != nil {
 				err = errors.Wrapf(
 					err,
 					"InventoryList: %s",
-					t.GetObjectId(),
+					listObject.GetObjectId(),
 				)
 
 				return

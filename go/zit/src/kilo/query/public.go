@@ -63,11 +63,11 @@ func (qg *Query) String() string {
 	// 	},
 	// )
 
-	for _, g := range qg.sortedUserQueries() {
+	for _, userQuery := range qg.sortedUserQueries() {
 		// TODO determine why GS can be ""
-		gs := g.String()
+		userQueryString := userQuery.String()
 
-		if gs == "" {
+		if userQueryString == "" {
 			continue
 		}
 
@@ -75,7 +75,7 @@ func (qg *Query) String() string {
 			sb.WriteRune(' ')
 		}
 
-		sb.WriteString(gs)
+		sb.WriteString(userQueryString)
 
 		first = false
 	}

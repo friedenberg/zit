@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 )
@@ -37,11 +38,29 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.GetInventoryListStore().ReadAllSkus(
-		s.reindexOne,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	missingObjects := sku.MakeList()
+
+	for objectWithList, iterErr := range s.GetInventoryListStore().IterAllSkus() {
+		if iterErr != nil {
+			if env_dir.IsErrBlobMissing(iterErr) {
+				missingObjects.Add(objectWithList.List)
+				continue
+			}
+
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		if err = s.reindexOne(objectWithList); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	s.envRepo.GetUI().Print("missing list blobs: ")
+
+	for missingList := range missingObjects.All() {
+		s.envRepo.GetUI().Print(sku.String(missingList))
 	}
 
 	return

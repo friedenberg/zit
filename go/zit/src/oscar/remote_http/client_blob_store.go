@@ -52,7 +52,7 @@ func (client *client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 
 func (client *client) BlobReader(
 	sh interfaces.Sha,
-) (r interfaces.ShaReadCloser, err error) {
+) (reader interfaces.ShaReadCloser, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
@@ -72,18 +72,18 @@ func (client *client) BlobReader(
 		return
 	}
 
-	// TODO refactor this into a common structure
-	if response.StatusCode >= 300 {
-		var sb strings.Builder
-
-		if _, err = io.Copy(&sb, response.Body); err != nil {
+	switch {
+	case response.StatusCode == http.StatusNotFound:
+		err = env_dir.ErrBlobMissing{
+			ShaGetter: sh,
 		}
 
-		err = errors.Errorf("remote responded with error: %q", &sb)
-		return
-	}
+	case response.StatusCode >= 300:
+		err = ReadErrorFromBody(response)
 
-	r = sha.MakeReadCloser(response.Body)
+	default:
+		reader = sha.MakeReadCloser(response.Body)
+	}
 
 	return
 }

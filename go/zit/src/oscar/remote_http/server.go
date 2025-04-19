@@ -22,6 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
@@ -518,7 +519,12 @@ func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) 
 			var err error
 
 			if rc, err = server.Repo.GetBlobStore().BlobReader(sh); err != nil {
-				response.Error(err)
+				if env_dir.IsErrBlobMissing(err) {
+					response.StatusCode = http.StatusNotFound
+				} else {
+					response.Error(err)
+				}
+
 				return
 			}
 		}

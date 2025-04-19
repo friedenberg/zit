@@ -553,17 +553,19 @@ func (s *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
+func (s *Store) reindexOne(object sku.ObjectWithList) (err error) {
 	o := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = s.Commit(sk, o); err != nil {
+	if err = s.Commit(object.Object, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(sk); err != nil {
+	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(
+		object.Object,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

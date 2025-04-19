@@ -224,21 +224,21 @@ func (client *client) PullQueryGroupFromRemote(
 	)
 }
 
-func (remote *client) pullQueryGroupFromWorkingCopy(
-	local repo.WorkingCopy,
+func (client *client) pullQueryGroupFromWorkingCopy(
+	remote repo.WorkingCopy,
 	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	var list *sku.List
 
-	if list, err = local.MakeInventoryList(queryGroup); err != nil {
+	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO local / remote version negotiation
 
-	listFormat := remote.GetInventoryListStore().FormatForVersion(
+	listFormat := client.GetInventoryListStore().FormatForVersion(
 		config_immutable.CurrentStoreVersion,
 	)
 
@@ -256,7 +256,7 @@ func (remote *client) pullQueryGroupFromWorkingCopy(
 		var request *http.Request
 
 		if request, err = http.NewRequestWithContext(
-			remote.GetEnv(),
+			client.GetEnv(),
 			"POST",
 			"/inventory_lists",
 			buffer,
@@ -269,7 +269,7 @@ func (remote *client) pullQueryGroupFromWorkingCopy(
 			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
 		}
 
-		if response, err = remote.http.Do(request); err != nil {
+		if response, err = client.http.Do(request); err != nil {
 			err = errors.Errorf("failed to read response: %w", err)
 			return
 		}
@@ -282,7 +282,7 @@ func (remote *client) pullQueryGroupFromWorkingCopy(
 
 	br := bufio.NewReader(response.Body)
 
-	remote.GetEnv().ContinueOrPanicOnDone()
+	client.GetEnv().ContinueOrPanicOnDone()
 
 	var shas sha.Slice
 
@@ -298,8 +298,8 @@ func (remote *client) pullQueryGroupFromWorkingCopy(
 
 	if options.IncludeBlobs {
 		for _, expected := range shas {
-			if err = remote.WriteBlobToRemote(
-				local.GetBlobStore(),
+			if err = client.WriteBlobToRemote(
+				remote.GetBlobStore(),
 				expected,
 			); err != nil {
 				err = errors.Wrap(err)
