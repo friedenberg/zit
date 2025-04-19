@@ -23,3 +23,10 @@ type WaitGroup interface {
 	DoAfter(Func)
 	GetError() error
 }
+
+func MakeNilFunc(in func()) Func {
+	return func() error {
+		in()
+		return nil
+	}
+}

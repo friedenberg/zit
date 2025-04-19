@@ -24,7 +24,7 @@ func MakeContext(
 	}
 
 	if options.PProfCPU {
-		if c.filePprofCpu, err = files.Create("build/cpu.pprof"); err != nil {
+		if c.filePprofCpu, err = files.Create("cpu.pprof"); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -33,7 +33,7 @@ func MakeContext(
 	}
 
 	if options.Trace {
-		if c.fileTrace, err = files.Create("build/trace"); err != nil {
+		if c.fileTrace, err = files.Create("trace"); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -45,46 +45,62 @@ func MakeContext(
 		debug.SetGCPercent(-1)
 	}
 
-	go func() {
-		<-ctx.Done()
-		c.Close()
-	}()
+	ctx.After(c.Close)
 
 	return
 }
 
-func (c *Context) Close() (err error) {
-	if c.fileTrace != nil {
-		trace.Stop()
+func (c *Context) Close() error {
+	waitGroupStopOrWrite := errors.MakeWaitGroupParallel()
+	multiError := errors.MakeMulti()
 
-		if err = c.fileTrace.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if c.fileTrace != nil {
+		waitGroupStopOrWrite.Do(errors.MakeNilFunc(trace.Stop))
 	}
 
 	if c.filePprofCpu != nil {
-		pprof.StopCPUProfile()
-
-		if err = c.filePprofCpu.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		waitGroupStopOrWrite.Do(errors.MakeNilFunc(pprof.StopCPUProfile))
 	}
 
 	if c.options.PProfHeap {
-		if c.filePprofHeap, err = files.Create("build/heap.pprof"); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if c.filePprofHeap, err = files.Create("heap.pprof"); err != nil {
+				multiError.Add(errors.Wrap(err))
+			}
 		}
 
-		pprof.WriteHeapProfile(c.filePprofHeap)
-
-		if err = c.filePprofHeap.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		waitGroupStopOrWrite.Do(func() error {
+			return pprof.WriteHeapProfile(c.filePprofHeap)
+		})
 	}
 
-	return
+	if err := waitGroupStopOrWrite.GetError(); err != nil {
+		multiError.Add(errors.Wrap(err))
+	}
+
+	waitGroupClose := errors.MakeWaitGroupParallel()
+
+	if c.fileTrace != nil {
+		waitGroupClose.Do(c.fileTrace.Close)
+	}
+
+	if c.filePprofCpu != nil {
+		waitGroupClose.Do(c.filePprofCpu.Close)
+	}
+
+	if c.options.PProfHeap {
+		waitGroupClose.Do(c.filePprofHeap.Close)
+	}
+
+	if err := waitGroupClose.GetError(); err != nil {
+		multiError.Add(errors.Wrap(err))
+	}
+
+	if multiError.Len() > 0 {
+		return multiError
+	}
+
+	return nil
 }
