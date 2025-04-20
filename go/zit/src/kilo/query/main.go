@@ -295,7 +295,6 @@ func (qg *Query) containsSku(tg sku.TransactedGetter) (ok bool) {
 	}
 
 	sk := tg.GetSku()
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if len(qg.optimizedQueries) == 0 && qg.matchOnEmpty {
 		ok = true

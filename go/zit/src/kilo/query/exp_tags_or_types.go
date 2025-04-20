@@ -211,9 +211,6 @@ func (m *expTagsOrTypes) negateIfNecessary(v bool) bool {
 }
 
 func (e *expTagsOrTypes) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-	sk := tg.GetSku()
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(e, &ok)
-
 	if len(e.Children) == 0 {
 		ok = e.negateIfNecessary(true)
 		return

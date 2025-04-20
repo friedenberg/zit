@@ -31,8 +31,6 @@ func (k ObjectId) reduce(b *buildState) (err error) {
 func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	sk := tg.GetSku()
 
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(exp, &ok)
-
 	skMe := sk.GetMetadata()
 
 	method := ids.Contains
@@ -58,8 +56,6 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		ui.Log().Print(exp, idx, ok, skMe.Cache.TagPaths.All, sk)
 
 		if ok {
-			ps := skMe.Cache.TagPaths.All[idx]
-			sk.Metadata.Cache.QueryPath.PushOnReturn(ps.Parents, &ok)
 			return
 		}
 

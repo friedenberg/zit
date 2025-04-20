@@ -3,9 +3,6 @@ package object_metadata
 import (
 	"fmt"
 	"strings"
-
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type qpItem struct {
@@ -32,15 +29,6 @@ func (qp *QueryPath) Reset() {
 
 func (qp *QueryPath) Len() int {
 	return len(*qp)
-}
-
-func (qp *QueryPath) PushOnReturn(q any, ok *bool) {
-	if !ui.IsVerbose() {
-		return
-	}
-
-	si, _ := errors.MakeStackInfo(1)
-	ui.Log().Print("QueryPath", *ok, si.FileNameLine())
 }
 
 func (qp *QueryPath) Pop() any {

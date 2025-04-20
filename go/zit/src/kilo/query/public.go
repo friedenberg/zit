@@ -95,8 +95,6 @@ func ContainsExternalSku(
 
 	sk := el.GetSku()
 
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
-
 	if !ContainsSkuCheckedOutState(qg, state) {
 		return
 	}

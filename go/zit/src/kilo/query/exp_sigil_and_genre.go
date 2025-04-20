@@ -260,7 +260,6 @@ func (q *expSigilAndGenre) ShouldHide(tg sku.TransactedGetter, k string) bool {
 func (q *expSigilAndGenre) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	sk := tg.GetSku()
 
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(q, &ok)
 	k := sk.ObjectId.String()
 
 	if q.ShouldHide(sk, k) {
@@ -291,8 +290,6 @@ func (q *expSigilAndGenre) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 
 func (q *expSigilAndGenre) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	sk := el.GetSku()
-
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(q, &ok)
 
 	g := genres.Must(sk)
 
