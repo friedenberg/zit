@@ -90,14 +90,18 @@ func (s TagsWithParentsAndTypes) ContainsTag(e *Tag) (int, bool) {
 	)
 }
 
-func (s TagsWithParentsAndTypes) ContainsComparer(
-	c catgut.Comparer,
+func (s TagsWithParentsAndTypes) ContainsString(
+	value string,
 ) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
-		c,
-		func(ewp TagWithParentsAndTypes, c catgut.Comparer) int {
-			cmp := ewp.Tag.ComparePartialComparer(c)
+		catgut.ComparerString(value),
+		func(ewp TagWithParentsAndTypes, c catgut.ComparerString) int {
+			cmp := catgut.CompareUTF8Bytes(
+				catgut.ComparerBytes(ewp.Tag.Bytes()),
+				c,
+				true,
+			)
 			return cmp
 		},
 	)

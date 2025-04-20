@@ -120,14 +120,6 @@ func (a *String) ComparePartial(b *String) int {
 	)
 }
 
-func (a *String) ComparePartialComparer(b Comparer) int {
-	return CompareUTF8Bytes(
-		ComparerBytes(a.Bytes()),
-		b,
-		true,
-	)
-}
-
 func (a *String) Compare(b *String) int {
 	return CompareUTF8Bytes(
 		ComparerBytes(a.Bytes()),

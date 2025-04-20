@@ -96,9 +96,9 @@ func (client *client) WriteBlobToRemote(
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var rc interfaces.ShaReadCloser
+	var reader interfaces.ShaReadCloser
 
-	if rc, err = localBlobStore.BlobReader(
+	if reader, err = localBlobStore.BlobReader(
 		expected,
 	); err != nil {
 		if env_dir.IsErrBlobMissing(err) {
@@ -119,7 +119,7 @@ func (client *client) WriteBlobToRemote(
 		client.GetEnv(),
 		"POST",
 		"/blobs",
-		rc,
+		reader,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

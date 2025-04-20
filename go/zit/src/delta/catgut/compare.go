@@ -2,13 +2,17 @@ package catgut
 
 import "unicode/utf8"
 
-type Comparer interface {
+type Comparer[Self any] interface {
 	Len() int
-	SliceFrom(int) Comparer
+	SliceFrom(int) Self
 	DecodeRune() (r rune, width int)
 }
 
-func CompareUTF8Bytes(a, b Comparer, partial bool) int {
+func CompareUTF8Bytes[A Comparer[A], B Comparer[B]](
+  a A,
+  b B,
+  partial bool,
+) int {
 	lenA, lenB := a.Len(), b.Len()
 
 	// TODO remove?
@@ -73,7 +77,7 @@ func (cb ComparerBytes) Len() int {
 	return len(cb)
 }
 
-func (cb ComparerBytes) SliceFrom(start int) Comparer {
+func (cb ComparerBytes) SliceFrom(start int) ComparerBytes {
 	return ComparerBytes(cb[start:])
 }
 
@@ -88,7 +92,7 @@ func (cb ComparerString) Len() int {
 	return len(cb)
 }
 
-func (cb ComparerString) SliceFrom(start int) Comparer {
+func (cb ComparerString) SliceFrom(start int) ComparerString {
 	return ComparerString(cb[start:])
 }
 
