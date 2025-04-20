@@ -304,12 +304,10 @@ func (s *Index) ReadOneSha(
 	var loc object_probe_index.Loc
 
 	if loc, err = s.readOneShaLoc(sh); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.readOneLoc(loc, sk); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -377,7 +375,6 @@ func (s *Index) ReadOneObjectId(
 	defer sha.GetPool().Put(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -398,6 +395,7 @@ func (s *Index) ReadManyObjectId(
 	return
 }
 
+// TODO switch to empty=not found semantics instead of error
 func (s *Index) ReadOneObjectIdTai(
 	k interfaces.ObjectId,
 	t ids.Tai,
@@ -413,7 +411,6 @@ func (s *Index) ReadOneObjectIdTai(
 	sk = sku.GetTransactedPool().Get()
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
-		err = errors.Wrapf(err, "ObjectId: %q, Tai: %q", k, t)
 		return
 	}
 
