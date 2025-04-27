@@ -224,6 +224,9 @@ deploy-docker: build-docker
 deploy-github: \
     build-go \
     test \
-    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
+    (git-add-and-commit \
+      "." \
+      "../../{zz-pandoc,zz-vim,zz-tests_bats}" \
+      "gomod2nix.toml")
 
 deploy: deploy-github deploy-docker
