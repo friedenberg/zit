@@ -35,8 +35,6 @@
             ];
           };
 
-          callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
-
           gomod2nix = pkgs.gomod2nix;
 
           zit = pkgs.buildGoApplication {
@@ -58,7 +56,7 @@
             config = {
               Cmd = ["${zit}/bin/zit"];
               Env = [];
-              ExposedPorts = {"28669/tcp" = {};};
+              ExposedPorts = {"9000/tcp" = {};};
             };
           };
 
