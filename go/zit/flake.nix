@@ -1,8 +1,8 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "nixpkgs/release-24.11";
-    utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.789333.tar.gz";
+    nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2411.717296.tar.gz";
+    utils.url = "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz";
 
     go = {
       url = "github:friedenberg/dev-flake-templates?dir=go";
