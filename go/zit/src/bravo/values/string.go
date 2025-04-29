@@ -14,6 +14,12 @@ func MakeString(v string) String {
 	}
 }
 
+func MakeStringDefault(v string) String {
+	return String{
+		string: v,
+	}
+}
+
 func (sv *String) Set(v string) (err error) {
 	*sv = String{
 		wasSet: true,

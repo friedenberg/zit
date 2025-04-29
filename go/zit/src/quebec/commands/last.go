@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -25,7 +26,9 @@ import (
 )
 
 func init() {
-	command.Register("last", &Last{})
+	command.Register("last", &Last{
+		Format: values.MakeStringDefault("log"),
+	})
 }
 
 type Last struct {
@@ -35,17 +38,17 @@ type Last struct {
 	RepoId   ids.RepoId
 	Edit     bool
 	Organize bool
-	Format   string
+	Format   values.String
 }
 
-func (cmd *Last) SetFlagSet(f *flag.FlagSet) {
-	cmd.EnvRepo.SetFlagSet(f)
-	cmd.LocalArchive.SetFlagSet(f)
+func (cmd *Last) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.EnvRepo.SetFlagSet(flagSet)
+	cmd.LocalArchive.SetFlagSet(flagSet)
 
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
-	f.StringVar(&cmd.Format, "format", "log", "format")
-	f.BoolVar(&cmd.Organize, "organize", false, "")
-	f.BoolVar(&cmd.Edit, "edit", false, "")
+	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
+	flagSet.Var(&cmd.Format, "format", "format")
+	flagSet.BoolVar(&cmd.Organize, "organize", false, "")
+	flagSet.BoolVar(&cmd.Edit, "edit", false, "")
 }
 
 func (c Last) CompletionGenres() ids.Genre {
@@ -71,7 +74,7 @@ func (cmd Last) Run(dep command.Request) {
 }
 
 func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
-	if (c.Edit || c.Organize) && c.Format != "" {
+	if (c.Edit || c.Organize) && c.Format.WasSet() {
 		repoLayout.CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
 	}
 
@@ -98,7 +101,7 @@ func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
 }
 
 func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
-	if (c.Edit || c.Organize) && c.Format != "" {
+	if (c.Edit || c.Organize) && c.Format.WasSet() {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
 		localWorkingCopy.GetEnvRepo().CancelWithErrorf("cannot organize and edit at the same time")
@@ -106,16 +109,16 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 
 	skus := sku.MakeTransactedMutableSet()
 
-	var f interfaces.FuncIter[*sku.Transacted]
+	var funcIter interfaces.FuncIter[*sku.Transacted]
 
 	if c.Organize || c.Edit {
-		f = skus.Add
+		funcIter = skus.Add
 	} else {
 		{
 			var err error
 
-			if f, err = localWorkingCopy.MakeFormatFunc(
-				c.Format,
+			if funcIter, err = localWorkingCopy.MakeFormatFunc(
+				c.Format.String(),
 				localWorkingCopy.GetEnvRepo().GetUIFile(),
 			); err != nil {
 				localWorkingCopy.GetEnvRepo().CancelWithError(err)
@@ -123,12 +126,12 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 		}
 	}
 
-	f = quiter.MakeSyncSerializer(f)
+	funcIter = quiter.MakeSyncSerializer(funcIter)
 
 	if err := c.runWithInventoryList(
 		localWorkingCopy.GetEnvRepo(),
 		localWorkingCopy,
-		f,
+		funcIter,
 	); err != nil {
 		localWorkingCopy.GetEnvRepo().CancelWithError(err)
 	}
@@ -170,9 +173,9 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 }
 
 func (cmd Last) runWithInventoryList(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 	archive repo.Repo,
-	f interfaces.FuncIter[*sku.Transacted],
+	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var b *sku.Transacted
 
@@ -184,7 +187,7 @@ func (cmd Last) runWithInventoryList(
 	}
 
 	inventoryListBlobStore := cmd.MakeTypedInventoryListBlobStore(
-		repoLayout,
+		envRepo,
 	)
 
 	var twb sku.TransactedWithBlob[*sku.List]
@@ -199,7 +202,7 @@ func (cmd Last) runWithInventoryList(
 	ui.TodoP3("support log line format for skus")
 	if err = twb.Blob.EachPtr(
 		func(sk *sku.Transacted) (err error) {
-			return f(sk)
+			return funcIter(sk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

@@ -62,7 +62,7 @@ func (op Organize) RunWithTransacted(
 	for z := range transacted.All() {
 		clone := sku.CloneSkuTypeFromTransacted(
 			z.GetSku(),
-			checked_out_state.Unknown,
+			checked_out_state.Internal,
 		)
 
 		skus.Add(clone)
