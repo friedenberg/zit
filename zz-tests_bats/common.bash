@@ -1,8 +1,8 @@
 #! /bin/bash -e
 
-load "$BATS_CWD/zz-tests_bats/test_helper/bats-support/load"
-load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert/load"
-load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert-additions/load"
+load "$BATS_CWD/test_helper/bats-support/load"
+load "$BATS_CWD/test_helper/bats-assert/load"
+load "$BATS_CWD/test_helper/bats-assert-additions/load"
 
 set_xdg() {
   loc="$(realpath "$1" 2>/dev/null)"
@@ -19,8 +19,6 @@ set_xdg "$BATS_TEST_TMPDIR"
 # use $BATS_TEST_FILENAME instead of ${BASH_SOURCE[0]} or $0,
 # as those will point to the bats executable's location or the preprocessed file respectively
 DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
-# make executables in build/ visible to PATH
-PATH="$BATS_CWD/build:$PATH"
 
 # {
 #   pushd "$BATS_CWD" >/dev/null 2>&1
@@ -79,7 +77,7 @@ function rm_from_version {
 }
 
 function chflags_and_rm {
-  "$BATS_CWD/bin/chflags.bash" -R nouchg "$BATS_TEST_TMPDIR"
+  "$BATS_CWD/../bin/chflags.bash" -R nouchg "$BATS_TEST_TMPDIR"
 }
 
 function run_zit {

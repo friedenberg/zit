@@ -1,7 +1,7 @@
 #! /usr/bin/env bats
 
 setup() {
-	load "$BATS_CWD/zz-tests_bats/common.bash"
+	load "$(dirname "$BATS_TEST_FILE")/common.bash"
 
 	run_zit_init_disable_age
 	assert_success

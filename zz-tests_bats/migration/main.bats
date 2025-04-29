@@ -1,7 +1,7 @@
 #! /usr/bin/env bats
 
 setup() {
-	load "$BATS_CWD/zz-tests_bats/common.bash"
+	load "$BATS_CWD/common.bash"
 
 	# for shellcheck SC2154
 	export output

@@ -172,28 +172,11 @@ test-go-unit:
 
 test-go: test-go-unit
 
-test-bats-generate:
-  ./zz-tests_bats/migration/generate_fixture.bash
+dir_build := absolute_path("build")
 
-bats_timeout := "10"
-
-# runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
-test-bats-targets *targets="zz-tests_bats/*.bats":
-  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
-
-# runs specific bats test tags
-test-bats-tags *tags:
-  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats \
-    --tap \
-    --jobs {{num_cpus()}} \
-    --filter-tags {{tags}} \
-    zz-tests_bats/*.bats
-
-test-bats-integration: (test-bats-targets "zz-tests_bats/*.bats")
-test-bats-migration: (test-bats-targets "zz-tests_bats/migration/*.bats")
-
-test-bats: test-bats-generate \
-    (test-bats-targets "zz-tests_bats/*.bats" "zz-tests_bats/migration/*.bats")
+test-bats:
+  PATH="{{dir_build}}:$PATH" just zz-tests_bats/test-bats-generate "$(build/zit info)"
+  PATH="{{dir_build}}:$PATH" just zz-tests_bats/test
 
 test: test-go test-bats
 
@@ -207,6 +190,11 @@ test: test-go test-bats
 @stats-bats-skipped:
   echo -n "skipped bats tests: "
   ag '^\s+skip' zz-tests_bats/ -c | cut -d: -f2 | paste -s -d + - | bc
+
+@stats-todos:
+  #! /usr/bin/env -S fish
+  echo -n "todos: "
+  count-pattern '(//|#)\s*todo[-\w]*' src zz-tests_bats/ | sort -n -r
 
 @stats: stats-bats-skipped
 

@@ -1,17 +1,20 @@
 #! /bin/bash -e
 
-dir_base="$(realpath "$(dirname "$0")")"
-zit="$(realpath build/zit)"
 
-if ! v="$("$zit" info store-version)"; then
-  echo "failed to get store version" >&2
+dir_git_root="$(git rev-parse --show-toplevel)"
+dir_base="$(realpath "$(dirname "$0")")"
+
+v="$1"
+
+if [[ -z "$1" ]]; then
+  echo "no store version passed in" >&2
   exit 1
 fi
 
-d="${1:-$dir_base/v$v}"
+d="${2:-$dir_base/v$v}"
 
 if [[ -d $d ]]; then
-  ./bin/chflags.bash -R nouchg "$d"
+  "$dir_git_root/bin/chflags.bash" -R nouchg "$d"
   rm -rf "$d"
 fi
 
@@ -19,7 +22,7 @@ cmd_bats=(
   bats
   --tap
   --no-tempdir-cleanup
-  zz-tests_bats/migration/generate_fixture.bats
+  migration/generate_fixture.bats
 )
 
 export BATS_TEST_TIMEOUT=3

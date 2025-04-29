@@ -1,0 +1,91 @@
+
+default: test
+
+clean-bats-fixtures:
+  #! /bin/bash -ex
+
+  dir="$(git rev-parse --show-toplevel)"
+  pushd "$dir" || exit
+
+  git reset HEAD migration/v*/
+  ./go/zit/bin/chflags.bash -R nouchg migration/v*/
+  git clean -fd migration/v*/
+  git checkout migration/
+
+clean: clean-bats-fixtures
+
+#   _   _           _       _
+#  | | | |_ __   __| | __ _| |_ ___
+#  | | | | '_ \ / _` |/ _` | __/ _ \
+#  | |_| | |_) | (_| | (_| | ||  __/
+#   \___/| .__/ \__,_|\__,_|\__\___|
+#        |_|
+
+update:
+
+#   ____        _ _     _
+#  | __ ) _   _(_) | __| |
+#  |  _ \| | | | | |/ _` |
+#  | |_) | |_| | | | (_| |
+#  |____/ \__,_|_|_|\__,_|
+#
+
+build:
+
+#    ____ _               _
+#   / ___| |__   ___  ___| | __
+#  | |   | '_ \ / _ \/ __| |/ /
+#  | |___| | | |  __/ (__|   <
+#   \____|_| |_|\___|\___|_|\_\
+#
+
+check:
+
+#   _____         _
+#  |_   _|__  ___| |_
+#    | |/ _ \/ __| __|
+#    | |  __/\__ \ |_
+#    |_|\___||___/\__|
+#
+
+test-bats-generate store_version:
+  ./migration/generate_fixture.bash {{store_version}}
+
+bats_timeout := "10"
+
+# runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
+test-bats-targets *targets="*.bats":
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
+
+# runs specific bats test tags
+test-bats-tags *tags:
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats \
+    --tap \
+    --jobs {{num_cpus()}} \
+    --filter-tags {{tags}} \
+    *.bats
+
+test-bats-integration: (test-bats-targets "*.bats")
+test-bats-migration: (test-bats-targets "migration/*.bats")
+
+test-bats: (test-bats-targets "*.bats" "migration/*.bats")
+
+test: test-bats
+
+#   ____  _        _
+#  / ___|| |_ __ _| |_ ___
+#  \___ \| __/ _` | __/ __|
+#   ___) | || (_| | |_\__ \
+#  |____/ \__\__,_|\__|___/
+#
+
+@stats-skipped:
+  echo -n "skipped bats tests: "
+  ag '^\s+skip'  -c | cut -d: -f2 | paste -s -d + - | bc
+
+@stats-todos:
+  #! /usr/bin/env -S fish
+  echo -n "todos: "
+  count-pattern '#\s*todo[-\w]*' | sort -n -r
+
+@stats: stats-skipped stats-todos
