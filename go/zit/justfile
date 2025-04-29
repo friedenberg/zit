@@ -1,4 +1,6 @@
 
+dir_build := absolute_path("build")
+
 default: build
 
 git-add-and-commit *PATHS:
@@ -172,11 +174,9 @@ test-go-unit:
 
 test-go: test-go-unit
 
-dir_build := absolute_path("build")
-
-test-bats:
-  PATH="{{dir_build}}:$PATH" just zz-tests_bats/test-bats-generate "$(build/zit info)"
-  PATH="{{dir_build}}:$PATH" just zz-tests_bats/test
+test-bats $PATH=(dir_build + ":" + env("PATH")):
+  just zz-tests_bats/test-bats-generate "$(build/zit info)"
+  just zz-tests_bats/test
 
 test: test-go test-bats
 
