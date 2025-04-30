@@ -70,6 +70,7 @@ type Context interface {
 	CancelWithError(err error)
 	CancelWithErrorAndFormat(err error, f string, values ...any)
 	CancelWithErrorf(f string, values ...any)
+	CancelWithBadRequestError(err error)
 	CancelWithBadRequestf(f string, values ...any)
 	CancelWithNotImplemented()
 }
@@ -321,6 +322,11 @@ func (c *context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 func (c *context) CancelWithErrorf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(WrapSkip(1, fmt.Errorf(f, values...)))
+}
+
+func (c *context) CancelWithBadRequestError(err error) {
+	defer c.ContinueOrPanicOnDone()
+	c.cancel(&errBadRequestWrap{err})
 }
 
 func (c *context) CancelWithBadRequestf(f string, values ...any) {

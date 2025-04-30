@@ -1,13 +1,32 @@
 package files
 
-import "os"
+import (
+	"os"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+)
 
 func Exists(path string) bool {
 	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+	return !errors.IsNotExist(err)
 }
 
-func DirExists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+func AssertDir(path string) (err error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		if errors.IsNotExist(err) {
+			err = ErrNotDirectory(path)
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	if !fi.IsDir() {
+		err = ErrNotDirectory(path)
+		return
+	}
+
+	return
 }

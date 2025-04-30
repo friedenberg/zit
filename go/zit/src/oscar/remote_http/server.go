@@ -718,8 +718,11 @@ func (server *Server) handleGetInventoryList(
 		"\n",
 		b,
 		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.EncodeStringTo(o, w)
+			func(
+				writer interfaces.WriterAndStringWriter,
+				object *sku.Transacted,
+			) (n int64, err error) {
+				return boxFormat.EncodeStringTo(object, writer)
 			},
 		),
 	)

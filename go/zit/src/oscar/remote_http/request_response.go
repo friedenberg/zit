@@ -56,7 +56,7 @@ func ReadErrorFromBody(response *http.Response) (err error) {
 	}
 
 	err = errors.BadRequestf(
-		"remote responded to request (%q) with error (%d): %q",
+		"remote responded to request (%q) with error (%d):\n\n%s",
 		fmt.Sprintf("%s %s", response.Request.Method, response.Request.URL),
 		response.StatusCode,
 		&sb,

@@ -1,18 +1,21 @@
 
 default: test
 
-clean-bats-fixtures:
+dir_git_root := shell("git rev-parse --show-toplevel")
+
+[group("clean")]
+clean-fixtures:
   #! /bin/bash -ex
 
-  dir="$(git rev-parse --show-toplevel)"
-  pushd "$dir" || exit
+  pushd "{{dir_git_root}}/zz-tests_bats" || exit
 
   git reset HEAD migration/v*/
-  ./go/zit/bin/chflags.bash -R nouchg migration/v*/
+  ./../bin/chflags.bash -R nouchg migration/v*/
   git clean -fd migration/v*/
   git checkout migration/
 
-clean: clean-bats-fixtures
+[group("clean")]
+clean: clean-fixtures
 
 #   _   _           _       _
 #  | | | |_ __   __| | __ _| |_ ___
@@ -21,6 +24,7 @@ clean: clean-bats-fixtures
 #   \___/| .__/ \__,_|\__,_|\__\___|
 #        |_|
 
+[group("update")]
 update:
 
 #   ____        _ _     _
@@ -30,6 +34,7 @@ update:
 #  |____/ \__,_|_|_|\__,_|
 #
 
+[group("build")]
 build:
 
 #    ____ _               _
@@ -39,6 +44,7 @@ build:
 #   \____|_| |_|\___|\___|_|\_\
 #
 
+[group("check")]
 check:
 
 #   _____         _
@@ -48,29 +54,34 @@ check:
 #    |_|\___||___/\__|
 #
 
-test-bats-generate store_version:
+[group("test")]
+test-generate_fixtures store_version:
   ./migration/generate_fixture.bash {{store_version}}
 
 bats_timeout := "10"
 
 # runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
-test-bats-targets *targets="*.bats":
+[group("test")]
+test-targets *targets="*.bats":
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
 
 # runs specific bats test tags
-test-bats-tags *tags:
+[group("test")]
+test-tags *tags:
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats \
     --tap \
     --jobs {{num_cpus()}} \
     --filter-tags {{tags}} \
     *.bats
 
-test-bats-integration: (test-bats-targets "*.bats")
-test-bats-migration: (test-bats-targets "migration/*.bats")
+[group("test")]
+test-integration: (test-targets "*.bats")
 
-test-bats: (test-bats-targets "*.bats" "migration/*.bats")
+[group("test")]
+test-migration: (test-targets "migration/*.bats")
 
-test: test-bats
+[group("test")]
+test: (test-targets "*.bats" "migration/*.bats")
 
 #   ____  _        _
 #  / ___|| |_ __ _| |_ ___
@@ -79,13 +90,16 @@ test: test-bats
 #  |____/ \__\__,_|\__|___/
 #
 
+[group("stats")]
 @stats-skipped:
   echo -n "skipped bats tests: "
   ag '^\s+skip'  -c | cut -d: -f2 | paste -s -d + - | bc
 
+[group("stats")]
 @stats-todos:
   #! /usr/bin/env -S fish
   echo -n "todos: "
   count-pattern '#\s*todo[-\w]*' | sort -n -r
 
+[group("stats")]
 @stats: stats-skipped stats-todos

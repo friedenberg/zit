@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/repo_signing"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 )
 
 type RoundTripperStdio struct {
@@ -21,15 +22,12 @@ type RoundTripperStdio struct {
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
-	envUI env_ui.Env,
+	envRepo env_repo.Env,
 	pubkey repo_signing.PublicKey,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 
-	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	roundTripper.Path = envRepo.GetExecPath()
 
 	roundTripper.Args = []string{
 		"zit",
@@ -38,12 +36,12 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 
 	roundTripper.Args = append(
 		roundTripper.Args,
-		envUI.GetCLIConfig().GetCLIFlags()...,
+		envRepo.GetCLIConfig().GetCLIFlags()...,
 	)
 
 	roundTripper.Args = append(roundTripper.Args, "-")
 
-	if err = roundTripper.initialize(envUI); err != nil {
+	if err = roundTripper.initialize(envRepo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

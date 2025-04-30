@@ -5,14 +5,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/mike/importer"
+	pkg_importer "code.linenisgreat.com/zit/go/zit/src/mike/importer"
 )
 
 func (store *Store) MakeImporter(
 	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
 ) sku.Importer {
-	importer := importer.Make(
+	importer := pkg_importer.Make(
 		options,
 		storeOptions,
 		store.envRepo,
@@ -27,13 +27,13 @@ func (store *Store) MakeImporter(
 
 func (store *Store) ImportList(
 	list *sku.List,
-	i sku.Importer,
+	importer sku.Importer,
 ) (err error) {
 	var hasConflicts bool
 
-	oldPrinter := i.GetCheckedOutPrinter()
+	oldPrinter := importer.GetCheckedOutPrinter()
 
-	i.SetCheckedOutPrinter(
+	importer.SetCheckedOutPrinter(
 		func(co *sku.CheckedOut) (err error) {
 			if co.GetState() == checked_out_state.Conflicted {
 				hasConflicts = true
@@ -50,7 +50,7 @@ func (store *Store) ImportList(
 			break
 		}
 
-		if _, err = i.Import(
+		if _, err = importer.Import(
 			sk,
 		); err != nil {
 			if errors.Is(err, collections.ErrExists) {
@@ -63,7 +63,7 @@ func (store *Store) ImportList(
 	}
 
 	if hasConflicts {
-		err = importer.ErrNeedsMerge
+		err = pkg_importer.ErrNeedsMerge
 	}
 
 	return

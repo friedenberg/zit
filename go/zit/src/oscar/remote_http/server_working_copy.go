@@ -67,6 +67,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	b := bytes.NewBuffer(nil)
 
 	// TODO make option to read from headers
+	// TODO add remote blob store
 	importerOptions := sku.ImporterOptions{
 		// TODO
 		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),

@@ -76,3 +76,7 @@ func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
 func (u *Repo) GetStore() *store.Store {
 	return &u.store
 }
+
+func (repo *Repo) GetAbbr() sku.AbbrStore {
+	return repo.storeAbbr
+}

@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
@@ -126,7 +127,9 @@ func (cmd Remote) MakeRemote(
 		}
 	}
 
-	return cmd.MakeRemoteFromBlob(req, local, blob)
+	remote = cmd.MakeRemoteFromBlob(req, local, blob)
+
+	return
 }
 
 func (cmd Remote) MakeRemoteFromBlob(
@@ -285,6 +288,14 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	envRepo := cmd.MakeEnvRepo(req, false)
 
 	var httpRoundTripper remote_http.RoundTripperStdio
+
+	if err := files.AssertDir(dir); err != nil {
+		if files.IsErrNotDirectory(err) {
+			req.CancelWithBadRequestError(err)
+		} else {
+			req.CancelWithError(err)
+		}
+	}
 
 	httpRoundTripper.Dir = dir
 
