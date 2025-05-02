@@ -23,6 +23,10 @@ func MakeContext(
 		options: options,
 	}
 
+	if options.GCDisabled {
+		debug.SetGCPercent(-1)
+	}
+
 	if options.PProfCPU {
 		if c.filePprofCpu, err = files.Create("cpu.pprof"); err != nil {
 			err = errors.Wrap(err)
