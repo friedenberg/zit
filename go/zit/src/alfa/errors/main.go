@@ -53,15 +53,15 @@ func WrapSkip(
 		return
 	}
 
-	var si StackInfo
+	var si StackFrame
 	var ok bool
 
-	if si, ok = MakeStackInfo(skip + 1); !ok {
+	if si, ok = MakeStackFrame(skip + 1); !ok {
 		panic("failed to get stack info")
 	}
 
 	err = &stackWrapError{
-		StackInfo: si,
+		StackFrame: si,
 	}
 
 	if swe, ok := in.(*stackWrapError); ok {
@@ -99,7 +99,7 @@ func Wrapf(in error, f string, values ...interface{}) error {
 	}
 
 	return &stackWrapError{
-		StackInfo: MustStackInfo(thisSkip),
+		StackFrame: MustStackFrame(thisSkip),
 		error:     fmt.Errorf(f, values...),
 		next:      WrapSkip(thisSkip, in),
 	}

@@ -7,12 +7,13 @@ import (
 	"strings"
 )
 
+// TODO refactor / remove?
 type StackTracer interface {
 	error
 	ShouldShowStackTrace() bool
 }
 
-type StackInfo struct {
+type StackFrame struct {
 	Package     string
 	Function    string
 	Filename    string
@@ -20,7 +21,7 @@ type StackInfo struct {
 	Line        int
 }
 
-func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
+func MakeStackFrameFromFrame(frame runtime.Frame) (si StackFrame) {
 	si.Filename = filepath.Clean(frame.File)
 	si.Line = frame.Line
 	si.Function = frame.Function
@@ -32,8 +33,8 @@ func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 }
 
 //go:noinline
-func MustStackInfo(skip int) StackInfo {
-	si, ok := MakeStackInfo(skip + 1)
+func MustStackFrame(skip int) StackFrame {
+	si, ok := MakeStackFrame(skip + 1)
 
 	if !ok {
 		panic("stack unavailable")
@@ -43,19 +44,46 @@ func MustStackInfo(skip int) StackInfo {
 }
 
 //go:noinline
-func MakeStackInfo(skip int) (si StackInfo, ok bool) {
-	var pc uintptr
-	pc, _, _, ok = runtime.Caller(skip + 1) // 0 is self
+func MakeStackFrames(skip, count int) (frames []StackFrame) {
+	programCounters := make([]uintptr, count)
+	writtenCounters := runtime.Callers(skip+1, programCounters) // 0 is self
+	if writtenCounters == 0 {
+		return
+	}
+
+	programCounters = programCounters[:writtenCounters]
+
+	rawFrames := runtime.CallersFrames(programCounters)
+
+	frames = make([]StackFrame, 0, len(programCounters))
+
+	for {
+		frame, more := rawFrames.Next()
+		frames = append(frames, MakeStackFrameFromFrame(frame))
+
+		if !more {
+			break
+		}
+	}
+
+	return
+}
+
+//go:noinline
+func MakeStackFrame(skip int) (si StackFrame, ok bool) {
+	var programCounter uintptr
+	programCounter, _, _, ok = runtime.Caller(skip + 1) // 0 is self
 
 	if !ok {
 		return
 	}
 
-	frames := runtime.CallersFrames([]uintptr{pc})
+	frames := runtime.CallersFrames([]uintptr{programCounter})
 
 	frame, _ := frames.Next()
-	si = MakeStackInfoFromFrame(frame)
+	si = MakeStackFrameFromFrame(frame)
 
+	// TODO remove this ugly hack
 	if si.Function == "Wrap" {
 		panic(fmt.Sprintf("Parent Wrap included in stack. Skip: %d", skip))
 	}
@@ -81,7 +109,7 @@ func getPackageAndFunctionName(v string) (p string, f string) {
 	return
 }
 
-func (si StackInfo) FileNameLine() string {
+func (si StackFrame) FileNameLine() string {
 	filename := si.Filename
 
 	if si.RelFilename != "" {
@@ -95,30 +123,53 @@ func (si StackInfo) FileNameLine() string {
 	)
 }
 
-func (si StackInfo) String() string {
+func (frame StackFrame) String() string {
 	testPrefix := ""
 
 	if isTest {
 		testPrefix = "    "
 	}
 
-	filename := si.Filename
+	filename := frame.Filename
 
-	if si.RelFilename != "" {
-		filename = si.RelFilename
+	if frame.RelFilename != "" {
+		filename = frame.RelFilename
 	}
 
 	// TODO-P3 determine if si.line is ever not valid
 	return fmt.Sprintf(
 		"# %s\n%s%s:%d",
-		si.Function,
+		frame.Function,
 		testPrefix,
 		filename,
-		si.Line,
+		frame.Line,
 	)
 }
 
-func (si StackInfo) StringNoFunctionName() string {
+func (frame StackFrame) StringLogLine() string {
+	testPrefix := ""
+
+	if isTest {
+		testPrefix = "    "
+	}
+
+	filename := frame.Filename
+
+	if frame.RelFilename != "" {
+		filename = frame.RelFilename
+	}
+
+	// TODO-P3 determine if si.line is ever not valid
+	return fmt.Sprintf(
+		"%s%s:%d: %s",
+		testPrefix,
+		filename,
+		frame.Line,
+		frame.Function,
+	)
+}
+
+func (si StackFrame) StringNoFunctionName() string {
 	filename := si.Filename
 
 	if si.RelFilename != "" {
@@ -132,34 +183,34 @@ func (si StackInfo) StringNoFunctionName() string {
 	)
 }
 
-func (si StackInfo) Wrap(in error) (err error) {
+func (si StackFrame) Wrap(in error) (err error) {
 	return &stackWrapError{
-		StackInfo: si,
-		error:     in,
+		StackFrame: si,
+		error:      in,
 	}
 }
 
-func (si StackInfo) Wrapf(in error, f string, values ...any) (err error) {
+func (si StackFrame) Wrapf(in error, f string, values ...any) (err error) {
 	return &stackWrapError{
-		StackInfo: si,
-		ExtraData: fmt.Sprintf(f, values...),
+		StackFrame: si,
+		ExtraData:  fmt.Sprintf(f, values...),
 		next: &stackWrapError{
-			StackInfo: si,
-			error:     in,
+			StackFrame: si,
+			error:      in,
 		},
 	}
 }
 
-func (si StackInfo) Errorf(f string, values ...any) (err error) {
+func (si StackFrame) Errorf(f string, values ...any) (err error) {
 	return &stackWrapError{
-		StackInfo: si,
-		error:     fmt.Errorf(f, values...),
+		StackFrame: si,
+		error:      fmt.Errorf(f, values...),
 	}
 }
 
 type stackWrapError struct {
 	ExtraData string
-	StackInfo
+	StackFrame
 	error
 
 	next *stackWrapError
@@ -190,7 +241,7 @@ func (se *stackWrapError) UnwrapAll() []error {
 }
 
 func (se *stackWrapError) writeError(sb *strings.Builder) {
-	sb.WriteString(se.StackInfo.String())
+	sb.WriteString(se.StackFrame.String())
 
 	if se.error != nil {
 		sb.WriteString(": ")

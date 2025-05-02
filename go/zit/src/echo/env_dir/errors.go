@@ -31,26 +31,33 @@ func (e *ErrAlreadyExists) Is(target error) bool {
 	return ok
 }
 
+func IsErrBlobMissing(err error) bool {
+	return errors.Is(err, ErrBlobMissing{})
+}
+
 type ErrBlobMissing struct {
 	interfaces.ShaGetter
 	Path string
 }
 
 func (e ErrBlobMissing) Error() string {
-	return fmt.Sprintf(
-		"Blob with sha %q does not exist locally: %q",
-		e.GetShaLike(),
-		e.Path,
-	)
+	if e.Path == "" {
+		return fmt.Sprintf(
+			"Blob with sha %q does not exist locally",
+			e.GetShaLike(),
+		)
+	} else {
+		return fmt.Sprintf(
+			"Blob with sha %q does not exist locally: %q",
+			e.GetShaLike(),
+			e.Path,
+		)
+	}
 }
 
 func (e ErrBlobMissing) Is(target error) bool {
 	_, ok := target.(ErrBlobMissing)
 	return ok
-}
-
-func IsErrBlobMissing(err error) bool {
-	return errors.Is(err, ErrBlobMissing{})
 }
 
 func MakeErrTempAlreadyExists(

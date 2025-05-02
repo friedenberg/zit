@@ -10,12 +10,12 @@ type (
 
 type FuncWithStackInfo struct {
 	Func
-	StackInfo
+	StackFrame
 }
 
 type WithStackInfo[T any] struct {
 	Contents T
-	StackInfo
+	StackFrame
 }
 
 type WaitGroup interface {

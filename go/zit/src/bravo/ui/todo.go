@@ -87,7 +87,7 @@ func (p todoPrinter) printf(
 	}
 
 	if p.includesStack {
-		si, _ := errors.MakeStackInfo(1 + skip)
+		si, _ := errors.MakeStackFrame(1 + skip)
 		f = "%s %s" + f
 		a = append([]interface{}{pr, si}, a...)
 	}

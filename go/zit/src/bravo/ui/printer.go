@@ -85,7 +85,7 @@ func (p printer) printfStack(depth int, f string, a ...any) (err error) {
 		return
 	}
 
-	si, _ := errors.MakeStackInfo(1 + depth)
+	si, _ := errors.MakeStackFrame(1 + depth)
 	f = "%s" + f
 	a = append([]interface{}{si}, a...)
 

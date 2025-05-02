@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
@@ -40,21 +39,20 @@ func makeBinary(s ids.Sigil) binaryDecoder {
 }
 
 func makeBinaryWithQueryGroup(
-	qg sku.PrimitiveQueryGroup,
-	s ids.Sigil,
+	query sku.PrimitiveQueryGroup,
+	sigil ids.Sigil,
 ) binaryDecoder {
-	ui.Log().Print(qg)
-	if qg == nil {
-		qg = sku.MakePrimitiveQueryGroup()
+	if query == nil {
+		query = sku.MakePrimitiveQueryGroup()
 	}
 
-	if !qg.HasHidden() {
-		s.Add(ids.SigilHidden)
+	if !query.HasHidden() {
+		sigil.Add(ids.SigilHidden)
 	}
 
 	return binaryDecoder{
-		queryGroup: qg,
-		sigil:      s,
+		queryGroup: query,
+		sigil:      sigil,
 	}
 }
 

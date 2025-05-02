@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/india/log_remote_inventory_lists"
@@ -27,7 +28,7 @@ import (
 func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
-	localInventoryListStore repo.LocalRepo,
+	localRepo repo.LocalRepo,
 	typedBlobStore typed_blob_store.InventoryList,
 ) *client {
 	client := &client{
@@ -35,7 +36,7 @@ func MakeClient(
 		http: http.Client{
 			Transport: transport,
 		},
-		localRepo:      localInventoryListStore,
+		localRepo:      localRepo,
 		typedBlobStore: typedBlobStore,
 	}
 
@@ -244,71 +245,85 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	buffer := bytes.NewBuffer(nil)
 
-	// TODO make a reader version of inventory lists to avoid allocation
-	if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	for {
+		// TODO make a reader version of inventory lists to avoid allocation
+		if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	var response *http.Response
+		var response *http.Response
 
-	{
-		var request *http.Request
+		{
+			var request *http.Request
 
-		if request, err = http.NewRequestWithContext(
-			client.GetEnv(),
-			"POST",
-			"/inventory_lists",
-			buffer,
+			if request, err = http.NewRequestWithContext(
+				client.GetEnv(),
+				"POST",
+				"/inventory_lists",
+				buffer,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if options.AllowMergeConflicts {
+				request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
+			}
+
+			if response, err = client.http.Do(request); err != nil {
+				err = errors.Errorf("failed to read response: %w", err)
+				return
+			}
+		}
+
+		if err = ReadErrorFromBodyOnNot(
+			response,
+			http.StatusCreated,
+			http.StatusExpectationFailed,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if options.AllowMergeConflicts {
-			request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
-		}
+		br := bufio.NewReader(response.Body)
 
-		if response, err = client.http.Do(request); err != nil {
-			err = errors.Errorf("failed to read response: %w", err)
+		client.GetEnv().ContinueOrPanicOnDone()
+
+		var listMissingSkus *sku.List
+
+		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
+			builtin_types.GetOrPanic(builtin_types.InventoryListTypeV1).Type,
+			br,
+		); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
-	}
 
-	if err = ReadErrorFromBodyOnGreaterOrEqual(response, 300); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		if err = response.Body.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	br := bufio.NewReader(response.Body)
-
-	client.GetEnv().ContinueOrPanicOnDone()
-
-	var shas sha.Slice
-
-	if _, err = shas.ReadFrom(br); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = response.Body.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if options.IncludeBlobs {
-		for _, expected := range shas {
+		// if options.IncludeBlobs {
+		for expected := range listMissingSkus.All() {
 			if err = client.WriteBlobToRemote(
 				remote.GetBlobStore(),
-				expected,
+				sha.Make(expected.GetBlobSha()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
-	}
+		// }
 
-	ui.Log().Print("done")
+		if response.StatusCode == http.StatusCreated {
+			ui.Log().Print("done")
+			return
+		}
+
+		buffer.Reset()
+	}
 
 	return
 }

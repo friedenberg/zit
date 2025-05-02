@@ -436,7 +436,7 @@ func (i *Index) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	ui.Log().Print("starting query: %q", qg)
+	ui.Log().Printf("starting query: %q", qg)
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 	me := errors.MakeMulti()

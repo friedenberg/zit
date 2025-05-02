@@ -13,9 +13,21 @@ teardown() {
 
 # bats file_tags=user_story:pull,user_story:repo,user_store:xdg,user_story:remote
 
-function bootstrap {
+function bootstrap_xdg {
 	set_xdg "$1"
 	run_zit_init
+	bootstrap_content
+}
+
+function bootstrap_repo_at_dir_with_name {
+	mkdir -p "$1"
+	pushd "$1" || exit 1
+	run_zit_init -override-xdg-with-cwd "$1"
+	bootstrap_content
+  popd || exit 1
+}
+
+function bootstrap_content {
 
 	{
 		echo "---"
@@ -82,7 +94,7 @@ function try_add_new_after_pull {
 
 function pull_history_zettel_typ_etikett_no_conflicts { # @test
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -121,15 +133,9 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 	try_add_new_after_pull
 }
 
-function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
-	them="them"
-	bootstrap "$them"
+function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
+	bootstrap_repo_at_dir_with_name them
 	assert_success
-
-	function print_their_xdg() (
-		set_xdg "$them"
-		zit info xdg
-	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
 	export BATS_TEST_BODY=true
@@ -137,12 +143,12 @@ function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
 	run_zit_init_disable_age
 
 	run_zit remote-add \
-		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		-remote-type stdio-local \
+		them \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
 	EOM
 
 	# TODO make this actually use a socket
@@ -166,7 +172,7 @@ function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
 
 function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -296,7 +302,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_allowed_remote_first { # 
 	EOM
 
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -377,7 +383,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 	EOM
 
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -450,7 +456,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 
 function pull_history_default_no_conflict { # @test
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -511,7 +517,7 @@ function pull_history_zettel_one_abbr { # @test
 	# TODO add support for abbreviations in remote transfers
 	skip
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (
@@ -548,7 +554,7 @@ function pull_history_zettel_one_abbr { # @test
 
 function pull_history_zettels_no_conflict_no_blobs { # @test
 	them="them"
-	bootstrap "$them"
+	bootstrap_xdg "$them"
 	assert_success
 
 	function print_their_xdg() (

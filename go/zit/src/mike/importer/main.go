@@ -111,24 +111,36 @@ func (importer importer) Import(
 }
 
 func (importer importer) importInventoryList(
-	el *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	if importer.remoteBlobStore == nil {
-		err = errors.Errorf("RemoteBlobStore is nil")
+	listObject *sku.Transacted,
+) (checkedOut *sku.CheckedOut, err error) {
+	blobSha := listObject.GetBlobSha()
+
+	if !importer.envRepo.HasBlob(blobSha) {
+		if err = importer.blobCopierDelegate(
+			sku.BlobCopyResult{
+				Transacted: listObject,
+				Sha:        blobSha,
+				N:          -1,
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		return
 	}
+	// if importer.remoteBlobStore == nil {
+	// 	err = errors.Errorf("RemoteBlobStore is nil")
+	// 	return
+	// }
 
-	if el.GetGenre() != genres.InventoryList {
-		err = errors.Errorf(
-			"Expected genre %q but got %q",
-			genres.InventoryList,
-			el.GetGenre(),
-		)
+	if err = genres.InventoryList.AssertGenre(listObject.GetGenre()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	iter := importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
-		el,
+		listObject,
 	)
 
 	for sk, errIter := range iter {
@@ -145,8 +157,8 @@ func (importer importer) importInventoryList(
 		}
 	}
 
-	if co, err = importer.importLeafSku(
-		el,
+	if checkedOut, err = importer.importLeafSku(
+		listObject,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

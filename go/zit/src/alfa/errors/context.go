@@ -240,13 +240,13 @@ func (c *context) after(skip int, f func() error) {
 	c.lockConc.Lock()
 	defer c.lockConc.Unlock()
 
-	si, _ := MakeStackInfo(skip + 1)
+	frame, _ := MakeStackFrame(skip + 1)
 
 	c.doAfter = append(
 		c.doAfter,
 		FuncWithStackInfo{
 			Func:      f,
-			StackInfo: si,
+			StackFrame: frame,
 		},
 	)
 }
@@ -312,7 +312,7 @@ func (c *context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(
 		&stackWrapError{
-			StackInfo: MustStackInfo(1),
+			StackFrame: MustStackFrame(1),
 			error:     fmt.Errorf(f, values...),
 			next:      WrapSkip(1, err),
 		},

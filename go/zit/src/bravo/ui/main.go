@@ -43,6 +43,7 @@ type DevPrinter interface {
 	Printer
 	Caller(i int, vs ...interface{})
 	FunctionName(skip int)
+	Stack(skip, count int)
 }
 
 var (

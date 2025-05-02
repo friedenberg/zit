@@ -54,7 +54,7 @@ func (wg *waitGroupParallel) Do(f Func) (d bool) {
 
 	wg.inner.Add(1)
 
-	si, _ := MakeStackInfo(1)
+	si, _ := MakeStackFrame(1)
 
 	go func() {
 		err := f()
@@ -68,18 +68,18 @@ func (wg *waitGroupParallel) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
-	si, _ := MakeStackInfo(1)
+	si, _ := MakeStackFrame(1)
 
 	wg.doAfter = append(
 		wg.doAfter,
 		FuncWithStackInfo{
 			Func:      f,
-			StackInfo: si,
+			StackFrame: si,
 		},
 	)
 }
 
-func (wg *waitGroupParallel) doneWith(si StackInfo, err error) {
+func (wg *waitGroupParallel) doneWith(si StackFrame, err error) {
 	wg.inner.Done()
 
 	if err != nil {

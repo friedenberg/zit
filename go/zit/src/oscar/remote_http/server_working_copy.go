@@ -3,10 +3,10 @@ package remote_http
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -64,7 +64,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
-	b := bytes.NewBuffer(nil)
+	responseBuffer := bytes.NewBuffer(nil)
 
 	// TODO make option to read from headers
 	// TODO add remote blob store
@@ -77,6 +77,13 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		importerOptions.AllowMergeConflicts = true
 	}
 
+	listFormat := server.Repo.GetInventoryListStore().FormatForVersion(
+		config_immutable.CurrentStoreVersion,
+	)
+
+	listMissingSkus := sku.MakeList()
+	var requestRetry bool
+
 	importerOptions.BlobCopierDelegate = func(
 		result sku.BlobCopyResult,
 	) (err error) {
@@ -86,7 +93,11 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			return
 		}
 
-		fmt.Fprintf(b, "%s\n", result.GetBlobSha())
+		if result.Transacted.GetGenre() == genres.InventoryList {
+			requestRetry = true
+		}
+
+		listMissingSkus.Add(result.Transacted.CloneTransacted())
 
 		return
 	}
@@ -104,8 +115,18 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		return
 	}
 
-	response.StatusCode = http.StatusCreated
-	response.Body = io.NopCloser(b)
+	if _, err := listFormat.WriteInventoryListBlob(listMissingSkus, responseBuffer); err != nil {
+		response.Error(err)
+		return
+	}
+
+	if requestRetry {
+		response.StatusCode = http.StatusExpectationFailed
+	} else {
+		response.StatusCode = http.StatusCreated
+	}
+
+	response.Body = io.NopCloser(responseBuffer)
 
 	return
 }

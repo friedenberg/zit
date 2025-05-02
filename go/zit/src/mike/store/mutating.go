@@ -80,7 +80,7 @@ func (s *Store) tryPrecommit(
 }
 
 // TODO add RealizeAndOrStore result
-func (s *Store) Commit(
+func (store *Store) Commit(
 	external sku.ExternalLike,
 	options sku.CommitOptions,
 ) (err error) {
@@ -88,7 +88,7 @@ func (s *Store) Commit(
 
 	ui.Log().Printf("%s -> %s", options, child)
 
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() &&
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() &&
 		(options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
@@ -100,7 +100,7 @@ func (s *Store) Commit(
 	// TAI must be set before calculating object sha
 	if options.UpdateTai {
 		if options.Clock == nil {
-			options.Clock = s
+			options.Clock = store
 		}
 
 		child.SetTai(options.Clock.GetTai())
@@ -111,7 +111,7 @@ func (s *Store) Commit(
 		child.GetGenre() == genres.Blob) {
 		var zettelId *ids.ZettelId
 
-		if zettelId, err = s.zettelIdIndex.CreateZettelId(); err != nil {
+		if zettelId, err = store.zettelIdIndex.CreateZettelId(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -124,7 +124,7 @@ func (s *Store) Commit(
 
 	var parent *sku.Transacted
 
-	if parent, err = s.fetchParentIfNecessary(child); err != nil {
+	if parent, err = store.fetchParentIfNecessary(child); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,20 +134,20 @@ func (s *Store) Commit(
 		child.Metadata.Cache.ParentTai = parent.GetTai()
 	}
 
-	if err = s.tryPrecommit(external, parent, options); err != nil {
+	if err = store.tryPrecommit(external, parent, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if options.AddToInventoryList {
-		if err = s.addMissingTypeAndTags(options, child); err != nil {
+		if err = store.addMissingTypeAndTags(options, child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
-		if err = s.addObjectToAbbrStore(child); err != nil {
+		if err = store.addObjectToAbbrStore(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -161,8 +161,8 @@ func (s *Store) Commit(
 
 		sku.TransactedResetter.ResetWithExceptFields(child, parent)
 
-		if s.sunrise.Less(child.GetTai()) {
-			if err = s.ui.TransactedUnchanged(child); err != nil {
+		if store.sunrise.Less(child.GetTai()) {
+			if err = store.ui.TransactedUnchanged(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -171,7 +171,7 @@ func (s *Store) Commit(
 		return
 	}
 
-	if err = s.applyDormantAndRealizeTags(
+	if err = store.applyDormantAndRealizeTags(
 		child,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -179,7 +179,7 @@ func (s *Store) Commit(
 	}
 
 	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
-		if err = s.config.AddTransacted(
+		if err = store.config.AddTransacted(
 			child,
 			parent,
 		); err != nil {
@@ -189,7 +189,7 @@ func (s *Store) Commit(
 	}
 
 	if child.GetGenre() == genres.Zettel {
-		if err = s.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
+		if err = store.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
 			if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 				ui.Log().Printf("object id does not contain value: %s", err)
 				err = nil
@@ -202,14 +202,14 @@ func (s *Store) Commit(
 
 	if options.AddToInventoryList {
 		ui.Log().Print("adding to bestandsaufnahme", options, child)
-		if err = s.commitTransacted(child, parent); err != nil {
+		if err = store.commitTransacted(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
-		if err = s.GetStreamIndex().Add(
+		if err = store.GetStreamIndex().Add(
 			child,
 			options,
 		); err != nil {
@@ -226,7 +226,7 @@ func (s *Store) Commit(
 				// abort
 			}
 
-			if err = s.ui.TransactedNew(child); err != nil {
+			if err = store.ui.TransactedNew(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -237,7 +237,7 @@ func (s *Store) Commit(
 			// 	return
 			// }
 
-			if err = s.ui.TransactedUpdated(child); err != nil {
+			if err = store.ui.TransactedUpdated(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -246,7 +246,7 @@ func (s *Store) Commit(
 	}
 
 	if options.MergeCheckedOut {
-		if err = s.ReadExternalAndMergeIfNecessary(
+		if err = store.ReadExternalAndMergeIfNecessary(
 			child,
 			parent,
 			options,
@@ -263,6 +263,7 @@ func (s *Store) fetchParentIfNecessary(
 	sk *sku.Transacted,
 ) (mutter *sku.Transacted, err error) {
 	mutter = sku.GetTransactedPool().Get()
+	// TODO find a way to make this more performant when operating over sshfs
 	if err = s.GetStreamIndex().ReadOneObjectId(
 		sk.GetObjectId(),
 		mutter,

@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	StackInfo = errors.StackInfo
+	StackInfo = errors.StackFrame
 )
 
 func MakeStackInfo(t *T, skip int) (si StackInfo) {
@@ -22,7 +22,7 @@ func MakeStackInfo(t *T, skip int) (si StackInfo) {
 	frames := runtime.CallersFrames([]uintptr{pc})
 
 	frame, _ := frames.Next()
-	si = errors.MakeStackInfoFromFrame(frame)
+	si = errors.MakeStackFrameFromFrame(frame)
 
 	return
 }

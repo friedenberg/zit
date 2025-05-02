@@ -10,7 +10,7 @@ import (
 func MakeLineReaderIterateStrict(
 	rffs ...interfaces.FuncSetString,
 ) interfaces.FuncSetString {
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := errors.MakeStackFrame(1)
 	var i int64
 
 	return func(v string) (err error) {
@@ -37,7 +37,7 @@ func MakeLineReaderIterateStrict(
 func MakeLineReaderIterate(
 	rffs ...interfaces.FuncSetString,
 ) interfaces.FuncSetString {
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := errors.MakeStackFrame(1)
 	var i int64
 
 	return func(v string) (err error) {
@@ -65,7 +65,7 @@ func MakeLineReaderIterate(
 func MakeLineReaderKeyValues(
 	dict map[string]interfaces.FuncSetString,
 ) interfaces.FuncSetString {
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := errors.MakeStackFrame(1)
 
 	return func(line string) (err error) {
 		loc := strings.Index(line, " ")

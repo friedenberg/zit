@@ -18,7 +18,7 @@ func (p devPrinter) Print(a ...interface{}) (err error) {
 	}
 
 	if p.includesStack {
-		si, _ := errors.MakeStackInfo(1)
+		si, _ := errors.MakeStackFrame(1)
 		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
 
@@ -31,7 +31,7 @@ func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
 	}
 
 	if p.includesStack {
-		si, _ := errors.MakeStackInfo(1)
+		si, _ := errors.MakeStackFrame(1)
 		f = "%s " + f
 		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
@@ -44,7 +44,7 @@ func (p devPrinter) Caller(i int, vs ...interface{}) {
 		return
 	}
 
-	st, _ := errors.MakeStackInfo(i + 1)
+	st, _ := errors.MakeStackFrame(i + 1)
 
 	vs = append([]interface{}{st}, vs...)
 	// TODO-P4 strip trailing newline and add back
@@ -62,6 +62,32 @@ func (p devPrinter) FunctionName(skip int) {
 		return
 	}
 
-	st, _ := errors.MakeStackInfo(skip + 1)
+	st, _ := errors.MakeStackFrame(skip + 1)
 	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.Function))
+}
+
+//go:noinline
+func (p devPrinter) Stack(skip, count int) {
+	if !p.on {
+		return
+	}
+
+	frames := errors.MakeStackFrames(skip+1, count)
+
+	io.WriteString(
+		p.f,
+		fmt.Sprintf(
+			"Printing Stack (skip: %d, count requested: %d, count actual: %d):\n\n",
+			skip,
+			count,
+			len(frames),
+		),
+	)
+
+	for i, frame := range frames {
+		io.WriteString(
+			p.f,
+			fmt.Sprintf("%s (%d)\n", frame.StringLogLine(), i),
+		)
+	}
 }
