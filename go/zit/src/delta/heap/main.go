@@ -198,44 +198,6 @@ func (a *Heap[T, TPtr]) Copy() Heap[T, TPtr] {
 	}
 }
 
-func (a *Heap[T, TPtr]) EachPtr(f interfaces.FuncIter[TPtr]) (err error) {
-	a.l.Lock()
-	defer a.l.Unlock()
-
-	for _, s := range a.h.Elements {
-		if err = f(s); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
-
-func (a *Heap[T, TPtr]) Each(f interfaces.FuncIter[T]) (err error) {
-	a.l.Lock()
-	defer a.l.Unlock()
-
-	for _, s := range a.h.Elements {
-		if err = f(*s); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
-
 func (a *Heap[T, TPtr]) Fix() {
 	a.l.Lock()
 	defer a.l.Unlock()

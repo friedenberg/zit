@@ -43,20 +43,14 @@ func (store *Store) ImportList(
 		},
 	)
 
-	for {
-		sk, ok := list.Pop()
-
-		if !ok {
-			break
-		}
-
+	for sk := range list.All() {
 		if _, err = importer.Import(
 			sk,
 		); err != nil {
 			if errors.Is(err, collections.ErrExists) {
 				err = nil
 			} else {
-				err = errors.Wrapf(err, "Sku: %s", sk)
+				err = errors.Wrapf(err, "Sku: %s", sku.String(sk))
 				return
 			}
 		}
