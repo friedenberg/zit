@@ -74,7 +74,10 @@ func (server *Server) InitializeListener(
 
 		addr := listener.Addr().(*net.TCPAddr)
 
-		ui.Log().Printf("starting HTTP server on port: %q", strconv.Itoa(addr.Port))
+		server.EnvLocal.GetOut().Printf(
+			"starting HTTP server on port: %q",
+			strconv.Itoa(addr.Port),
+		)
 
 	default:
 		if listener, err = config.Listen(

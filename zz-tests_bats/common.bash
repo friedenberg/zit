@@ -95,7 +95,7 @@ function run_zit_stderr_unified {
 }
 
 function run_zit_init {
-  if [[ "$#" -eq 0 ]]; then
+  if [[ $# -eq 0 ]]; then
     args=("test")
   else
     args=("$@")
@@ -133,7 +133,7 @@ run_find() {
 }
 
 function run_zit_init_disable_age {
-  if [[ "$#" -eq 0 ]]; then
+  if [[ $# -eq 0 ]]; then
     args=("test-repo-id")
   else
     args=("$@")
@@ -157,4 +157,28 @@ EOM
   assert_output
 
   run_zit init-workspace
+}
+
+function start_server {
+  dir="$1"
+
+  coproc server {
+    if [[ -n $dir ]]; then
+      cd "$dir"
+    fi
+
+    # shellcheck disable=SC2068
+    zit serve ${cmd_zit_def[@]} tcp :0
+  }
+
+  read -r output <&"${server[0]}"
+
+  if [[ $output =~ (starting HTTP server on port: \"([0-9]+)\") ]]; then
+    export port="${BASH_REMATCH[2]}"
+  else
+    fail <<-EOM
+			unable to get port info from zit server.
+			server output: $output
+		EOM
+  fi
 }
