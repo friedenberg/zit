@@ -48,12 +48,6 @@ func (a *Transacted) CloneTransacted() (b *Transacted) {
 	return
 }
 
-func (a *Transacted) CloneExternalLike() ExternalLike {
-	b := GetTransactedPool().Get()
-	TransactedResetter.ResetWith(b, a)
-	return b
-}
-
 func (t *Transacted) GetSku() *Transacted {
 	return t
 }

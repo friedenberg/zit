@@ -47,8 +47,10 @@ type ListFormat interface {
 	) error
 }
 
+// TODO rename to ListTransacted
 type List = heap.Heap[Transacted, *Transacted]
 
+// TODO rename to MakeListTransacted
 func MakeList() *List {
 	h := heap.Make(
 		transactedEqualer{},
@@ -86,4 +88,77 @@ func CollectList(seq iter.Seq2[*Transacted, error]) (list *List, err error) {
 	}
 
 	return
+}
+
+type ListCheckedOut = heap.Heap[CheckedOut, *CheckedOut]
+
+func MakeListCheckedOut() *ListCheckedOut {
+	h := heap.Make(
+		genericEqualer[*CheckedOut]{},
+		genericLessorStable[*CheckedOut]{},
+		CheckedOutResetter,
+	)
+
+	h.SetPool(GetCheckedOutPool())
+
+	return h
+}
+
+var ResetterListCheckedOut resetterListCheckedOut
+
+type resetterListCheckedOut struct{}
+
+func (resetterListCheckedOut) Reset(a *ListCheckedOut) {
+	a.Reset()
+}
+
+func (resetterListCheckedOut) ResetWith(a, b *ListCheckedOut) {
+	a.ResetWith(b)
+}
+
+func CollectListCheckedOut(
+	seq iter.Seq2[*CheckedOut, error],
+) (list *ListCheckedOut, err error) {
+	list = MakeListCheckedOut()
+
+	for checkedOut, iterErr := range seq {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		list.Add(checkedOut)
+	}
+
+	return
+}
+
+type genericLessorTaiOnly[T ids.Clock] struct{}
+
+func (genericLessorTaiOnly[T]) Less(a, b T) bool {
+	return a.GetTai().Less(b.GetTai())
+}
+
+type clockWithObjectId interface {
+	ids.Clock
+	// TODO figure out common interface for this
+	GetObjectId() *ids.ObjectId
+}
+
+type genericLessorStable[T clockWithObjectId] struct{}
+
+func (genericLessorStable[T]) Less(a, b T) bool {
+	if result := a.GetTai().SortCompare(b.GetTai()); !result.Equal() {
+		return result.Less()
+	}
+
+	return a.GetObjectId().String() < b.GetObjectId().String()
+}
+
+type genericEqualer[T interface {
+	Equals(T) bool
+}] struct{}
+
+func (genericEqualer[T]) Equals(a, b T) bool {
+	return a.Equals(b)
 }

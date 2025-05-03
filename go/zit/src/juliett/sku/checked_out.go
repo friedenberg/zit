@@ -65,3 +65,17 @@ func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", a.GetSku(), a.GetSkuExternal())
 }
+
+func (a *CheckedOut) Equals(b *CheckedOut) bool {
+	return a.internal.Equals(&b.internal) && a.external.Equals(&b.external)
+}
+
+func (a *CheckedOut) GetTai() ids.Tai {
+	external := a.external.GetTai()
+
+	if external.IsZero() {
+		return a.internal.GetTai()
+	} else {
+		return external
+	}
+}

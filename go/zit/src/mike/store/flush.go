@@ -23,7 +23,7 @@ func (s *Store) FlushInventoryList(
 		return
 	}
 
-	ui.Log().Printf("saving Bestandsaufnahme")
+	ui.Log().Printf("saving inventory list")
 
 	var inventoryListSku *sku.Transacted
 
@@ -32,7 +32,7 @@ func (s *Store) FlushInventoryList(
 		s.GetConfig().GetCLIConfig().Description,
 	); err != nil {
 		if errors.Is(err, inventory_list_store.ErrEmpty) {
-			ui.Log().Printf("Bestandsaufnahme was empty")
+			ui.Log().Printf("inventory list was empty")
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (s *Store) FlushInventoryList(
 		return
 	}
 
-	ui.Log().Printf("done saving Bestandsaufnahme")
+	ui.Log().Printf("done saving inventory list")
 
 	return
 }

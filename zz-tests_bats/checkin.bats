@@ -295,7 +295,7 @@ function checkin_zettel_typ_has_commit_hook { # @test
 }
 
 function checkin_zettel_with_komment { # @test
-	run_zit checkin -print-bestandsaufnahme=true -komment "message" one/uno.zettel
+	run_zit checkin -print-inventory_list=true -comment "message" one/uno.zettel
 	assert_success
 	assert_output --regexp - <<-'EOM'
 		\[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\]

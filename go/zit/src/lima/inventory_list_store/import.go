@@ -2,8 +2,10 @@ package inventory_list_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	pkg_importer "code.linenisgreat.com/zit/go/zit/src/mike/importer"
 )
@@ -31,7 +33,7 @@ func (store *Store) ImportList(
 ) (err error) {
 	var hasConflicts bool
 
-	oldPrinter := importer.GetCheckedOutPrinter()
+	checkedOutPrinter := importer.GetCheckedOutPrinter()
 
 	importer.SetCheckedOutPrinter(
 		func(co *sku.CheckedOut) (err error) {
@@ -39,25 +41,59 @@ func (store *Store) ImportList(
 				hasConflicts = true
 			}
 
-			return oldPrinter(co)
+			return checkedOutPrinter(co)
 		},
 	)
 
+	importErrors := errors.MakeMulti()
+	missingBlobs := sku.MakeListCheckedOut()
+
 	for sk := range list.All() {
-		if _, err = importer.Import(
-			sk,
-		); err != nil {
-			if errors.Is(err, collections.ErrExists) {
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "Sku: %s", sku.String(sk))
+		checkedOut, importError := importer.Import(sk)
+
+		func() {
+			defer sku.GetCheckedOutPool().Put(checkedOut)
+
+			if importError == nil ||
+				errors.Is(importError, collections.ErrExists) {
+				return
+			}
+
+			if env_dir.IsErrBlobMissing(importError) {
+				checkedOut := sku.GetCheckedOutPool().Get()
+				sku.TransactedResetter.ResetWith(checkedOut.GetSkuExternal(), sk)
+				checkedOut.SetState(checked_out_state.Untracked)
+
+				missingBlobs.Add(checkedOut)
+
+				return
+			}
+
+			importErrors.Add(errors.Wrapf(err, "Sku: %s", sku.String(sk)))
+		}()
+	}
+
+	if missingBlobs.Len() > 0 {
+		ui.Err().Printf(
+			"could not import the %d objects (blobs missing):\n",
+			missingBlobs.Len(),
+		)
+
+		for missing := range missingBlobs.All() {
+			ui.Debug().Print(missing)
+			if err = checkedOutPrinter(missing); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
 	if hasConflicts {
-		err = pkg_importer.ErrNeedsMerge
+		importErrors.Add(pkg_importer.ErrNeedsMerge)
+	}
+
+	if importErrors.Len() > 0 {
+		err = importErrors
 	}
 
 	return

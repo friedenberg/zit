@@ -153,7 +153,7 @@ func (c *V0) AddToFlags(f *flag.FlagSet, m *V0) {
 
 	boolVarWithMask(
 		f,
-		"print-bestandsaufnahme",
+		"print-inventory_list",
 		&c.PrintInventoryLists,
 		&m.PrintInventoryLists,
 		"",

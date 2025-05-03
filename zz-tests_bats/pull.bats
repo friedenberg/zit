@@ -24,7 +24,7 @@ function bootstrap_repo_at_dir_with_name {
 	pushd "$1" || exit 1
 	run_zit_init -override-xdg-with-cwd "$1"
 	bootstrap_content
-  popd || exit 1
+	popd || exit 1
 }
 
 function bootstrap_content {

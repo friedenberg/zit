@@ -58,7 +58,7 @@ cmd_zit_def=(
   -print-empty-shas=true
   -print-flush=false
   -print-unchanged=false
-  -print-bestandsaufnahme=false
+  -print-inventory_list=false
   -boxed-description=true
   -print-colors=false
 )

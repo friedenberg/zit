@@ -201,7 +201,7 @@ func (store *Store) Commit(
 	}
 
 	if options.AddToInventoryList {
-		ui.Log().Print("adding to bestandsaufnahme", options, child)
+		ui.Log().Print("adding to inventory list", options, child)
 		if err = store.commitTransacted(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return

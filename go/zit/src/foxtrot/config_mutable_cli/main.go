@@ -79,7 +79,7 @@ func (c *Config) SetFlagSet(flagSet *flag.FlagSet) {
 
 	flagSet.StringVar(&c.Hooks, "hooks", "", "")
 
-	flagSet.Var(&c.Description, "komment", "Comment for Bestandsaufnahme")
+	flagSet.Var(&c.Description, "comment", "Comment for inventory list")
 }
 
 func Default() (c Config) {

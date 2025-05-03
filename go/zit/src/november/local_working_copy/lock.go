@@ -28,7 +28,7 @@ func (u *Repo) Unlock() (err error) {
 		changes = append(changes, u.GetDormantIndex().GetChanges()...)
 		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
-		ui.Log().Print("will flush bestandsaufnahme")
+		ui.Log().Print("will flush inventory list")
 		if err = u.store.FlushInventoryList(ptl); err != nil {
 			err = errors.Wrap(err)
 			return
