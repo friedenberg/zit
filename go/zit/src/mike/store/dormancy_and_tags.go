@@ -71,7 +71,7 @@ func (k *Store) applyDormantAndRealizeTags(
 	return
 }
 
-func (k *Store) addSuperTags(
+func (store *Store) addSuperTags(
 	sk *sku.Transacted,
 ) (err error) {
 	g := sk.GetGenre()
@@ -102,7 +102,7 @@ func (k *Store) addSuperTags(
 
 		var ek *sku.Transacted
 
-		if ek, err = k.config.GetTagOrRepoIdOrType(ex); err != nil {
+		if ek, err = store.config.GetTagOrRepoIdOrType(ex); err != nil {
 			err = errors.Wrapf(err, "Expanded: %q", ex)
 			return
 		}

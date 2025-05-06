@@ -104,11 +104,37 @@ func (kc *compiled) getTag(
 		return
 	}
 
-	expandedActual := kc.getSortedTagsExpanded(k.String())
+	v := k.String()
 
-	if len(expandedActual) > 0 {
-		ct = expandedActual[0]
-		ok = true
+	kc.lock.Lock()
+	defer kc.lock.Unlock()
+
+	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
+	sa := quiter.MakeFuncSetString(expandedMaybe)
+	expansion.ExpanderRight.Expand(sa, v)
+
+	var cursor *tag
+
+	for v := range expandedMaybe.All() {
+		if cursor == nil {
+			cursor, _ = kc.Tags.Get(v.String())
+			continue
+		}
+
+		next, ok := kc.Tags.Get(v.String())
+
+		if !ok {
+			continue
+		}
+
+		if len(next.Transacted.GetObjectId().String()) > len(cursor.Transacted.GetObjectId().String()) {
+			cursor = next
+		}
+	}
+
+	if cursor != nil {
+		ct = sku.GetTransactedPool().Get()
+		sku.Resetter.ResetWith(ct, &cursor.Transacted)
 	}
 
 	return
