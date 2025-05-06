@@ -65,7 +65,7 @@ func MakeEditor(
 	}
 
 	if len(utility) < 1 {
-		err = errors.Errorf("utility has no valid path: %q", editor.utility)
+		err = errors.ErrorWithStackf("utility has no valid path: %q", editor.utility)
 		return
 	}
 

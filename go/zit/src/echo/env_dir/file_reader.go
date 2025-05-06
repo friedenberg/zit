@@ -63,12 +63,12 @@ func (r objectReader) String() string {
 
 func (ar objectReader) Close() (err error) {
 	if ar.file == nil {
-		err = errors.Errorf("nil file")
+		err = errors.ErrorWithStackf("nil file")
 		return
 	}
 
 	if ar.ShaReadCloser == nil {
-		err = errors.Errorf("nil object reader")
+		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 

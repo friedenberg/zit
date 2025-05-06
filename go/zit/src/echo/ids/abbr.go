@@ -157,7 +157,7 @@ func (a Abbr) AbbreviateObjectId(
 		return
 
 	default:
-		err = errors.Errorf("unsupported object id: %q, %T", in, in)
+		err = errors.ErrorWithStackf("unsupported object id: %q, %T", in, in)
 		return
 	}
 

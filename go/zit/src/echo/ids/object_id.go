@@ -78,7 +78,7 @@ func (a *objectId) Equals(b *objectId) bool {
 
 func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 	if k2.Len() > math.MaxUint8 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"%q is greater than max uint8 (%d)",
 			k2.String(),
 			math.MaxUint8,
@@ -161,7 +161,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 	middlePos := b[1]
 
 	if middlePos > contentLength-1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"middle position %d is greater than last index: %d",
 			middlePos,
 			contentLength,
@@ -359,7 +359,7 @@ func (k2 *objectId) SetFromPath(
 
 	case fe.Zettel:
 		if len(els) < 3 {
-			err = errors.Errorf("not a valid zettel: %q, %q", els, path)
+			err = errors.ErrorWithStackf("not a valid zettel: %q, %q", els, path)
 			return
 		}
 

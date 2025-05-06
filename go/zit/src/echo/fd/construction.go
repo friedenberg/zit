@@ -28,12 +28,12 @@ func MakeFromPathAndDirEntry(
 	blobWriter interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	if path == "" {
-		err = errors.Errorf("nil file desriptor")
+		err = errors.ErrorWithStackf("nil file desriptor")
 		return
 	}
 
 	if path == "." {
-		err = errors.Errorf("'.' not supported")
+		err = errors.ErrorWithStackf("'.' not supported")
 		return
 	}
 
@@ -58,12 +58,12 @@ func MakeFromPath(
 	blobWriter interfaces.BlobWriter,
 ) (fd *FD, err error) {
 	if path == "" {
-		err = errors.Errorf("nil file desriptor")
+		err = errors.ErrorWithStackf("nil file desriptor")
 		return
 	}
 
 	if path == "." {
-		err = errors.Errorf("'.' not supported")
+		err = errors.ErrorWithStackf("'.' not supported")
 		return
 	}
 

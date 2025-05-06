@@ -18,7 +18,7 @@ var configBytes = []byte("konfig")
 
 func ErrOnConfigBytes(b []byte) (err error) {
 	if bytes.Equal(b, configBytes) {
-		return errors.Errorf("cannot be %q", "konfig")
+		return errors.ErrorWithStackf("cannot be %q", "konfig")
 	}
 
 	return nil
@@ -26,7 +26,7 @@ func ErrOnConfigBytes(b []byte) (err error) {
 
 func ErrOnConfig(v string) (err error) {
 	if v == "konfig" {
-		return errors.Errorf("cannot be %q", "konfig")
+		return errors.ErrorWithStackf("cannot be %q", "konfig")
 	}
 
 	return nil

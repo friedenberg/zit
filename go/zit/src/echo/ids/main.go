@@ -92,7 +92,7 @@ func Make(v string) (k interfaces.ObjectId, err error) {
 		}
 	}
 
-	err = errors.Errorf("%q is not a valid object id", v)
+	err = errors.ErrorWithStackf("%q is not a valid object id", v)
 
 	return
 }

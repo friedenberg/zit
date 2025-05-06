@@ -51,7 +51,7 @@ func (r *reader) Seek(offset int64, whence int) (actual int64, err error) {
 	seeker, ok := r.decrypter.(io.Seeker)
 
 	if !ok {
-		err = errors.Errorf("seeking not supported")
+		err = errors.ErrorWithStackf("seeking not supported")
 		return
 	}
 

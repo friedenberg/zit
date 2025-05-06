@@ -13,7 +13,7 @@ func (env env) Delete(paths ...string) (err error) {
 		path = filepath.Clean(path)
 
 		if path == "." {
-			err = errors.Errorf("invalid delete request: %q", path)
+			err = errors.ErrorWithStackf("invalid delete request: %q", path)
 			return
 		}
 

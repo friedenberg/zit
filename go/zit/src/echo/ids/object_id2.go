@@ -76,7 +76,7 @@ func (a *objectId2) Equals(b *objectId2) bool {
 
 func (k2 *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 	if k2.Len() > math.MaxUint8 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"%q is greater than max uint8 (%d)",
 			k2.String(),
 			math.MaxUint8,
@@ -159,7 +159,7 @@ func (k2 *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	middlePos := b[1]
 
 	if middlePos > contentLength-1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"middle position %d is greater than last index: %d",
 			middlePos,
 			contentLength,
@@ -595,7 +595,7 @@ func (oid *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		els := strings.SplitAfterN(v[1:], "/", 2)
 
 		if len(els) != 2 {
-			err = errors.Errorf("invalid object id format: %q", v)
+			err = errors.ErrorWithStackf("invalid object id format: %q", v)
 			return
 		}
 

@@ -85,7 +85,7 @@ func (h *Heap[T, TPtr]) Push(sk TPtr) {
 
 	if h.s > 0 {
 		panic(
-			errors.Errorf(
+			errors.ErrorWithStackf(
 				"attempting to push to a heap that has saved elements",
 			),
 		)

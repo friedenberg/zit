@@ -66,7 +66,7 @@ func PageIndexForSha(width uint8, s interfaces.Sha) (n uint8, err error) {
 	}
 
 	if n1 > math.MaxUint8 {
-		err = errors.Errorf("page out of bounds: %d", n1)
+		err = errors.ErrorWithStackf("page out of bounds: %d", n1)
 		return
 	}
 

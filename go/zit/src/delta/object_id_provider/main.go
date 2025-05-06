@@ -46,7 +46,7 @@ func newProvider(path string) (p provider, err error) {
 
 func (p provider) MakeZettelIdFromCoordinates(i coordinates.Int) (s string, err error) {
 	if len(p)-1 < int(i) {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"insuffient ids. requested %d, have %d, last %s",
 			int(i),
 			len(p)-1,

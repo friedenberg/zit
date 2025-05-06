@@ -115,7 +115,7 @@ func (e *RepoId) Set(v string) (err error) {
 	}
 
 	if !RepoIdRegex.Match([]byte(v)) {
-		err = errors.Errorf("not a valid Kasten: '%s'", v)
+		err = errors.ErrorWithStackf("not a valid Kasten: '%s'", v)
 		return
 	}
 

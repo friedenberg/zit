@@ -24,7 +24,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 
 	if vm.Top.Type() == LTTable {
 		if funcName == "" {
-			err = errors.Errorf("needs function name because top is table")
+			err = errors.ErrorWithStackf("needs function name because top is table")
 			return
 		}
 
@@ -33,7 +33,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 		tv := vm.GetField(tt, funcName)
 
 		if tv.Type() != LTFunction {
-			err = errors.Errorf("expected %v but got %v", LTFunction, tv.Type())
+			err = errors.ErrorWithStackf("expected %v but got %v", LTFunction, tv.Type())
 			return
 		}
 
@@ -43,7 +43,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 	} else if vm.Top.Type() == LTFunction {
 		t = vm.Top.(*LFunction)
 	} else {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected table or function but got: %q",
 			vm.Top.Type(),
 		)
@@ -56,7 +56,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 
 func (vm *VM) GetTopTableOrError() (t *LTable, err error) {
 	if vm.Top.Type() != LTTable {
-		err = errors.Errorf("expected %v but got %v", LTTable, vm.Top.Type())
+		err = errors.ErrorWithStackf("expected %v but got %v", LTTable, vm.Top.Type())
 		return
 	}
 
@@ -67,7 +67,7 @@ func (vm *VM) GetTopTableOrError() (t *LTable, err error) {
 
 func (vm *VM) GetTopFunctionOrError() (t *LFunction, err error) {
 	if vm.Top.Type() != LTFunction {
-		err = errors.Errorf("expected %v but got %v", LTFunction, vm.Top.Type())
+		err = errors.ErrorWithStackf("expected %v but got %v", LTFunction, vm.Top.Type())
 		return
 	}
 

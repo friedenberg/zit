@@ -36,7 +36,7 @@ func (s ScriptValue) Cmd() *exec.Cmd {
 
 func (s *ScriptValue) RunWithInput() (w io.WriteCloser, r io.Reader, err error) {
 	if s.IsEmpty() {
-		err = errors.Errorf("empty script")
+		err = errors.ErrorWithStackf("empty script")
 		return
 	}
 

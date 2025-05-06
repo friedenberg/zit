@@ -47,14 +47,14 @@ func (l *Lock) IsAcquired() (acquired bool) {
 
 func (lock *Lock) Lock() (err error) {
 	if !lock.mutex.TryLock() {
-		err = errors.Errorf("attempting concurrent locks")
+		err = errors.ErrorWithStackf("attempting concurrent locks")
 		return
 	}
 
 	defer lock.mutex.Unlock()
 
 	if lock.file != nil {
-		err = errors.Errorf("already locked")
+		err = errors.ErrorWithStackf("already locked")
 		return
 	}
 
@@ -95,7 +95,7 @@ func (lock *Lock) Lock() (err error) {
 
 func (lock *Lock) Unlock() (err error) {
 	if !lock.mutex.TryLock() {
-		err = errors.Errorf("attempting concurrent locks")
+		err = errors.ErrorWithStackf("attempting concurrent locks")
 		return
 	}
 

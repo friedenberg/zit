@@ -65,7 +65,7 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 		left, right, ok := strings.Cut(line, "=")
 
 		if !ok {
-			err = errors.Errorf("malformed env var entry: %q", line)
+			err = errors.ErrorWithStackf("malformed env var entry: %q", line)
 			return
 		}
 

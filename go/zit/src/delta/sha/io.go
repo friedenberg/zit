@@ -73,7 +73,7 @@ func (r readCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	seeker, ok := r.r.(io.Seeker)
 
 	if !ok {
-		err = errors.Errorf("seeking not supported")
+		err = errors.ErrorWithStackf("seeking not supported")
 		return
 	}
 
@@ -125,7 +125,7 @@ func MakeNopReadCloser(rc io.ReadCloser) ReadCloser {
 }
 
 func (nopReadCloser) Seek(offset int64, whence int) (actual int64, err error) {
-	err = errors.Errorf("seeking not supported")
+	err = errors.ErrorWithStackf("seeking not supported")
 	return
 }
 

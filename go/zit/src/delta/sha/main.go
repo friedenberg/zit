@@ -174,7 +174,7 @@ func (s *Sha) SetFromPath(p string) (err error) {
 		fallthrough
 
 	case tail == "." || head == ".":
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"path cannot be turned into a head/tail pair: '%s/%s'",
 			head,
 			tail,
@@ -201,7 +201,7 @@ func (s *Sha) ReadAtFrom(r io.ReaderAt, start int64) (n int64, err error) {
 	if n == 0 && err == io.EOF {
 		return
 	} else if n != ByteSize && n != 0 {
-		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n)
+		err = errors.ErrorWithStackf("expected to read %d bytes but only read %d", ByteSize, n)
 		return
 	} else if errors.IsNotNilAndNotEOF(err) {
 		err = errors.Wrap(err)
@@ -221,7 +221,7 @@ func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
 	if n == 0 && err == io.EOF {
 		return
 	} else if n != ByteSize && n != 0 {
-		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n)
+		err = errors.ErrorWithStackf("expected to read %d bytes but only read %d", ByteSize, n)
 		return
 	} else if errors.IsNotNilAndNotEOF(err) {
 		err = errors.Wrap(err)

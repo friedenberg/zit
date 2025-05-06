@@ -151,7 +151,7 @@ func (g *Genre) ReadFromBoxScanner(
 			return
 
 		default:
-			err = errors.Errorf("unsupported sequence: %q:%#v", seq, seq)
+			err = errors.ErrorWithStackf("unsupported sequence: %q:%#v", seq, seq)
 			return
 		}
 	}

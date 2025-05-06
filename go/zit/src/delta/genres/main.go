@@ -365,7 +365,7 @@ func (i Genre) MarshalBinary() (b []byte, err error) {
 
 func (i *Genre) UnmarshalBinary(b []byte) (err error) {
 	if len(b) != 1 {
-		err = errors.Errorf("expected exactly one byte but got %q", b)
+		err = errors.ErrorWithStackf("expected exactly one byte but got %q", b)
 		return
 	}
 

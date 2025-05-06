@@ -42,12 +42,12 @@ func MakeZettelIdFromProvidersAndCoordinates(
 	var l, r string
 
 	if l, err = pl.MakeZettelIdFromCoordinates(k.Left); err != nil {
-		err = errors.Errorf("failed to make left zettel id: %s", err)
+		err = errors.ErrorWithStackf("failed to make left zettel id: %s", err)
 		return
 	}
 
 	if r, err = pr.MakeZettelIdFromCoordinates(k.Right); err != nil {
-		err = errors.Errorf("failed to make right zettel id: %s", err)
+		err = errors.ErrorWithStackf("failed to make right zettel id: %s", err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 
 	switch {
 	case head == "":
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"head was empty: {head: %q, tail: %q}",
 			head,
 			tail,
@@ -68,7 +68,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 		return
 
 	case tail == "":
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"tail was empty: {head: %q, tail: %q}",
 			head,
 			tail,
@@ -81,7 +81,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 	h = &ZettelId{}
 
 	if err = h.Set(hs); err != nil {
-		err = errors.Errorf("failed to set zettel id: %s", err)
+		err = errors.ErrorWithStackf("failed to set zettel id: %s", err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func (h *ZettelId) Set(v string) (err error) {
 			}
 		},
 	) {
-		me.Add(errors.Errorf("contains invalid characters: %q", v))
+		me.Add(errors.ErrorWithStackf("contains invalid characters: %q", v))
 	}
 
 	if v == "/" {
@@ -190,7 +190,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	switch count {
 	default:
-		me.Add(errors.Errorf(
+		me.Add(errors.ErrorWithStackf(
 			"zettel id needs exactly 2 components, but got %d: %q",
 			count,
 			v,
@@ -207,7 +207,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	if (len(h.left) == 0 && len(h.right) > 0) ||
 		(len(h.right) == 0 && len(h.left) > 0) {
-		err = errors.Errorf("incomplete zettel id: %s", h)
+		err = errors.ErrorWithStackf("incomplete zettel id: %s", h)
 		return
 	}
 

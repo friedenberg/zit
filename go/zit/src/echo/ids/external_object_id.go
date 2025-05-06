@@ -59,12 +59,12 @@ func (eoid *ExternalObjectId) Set(value string) (err error) {
 	}
 
 	if len(value) <= 1 {
-		err = errors.Errorf("external object id must be at least two characters, but got %q", value)
+		err = errors.ErrorWithStackf("external object id must be at least two characters, but got %q", value)
 		return
 	}
 
 	if strings.Contains(value, "!") {
-		err = errors.Errorf("contains illegal characters: %q", value)
+		err = errors.ErrorWithStackf("contains illegal characters: %q", value)
 		return
 	}
 

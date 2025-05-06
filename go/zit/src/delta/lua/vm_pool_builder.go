@@ -67,7 +67,7 @@ func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
 	}
 
 	if vpb.scriptReader == nil && vpb.compiled == nil {
-		err = errors.Errorf("no script, reader, or compiled set")
+		err = errors.ErrorWithStackf("no script, reader, or compiled set")
 		return
 	}
 

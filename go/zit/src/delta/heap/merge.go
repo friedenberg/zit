@@ -48,7 +48,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 		} else if equaler.Equals(e, last) {
 			return
 		} else if l.Less(e, last) {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"last is greater than current! last:\n%v\ncurrent: %v",
 				last,
 				e,
@@ -97,7 +97,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			popped, _ := h.popAndSave()
 
 			if !equaler.Equals(peeked, popped) {
-				err = errors.Errorf(
+				err = errors.ErrorWithStackf(
 					"popped not equal to peeked: %s != %s",
 					popped,
 					peeked,

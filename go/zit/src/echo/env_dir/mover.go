@@ -54,12 +54,12 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 
 func (m *Mover) Close() (err error) {
 	if m.file == nil {
-		err = errors.Errorf("nil file")
+		err = errors.ErrorWithStackf("nil file")
 		return
 	}
 
 	if m.Writer == nil {
-		err = errors.Errorf("nil object reader")
+		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
@@ -92,7 +92,7 @@ func (m *Mover) Close() (err error) {
 	if m.objectPath == "" {
 		// TODO-P3 move this validation to options
 		if m.basePath == "" {
-			err = errors.Errorf("basepath is nil")
+			err = errors.ErrorWithStackf("basepath is nil")
 			return
 		}
 

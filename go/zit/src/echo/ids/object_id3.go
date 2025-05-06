@@ -18,7 +18,7 @@ func (oid *objectId2) ReadFromSeq(
 ) (err error) {
 	switch {
 	case seq.Len() == 0:
-		err = errors.Errorf("empty seq")
+		err = errors.ErrorWithStackf("empty seq")
 		return
 
 		// tag
@@ -81,7 +81,7 @@ func (oid *objectId2) ReadFromSeq(
 		var t Tai
 
 		if err = t.Set(seq.String()); err != nil {
-			err = errors.Errorf("unsupported seq: %q, %#v", seq, seq)
+			err = errors.ErrorWithStackf("unsupported seq: %q, %#v", seq, seq)
 			return
 		}
 
@@ -92,7 +92,7 @@ func (oid *objectId2) ReadFromSeq(
 		return
 
 	default:
-		err = errors.Errorf("unsupported seq: %q, %#v", seq, seq)
+		err = errors.ErrorWithStackf("unsupported seq: %q, %#v", seq, seq)
 		return
 	}
 }

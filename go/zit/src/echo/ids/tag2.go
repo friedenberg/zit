@@ -107,7 +107,7 @@ func (e *tag2) Set(v string) (err error) {
 	}
 
 	if !Tag2Regex.MatchString(v) {
-		err = errors.Errorf("not a valid tag: %q", v1)
+		err = errors.ErrorWithStackf("not a valid tag: %q", v1)
 		return
 	}
 

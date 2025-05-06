@@ -168,7 +168,7 @@ func (e *tag) Set(v string) (err error) {
 		if v == "" {
 			err = ErrEmptyTag
 		} else {
-			err = errors.Errorf("not a valid tag: %q", v1)
+			err = errors.ErrorWithStackf("not a valid tag: %q", v1)
 		}
 
 		return

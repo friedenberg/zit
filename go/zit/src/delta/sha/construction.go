@@ -54,7 +54,7 @@ func MakeShaFromPath(p string) (s *Sha, err error) {
 		fallthrough
 
 	case tail == "." || head == ".":
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"path cannot be turned into a head/tail pair: '%s/%s'",
 			head,
 			tail,

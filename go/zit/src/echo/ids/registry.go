@@ -40,7 +40,7 @@ func register[T interfaces.ObjectId, TPtr interface {
 
 	if id1, ok = registryGenres[g]; ok {
 		panic(
-			errors.Errorf(
+			errors.ErrorWithStackf(
 				"genre %s has two registrations: %s (old), %s (new)",
 				g,
 				id1,

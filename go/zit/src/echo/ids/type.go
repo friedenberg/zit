@@ -109,7 +109,7 @@ func (e *Type) Set(v string) (err error) {
 	}
 
 	if !TagRegex.Match([]byte(v)) {
-		err = errors.Errorf("not a valid Typ: '%s'", v)
+		err = errors.ErrorWithStackf("not a valid Typ: '%s'", v)
 		return
 	}
 

@@ -193,7 +193,7 @@ func (t *Tai) Set(v string) (err error) {
 			if err == io.EOF {
 				err = nil
 			} else {
-				err = errors.Errorf("expected no more elements but got %s", val)
+				err = errors.ErrorWithStackf("expected no more elements but got %s", val)
 			}
 
 			return
