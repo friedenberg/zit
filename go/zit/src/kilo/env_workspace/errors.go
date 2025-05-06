@@ -3,7 +3,6 @@ package env_workspace
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
@@ -19,20 +18,18 @@ func (e ErrUnsupportedType) Error() string {
 	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
 }
 
-func makeErrUnsupportedOperation(s *Store, op interface{}) error {
-	return errors.WrapN(1,
-		&ErrUnsupportedOperation{
-			repoId:             s.RepoId,
-			store:              s.StoreLike,
-			operationInterface: op,
-		},
-	)
+func makeErrUnsupportedOperation(s *Store, op any) error {
+	return ErrUnsupportedOperation{
+		repoId:             s.RepoId,
+		store:              s.StoreLike,
+		operationInterface: op,
+	}
 }
 
 type ErrUnsupportedOperation struct {
 	repoId             ids.RepoId
 	store              store_workspace.StoreLike
-	operationInterface interface{}
+	operationInterface any
 }
 
 func (e ErrUnsupportedOperation) Error() string {
