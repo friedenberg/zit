@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -54,8 +55,22 @@ func (store *Store) ImportList(
 		func() {
 			defer sku.GetCheckedOutPool().Put(checkedOut)
 
-			if importError == nil ||
-				errors.Is(importError, collections.ErrExists) {
+			if importError == nil {
+				// TODO eliminate condition where checkedOut can be nil and err can be
+				// nil
+				if checkedOut != nil &&
+					checkedOut.GetState() == checked_out_state.Conflicted {
+					hasConflicts = true
+				}
+
+				return
+			}
+
+			if errors.Is(importError, collections.ErrExists) {
+				return
+			}
+
+			if genres.IsErrUnsupportedGenre(importError) {
 				return
 			}
 
