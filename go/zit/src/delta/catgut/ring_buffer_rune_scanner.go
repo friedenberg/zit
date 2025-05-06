@@ -87,7 +87,7 @@ func (s *RingBufferRuneScanner) UnreadRune() (err error) {
 	actuallyUnread := s.rb.Unread(s.lastRuneSize)
 
 	if actuallyUnread != s.lastRuneSize {
-		err = errors.Errorf("tried to unread %d bytes but actually unread %d", s.lastRuneSize, actuallyUnread)
+		err = errors.ErrorWithStackf("tried to unread %d bytes but actually unread %d", s.lastRuneSize, actuallyUnread)
 		return
 	}
 

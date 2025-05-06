@@ -52,7 +52,7 @@ func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 	intErr = binary.PutUvarint(b[:], uint64(n))
 
 	if intErr != 1 {
-		err = errors.Errorf("expected to write %d but wrote %d", 2, intErr)
+		err = errors.ErrorWithStackf("expected to write %d but wrote %d", 2, intErr)
 		return
 	}
 
@@ -72,7 +72,7 @@ func WriteUint32(w io.Writer, n uint32) (written int, err error) {
 	intErr = binary.PutVarint(b[:], int64(n))
 
 	if intErr != 1 {
-		err = errors.Errorf("expected to write %d but wrote %d", 2, intErr)
+		err = errors.ErrorWithStackf("expected to write %d but wrote %d", 2, intErr)
 		return
 	}
 

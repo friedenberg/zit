@@ -66,7 +66,7 @@ func (m *Mode) Set(v string) (err error) {
 		*m = MetadataAndBlob
 
 	default:
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"unsupported checkout mode: %s. Available modes: %q",
 			v,
 			AvailableModes,

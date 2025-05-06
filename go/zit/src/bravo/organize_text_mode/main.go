@@ -25,7 +25,7 @@ func (m *Mode) Set(v string) (err error) {
 		*m = ModeOutputOnly
 	default:
 		*m = ModeUnknown
-		err = errors.Errorf("unsupported mode: %s", v)
+		err = errors.ErrorWithStackf("unsupported mode: %s", v)
 	}
 
 	return

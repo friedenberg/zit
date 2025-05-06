@@ -49,7 +49,7 @@ func (ip pool[T, TPtr]) Get() (e TPtr, err error) {
 				err = rt
 
 			default:
-				err = errors.Errorf("panicked during pool new: %w", err)
+				err = errors.ErrorWithStackf("panicked during pool new: %w", err)
 			}
 		}
 	}()

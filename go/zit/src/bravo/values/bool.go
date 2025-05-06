@@ -76,7 +76,7 @@ func (a *Bool) MarshalBinary() ([]byte, error) {
 
 func (a *Bool) UnmarshalBinary(b []byte) (err error) {
 	if len(b) != 1 {
-		err = errors.Errorf("expected exactly 1 byte but got %d", b)
+		err = errors.ErrorWithStackf("expected exactly 1 byte but got %d", b)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (a *Bool) UnmarshalBinary(b []byte) (err error) {
 		a.SetBool(true)
 
 	default:
-		err = errors.Errorf("unexpected value: %d", b1)
+		err = errors.ErrorWithStackf("unexpected value: %d", b1)
 		return
 	}
 

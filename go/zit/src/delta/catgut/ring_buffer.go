@@ -33,7 +33,7 @@ func (rb *RingBuffer) Seek(offset int64, whence int) (actual int64, err error) {
 	seeker, ok := rb.reader.(io.Seeker)
 
 	if !ok {
-		err = errors.Errorf("seeking not supported")
+		err = errors.ErrorWithStackf("seeking not supported")
 		return
 	}
 

@@ -8,7 +8,7 @@ func MakeErrInvalidCheckoutModeMode(mode Mode) errInvalidCheckoutMode {
 	return errors.WrapN(
 		1,
 		errInvalidCheckoutMode(
-			errors.Errorf("invalid checkout mode: %s", mode),
+			errors.ErrorWithStackf("invalid checkout mode: %s", mode),
 		),
 	)
 }

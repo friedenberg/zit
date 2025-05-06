@@ -38,11 +38,11 @@ func (scanner *SeqRuneScanner) ReadRune() (r rune, size int, err error) {
 	r, size = utf8.DecodeRune(contents)
 
 	if r == utf8.RuneError && size > 0 {
-		err = errors.Errorf("invalid utf8 byte sequence: %q", contents)
+		err = errors.ErrorWithStackf("invalid utf8 byte sequence: %q", contents)
 		return
 	} else if r == utf8.RuneError {
 		// should never happen
-		err = errors.Errorf("tried to read past end of tokens: %q", contents)
+		err = errors.ErrorWithStackf("tried to read past end of tokens: %q", contents)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (scanner *SeqRuneScanner) ReadRune() (r rune, size int, err error) {
 
 func (scanner *SeqRuneScanner) UnreadRune() (err error) {
 	if scanner.token_index == 0 && scanner.byte_index == 0 {
-		err = errors.Errorf("seq rune scanner fully unread")
+		err = errors.ErrorWithStackf("seq rune scanner fully unread")
 		return
 	}
 

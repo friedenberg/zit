@@ -60,7 +60,7 @@ func (s *SliceRuneScanner) ResetWith(slice Slice) {
 
 func (s *SliceRuneScanner) UnreadRune() (err error) {
 	if s.locFirst <= 0 && s.locSecond <= 0 {
-		err = errors.Errorf("nothing to unread")
+		err = errors.ErrorWithStackf("nothing to unread")
 		return
 	}
 

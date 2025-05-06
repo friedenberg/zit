@@ -87,7 +87,7 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 
 	switch {
 	case s.Script == "" && len(s.Shell) == 0:
-		err = errors.Errorf("no script or shell set")
+		err = errors.ErrorWithStackf("no script or shell set")
 		return
 
 	case s.Script != "" && len(s.Shell) > 0:

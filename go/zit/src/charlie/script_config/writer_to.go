@@ -32,7 +32,7 @@ func MakeWriterTo(
 	wt = &writerTo{}
 
 	if rs == nil {
-		err = errors.Errorf("empty remote script")
+		err = errors.ErrorWithStackf("empty remote script")
 		return
 	}
 

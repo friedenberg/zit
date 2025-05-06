@@ -14,7 +14,7 @@ type TomlPrivateKeyV0 struct {
 
 func (b *TomlPrivateKeyV0) GeneratePrivateKey() (err error) {
 	if len(b.PrivateKey.Data) > 0 {
-		err = errors.Errorf("private key data already exists, refusing to generate.")
+		err = errors.ErrorWithStackf("private key data already exists, refusing to generate.")
 		return
 	}
 

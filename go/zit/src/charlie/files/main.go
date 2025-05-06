@@ -49,7 +49,7 @@ func TryOrTimeout(
 
 	go func() {
 		<-timer.C
-		chError <- errors.Errorf("timeout while %s: %q", explainApply, path)
+		chError <- errors.ErrorWithStackf("timeout while %s: %q", explainApply, path)
 	}()
 
 	go func() {

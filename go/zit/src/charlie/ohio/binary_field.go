@@ -31,7 +31,7 @@ func (bf *BinaryField) GetContentLength() (contentLength int, contentLength64 in
 	contentLength64, n = binary.Varint(bf.ContentLength[:])
 
 	if n <= 0 {
-		err = errors.Errorf("error in content length: %d", n)
+		err = errors.ErrorWithStackf("error in content length: %d", n)
 		return
 	}
 

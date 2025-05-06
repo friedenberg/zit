@@ -151,7 +151,7 @@ func (c *context) SetCancelOnSignals(signals ...os.Signal) {
 
 func (ctx *context) Run(funcRun func(Context)) error {
 	if !ctx.lockRun.TryLock() {
-		return Errorf("Context.Run called before previous run completed.")
+		return ErrorWithStackf("Context.Run called before previous run completed.")
 	}
 
 	defer ctx.lockRun.Unlock()

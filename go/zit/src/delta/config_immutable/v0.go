@@ -76,11 +76,11 @@ func (k v0Common) GetRepoType() repo_type.Type {
 }
 
 func (k v0Common) GetPrivateKey() repo_signing.PrivateKey {
-	panic(errors.Errorf("not supported"))
+	panic(errors.ErrorWithStackf("not supported"))
 }
 
 func (k v0Common) GetPublicKey() repo_signing.PublicKey {
-	panic(errors.Errorf("not supported"))
+	panic(errors.ErrorWithStackf("not supported"))
 }
 
 func (k v0Common) GetRepoId() ids.RepoId {

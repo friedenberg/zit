@@ -85,7 +85,7 @@ func (o *Options) Set(v string) (err error) {
 			o.Trace = true
 
 		default:
-			err = errors.Errorf("unsupported debug option: %s", p)
+			err = errors.ErrorWithStackf("unsupported debug option: %s", p)
 			return
 		}
 	}

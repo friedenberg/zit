@@ -161,7 +161,7 @@ func (lr *delimReader) ReadOneKeyValue(
 	loc := strings.Index(str, sep)
 
 	if loc == -1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected at least one %q, but found none: %q",
 			sep,
 			str,
@@ -197,7 +197,7 @@ func (lr *delimReader) ReadOneKeyValueBytes(
 	loc := bytes.IndexByte(str, sep)
 
 	if loc == -1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected at least one %q, but found none: %q",
 			sep,
 			str,
