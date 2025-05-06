@@ -19,6 +19,8 @@ type waitGroupParallel struct {
 	err     Multi
 	doAfter []FuncWithStackInfo
 
+	addStackInfo bool
+
 	isDone bool
 }
 
@@ -54,11 +56,16 @@ func (wg *waitGroupParallel) Do(f Func) (d bool) {
 
 	wg.inner.Add(1)
 
-	si, _ := MakeStackFrame(1)
+	var si StackFrame
+
+	if wg.addStackInfo {
+		si, _ = MakeStackFrame(1)
+	}
 
 	go func() {
 		err := f()
-		wg.doneWith(si, err)
+
+		wg.doneWith(&si, err)
 	}()
 
 	return true
@@ -68,22 +75,22 @@ func (wg *waitGroupParallel) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
-	si, _ := MakeStackFrame(1)
+	frame, _ := MakeStackFrame(1)
 
 	wg.doAfter = append(
 		wg.doAfter,
 		FuncWithStackInfo{
-			Func:      f,
-			StackFrame: si,
+			Func:       f,
+			StackFrame: frame,
 		},
 	)
 }
 
-func (wg *waitGroupParallel) doneWith(si StackFrame, err error) {
+func (wg *waitGroupParallel) doneWith(frame *StackFrame, err error) {
 	wg.inner.Done()
 
 	if err != nil {
-		wg.err.Add(si.Wrap(err))
+		wg.err.Add(frame.Wrap(err))
 	}
 }
 

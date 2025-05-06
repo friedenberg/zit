@@ -3,6 +3,7 @@ package errors
 import (
 	"fmt"
 	"iter"
+	"slices"
 
 	"golang.org/x/xerrors"
 )
@@ -77,6 +78,12 @@ const thisSkip = 1
 
 //go:noinline
 func Errorf(f string, values ...interface{}) (err error) {
+	err = fmt.Errorf(f, values...)
+	return
+}
+
+//go:noinline
+func ErrorWithStackf(f string, values ...interface{}) (err error) {
 	err = WrapSkip(thisSkip, fmt.Errorf(f, values...))
 	return
 }
@@ -93,28 +100,29 @@ func Wrap(in error) error {
 }
 
 //go:noinline
-func Wrapf(in error, f string, values ...interface{}) error {
+func Wrapf(in error, f string, values ...any) error {
 	if in == nil {
 		return nil
 	}
 
 	return &stackWrapError{
 		StackFrame: MustStackFrame(thisSkip),
-		error:     fmt.Errorf(f, values...),
-		next:      WrapSkip(thisSkip, in),
+		error:      fmt.Errorf(f, values...),
+		next:       WrapSkip(thisSkip, in),
 	}
 }
 
+// wrap the error with stack info unless it's one of the provided `except`
+// errors, in which case return nil.
+//
 //go:noinline
 func WrapExceptAsNil(in error, except ...error) (err error) {
 	if in == nil {
 		return
 	}
 
-	for _, e := range except {
-		if in == e {
-			return nil
-		}
+	if slices.Contains(except, in) {
+		return nil
 	}
 
 	err = WrapSkip(thisSkip, in)
@@ -122,6 +130,9 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 	return
 }
 
+// wrap the error with stack info unless it's one of the provided `except`
+// errors, in which case return that bare error
+//
 //go:noinline
 func WrapExcept(in error, except ...error) (err error) {
 	if in == nil {

@@ -19,28 +19,31 @@ type StackFrame struct {
 	Filename    string
 	RelFilename string
 	Line        int
+
+	nonZero bool
 }
 
-func MakeStackFrameFromFrame(frame runtime.Frame) (si StackFrame) {
-	si.Filename = filepath.Clean(frame.File)
-	si.Line = frame.Line
-	si.Function = frame.Function
-	si.Package, si.Function = getPackageAndFunctionName(si.Function)
+func MakeStackFrameFromFrame(runtimeFrame runtime.Frame) (frame StackFrame) {
+	frame.Filename = filepath.Clean(runtimeFrame.File)
+	frame.Line = runtimeFrame.Line
+	frame.Function = runtimeFrame.Function
+	frame.Package, frame.Function = getPackageAndFunctionName(frame.Function)
 
-	si.RelFilename, _ = filepath.Rel(cwd, si.Filename)
+	frame.RelFilename, _ = filepath.Rel(cwd, frame.Filename)
+	frame.nonZero = true
 
 	return
 }
 
 //go:noinline
 func MustStackFrame(skip int) StackFrame {
-	si, ok := MakeStackFrame(skip + 1)
+	frame, ok := MakeStackFrame(skip + 1)
 
 	if !ok {
 		panic("stack unavailable")
 	}
 
-	return si
+	return frame
 }
 
 //go:noinline
@@ -183,10 +186,16 @@ func (si StackFrame) StringNoFunctionName() string {
 	)
 }
 
-func (si StackFrame) Wrap(in error) (err error) {
-	return &stackWrapError{
-		StackFrame: si,
-		error:      in,
+// If the frame is non-zero, return a wrapped error. Otherwise return the input
+// error unwrapped.
+func (frame StackFrame) Wrap(in error) (err error) {
+	if frame.nonZero {
+		return &stackWrapError{
+			StackFrame: frame,
+			error:      in,
+		}
+	} else {
+		return in
 	}
 }
 
