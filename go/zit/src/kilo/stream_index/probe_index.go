@@ -42,7 +42,6 @@ func (s *probe_index) readOneShaLoc(
 	sh *sha.Sha,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = s.Index.ReadOne(sh); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -53,7 +52,6 @@ func (s *probe_index) readManyShaLoc(
 	sh *sha.Sha,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = s.Index.ReadMany(sh, &locs); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
