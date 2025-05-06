@@ -3,7 +3,6 @@ package errors
 import (
 	"fmt"
 	"iter"
-	"slices"
 
 	"golang.org/x/xerrors"
 )
@@ -121,8 +120,10 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 		return
 	}
 
-	if slices.Contains(except, in) {
-		return nil
+	for _, anExcept := range except {
+		if Is(in, anExcept) {
+			return nil
+		}
 	}
 
 	err = WrapSkip(thisSkip, in)

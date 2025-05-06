@@ -60,7 +60,7 @@ func (p printer) PrintDebug(a ...any) (err error) {
 
 	_, err = fmt.Fprintf(
 		p.f,
-		strings.Repeat("%#v ", len(a)),
+		strings.Repeat("%#v ", len(a)) + "\n",
 		a...,
 	)
 

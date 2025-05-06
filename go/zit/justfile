@@ -167,6 +167,10 @@ test-bats $PATH=(dir_build + ":" + env("PATH")):
   just zz-tests_bats/test-generate_fixtures "$(build/zit info)"
   just zz-tests_bats/test
 
+# test-bats-targets $PATH=(dir_build + ":" + env("PATH")):
+#   just zz-tests_bats/test-generate_fixtures "$(build/zit info)"
+#   just zz-tests_bats/test
+
 test: test-go test-bats
 
 #   ____  _        _
