@@ -23,7 +23,7 @@ func MakeErrNotFoundString(s string) error {
 }
 
 func IsErrNotFound(err error) bool {
-	return errors.Is(err, errNotFound(""))
+	return errors.Is(err, ErrNotFound)
 }
 
 type errNotFound string

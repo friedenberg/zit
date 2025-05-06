@@ -67,24 +67,14 @@ func (s *Store) TryFormatHook(
 	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOneObjectId(kinder.GetObjectId()); err != nil {
-		if collections.IsErrNotFound(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
 		return
 	}
 
 	var t *sku.Transacted
 
 	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
-		if collections.IsErrNotFound(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
 		return
 	}
 
