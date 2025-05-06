@@ -115,15 +115,8 @@ func (importer importer) importInventoryList(
 	blobSha := listObject.GetBlobSha()
 
 	if !importer.envRepo.HasBlob(blobSha) {
-		if err = importer.blobCopierDelegate(
-			sku.BlobCopyResult{
-				Transacted: listObject,
-				Sha:        blobSha,
-				N:          -1,
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		err = env_dir.ErrBlobMissing{
+			ShaGetter: blobSha,
 		}
 
 		return

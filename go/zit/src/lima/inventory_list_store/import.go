@@ -56,10 +56,7 @@ func (store *Store) ImportList(
 			defer sku.GetCheckedOutPool().Put(checkedOut)
 
 			if importError == nil {
-				// TODO eliminate condition where checkedOut can be nil and err can be
-				// nil
-				if checkedOut != nil &&
-					checkedOut.GetState() == checked_out_state.Conflicted {
+				if checkedOut.GetState() == checked_out_state.Conflicted {
 					hasConflicts = true
 				}
 
