@@ -77,7 +77,7 @@ func (c New) ValidateFlagsAndArgs(
 	args ...string,
 ) (err error) {
 	if u.GetConfig().GetCLIConfig().IsDryRun() && len(args) == 0 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"when -dry-run is set, paths to existing zettels must be provided",
 		)
 		return

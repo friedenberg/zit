@@ -112,7 +112,7 @@ func (log *v0) Append(entry Entry) (err error) {
 
 func (log *v0) Key(entry Entry) (key string, err error) {
 	if entry.EntryType == nil {
-		err = errors.Errorf("nil entry type")
+		err = errors.ErrorWithStackf("nil entry type")
 		return
 	}
 

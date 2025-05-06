@@ -61,7 +61,7 @@ func FromLuaTableV2(o *Transacted, l *lua.LState, lt *LuaTableV2) (err error) {
 	ets, ok := et.(*lua.LTable)
 
 	if !ok {
-		err = errors.Errorf("expected table but got %T", et)
+		err = errors.ErrorWithStackf("expected table but got %T", et)
 		return
 	}
 

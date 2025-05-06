@@ -34,7 +34,7 @@ func (av writer) write(a *Assignment) (err error) {
 	if a.GetDepth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
 	} else if a.GetDepth() < 0 {
-		err = errors.Errorf("negative depth: %d", a.GetDepth())
+		err = errors.ErrorWithStackf("negative depth: %d", a.GetDepth())
 		return
 	}
 

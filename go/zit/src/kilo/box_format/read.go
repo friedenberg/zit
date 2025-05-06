@@ -149,7 +149,7 @@ func (f *BoxTransacted) readStringFormatBox(
 				}
 
 			} else {
-				err = errors.Errorf("unsupported seq: %q", seq)
+				err = errors.ErrorWithStackf("unsupported seq: %q", seq)
 				return
 			}
 		}

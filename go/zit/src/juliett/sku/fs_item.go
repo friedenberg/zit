@@ -188,7 +188,7 @@ func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 
 func (e *FSItem) GenerateConflictFD() (err error) {
 	if e.ExternalObjectId.IsEmpty() {
-		err = errors.Errorf("cannot generate conflict FD for empty external object id")
+		err = errors.ErrorWithStackf("cannot generate conflict FD for empty external object id")
 		return
 	}
 
@@ -216,7 +216,7 @@ func (e *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty: %s", e.Debug()),
+			errors.ErrorWithStackf("all FD's are empty: %s", e.Debug()),
 		)
 	}
 

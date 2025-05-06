@@ -338,7 +338,7 @@ func (a InventoryList) ReadInventoryListObject(
 				if out == nil {
 					out = sk.CloneTransacted()
 				} else {
-					err = errors.Errorf("expected only one sku.Transacted, but read more than one")
+					err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
 					return
 				}
 

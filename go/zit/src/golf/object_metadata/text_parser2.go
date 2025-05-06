@@ -60,7 +60,7 @@ func (f *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 			err = f.readTyp(m, remainder)
 
 		default:
-			err = errors.Errorf("unsupported entry: %q", line)
+			err = errors.ErrorWithStackf("unsupported entry: %q", line)
 		}
 
 		if err != nil {

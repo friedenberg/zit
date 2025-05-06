@@ -52,7 +52,7 @@ func (t *RemoteType) Set(v string) (err error) {
 		*t = RemoteTypeStdioSSH
 
 	default:
-		err = errors.Errorf("unsupported remote type: %q", v)
+		err = errors.ErrorWithStackf("unsupported remote type: %q", v)
 		return
 	}
 

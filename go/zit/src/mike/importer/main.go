@@ -163,7 +163,7 @@ func (importer importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
-		err = errors.Errorf("skipping because objects are excluded")
+		err = errors.ErrorWithStackf("skipping because objects are excluded")
 		return
 	}
 

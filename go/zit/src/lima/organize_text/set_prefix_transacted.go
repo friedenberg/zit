@@ -44,7 +44,7 @@ func (s PrefixSet) Len() int {
 
 func (s *PrefixSet) AddSku(object sku.SkuType) (err error) {
 	if object.GetState() == checked_out_state.Unknown {
-		err = errors.Errorf("unacceptable state: %s", object.GetState())
+		err = errors.ErrorWithStackf("unacceptable state: %s", object.GetState())
 		err = errors.Wrapf(err, "Sku: %s", sku.String(object.GetSku()))
 		return
 	}

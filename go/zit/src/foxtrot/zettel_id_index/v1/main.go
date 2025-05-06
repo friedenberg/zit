@@ -142,12 +142,12 @@ func (i *index) Reset() (err error) {
 	rMax := i.oldHinweisenStore.Right().Len() - 1
 
 	if lMax == 0 {
-		err = errors.Errorf("left zettel id are empty")
+		err = errors.ErrorWithStackf("left zettel id are empty")
 		return
 	}
 
 	if rMax == 0 {
-		err = errors.Errorf("right zettel id are empty")
+		err = errors.ErrorWithStackf("right zettel id are empty")
 		return
 	}
 
@@ -213,7 +213,7 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	}
 
 	if i.bitset.CountOn() == 0 {
-		err = errors.Errorf("no available zettel ids")
+		err = errors.ErrorWithStackf("no available zettel ids")
 		return
 	}
 

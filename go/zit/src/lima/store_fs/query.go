@@ -168,7 +168,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 			}
 
 		default:
-			err = errors.Errorf("unsupported type for item: %T", itemUnknown)
+			err = errors.ErrorWithStackf("unsupported type for item: %T", itemUnknown)
 			return
 		}
 
@@ -182,7 +182,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if !item.Conflict.IsEmpty() {
-		err = errors.Errorf("cannot have a conflict for a definitely not checked out blob: %s", item.Debug())
+		err = errors.ErrorWithStackf("cannot have a conflict for a definitely not checked out blob: %s", item.Debug())
 		return
 	}
 

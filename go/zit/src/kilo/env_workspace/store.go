@@ -86,7 +86,7 @@ func (es *Store) ReadAllExternalItems() (err error) {
 	esado, ok := es.StoreLike.(interfaces.WorkspaceStoreReadAllExternalItems)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &esado)
+		err = errors.ErrorWithStackf("store does not support %T", &esado)
 		return
 	}
 

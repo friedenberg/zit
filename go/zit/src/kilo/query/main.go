@@ -73,7 +73,7 @@ func (qg *Query) addExactExternalObjectId(
 	k sku.ExternalObjectId,
 ) (err error) {
 	if k == nil {
-		err = errors.Errorf("nil object id")
+		err = errors.ErrorWithStackf("nil object id")
 		return
 	}
 
@@ -154,7 +154,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 	permitInternal bool,
 ) (objectId ids.ObjectIdLike, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",
 			len(queryGroup.optimizedQueries),
 		)
@@ -169,7 +169,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 	}
 
 	if query.Sigil.ContainsOneOf(ids.SigilHistory) {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"sigil (%s) includes history, which may return multiple objects",
 			query.Sigil,
 		)
@@ -197,7 +197,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 		sigil.Add(ids.SigilExternal)
 
 	default:
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids. Permit internal: %t",
 			oidsLen,
 			eoidsLen,
@@ -214,7 +214,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 
 func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",
 			len(queryGroup.optimizedQueries),
 		)
@@ -229,7 +229,7 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 	}
 
 	if query.Sigil.ContainsOneOf(ids.SigilHistory) {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"sigil (%s) includes history, which may return multiple objects",
 			query.Sigil,
 		)
@@ -250,7 +250,7 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 		}
 
 	default:
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected to exactly 1 object id or 1 external object id but got %d object ids and %d external object ids",
 			oidsLen,
 			eoidsLen,

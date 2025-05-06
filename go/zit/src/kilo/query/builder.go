@@ -239,7 +239,7 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 		state.group.ExternalQueryOptions = externalQueryOptions
 
 		if !ok {
-			err = errors.Errorf("kasten not found: %q", externalQueryOptions.RepoId)
+			err = errors.ErrorWithStackf("kasten not found: %q", externalQueryOptions.RepoId)
 			return
 		}
 	}

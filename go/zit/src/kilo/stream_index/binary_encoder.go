@@ -136,7 +136,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			}
 
 			if e.String() == "" {
-				err = errors.Errorf("empty tag in %q", es)
+				err = errors.ErrorWithStackf("empty tag in %q", es)
 				return
 			}
 

@@ -130,7 +130,7 @@ func (client *client) WriteBlobToRemote(
 	var response *http.Response
 
 	if response, err = client.http.Do(request); err != nil {
-		err = errors.Errorf("failed to read response: %w", err)
+		err = errors.ErrorWithStackf("failed to read response: %w", err)
 		return
 	}
 

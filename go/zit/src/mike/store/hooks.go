@@ -269,7 +269,7 @@ func (s *Store) tryPreCommitHook(
 	vm.Pop(1)
 
 	if retval.Type() != lua.LTNil {
-		err = errors.Errorf("lua error: %s", retval)
+		err = errors.ErrorWithStackf("lua error: %s", retval)
 		return
 	}
 
@@ -363,7 +363,7 @@ func (s *Store) tryHookWithName(
 	vm.Pop(1)
 
 	if retval.Type() != lua.LTNil {
-		err = errors.Errorf("lua error: %s", retval)
+		err = errors.ErrorWithStackf("lua error: %s", retval)
 		return
 	}
 

@@ -48,7 +48,7 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	if n != RowSize {
-		err = errors.Errorf("expected to read %d but read %d", RowSize, n)
+		err = errors.ErrorWithStackf("expected to read %d but read %d", RowSize, n)
 		return
 	}
 
@@ -76,7 +76,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	if n != RowSize {
-		err = errors.Errorf("expected to write %d but wrote %d", RowSize, n)
+		err = errors.ErrorWithStackf("expected to write %d but wrote %d", RowSize, n)
 		return
 	}
 

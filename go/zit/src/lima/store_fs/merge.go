@@ -377,7 +377,7 @@ func (store *Store) RunMergeTool(
 	conflicted sku.Conflicted,
 ) (co *sku.CheckedOut, err error) {
 	if len(tool) == 0 {
-		err = errors.Errorf("no utility provided")
+		err = errors.ErrorWithStackf("no utility provided")
 		return
 	}
 

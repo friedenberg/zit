@@ -294,7 +294,7 @@ func (server *Server) Serve(listener net.Listener) (err error) {
 		ctx, cancel := context.WithTimeoutCause(
 			context.Background(),
 			1e9, // 1 second
-			errors.Errorf("shut down timeout"),
+			errors.ErrorWithStackf("shut down timeout"),
 		)
 
 		defer cancel()
@@ -492,7 +492,7 @@ func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) 
 	shString := request.Vars()["sha"]
 
 	if shString == "" {
-		response.ErrorWithStatus(http.StatusBadRequest, errors.Errorf("empty sha"))
+		response.ErrorWithStatus(http.StatusBadRequest, errors.ErrorWithStackf("empty sha"))
 		return
 	}
 
@@ -779,7 +779,7 @@ func (server *Server) handlePostInventoryList(
 				strings.NewReader(boxString),
 			); err != nil {
 				response.Error(
-					errors.Errorf(
+					errors.ErrorWithStackf(
 						"failed to parse inventory list sku (%q): %w",
 						boxString,
 						err,

@@ -64,7 +64,7 @@ func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
 	host := strings.Join(els, "-")
 
 	if len(host) == 0 {
-		err = errors.Errorf("empty host: %q", els)
+		err = errors.ErrorWithStackf("empty host: %q", els)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 			}
 
 		default:
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"unsupported field type: %q=%q. Fields: %#v",
 				field.Key,
 				field.Value,

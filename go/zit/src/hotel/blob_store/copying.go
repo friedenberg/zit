@@ -150,7 +150,7 @@ func CopyBlob(
 	shaWc := wc.GetShaLike()
 
 	if !shaRc.EqualsSha(blobSha) || !shaWc.EqualsSha(blobSha) {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"lookup sha was %s, read sha was %s, but written sha was %s",
 			blobSha,
 			shaRc,

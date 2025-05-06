@@ -133,7 +133,7 @@ func (f v4) ParsePersistentMetadata(
 
 		case key.Equal(keyVerzeichnisseEtikettImplicit.Bytes()):
 			if !o.Verzeichnisse {
-				err = errors.Errorf(
+				err = errors.ErrorWithStackf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
 				)
@@ -154,7 +154,7 @@ func (f v4) ParsePersistentMetadata(
 
 		case key.Equal(keyVerzeichnisseEtikettExpanded.Bytes()):
 			if !o.Verzeichnisse {
-				err = errors.Errorf(
+				err = errors.ErrorWithStackf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
 				)

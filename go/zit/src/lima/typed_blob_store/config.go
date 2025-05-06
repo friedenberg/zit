@@ -114,7 +114,7 @@ func (a Config) PutTypedBlob(
 	switch tipe.String() {
 	case "", builtin_types.ConfigTypeTomlV0:
 		if blob, ok := common.(*config_mutable_blobs.V0); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
 			a.toml_v0.PutBlob(blob)
@@ -122,7 +122,7 @@ func (a Config) PutTypedBlob(
 
 	case builtin_types.ConfigTypeTomlV1:
 		if blob, ok := common.(*config_mutable_blobs.V1); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
 			a.toml_v1.PutBlob(blob)

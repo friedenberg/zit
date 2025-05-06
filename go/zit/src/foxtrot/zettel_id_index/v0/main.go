@@ -141,12 +141,12 @@ func (i *index) Reset() (err error) {
 	rMax := i.oldZettelIdStore.Right().Len() - 1
 
 	if lMax == 0 {
-		err = errors.Errorf("left object id are empty")
+		err = errors.ErrorWithStackf("left object id are empty")
 		return
 	}
 
 	if rMax == 0 {
-		err = errors.Errorf("right object id are empty")
+		err = errors.ErrorWithStackf("right object id are empty")
 		return
 	}
 

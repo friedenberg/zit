@@ -220,7 +220,7 @@ func (f *BoxTransacted) addFieldsObjectIdsWithFSItem(
 		box.Contents = append(box.Contents, external)
 
 	default:
-		err = errors.Errorf("empty id")
+		err = errors.ErrorWithStackf("empty id")
 		return
 	}
 
@@ -303,7 +303,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 
 	switch co.GetState() {
 	case checked_out_state.Unknown:
-		err = errors.Errorf("invalid state unknown")
+		err = errors.ErrorWithStackf("invalid state unknown")
 		return
 
 	case checked_out_state.Untracked:
@@ -380,7 +380,7 @@ func (f *BoxTransacted) addFieldsFSBlobExcept(
 	box *string_format_writer.Box,
 ) (err error) {
 	if fds.MutableSetLike == nil {
-		err = errors.Errorf("FDSet.MutableSetLike was nil")
+		err = errors.ErrorWithStackf("FDSet.MutableSetLike was nil")
 		return
 	}
 

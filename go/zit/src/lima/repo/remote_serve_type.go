@@ -31,7 +31,7 @@ func (t *RemoteServeType) Set(v string) (err error) {
 		*t = RemoteServeTypeStdioLocal
 
 	default:
-		err = errors.Errorf("unsupported remote type: %q", v)
+		err = errors.ErrorWithStackf("unsupported remote type: %q", v)
 		return
 	}
 

@@ -82,7 +82,7 @@ func (s *Store) flushUrls() (err error) {
 		originalItem, ok := deleted[item.ExternalId]
 
 		if !ok {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"missing item with id %q from deleted cache: %q",
 				item.ExternalId,
 				maps.Keys(deleted),

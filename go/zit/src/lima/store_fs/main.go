@@ -231,7 +231,7 @@ func (s *Store) GetFSItemsForDir(
 	fd *fd.FD,
 ) (items []*sku.FSItem, err error) {
 	if !fd.IsDir() {
-		err = errors.Errorf("not a directory: %q", fd)
+		err = errors.ErrorWithStackf("not a directory: %q", fd)
 		return
 	}
 
@@ -369,7 +369,7 @@ func (s *Store) ReadFSItemFromExternal(
 			fdee = &item.Conflict
 
 		default:
-			err = errors.Errorf("unexpected field: %#v", field)
+			err = errors.ErrorWithStackf("unexpected field: %#v", field)
 			return
 		}
 
@@ -458,7 +458,7 @@ func (s *Store) WriteFSItemToExternal(
 		}
 
 		if external.ExternalObjectId.String() != k.String() {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"expected %q but got %q. %s",
 				k,
 				&external.ExternalObjectId,

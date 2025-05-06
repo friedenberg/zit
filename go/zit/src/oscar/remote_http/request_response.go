@@ -46,7 +46,7 @@ func ReadErrorFromBody(response *http.Response) (err error) {
 	var sb strings.Builder
 
 	if _, err = io.Copy(&sb, response.Body); err != nil {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"failed to read error string from response (%d) body: %q",
 			response.StatusCode,
 			err,

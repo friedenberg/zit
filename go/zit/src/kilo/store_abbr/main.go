@@ -181,7 +181,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 		return
 
 	default:
-		err = errors.Errorf("unsupported object id: %#v", ks)
+		err = errors.ErrorWithStackf("unsupported object id: %#v", ks)
 		return
 	}
 

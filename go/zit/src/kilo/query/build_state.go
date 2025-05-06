@@ -107,7 +107,7 @@ func (b *buildState) build(
 
 			for _, externalObjectId := range externalObjectIds {
 				if externalObjectId.GetGenre() == genres.None {
-					err = errors.Errorf("id with empty genre: %q", externalObjectId)
+					err = errors.ErrorWithStackf("id with empty genre: %q", externalObjectId)
 					return
 				}
 
@@ -141,7 +141,7 @@ func (b *buildState) build(
 
 	for _, k := range b.pinnedExternalObjectIds {
 		if k.GetGenre() == genres.None {
-			err = errors.Errorf("id with empty genre: %q", k)
+			err = errors.ErrorWithStackf("id with empty genre: %q", k)
 			return
 		}
 
@@ -258,7 +258,7 @@ LOOP:
 
 			case ':', '+', '?':
 				if len(stack) > 1 {
-					err = errors.Errorf("sigil before end")
+					err = errors.ErrorWithStackf("sigil before end")
 					return
 				}
 
@@ -423,7 +423,7 @@ func (b *buildState) parseSigilsAndGenres(
 
 			switch op {
 			default:
-				err = errors.Errorf("unexpected operator %q", seq)
+				err = errors.ErrorWithStackf("unexpected operator %q", seq)
 				return
 
 			case ' ':
@@ -443,7 +443,7 @@ func (b *buildState) parseSigilsAndGenres(
 			b.scanner.Unscan()
 			break
 		} else {
-			err = errors.Errorf("expected operator but got %q", seq)
+			err = errors.ErrorWithStackf("expected operator but got %q", seq)
 			return
 		}
 	}

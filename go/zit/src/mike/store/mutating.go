@@ -365,7 +365,7 @@ func (s *Store) addType(
 	t ids.Type,
 ) (err error) {
 	if t.IsEmpty() {
-		err = errors.Errorf("attempting to add empty type")
+		err = errors.ErrorWithStackf("attempting to add empty type")
 		return
 	}
 

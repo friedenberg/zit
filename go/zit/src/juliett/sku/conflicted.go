@@ -176,7 +176,7 @@ func (c *Conflicted) ReadConflictMarker(
 			c.Remote = sk
 
 		default:
-			err = errors.Errorf("too many skus in conflict file")
+			err = errors.ErrorWithStackf("too many skus in conflict file")
 			return
 		}
 

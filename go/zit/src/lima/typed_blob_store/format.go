@@ -36,7 +36,7 @@ func (af format[O, OPtr]) EncodeTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	if af.EncoderTo == nil {
-		err = errors.Errorf("no ParsedBlobFormatter")
+		err = errors.ErrorWithStackf("no ParsedBlobFormatter")
 	} else {
 		n, err = af.EncoderTo.EncodeTo(object, writer)
 	}

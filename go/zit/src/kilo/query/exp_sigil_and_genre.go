@@ -48,7 +48,7 @@ func (q *expSigilAndGenre) addExactObjectId(
 	sigil ids.Sigil,
 ) (err error) {
 	if k.ObjectId == nil {
-		err = errors.Errorf("nil object id")
+		err = errors.ErrorWithStackf("nil object id")
 		return
 	}
 
@@ -61,7 +61,7 @@ func (q *expSigilAndGenre) addExactObjectId(
 
 func (a *expSigilAndGenre) ContainsObjectId(k *ids.ObjectId) bool {
 	if !a.Genre.Contains(k.GetGenre()) {
-		err := errors.Errorf("checking query %#v for object id %#v, %q, %q", a, k, a, k)
+		err := errors.ErrorWithStackf("checking query %#v for object id %#v, %q, %q", a, k, a, k)
 		panic(err)
 	}
 
@@ -109,7 +109,7 @@ func (q *expSigilAndGenre) Add(m sku.Query) (err error) {
 	}
 
 	if q1.Genre != q.Genre {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected %q but got %q",
 			q.Genre,
 			q1.Genre,

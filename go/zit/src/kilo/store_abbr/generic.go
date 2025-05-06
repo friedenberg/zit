@@ -136,7 +136,7 @@ func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) 
 		}
 
 	default:
-		err = errors.Errorf("unsupported type %T: %q", idt, idt)
+		err = errors.ErrorWithStackf("unsupported type %T: %q", idt, idt)
 		return
 	}
 

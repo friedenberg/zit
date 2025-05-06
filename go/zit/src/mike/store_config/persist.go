@@ -91,7 +91,7 @@ func (kc *store) recompileTypes(
 			defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
 
 			if commonBlob == nil {
-				err = errors.Errorf("nil type blob for type: %q. Sku: %s", tipe, ct)
+				err = errors.ErrorWithStackf("nil type blob for type: %q. Sku: %s", tipe, ct)
 				return
 			}
 

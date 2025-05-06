@@ -162,7 +162,7 @@ func (remote *client) MakeInventoryList(
 	var response *http.Response
 
 	if response, err = remote.http.Do(request); err != nil {
-		err = errors.Errorf("failed to read response: %w", err)
+		err = errors.ErrorWithStackf("failed to read response: %w", err)
 		return
 	}
 
@@ -272,7 +272,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			}
 
 			if response, err = client.http.Do(request); err != nil {
-				err = errors.Errorf("failed to read response: %w", err)
+				err = errors.ErrorWithStackf("failed to read response: %w", err)
 				return
 			}
 		}

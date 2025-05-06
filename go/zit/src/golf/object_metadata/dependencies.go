@@ -160,7 +160,7 @@ func (f Dependencies) writePathType(
 	if ap != "" {
 		ap = f.EnvDir.RelToCwdOrSame(ap)
 	} else {
-		err = errors.Errorf("path not found in fields")
+		err = errors.ErrorWithStackf("path not found in fields")
 		return
 	}
 
@@ -180,7 +180,7 @@ func (f Dependencies) writeBlob(
 	}
 
 	if ar == nil {
-		err = errors.Errorf("blob reader is nil")
+		err = errors.ErrorWithStackf("blob reader is nil")
 		return
 	}
 

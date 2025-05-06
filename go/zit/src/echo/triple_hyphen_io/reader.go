@@ -40,12 +40,12 @@ func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
 	br := bufio.NewReader(*r)
 
 	if mr.RequireMetadata && mr.Metadata == nil {
-		err = errors.Errorf("metadata reader is nil")
+		err = errors.ErrorWithStackf("metadata reader is nil")
 		return
 	}
 
 	if mr.Blob == nil {
-		err = errors.Errorf("blob reader is nil")
+		err = errors.ErrorWithStackf("blob reader is nil")
 		return
 	}
 
@@ -76,7 +76,7 @@ LINE_READ_LOOP:
 		case readerStateEmpty:
 			switch {
 			case mr.RequireMetadata && line != Boundary:
-				err = errors.Errorf("expected %q but got %q", Boundary, line)
+				err = errors.ErrorWithStackf("expected %q but got %q", Boundary, line)
 				return
 
 			case line != Boundary:
@@ -113,7 +113,7 @@ LINE_READ_LOOP:
 			break LINE_READ_LOOP
 
 		default:
-			err = errors.Errorf("impossible state %d", state)
+			err = errors.ErrorWithStackf("impossible state %d", state)
 			return
 		}
 	}

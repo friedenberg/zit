@@ -162,7 +162,7 @@ func (a *Assignment) nthParent(n int) (p *Assignment, err error) {
 	}
 
 	if a.Parent == nil {
-		err = errors.Errorf("cannot get nth parent as parent is nil")
+		err = errors.ErrorWithStackf("cannot get nth parent as parent is nil")
 		return
 	}
 
@@ -175,12 +175,12 @@ func (a *Assignment) removeFromParent() (err error) {
 
 func (a *Assignment) removeChild(c *Assignment) (err error) {
 	if c.Parent != a {
-		err = errors.Errorf("attempting to remove child from wrong parent")
+		err = errors.ErrorWithStackf("attempting to remove child from wrong parent")
 		return
 	}
 
 	if len(a.Children) == 0 {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"attempting to remove child when there are no children",
 		)
 		return
@@ -277,7 +277,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			}
 
 			if pe.Len() > 1 {
-				err = errors.Errorf(
+				err = errors.ErrorWithStackf(
 					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
 					a.Parent.Transacted.Metadata.Tags,
 				)
@@ -288,7 +288,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			e1 := pe.Any()
 
 			if ids.IsEmpty(e1) {
-				err = errors.Errorf("parent tag is empty")
+				err = errors.ErrorWithStackf("parent tag is empty")
 				return
 			}
 

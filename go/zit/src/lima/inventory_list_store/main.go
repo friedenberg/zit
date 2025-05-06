@@ -234,7 +234,7 @@ func (s *Store) WriteInventoryListBlob(
 ) (err error) {
 	if skus.Len() == 0 {
 		if !t.GetBlobSha().IsNull() {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"inventory list has non-empty blob but passed in list is empty. %q",
 				sku.String(t),
 			)

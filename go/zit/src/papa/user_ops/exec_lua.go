@@ -38,7 +38,7 @@ func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
 	retval := vm.LState.Get(1)
 
 	if retval.Type() != lua.LTNil {
-		err = errors.Errorf("lua error: %s", retval)
+		err = errors.ErrorWithStackf("lua error: %s", retval)
 		return
 	}
 

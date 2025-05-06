@@ -51,7 +51,7 @@ func (c CoderTypeMap[S]) EncodeTo(
 	coder, ok := c[t.String()]
 
 	if !ok {
-		err = errors.Errorf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", t)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (c DecoderTypeMapWithoutType[S]) DecodeFrom(
 	coder, ok := c[t.String()]
 
 	if !ok {
-		err = errors.Errorf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", t)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (c CoderTypeMapWithoutType[S]) DecodeFrom(
 	coder, ok := c[t.String()]
 
 	if !ok {
-		err = errors.Errorf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", t)
 		return
 	}
 
@@ -115,7 +115,7 @@ func (c CoderTypeMapWithoutType[S]) EncodeTo(
 	coder, ok := c[t.String()]
 
 	if !ok {
-		err = errors.Errorf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", t)
 		return
 	}
 

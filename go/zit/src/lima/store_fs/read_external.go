@@ -57,7 +57,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 		break
 
 	default:
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"more than one FSItem (%q) matches object id (%q).",
 			items,
 			objectIdMaybeExternal,

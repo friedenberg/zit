@@ -179,7 +179,7 @@ func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 	path := fdee.GetPath()
 
 	if path == "" {
-		err = errors.Errorf("empty path")
+		err = errors.ErrorWithStackf("empty path")
 		return
 	}
 
@@ -191,14 +191,14 @@ func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 	}
 
 	if rel == "" {
-		err = errors.Errorf("empty rel path")
+		err = errors.ErrorWithStackf("empty rel path")
 		return
 	}
 
 	key = d.keyForObjectIdString(rel)
 
 	if key == "" {
-		err = errors.Errorf("empty key for rel path: %q", rel)
+		err = errors.ErrorWithStackf("empty key for rel path: %q", rel)
 		return
 	}
 
@@ -338,7 +338,7 @@ func (d *dirInfo) processFD(
 	item := cache[objectIdString]
 
 	if item == nil {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"failed to write FSItem to cache. Cache: %s, Pattern: %s, ObjectId: %s, Dir: %s",
 			cache,
 			pattern,
@@ -459,13 +459,13 @@ func (d *dirInfo) processFDSet(
 
 	if fds.ExternalObjectId.GetGenre() != genres.None {
 		if blobCount > 1 {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"several blobs matching object id %q: %q",
 				objectIdString,
 				fds.MutableSetLike,
 			)
 		} else if objectCount > 1 {
-			err = errors.Errorf(
+			err = errors.ErrorWithStackf(
 				"found more than one object: %q",
 				fds.MutableSetLike,
 			)

@@ -171,7 +171,7 @@ func (c *FormatBlob) FormatFromStdin(
 		}
 
 	default:
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)

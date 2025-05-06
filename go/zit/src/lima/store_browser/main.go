@@ -98,7 +98,7 @@ func (s *Store) GetObjectIdsForString(
 	item, ok := s.itemsById[v]
 
 	if !ok {
-		err = errors.Errorf("not a browser item id")
+		err = errors.ErrorWithStackf("not a browser item id")
 		return
 	}
 

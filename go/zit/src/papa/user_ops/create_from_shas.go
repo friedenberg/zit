@@ -99,7 +99,7 @@ func (c CreateFromShas) handleStoreError(
 	if errors.As(in, &normalError) {
 		ui.Err().Printf("%s", normalError.Error())
 	} else {
-		err = errors.Errorf("writing zettel failed: %s: %s", f, in)
+		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", f, in)
 		ui.Err().Print(err)
 	}
 }

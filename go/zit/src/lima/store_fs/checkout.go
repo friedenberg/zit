@@ -259,12 +259,12 @@ func (store *Store) SetFilenameForTransacted(
 	}
 
 	if strings.Contains(info.basename, "!") {
-		err = errors.Errorf("contains illegal characters: %q", info.basename)
+		err = errors.ErrorWithStackf("contains illegal characters: %q", info.basename)
 		return
 	}
 
 	if strings.Contains(info.objectName, "!") {
-		err = errors.Errorf("contains illegal characters: %q", info.objectName)
+		err = errors.ErrorWithStackf("contains illegal characters: %q", info.objectName)
 		return
 	}
 

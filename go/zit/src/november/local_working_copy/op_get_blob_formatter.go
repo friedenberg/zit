@@ -19,7 +19,7 @@ func (repo *Repo) GetBlobFormatter(
 	utiGroup string,
 ) (blobFormatter script_config.RemoteScript, err error) {
 	if tipe.GetType().IsEmpty() {
-		err = errors.Errorf("empty type")
+		err = errors.ErrorWithStackf("empty type")
 		return
 	}
 
@@ -90,7 +90,7 @@ func (repo *Repo) GetBlobFormatter(
 	ft, ok := g.Map()[formatId]
 
 	if !ok {
-		err = errors.Errorf(
+		err = errors.ErrorWithStackf(
 			"no format id %q for uti group %q. Available groups: %s",
 			formatId,
 			utiGroup,

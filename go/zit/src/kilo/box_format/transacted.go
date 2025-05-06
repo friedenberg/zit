@@ -215,7 +215,7 @@ func (f *BoxTransacted) addFieldsObjectIds(
 		box.Contents = append(box.Contents, external)
 
 	default:
-		err = errors.Errorf("empty id")
+		err = errors.ErrorWithStackf("empty id")
 		return
 	}
 

@@ -186,7 +186,7 @@ func (a Tag) PutTransactedWithBlob(
 	switch tipe.String() {
 	case "", builtin_types.TagTypeTomlV0:
 		if blob, ok := twb.Blob.(*tag_blobs.V0); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, twb.Blob)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, twb.Blob)
 			return
 		} else {
 			a.toml_v0.PutBlob(blob)
@@ -194,7 +194,7 @@ func (a Tag) PutTransactedWithBlob(
 
 	case builtin_types.TagTypeLuaV1:
 		if blob, ok := twb.Blob.(*tag_blobs.TomlV1); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, twb.Blob)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, twb.Blob)
 			return
 		} else {
 			a.toml_v1.PutBlob(blob)

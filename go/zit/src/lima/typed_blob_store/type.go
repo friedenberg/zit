@@ -87,7 +87,7 @@ func (a Type) PutTypedBlob(
 	switch tipe.String() {
 	case "", type_blobs.TypeV0:
 		if blob, ok := common.(*type_blobs.V0); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
 			a.toml_v0.PutBlob(blob)
@@ -95,7 +95,7 @@ func (a Type) PutTypedBlob(
 
 	case type_blobs.TypeV1:
 		if blob, ok := common.(*type_blobs.TomlV1); !ok {
-			err = errors.Errorf("expected %T but got %T", blob, common)
+			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
 			a.toml_v1.PutBlob(blob)

@@ -60,7 +60,7 @@ func (f tomlBlobDecoder[O, OPtr]) DecodeFrom(
 				if f.ignoreTomlErrors {
 					err = nil
 				} else {
-					err = toml.MakeError(errors.Errorf("panicked during toml decoding: %s", r))
+					err = toml.MakeError(errors.ErrorWithStackf("panicked during toml decoding: %s", r))
 					pr.CloseWithError(errors.Wrap(err))
 				}
 			}

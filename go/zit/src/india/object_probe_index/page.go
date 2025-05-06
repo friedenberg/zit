@@ -191,7 +191,7 @@ func (e *page) readCurrentLoc(
 	r io.Reader,
 ) (out Loc, found bool, err error) {
 	if in.IsNull() {
-		err = errors.Errorf("empty sha")
+		err = errors.ErrorWithStackf("empty sha")
 		return
 	}
 

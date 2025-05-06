@@ -85,7 +85,7 @@ func (s *Shas) Add(k, v string) (err error) {
 		}
 
 	default:
-		err = errors.Errorf("unrecognized sha kind: %q", k)
+		err = errors.ErrorWithStackf("unrecognized sha kind: %q", k)
 		return
 	}
 

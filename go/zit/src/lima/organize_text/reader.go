@@ -96,7 +96,7 @@ LOOP:
 				}
 
 			default:
-				err = errors.Errorf("unsupported verb: %c. slice: %q", pr, sl)
+				err = errors.ErrorWithStackf("unsupported verb: %c. slice: %q", pr, sl)
 				return
 			}
 		}
@@ -154,7 +154,7 @@ func (ar *reader) readOneHeading(
 	}
 
 	if newAssignment == nil {
-		err = errors.Errorf("read heading function return nil new assignment")
+		err = errors.ErrorWithStackf("read heading function return nil new assignment")
 		return
 	}
 

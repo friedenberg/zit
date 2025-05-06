@@ -55,7 +55,7 @@ func (f textParser) ParseMetadata(
 	}
 
 	if blobWriter == nil {
-		err = errors.Errorf("blob writer is nil")
+		err = errors.ErrorWithStackf("blob writer is nil")
 		return
 	}
 
