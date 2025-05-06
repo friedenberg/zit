@@ -129,7 +129,10 @@ func (e *page) ReadOne(sh *Sha) (loc Loc, err error) {
 	var start int64
 
 	if start, err = e.searchFunc(sh); err != nil {
-		err = errors.Wrap(err)
+		if !collections.IsErrNotFound(err) {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

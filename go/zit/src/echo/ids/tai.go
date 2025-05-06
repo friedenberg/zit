@@ -136,19 +136,18 @@ func (t *Tai) SetFromRFC3339(v string) (err error) {
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
 
-	dr := delim_io.Make('.', strings.NewReader(v))
-	defer delim_io.PutReader(dr)
+	delimiterReader := delim_io.Make('.', strings.NewReader(v))
+	defer delim_io.PutReader(delimiterReader)
 
 	idx := 0
 	var val string
 
 	for {
-		val, err = dr.ReadOneString()
+		val, err = delimiterReader.ReadOneString()
 
 		switch idx {
 		case 0:
-			if err != nil {
-				err = errors.Wrap(err)
+			if err = errors.WrapExcept(err, io.EOF); err != nil {
 				return
 			}
 
@@ -164,13 +163,8 @@ func (t *Tai) Set(v string) (err error) {
 			}
 
 		case 1:
-			if err != nil {
-				if err == io.EOF {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
+			if err = errors.WrapExceptAsNil(err, io.EOF); err != nil {
+				return
 			}
 
 			val = strings.TrimSpace(val)
