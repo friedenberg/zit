@@ -519,7 +519,7 @@ func (oid *objectId2) Set(v string) (err error) {
 
 	switch oid.g {
 	case genres.None:
-		if k, err = Make(v); err != nil {
+		if k, err = MakeObjectId(v); err != nil {
 			oid.g = genres.Blob
 
 			if err = oid.left.Set(v); err != nil {

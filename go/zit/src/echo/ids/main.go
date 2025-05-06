@@ -32,7 +32,25 @@ type (
 
 type Index struct{}
 
-func Make(v string) (k interfaces.ObjectId, err error) {
+func MakeObjectId(v string) (k interfaces.ObjectId, err error) {
+	// var boxScanner box.Scanner
+	// boxScanner.Reset(strings.NewReader(v))
+
+	// objectId = &ObjectId{}
+
+	// if v == "" {
+	// 	return
+	// }
+
+	// if !boxScanner.ScanDotAllowedInIdentifiers() {
+	// 	return
+	// }
+
+	// seq := boxScanner.GetSeq()
+
+	// if err = objectId.ReadFromSeq(seq); err != nil {
+	// 	return
+	// }
 	if v == "" {
 		k = &ObjectId{}
 		return

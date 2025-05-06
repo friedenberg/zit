@@ -451,7 +451,7 @@ func (h *objectId) Set(v string) (err error) {
 
 	switch h.g {
 	case genres.None:
-		k, err = Make(v)
+		k, err = MakeObjectId(v)
 
 	case genres.Zettel:
 		var h ZettelId
