@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/box"
 )
 
 type Abbreviatable interface {
@@ -32,85 +33,25 @@ type (
 
 type Index struct{}
 
-func MakeObjectId(v string) (k interfaces.ObjectId, err error) {
-	// var boxScanner box.Scanner
-	// boxScanner.Reset(strings.NewReader(v))
+func MakeObjectId(v string) (objectId *ObjectId, err error) {
+	var boxScanner box.Scanner
+	boxScanner.Reset(strings.NewReader(v))
 
-	// objectId = &ObjectId{}
+	objectId = &ObjectId{}
 
-	// if v == "" {
-	// 	return
-	// }
-
-	// if !boxScanner.ScanDotAllowedInIdentifiers() {
-	// 	return
-	// }
-
-	// seq := boxScanner.GetSeq()
-
-	// if err = objectId.ReadFromSeq(seq); err != nil {
-	// 	return
-	// }
 	if v == "" {
-		k = &ObjectId{}
 		return
 	}
 
-	{
-		var h Config
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
+	if !boxScanner.ScanDotAllowedInIdentifiers() {
+		return
 	}
 
-	{
-		var h Tai
+	seq := boxScanner.GetSeq()
 
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
+	if err = objectId.ReadFromSeq(seq); err != nil {
+		return
 	}
-
-	{
-		var e Tag
-
-		if err = e.Set(v); err == nil {
-			k = &e
-			return
-		}
-	}
-
-	{
-		var t Type
-
-		if err = t.Set(v); err == nil {
-			k = &t
-			return
-		}
-	}
-
-	{
-		var h ZettelId
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
-	}
-
-	{
-		var ka RepoId
-
-		if err = ka.Set(v); err == nil {
-			k = &ka
-			return
-		}
-	}
-
-	err = errors.ErrorWithStackf("%q is not a valid object id", v)
 
 	return
 }
