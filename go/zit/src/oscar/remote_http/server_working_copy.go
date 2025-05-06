@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/config_immutable"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/local_working_copy"
@@ -111,8 +112,12 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		list,
 		importer,
 	); err != nil {
-		response.Error(err)
-		return
+		if env_dir.IsErrBlobMissing(err) {
+			requestRetry = true
+		} else {
+			response.Error(err)
+			return
+		}
 	}
 
 	if _, err := listFormat.WriteInventoryListBlob(listMissingSkus, responseBuffer); err != nil {
