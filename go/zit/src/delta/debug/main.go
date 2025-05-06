@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"bufio"
 	"os"
 	"runtime/debug"
 	"runtime/pprof"
@@ -11,6 +12,7 @@ import (
 )
 
 type Context struct {
+	bufferedWriterTrace                    *bufio.Writer
 	filePprofCpu, filePprofHeap, fileTrace *os.File
 	options                                Options
 }
@@ -36,13 +38,23 @@ func MakeContext(
 		pprof.StartCPUProfile(c.filePprofCpu)
 	}
 
+	if options.PProfHeap {
+		if c.filePprofHeap, err = files.Create("heap.pprof"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		pprof.StartCPUProfile(c.filePprofCpu)
+	}
+
 	if options.Trace {
 		if c.fileTrace, err = files.Create("trace"); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		trace.Start(c.fileTrace)
+		c.bufferedWriterTrace = bufio.NewWriter(c.fileTrace)
+		trace.Start(c.bufferedWriterTrace)
 	}
 
 	if options.GCDisabled {
@@ -66,22 +78,21 @@ func (c *Context) Close() error {
 		waitGroupStopOrWrite.Do(errors.MakeNilFunc(pprof.StopCPUProfile))
 	}
 
-	if c.options.PProfHeap {
-		{
-			var err error
-
-			if c.filePprofHeap, err = files.Create("heap.pprof"); err != nil {
-				multiError.Add(errors.Wrap(err))
-			}
-		}
-
+	if c.filePprofHeap != nil  {
 		waitGroupStopOrWrite.Do(func() error {
-			return pprof.WriteHeapProfile(c.filePprofHeap)
+			return pprof.Lookup("heap").WriteTo(c.filePprofHeap, 0)
 		})
 	}
 
 	if err := waitGroupStopOrWrite.GetError(); err != nil {
 		multiError.Add(errors.Wrap(err))
+	}
+
+	if c.fileTrace != nil {
+		if err := c.bufferedWriterTrace.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	waitGroupClose := errors.MakeWaitGroupParallel()

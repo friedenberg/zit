@@ -17,6 +17,7 @@ cmd_def=(
 )
 
 function generate { # @test
+	which zit
 	run_zit_init_disable_age
 
 	run_zit show :b

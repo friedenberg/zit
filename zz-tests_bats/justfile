@@ -56,6 +56,7 @@ check:
 
 [group("test")]
 test-generate_fixtures store_version:
+  which zit
   ./migration/generate_fixture.bash {{store_version}}
 
 bats_timeout := "10"
