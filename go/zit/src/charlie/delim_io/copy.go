@@ -15,6 +15,7 @@ import (
 //
 // Useful for taking a Reader and adding a prefix for every line, like how `git`
 // shows `remote: <line>` for all remote stderr output.
+// TODO extract into an io.Writer-like object
 func CopyWithPrefixOnDelim(
 	delim byte,
 	prefix string,

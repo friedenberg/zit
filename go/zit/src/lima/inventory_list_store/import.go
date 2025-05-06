@@ -73,6 +73,8 @@ func (store *Store) ImportList(
 		}()
 	}
 
+	checkedOutPrinter = store.ui.CheckedOutCheckedOut
+
 	if missingBlobs.Len() > 0 {
 		ui.Err().Printf(
 			"could not import the %d objects (blobs missing):\n",
@@ -80,7 +82,6 @@ func (store *Store) ImportList(
 		)
 
 		for missing := range missingBlobs.All() {
-			ui.Debug().Print(missing)
 			if err = checkedOutPrinter(missing); err != nil {
 				err = errors.Wrap(err)
 				return

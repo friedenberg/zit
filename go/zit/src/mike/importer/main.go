@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/typed_blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store_workspace"
 )
@@ -171,16 +170,18 @@ func (importer importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
+		err = errors.Errorf("skipping because objects are excluded")
 		return
 	}
 
 	// TODO address this terrible hack? How should config objects be handled by
 	// remotes?
 	if external.GetGenre() == genres.Config {
+		err = genres.MakeErrUnsupportedGenre(external.GetGenre())
 		return
 	}
 
-	co = store_fs.GetCheckedOutPool().Get()
+	co = sku.GetCheckedOutPool().Get()
 
 	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
 
