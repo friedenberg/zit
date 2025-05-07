@@ -3,6 +3,7 @@ package errors
 import (
 	"errors"
 	"io"
+	"net"
 	"os"
 	"syscall"
 )
@@ -38,6 +39,18 @@ func Is(err, target error) bool {
 	}
 
 	return false
+}
+
+func IsNetTimeout(err error) (ok bool) {
+	var netError net.Error
+
+	if !As(err, &netError) {
+		return
+	}
+
+	ok = netError.Timeout()
+
+	return
 }
 
 func IsErrno(err error, target syscall.Errno) (ok bool) {

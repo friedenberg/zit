@@ -15,6 +15,8 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -240,6 +242,7 @@ func (server *Server) loggerMiddleware(next http.Handler) http.Handler {
 		func(responseWriter http.ResponseWriter, request *http.Request) {
 			ui.Log().Printf("serving request: %s %s", request.Method, request.URL.Path)
 			next.ServeHTTP(responseWriter, request)
+			ui.Log().Printf("done serving request: %s %s", request.Method, request.URL.Path)
 		},
 	)
 }
@@ -452,10 +455,15 @@ func (server *Server) makeHandler(
 
 		var response Response
 
-		if err := request.context.Run(
+		if err := errors.RunContextWithPrintTicker(
+			request.context,
 			func(ctx errors.Context) {
 				response = handler(request)
 			},
+			func(time time.Time) {
+				ui.Log().Printf("Still serving request (%s): %s", time, req.URL)
+			},
+			3*time.Second,
 		); err != nil {
 			server.EnvLocal.CancelWithError(err)
 		}
@@ -478,12 +486,29 @@ func (server *Server) makeHandler(
 			return
 		}
 
-		if _, err := io.Copy(responseWriter, response.Body); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-			} else {
-				server.EnvLocal.CancelWithError(err)
-			}
+		if err := errors.RunContextWithPrintTicker(
+			request.context,
+			func(ctx errors.Context) {
+				if _, err := io.Copy(responseWriter, response.Body); err != nil {
+					if errors.IsEOF(err) {
+						err = nil
+					} else if errors.IsErrno(err, syscall.ECONNRESET) {
+						err = nil
+						ui.Err().Print("connection reset by peer", req.URL)
+					} else if errors.IsNetTimeout(err) {
+						err = nil
+						ui.Err().Print("connection timeout", req.URL)
+					} else {
+						ctx.CancelWithError(err)
+					}
+				}
+			},
+			func(time time.Time) {
+				ui.Log().Printf("Still serving request (%s): %s", time, req.URL)
+			},
+			3*time.Second,
+		); err != nil {
+			server.EnvLocal.CancelWithError(err)
 		}
 	}
 }

@@ -128,7 +128,7 @@ func CopyBlob(
 		return
 	}
 
-	defer errors.DeferredCloser(&err, rc)
+	defer env.MustClose(rc)
 
 	var wc sha.WriteCloser
 
@@ -139,7 +139,7 @@ func CopyBlob(
 
 	// TODO should this be closed with an error when the shas don't match to
 	// prevent a garbage object in the store?
-	defer errors.DeferredCloser(&err, wc)
+	defer env.MustClose(wc)
 
 	if n, err = io.Copy(wc, rc); err != nil {
 		err = errors.Wrap(err)

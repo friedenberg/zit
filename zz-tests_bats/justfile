@@ -103,4 +103,9 @@ test: (test-targets "*.bats" "migration/*.bats")
   count-pattern '#\s*todo[-\w]*' | sort -n -r
 
 [group("stats")]
-@stats: stats-skipped stats-todos
+@stats-loc:
+  echo -n "bats loc:"
+  find . -type f -print0 | xargs -0 wc -l | tail -n 1
+
+[group("stats")]
+@stats: stats-skipped stats-todos stats-loc
