@@ -28,6 +28,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/config_immutable_io"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_local"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/box_format"
@@ -486,10 +487,15 @@ func (server *Server) makeHandler(
 			return
 		}
 
+		var progressWriter env_ui.ProgressWriter
+
 		if err := errors.RunContextWithPrintTicker(
 			request.context,
 			func(ctx errors.Context) {
-				if _, err := io.Copy(responseWriter, response.Body); err != nil {
+				if _, err := io.Copy(
+					io.MultiWriter(responseWriter, &progressWriter),
+					response.Body,
+				); err != nil {
 					if errors.IsEOF(err) {
 						err = nil
 					} else if errors.IsErrno(err, syscall.ECONNRESET) {
@@ -504,7 +510,12 @@ func (server *Server) makeHandler(
 				}
 			},
 			func(time time.Time) {
-				ui.Log().Printf("Still serving request (%s): %s", time, req.URL)
+				ui.Log().Printf(
+					"Still serving request (%s): %q (%d bytes written)",
+					time,
+					req.URL,
+					progressWriter.GetWritten(),
+				)
 			},
 			3*time.Second,
 		); err != nil {
