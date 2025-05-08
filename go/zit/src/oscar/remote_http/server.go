@@ -407,37 +407,42 @@ func (server *Server) makeHandlerUsingBufferedWriter(
 
 		var response Response
 
-		if err := request.context.Run(
+		if err := errors.RunContextWithPrintTicker(
+			request.context,
 			func(ctx errors.Context) {
 				response = handler(request)
+
+				responseModified := http.Response{
+					TransferEncoding: []string{"chunked"},
+					ProtoMajor:       req.ProtoMajor,
+					ProtoMinor:       req.ProtoMinor,
+					Request:          req,
+					StatusCode:       response.StatusCode,
+					Body:             response.Body,
+				}
+
+				// TODO determine why iterating thru the headers and setting them manually
+				// doesn't work
+				responseModified.Header = responseWriter.Header().Clone()
+
+				if responseModified.StatusCode == 0 {
+					responseModified.StatusCode = http.StatusOK
+				}
+
+				if err := responseModified.Write(out); err != nil {
+					if errors.IsEOF(err) {
+						err = nil
+					} else {
+						ctx.CancelWithError(err)
+					}
+				}
 			},
+			func(time time.Time) {
+				ui.Log().Printf("Still serving request (%s): %s", time, req.URL)
+			},
+			3*time.Second,
 		); err != nil {
 			server.EnvLocal.CancelWithError(err)
-		}
-
-		responseModified := http.Response{
-			TransferEncoding: []string{"chunked"},
-			ProtoMajor:       req.ProtoMajor,
-			ProtoMinor:       req.ProtoMinor,
-			Request:          req,
-			StatusCode:       response.StatusCode,
-			Body:             response.Body,
-		}
-
-		// TODO determine why iterating thru the headers and setting them manually
-		// doesn't work
-		responseModified.Header = responseWriter.Header().Clone()
-
-		if responseModified.StatusCode == 0 {
-			responseModified.StatusCode = http.StatusOK
-		}
-
-		if err := responseModified.Write(out); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-			} else {
-				server.EnvLocal.CancelWithError(err)
-			}
 		}
 	}
 }
@@ -454,44 +459,31 @@ func (server *Server) makeHandler(
 			Body:       req.Body,
 		}
 
-		var response Response
-
-		if err := errors.RunChildContextWithPrintTicker(
-			request.context,
-			func(ctx errors.Context) {
-				response = handler(request)
-			},
-			func(time time.Time) {
-				ui.Log().Printf("Still serving request (%s): %s", time, req.URL)
-			},
-			3*time.Second,
-		); err != nil {
-			server.EnvLocal.CancelWithError(err)
-		}
-
-		// header := responseWriter.Header()
-
-		// for key, values := range response.Headers {
-		// 	for _, value := range values {
-		// 		header.Add(key, value)
-		// 	}
-		// }
-
-		if response.StatusCode == 0 {
-			response.StatusCode = http.StatusOK
-		}
-
-		responseWriter.WriteHeader(response.StatusCode)
-
-		if response.Body == nil {
-			return
-		}
-
 		var progressWriter env_ui.ProgressWriter
 
-		if err := errors.RunChildContextWithPrintTicker(
+		if err := errors.RunContextWithPrintTicker(
 			request.context,
 			func(ctx errors.Context) {
+				response := handler(request)
+
+				// header := responseWriter.Header()
+
+				// for key, values := range response.Headers {
+				// 	for _, value := range values {
+				// 		header.Add(key, value)
+				// 	}
+				// }
+
+				if response.StatusCode == 0 {
+					response.StatusCode = http.StatusOK
+				}
+
+				responseWriter.WriteHeader(response.StatusCode)
+
+				if response.Body == nil {
+					return
+				}
+
 				if _, err := io.Copy(
 					io.MultiWriter(responseWriter, &progressWriter),
 					response.Body,

@@ -4,14 +4,12 @@ import (
 	"time"
 )
 
-func RunChildContextWithPrintTicker(
-	parentContext Context,
+func RunContextWithPrintTicker(
+	context Context,
 	runFunc func(Context),
 	printFunc func(time.Time),
 	duration time.Duration,
 ) (err error) {
-	context := MakeContext(parentContext)
-
 	if err = context.Run(
 		func(ctx Context) {
 			ticker := time.NewTicker(duration)
@@ -37,4 +35,18 @@ func RunChildContextWithPrintTicker(
 	}
 
 	return
+}
+
+func RunChildContextWithPrintTicker(
+	parentContext Context,
+	runFunc func(Context),
+	printFunc func(time.Time),
+	duration time.Duration,
+) (err error) {
+	return RunContextWithPrintTicker(
+		MakeContext(parentContext),
+		runFunc,
+		printFunc,
+		duration,
+	)
 }
