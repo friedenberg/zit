@@ -456,7 +456,7 @@ func (server *Server) makeHandler(
 
 		var response Response
 
-		if err := errors.RunContextWithPrintTicker(
+		if err := errors.RunChildContextWithPrintTicker(
 			request.context,
 			func(ctx errors.Context) {
 				response = handler(request)
@@ -489,7 +489,7 @@ func (server *Server) makeHandler(
 
 		var progressWriter env_ui.ProgressWriter
 
-		if err := errors.RunContextWithPrintTicker(
+		if err := errors.RunChildContextWithPrintTicker(
 			request.context,
 			func(ctx errors.Context) {
 				if _, err := io.Copy(

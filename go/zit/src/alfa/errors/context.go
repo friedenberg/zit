@@ -245,7 +245,7 @@ func (c *context) after(skip int, f func() error) {
 	c.doAfter = append(
 		c.doAfter,
 		FuncWithStackInfo{
-			Func:      f,
+			Func:       f,
 			StackFrame: frame,
 		},
 	)
@@ -313,8 +313,8 @@ func (c *context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	c.cancel(
 		&stackWrapError{
 			StackFrame: MustStackFrame(1),
-			error:     fmt.Errorf(f, values...),
-			next:      WrapSkip(1, err),
+			error:      fmt.Errorf(f, values...),
+			next:       WrapSkip(1, err),
 		},
 	)
 }

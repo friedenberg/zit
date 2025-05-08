@@ -3,55 +3,66 @@ package ui
 import (
 	"fmt"
 	"io"
+	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 type devPrinter struct {
 	printer
+	includesTime  bool
 	includesStack bool
 }
 
-func (p devPrinter) Print(a ...interface{}) (err error) {
+func (p devPrinter) Print(a ...any) (err error) {
 	if !p.on {
 		return
 	}
 
+	if p.includesTime {
+		a = append([]any{time.Now()}, a...)
+	}
+
 	if p.includesStack {
 		si, _ := errors.MakeStackFrame(1)
-		a = append([]interface{}{si.StringNoFunctionName()}, a...)
+		a = append([]any{si.StringNoFunctionName()}, a...)
 	}
 
 	return p.printer.Print(a...)
 }
 
-func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
+func (p devPrinter) Printf(f string, a ...any) (err error) {
 	if !p.on {
 		return
+	}
+
+	if p.includesTime {
+		f = "%s " + f
+		a = append([]any{time.Now()}, a...)
 	}
 
 	if p.includesStack {
 		si, _ := errors.MakeStackFrame(1)
 		f = "%s " + f
-		a = append([]interface{}{si.StringNoFunctionName()}, a...)
+		a = append([]any{si.StringNoFunctionName()}, a...)
 	}
 
 	return p.printer.Printf(f, a...)
 }
 
-func (p devPrinter) Caller(i int, vs ...interface{}) {
+func (p devPrinter) Caller(i int, vs ...any) {
 	if !p.on {
 		return
 	}
 
 	st, _ := errors.MakeStackFrame(i + 1)
 
-	vs = append([]interface{}{st}, vs...)
+	vs = append([]any{st}, vs...)
 	// TODO-P4 strip trailing newline and add back
 	p.printer.Print(vs...)
 }
 
-func (p devPrinter) CallerNonEmpty(i int, v interface{}) {
+func (p devPrinter) CallerNonEmpty(i int, v any) {
 	if v != nil {
 		p.Caller(i+1, "%s", v)
 	}
