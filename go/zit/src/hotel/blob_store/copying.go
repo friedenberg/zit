@@ -71,7 +71,7 @@ func (s CopyingBlobStore) BlobReader(
 
 	var n int64
 
-	if n, err = CopyBlob(s, s.local, s.remote, sh.GetShaLike()); err != nil {
+	if n, err = CopyBlob(s, s.local, s.remote, sh.GetShaLike(), nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -91,6 +91,7 @@ func CopyBlobIfNecessary(
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobShaGetter interfaces.ShaGetter,
+	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
@@ -107,7 +108,7 @@ func CopyBlobIfNecessary(
 		return
 	}
 
-	return CopyBlob(env, dst, src, blobSha)
+	return CopyBlob(env, dst, src, blobSha, extraWriter)
 }
 
 // TODO make this honor context closure and abort early
@@ -116,6 +117,7 @@ func CopyBlob(
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
 	blobSha interfaces.Sha,
+	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
@@ -141,7 +143,13 @@ func CopyBlob(
 	// prevent a garbage object in the store?
 	defer env.MustClose(wc)
 
-	if n, err = io.Copy(wc, rc); err != nil {
+	outputWriter := io.Writer(wc)
+
+	if extraWriter != nil {
+		outputWriter = io.MultiWriter(outputWriter, extraWriter)
+	}
+
+	if n, err = io.Copy(outputWriter, rc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

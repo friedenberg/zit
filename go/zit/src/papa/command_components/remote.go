@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"flag"
 	"fmt"
-	"net/http"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -328,7 +327,7 @@ func (cmd *Remote) MakeRemoteUrl(
 		envRepo,
 		&remote_http.RoundTripperHost{
 			UrlData:      remote_http.MakeUrlDataFromUri(uri),
-			RoundTripper: http.DefaultTransport,
+			RoundTripper: remote_http.DefaultRoundTripper,
 		},
 		local,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),

@@ -33,6 +33,8 @@ func (urlData UrlData) Apply(ur *url.URL) {
 	ur.Host = urlData.Host
 }
 
+// A round tripper that decorates another round tripper and always populates the
+// http requests with given UrlData template.
 type RoundTripperHost struct {
 	UrlData
 	http.RoundTripper

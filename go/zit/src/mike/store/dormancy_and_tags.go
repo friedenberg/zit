@@ -100,42 +100,46 @@ func (store *Store) addSuperTags(
 			continue
 		}
 
-		var ek *sku.Transacted
+		func() {
+			var ek *sku.Transacted
 
-		if ek, err = store.config.GetTagOrRepoIdOrType(ex); err != nil {
-			err = errors.Wrapf(err, "Expanded: %q", ex)
-			return
-		}
+			if ek, err = store.config.GetTagOrRepoIdOrType(ex); err != nil {
+				err = errors.Wrapf(err, "Expanded: %q", ex)
+				return
+			}
 
-		if ek == nil {
-			// this is ok because currently, konfig is applied twice. However, this
-			// is fragile as the order in which this method is called is
-			// non-deterministic and the `GetTag` call may request an Tag we
-			// have not processed yet
-			continue
-		}
+			if ek == nil {
+				// this is ok because currently, konfig is applied twice. However, this
+				// is fragile as the order in which this method is called is
+				// non-deterministic and the `GetTag` call may request an Tag we
+				// have not processed yet
+				return
+			}
 
-		if ek.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
-			ui.Log().Print(ks, ex, ek.Metadata.Cache.TagPaths)
-			continue
-		}
+			defer sku.GetTransactedPool().Put(ek)
 
-		prefix := catgut.MakeFromString(ex)
+			if ek.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
+				ui.Log().Print(ks, ex, ek.Metadata.Cache.TagPaths)
+				return
+			}
 
-		a := &sk.Metadata.Cache.TagPaths
-		b := &ek.Metadata.Cache.TagPaths
+			prefix := catgut.MakeFromString(ex)
 
-		ui.Log().Print("a", a)
-		ui.Log().Print("b", b)
+			a := &sk.Metadata.Cache.TagPaths
+			b := &ek.Metadata.Cache.TagPaths
 
-		ui.Log().Print("prefix", prefix)
+			ui.Log().Print("a", a)
+			ui.Log().Print("b", b)
 
-		if err = a.AddSuperFrom(b, prefix); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			ui.Log().Print("prefix", prefix)
 
-		ui.Log().Print("a after", a)
+			if err = a.AddSuperFrom(b, prefix); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			ui.Log().Print("a after", a)
+		}()
 	}
 
 	return

@@ -1,6 +1,8 @@
 package importer
 
 import (
+	"time"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -9,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env_ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env_repo"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/sku"
@@ -302,37 +305,56 @@ func (c importer) ImportBlobIfNecessary(
 		return
 	}
 
-	var n int64
+	var progressWriter env_ui.ProgressWriter
 
-	if n, err = blob_store.CopyBlobIfNecessary(
+	if err = errors.RunChildContextWithPrintTicker(
 		c.envRepo,
-		c.envRepo,
-		c.remoteBlobStore,
-		blobSha,
+		func(ctx errors.Context) {
+			var n int64
+
+			if n, err = blob_store.CopyBlobIfNecessary(
+				c.envRepo,
+				c.envRepo,
+				c.remoteBlobStore,
+				blobSha,
+				&progressWriter,
+			); err != nil {
+				if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
+					err = nil
+				} else {
+					// TODO add context that this could not be copied from the remote blob
+					// store
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			}
+
+			if c.blobCopierDelegate != nil {
+				if err = c.blobCopierDelegate(
+					sku.BlobCopyResult{
+						Transacted: sk,
+						Sha:        blobSha,
+						N:          n,
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		},
+		func(time time.Time) {
+			ui.Err().Print(
+				"Copying %s... (%d written)",
+				blobSha,
+				progressWriter.GetWritten(),
+			)
+		},
+		3*time.Second,
 	); err != nil {
-		if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
-			err = nil
-		} else {
-			// TODO add context that this could not be copied from the remote blob
-			// store
-			err = errors.Wrap(err)
-			return
-		}
-
+		err = errors.Wrap(err)
 		return
-	}
-
-	if c.blobCopierDelegate != nil {
-		if err = c.blobCopierDelegate(
-			sku.BlobCopyResult{
-				Transacted: sk,
-				Sha:        blobSha,
-				N:          n,
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

@@ -335,6 +335,7 @@ func (s *Store) ImportInventoryList(
 			s.GetEnvRepo(),
 			bs,
 			sk.GetBlobSha(),
+			nil,
 		); err != nil {
 			if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
 				err = nil
