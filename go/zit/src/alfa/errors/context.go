@@ -161,13 +161,13 @@ func (ctx *context) Run(funcRun func(Context)) error {
 	ctx.funcRun = funcRun
 
 	go func() {
+		defer signal.Stop(ctx.signals)
+
 		select {
 		case <-ctx.Done():
 		case sig := <-ctx.signals:
 			ctx.cancel(errContextCancelledExpected{Signal{Signal: sig}})
 		}
-
-		signal.Stop(ctx.signals)
 	}()
 
 	retry := true

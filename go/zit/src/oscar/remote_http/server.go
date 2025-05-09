@@ -490,12 +490,16 @@ func (server *Server) makeHandler(
 				); err != nil {
 					if errors.IsEOF(err) {
 						err = nil
-					} else if errors.IsErrno(err, syscall.ECONNRESET) {
+					} else if errors.IsAny(
+						err,
+						errors.MakeIsErrno(
+							syscall.ECONNRESET,
+							syscall.EPIPE,
+						),
+						errors.IsNetTimeout,
+					) {
+						ui.Err().Print(errors.Unwrap(err).Error(), req.URL)
 						err = nil
-						ui.Err().Print("connection reset by peer", req.URL)
-					} else if errors.IsNetTimeout(err) {
-						err = nil
-						ui.Err().Print("connection timeout", req.URL)
 					} else {
 						ctx.CancelWithError(err)
 					}
@@ -503,10 +507,10 @@ func (server *Server) makeHandler(
 			},
 			func(time time.Time) {
 				ui.Log().Printf(
-					"Still serving request (%s): %q (%d bytes written)",
+					"Still serving request (%s): %q (%s bytes written)",
 					time,
 					req.URL,
-					progressWriter.GetWritten(),
+					progressWriter.GetWrittenHumanString(),
 				)
 			},
 			3*time.Second,

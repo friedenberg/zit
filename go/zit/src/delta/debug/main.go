@@ -3,11 +3,14 @@ package debug
 import (
 	"bufio"
 	"os"
+	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
+	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
@@ -23,6 +26,59 @@ func MakeContext(
 ) (c *Context, err error) {
 	c = &Context{
 		options: options,
+	}
+
+	if options.ExitOnMemoryExhaustion {
+		ticker := time.NewTicker(time.Millisecond)
+		ctx.After(errors.MakeNilFunc(ticker.Stop))
+
+		var cgroupMemoryLimit uint64
+
+		if cgroupMemoryLimit, err = getMemoryLimit(); err != nil {
+			cgroupMemoryLimit = 1500 * 1024 * 1024 // 1.5 GB
+			ui.Err().Printf(
+				"memory limit not found, setting to %s",
+				ui.GetHumanBytesString(cgroupMemoryLimit),
+			)
+
+			err = nil
+			// err = errors.Wrapf(err, "could not determine memory limit")
+			// return
+		}
+
+		go func() {
+			var memStats runtime.MemStats
+
+			for {
+				select {
+				case <-ctx.Done():
+					return
+
+				case <-ticker.C:
+					runtime.ReadMemStats(&memStats)
+					memoryInUse := memStats.Alloc
+
+					percent := float64(memoryInUse) / float64(cgroupMemoryLimit) * 100
+
+					if percent >= 90 {
+						ui.Err().Printf(
+							"%.2f%% memory used: %s of %s",
+							percent,
+							ui.GetHumanBytesString(memoryInUse),
+							ui.GetHumanBytesString(cgroupMemoryLimit),
+						)
+
+						func() {
+							defer func() {
+								recover()
+							}()
+
+							ctx.CancelWithErrorf("10% memory remaining")
+						}()
+					}
+				}
+			}
+		}()
 	}
 
 	if options.GCDisabled {
@@ -78,7 +134,7 @@ func (c *Context) Close() error {
 		waitGroupStopOrWrite.Do(errors.MakeNilFunc(pprof.StopCPUProfile))
 	}
 
-	if c.filePprofHeap != nil  {
+	if c.filePprofHeap != nil {
 		waitGroupStopOrWrite.Do(func() error {
 			return pprof.Lookup("heap").WriteTo(c.filePprofHeap, 0)
 		})

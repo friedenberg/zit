@@ -263,19 +263,26 @@ function clone_archive_history_default_allow_conflicts { # @test
 	EOM
 }
 
+# TODO fix issue with start_server spawning zit processes that do not get cleaned up later
 function clone_history_zettel_type_tag_port { # @test
+	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
 
-  start_server them
+	start_server them
+
+	# shellcheck disable=SC2154
+	run echo "$server_PID"
+	trap 'kill $server_PID' EXIT
+	assert_output 'x'
 
 	us="us"
 	set_xdg "$us"
-  # shellcheck disable=SC2154
+	# shellcheck disable=SC2154
 	run_clone_default_with \
 		-remote-type url \
-	test-repo-id-us \
+		test-repo-id-us \
 		"http://localhost:$port" \
 		+zettel,typ,etikett
 

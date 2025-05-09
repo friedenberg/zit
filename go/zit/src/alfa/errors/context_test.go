@@ -3,6 +3,7 @@ package errors
 import (
 	ConTeXT "context"
 	"fmt"
+	"syscall"
 	"testing"
 )
 
@@ -99,4 +100,33 @@ func TestContextCancelledRetry(t *testing.T) {
 	if tryCount != 2 {
 		t.Errorf("expected try count 2 but got: %d", tryCount)
 	}
+}
+
+func TestContextSignal(t *testing.T) {
+	ctx := MakeContext(ConTeXT.Background())
+	ctx.SetCancelOnSIGHUP()
+
+	cont := make(chan struct{})
+
+	go func() {
+		if err := ctx.Run(
+			func(ctx Context) {
+				child := MakeContext(ctx)
+
+				if err := child.Run(
+					func(ctx Context) {
+						<-ctx.Done()
+						cont <- struct{}{}
+					},
+				); err != nil {
+					t.Errorf("expected no error but got: %s", err)
+				}
+			},
+		); err != nil {
+			t.Errorf("expected no error but got: %s", err)
+		}
+	}()
+
+	ctx.signals <- syscall.SIGHUP
+	<-cont
 }

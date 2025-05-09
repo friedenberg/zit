@@ -27,6 +27,7 @@ type printer struct {
 	on    bool
 }
 
+// Returns a copy of this printer with a modified `on` setting
 func (p printer) withOn(on bool) printer {
 	p.on = on
 	return p

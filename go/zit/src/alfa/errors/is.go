@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"slices"
 	"syscall"
 )
 
@@ -12,6 +13,18 @@ var (
 	As     = errors.As
 	Unwrap = errors.Unwrap
 )
+
+type FuncIs func(error) bool
+
+func IsAny(err error, ises ...FuncIs) bool {
+	for _, is := range ises {
+		if is(err) {
+			return true
+		}
+	}
+
+	return false
+}
 
 func Is(err, target error) bool {
 	if errors.Is(err, target) {
@@ -53,16 +66,20 @@ func IsNetTimeout(err error) (ok bool) {
 	return
 }
 
-func IsErrno(err error, target syscall.Errno) (ok bool) {
+func MakeIsErrno(targets ...syscall.Errno) FuncIs {
+	return func(err error) bool {
+		return IsErrno(err, targets...)
+	}
+}
+
+func IsErrno(err error, targets ...syscall.Errno) (ok bool) {
 	var errno syscall.Errno
 
 	if !As(err, &errno) {
-		return
+		return false
 	}
 
-	ok = errno == target
-
-	return
+	return slices.Contains(targets, errno)
 }
 
 func IsBrokenPipe(err error) bool {
@@ -104,7 +121,7 @@ func IsAsNilOrWrapf(
 	err error,
 	target error,
 	format string,
-	values ...interface{},
+	values ...any,
 ) (out error) {
 	if Is(err, target) {
 		out = nil

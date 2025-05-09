@@ -246,6 +246,8 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	buffer := bytes.NewBuffer(nil)
 
 	for {
+		client.envUI.ContinueOrPanicOnDone()
+
 		// TODO make a reader version of inventory lists to avoid allocation
 		if _, err = listFormat.WriteInventoryListBlob(list, buffer); err != nil {
 			err = errors.Wrap(err)
@@ -307,6 +309,8 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		// if options.IncludeBlobs {
 		for expected := range listMissingSkus.All() {
+			client.envUI.ContinueOrPanicOnDone()
+
 			if err = client.WriteBlobToRemote(
 				remote.GetBlobStore(),
 				sha.Make(expected.GetBlobSha()),

@@ -171,6 +171,9 @@ function start_server {
     zit serve ${cmd_zit_def[@]} tcp :0
   }
 
+  # shellcheck disable=SC2154
+  # trap 'kill $server_PID' EXIT
+
   read -r output <&"${server[0]}"
 
   if [[ $output =~ (starting HTTP server on port: \"([0-9]+)\") ]]; then

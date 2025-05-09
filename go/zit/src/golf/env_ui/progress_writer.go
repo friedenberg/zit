@@ -1,9 +1,18 @@
 package env_ui
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+)
 
 type ProgressWriter struct {
 	written atomic.Int64
+}
+
+func (writer *ProgressWriter) GetWrittenHumanString() string {
+	written := writer.GetWritten()
+	return ui.GetHumanBytesString(uint64(written))
 }
 
 func (writer *ProgressWriter) GetWritten() int64 {

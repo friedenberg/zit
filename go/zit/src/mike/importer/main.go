@@ -92,6 +92,8 @@ func (importer *importer) SetCheckedOutPrinter(
 func (importer importer) Import(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
+	importer.envRepo.ContinueOrPanicOnDone()
+
 	if err = importer.ImportBlobIfNecessary(external); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -345,10 +347,10 @@ func (c importer) ImportBlobIfNecessary(
 			}
 		},
 		func(time time.Time) {
-			ui.Err().Print(
-				"Copying %s... (%d written)",
+			ui.Err().Printf(
+				"Copying %s... (%s written)",
 				blobSha,
-				progressWriter.GetWritten(),
+				progressWriter.GetWrittenHumanString(),
 			)
 		},
 		3*time.Second,

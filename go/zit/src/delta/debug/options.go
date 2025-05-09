@@ -8,12 +8,13 @@ import (
 )
 
 type Options struct {
-	Trace            bool
-	PProfCPU         bool
-	PProfHeap        bool
-	GCDisabled       bool
-	NoTempDirCleanup bool
-	DryRun           bool
+	ExitOnMemoryExhaustion bool
+	Trace                  bool
+	PProfCPU               bool
+	PProfHeap              bool
+	GCDisabled             bool
+	NoTempDirCleanup       bool
+	DryRun                 bool
 }
 
 func (o Options) String() string {
@@ -41,6 +42,10 @@ func (o Options) String() string {
 
 	if o.DryRun {
 		sb.WriteString("dry-run")
+	}
+
+	if o.ExitOnMemoryExhaustion {
+		sb.WriteString("exit-on-memory-exhaustion")
 	}
 
 	return sb.String()
@@ -74,6 +79,9 @@ func (o *Options) Set(v string) (err error) {
 
 		case "dry-run":
 			o.DryRun = true
+
+		case "exit-on-memory-exhaustion":
+			o.ExitOnMemoryExhaustion = true
 
 		case "true":
 			fallthrough
