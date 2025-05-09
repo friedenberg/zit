@@ -7,6 +7,7 @@ import (
 	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
+	"sync"
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -46,6 +47,8 @@ func MakeContext(
 			// return
 		}
 
+		var memOnce sync.Once
+
 		go func() {
 			var memStats runtime.MemStats
 
@@ -61,20 +64,24 @@ func MakeContext(
 					percent := float64(memoryInUse) / float64(cgroupMemoryLimit) * 100
 
 					if percent >= 90 {
-						ui.Err().Printf(
-							"%.2f%% memory used: %s of %s",
-							percent,
-							ui.GetHumanBytesString(memoryInUse),
-							ui.GetHumanBytesString(cgroupMemoryLimit),
+						memOnce.Do(
+							func() {
+								ui.Err().Printf(
+									"%.2f%% memory used: %s of %s",
+									percent,
+									ui.GetHumanBytesString(memoryInUse),
+									ui.GetHumanBytesString(cgroupMemoryLimit),
+								)
+
+								func() {
+									defer func() {
+										recover()
+									}()
+
+									ctx.CancelWithErrorf("10% memory remaining")
+								}()
+							},
 						)
-
-						func() {
-							defer func() {
-								recover()
-							}()
-
-							ctx.CancelWithErrorf("10% memory remaining")
-						}()
 					}
 				}
 			}
