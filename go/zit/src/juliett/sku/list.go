@@ -7,6 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
+	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -38,6 +40,7 @@ type InventoryListStore interface {
 type ListFormat interface {
 	GetType() ids.Type
 	GetListFormat() ListFormat
+	WriteObjectToOpenList(*Transacted, *OpenList) (int64, error)
 	WriteInventoryListBlob(Collection, io.Writer) (int64, error)
 	WriteInventoryListObject(*Transacted, io.Writer) (int64, error)
 	ReadInventoryListObject(io.Reader) (int64, *Transacted, error)
@@ -45,10 +48,18 @@ type ListFormat interface {
 		rf io.Reader,
 		f interfaces.FuncIter[*Transacted],
 	) error
+	AllInventoryListBlobSkus(io.Reader) interfaces.SeqError[*Transacted]
 }
 
 // TODO rename to ListTransacted
 type List = heap.Heap[Transacted, *Transacted]
+
+type OpenList struct {
+	Tipe ids.Type
+	*env_dir.Mover
+	Description descriptions.Description
+	Len         int
+}
 
 // TODO rename to MakeListTransacted
 func MakeList() *List {

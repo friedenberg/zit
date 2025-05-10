@@ -33,7 +33,7 @@ type Store struct {
 	lockSmith    interfaces.LockSmith
 	storeVersion interfaces.StoreVersion
 	objectBlobStore
-	blobStore interfaces.BlobStore
+	blobStore blob_store.LocalBlobStore
 	clock     ids.Clock
 
 	object_format object_inventory_format.Format

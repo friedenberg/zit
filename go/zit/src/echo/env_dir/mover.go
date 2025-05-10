@@ -10,7 +10,7 @@ import (
 
 type Mover struct {
 	file *os.File
-	Writer
+	*writer
 
 	basePath                  string
 	objectPath                string
@@ -44,7 +44,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 		Writer: m.file,
 	}
 
-	if m.Writer, err = NewWriter(wo); err != nil {
+	if m.writer, err = NewWriter(wo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -58,12 +58,12 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
-	if m.Writer == nil {
+	if m.writer == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = m.Writer.Close(); err != nil {
+	if err = m.writer.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

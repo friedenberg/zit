@@ -13,6 +13,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 )
 
+type LocalBlobStore interface {
+	interfaces.LocalBlobStore
+	Mover() (*env_dir.Mover, error)
+}
+
 type storeShardedFiles struct {
 	env_dir.Config
 	basePath string
@@ -78,8 +83,17 @@ func (s storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	}
 }
 
-func (s storeShardedFiles) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
-	if w, err = s.blobWriterTo(s.basePath); err != nil {
+func (store storeShardedFiles) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+	if w, err = store.blobWriterTo(store.basePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (store storeShardedFiles) Mover() (mover *env_dir.Mover, err error) {
+	if mover, err = store.blobWriterTo(store.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -106,15 +120,17 @@ func (s storeShardedFiles) BlobReader(
 	return
 }
 
-func (s storeShardedFiles) blobWriterTo(p string) (w sha.WriteCloser, err error) {
-	mo := env_dir.MoveOptions{
-		Config:                   s.Config,
-		FinalPath:                p,
+func (store storeShardedFiles) blobWriterTo(
+	path string,
+) (mover *env_dir.Mover, err error) {
+	options := env_dir.MoveOptions{
+		Config:                   store.Config,
+		FinalPath:                path,
 		GenerateFinalPathFromSha: true,
-		TemporaryFS:              s.tempFS,
+		TemporaryFS:              store.tempFS,
 	}
 
-	if w, err = env_dir.NewMover(mo); err != nil {
+	if mover, err = env_dir.NewMover(options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -35,6 +35,14 @@ func (v V0) GetType() ids.Type {
 	return ids.MustType(builtin_types.InventoryListTypeV0)
 }
 
+func (format V0) WriteObjectToOpenList(
+	object *sku.Transacted,
+	list *sku.OpenList,
+) (n int64, err error) {
+	err = errors.ErrNotSupported
+	return
+}
+
 func (s V0) WriteInventoryListObject(
 	o *sku.Transacted,
 	w io.Writer,

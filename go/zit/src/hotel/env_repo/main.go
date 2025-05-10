@@ -29,7 +29,7 @@ type Env struct {
 
 	interfaces.DirectoryPaths
 
-	local, remote interfaces.LocalBlobStore
+	local, remote blob_store.LocalBlobStore
 
 	blob_store.CopyingBlobStore
 }
@@ -193,7 +193,11 @@ func (h Env) GetStoreVersion() interfaces.StoreVersion {
 	}
 }
 
-func (s Env) MakeBlobStore() interfaces.LocalBlobStore {
+func (env Env) Mover() (*env_dir.Mover, error) {
+	return env.local.Mover()
+}
+
+func (s Env) MakeBlobStore() blob_store.LocalBlobStore {
 	return blob_store.MakeShardedFilesStore(
 		s.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
