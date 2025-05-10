@@ -57,6 +57,10 @@ func (w *writer) Write(p []byte) (n int, err error) {
 	return w.tee.Write(p)
 }
 
+func (w *writer) WriteString(s string) (n int, err error) {
+	return io.WriteString(w.tee, s)
+}
+
 func (w *writer) Close() (err error) {
 	if err = w.wCompress.Close(); err != nil {
 		err = errors.Wrap(err)

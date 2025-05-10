@@ -300,7 +300,7 @@ func (s *Store) WriteInventoryListBlob(
 
 // TODO split into public and private parts, where public includes writing the
 // skus AND the list, while private writes just the list
-func (s *Store) ImportInventoryList(
+func (store *Store) ImportInventoryList(
 	bs interfaces.BlobStore,
 	t *sku.Transacted,
 ) (err error) {
@@ -316,7 +316,7 @@ func (s *Store) ImportInventoryList(
 	list := sku.MakeList()
 
 	if err = inventory_list_blobs.ReadInventoryListBlob(
-		s.FormatForVersion(s.storeVersion),
+		store.FormatForVersion(store.storeVersion),
 		rc,
 		list,
 	); err != nil {
@@ -331,8 +331,8 @@ func (s *Store) ImportInventoryList(
 		}
 
 		if _, err = blob_store.CopyBlobIfNecessary(
-			s.GetEnvRepo().GetEnv(),
-			s.GetEnvRepo(),
+			store.GetEnvRepo().GetEnv(),
+			store.GetEnvRepo(),
 			bs,
 			sk.GetBlobSha(),
 			nil,
@@ -348,7 +348,7 @@ func (s *Store) ImportInventoryList(
 		}
 	}
 
-	if err = s.WriteInventoryListBlob(
+	if err = store.WriteInventoryListBlob(
 		t,
 		list,
 	); err != nil {
@@ -356,7 +356,7 @@ func (s *Store) ImportInventoryList(
 		return
 	}
 
-	if err = s.WriteInventoryListObject(
+	if err = store.WriteInventoryListObject(
 		t,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -133,6 +133,12 @@ func (coder V0StreamCoder) DecodeFrom(
 	return
 }
 
+func (s V0) AllInventoryListBlobSkus(
+	reader io.Reader,
+) interfaces.SeqError[*sku.Transacted] {
+	return interfaces.MakeSeqErrorWithError[*sku.Transacted](errors.ErrNotSupported)
+}
+
 func (s V0) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
