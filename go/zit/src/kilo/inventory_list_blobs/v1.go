@@ -25,6 +25,37 @@ func (v V1) GetType() ids.Type {
 	return ids.MustType(builtin_types.InventoryListTypeV1)
 }
 
+func (format V1) writeObjectListItemToWriter(
+	object *sku.Transacted,
+	writer interfaces.WriterAndStringWriter,
+) (n int64, err error) {
+	if object.Metadata.Sha().IsNull() {
+		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
+		return
+	}
+
+	var n1 int64
+
+	n1, err = format.Box.EncodeStringTo(object, writer)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var n2 int
+	n2, err = fmt.Fprintf(writer, "\n")
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s V1) WriteInventoryListBlob(
 	o sku.Collection,
 	w1 io.Writer,
@@ -33,24 +64,10 @@ func (s V1) WriteInventoryListBlob(
 	defer errors.DeferredFlusher(&err, bw)
 
 	var n1 int64
-	var n2 int
 
 	for sk := range o.All() {
-		if sk.Metadata.Sha().IsNull() {
-			err = errors.ErrorWithStackf("empty sha: %q", sku.String(sk))
-			return
-		}
-
-		n1, err = s.Box.EncodeStringTo(sk, bw)
+		n1, err = s.writeObjectListItemToWriter(sk, bw)
 		n += n1
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = fmt.Fprintf(bw, "\n")
-		n += int64(n2)
 
 		if err != nil {
 			err = errors.Wrap(err)
