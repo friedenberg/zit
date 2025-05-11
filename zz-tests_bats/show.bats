@@ -583,6 +583,20 @@ function show_inventory_lists { # @test
 	assert_output
 }
 
+function show_inventory_list_blob { # @test
+	run_zit show -format tai :b
+	assert_success
+	mapfile -t tais <<<"$output"
+
+	for tai in "${tais[@]}"; do
+		run_zit show -format blob "$tai:b"
+		assert_success
+    listTais="$(echo -n "$output" | grep -o '[0-9]\+\.[0-9]\+')"
+    echo -n "$listTais" | run sort -n -c -
+    assert_success
+	done
+}
+
 # bats test_tags=user_story:builtin_types
 function show_builtin_type_md { # @test
 	run_zit show -format text !toml-type-v1:t
