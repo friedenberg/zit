@@ -332,7 +332,7 @@ function push_default_stdio_local_once { # @test
 	export BATS_TEST_BODY=true
 	run_zit push /them
 	assert_success
-  # TODO-P4 assert output of push
+	# TODO-P4 assert output of push
 
 	pushd them || exit 1
 	run_zit show :zettel
