@@ -203,7 +203,7 @@ func (store *Store) Commit(
 	if options.AddToInventoryList {
 		ui.Log().Print("adding to inventory list", options, child)
 		if err = store.commitTransacted(child, parent); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Sku: %s", sku.String(child))
 			return
 		}
 	}
@@ -287,14 +287,17 @@ func (s *Store) fetchParentIfNecessary(
 
 // TODO add results for which stores had which change types
 func (s *Store) commitTransacted(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
+	object *sku.Transacted,
+	parent *sku.Transacted,
 ) (err error) {
-	sk := sku.GetTransactedPool().Get()
+	if !s.inventoryList.LastTai.Less(object.GetTai()) {
+		object.Metadata.Tai = s.GetTai()
+	}
 
-	sku.TransactedResetter.ResetWith(sk, kinder)
-
-	if err = s.inventoryList.Add(sk); err != nil {
+	if err = s.inventoryListStore.AddObjectToOpenList(
+		s.inventoryList,
+		object,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -398,24 +401,24 @@ func (s *Store) addType(
 }
 
 func (s *Store) addTypeAndExpandedIfNecessary(
-	t1 ids.Type,
+	rootTipe ids.Type,
 ) (err error) {
-	if t1.IsEmpty() {
+	if rootTipe.IsEmpty() {
 		return
 	}
 
-	if builtin_types.IsBuiltin(t1) {
+	if builtin_types.IsBuiltin(rootTipe) {
 		return
 	}
 
-	typenExpanded := ids.ExpandOneSlice(
-		t1,
+	typesExpanded := ids.ExpandOneSlice(
+		rootTipe,
 		ids.MakeType,
 		expansion.ExpanderRight,
 	)
 
-	for _, t := range typenExpanded {
-		if err = s.addType(t); err != nil {
+	for _, tipe := range typesExpanded {
+		if err = s.addType(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -465,22 +468,22 @@ func (s *Store) addTags(
 }
 
 func (s *Store) addMissingTypeAndTags(
-	co sku.CommitOptions,
-	m *sku.Transacted,
+	commitOptions sku.CommitOptions,
+	object *sku.Transacted,
 ) (err error) {
-	t := m.GetType()
+	tipe := object.GetType()
 
-	if !co.DontAddMissingType {
-		if err = s.addTypeAndExpandedIfNecessary(t); err != nil {
+	if !commitOptions.DontAddMissingType {
+		if err = s.addTypeAndExpandedIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if !co.DontAddMissingTags && m.GetGenre() == genres.Tag {
+	if !commitOptions.DontAddMissingTags && object.GetGenre() == genres.Tag {
 		var tag ids.Tag
 
-		if err = tag.TodoSetFromObjectId(m.GetObjectId()); err != nil {
+		if err = tag.TodoSetFromObjectId(object.GetObjectId()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -501,13 +504,13 @@ func (s *Store) addMissingTypeAndTags(
 		}
 	}
 
-	if !co.DontAddMissingTags {
-		es := quiter.SortedValues(m.Metadata.GetTags())
+	if !commitOptions.DontAddMissingTags {
+		es := quiter.SortedValues(object.Metadata.GetTags())
 
-		if m.GetGenre() == genres.Tag {
+		if object.GetGenre() == genres.Tag {
 			var tag ids.Tag
 
-			if err = tag.TodoSetFromObjectId(m.GetObjectId()); err != nil {
+			if err = tag.TodoSetFromObjectId(object.GetObjectId()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

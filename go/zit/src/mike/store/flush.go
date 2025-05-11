@@ -12,14 +12,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 )
 
-func (s *Store) FlushInventoryList(
+func (store *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if s.GetConfig().GetCLIConfig().IsDryRun() {
+	if store.GetConfig().GetCLIConfig().IsDryRun() {
 		return
 	}
 
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		return
 	}
 
@@ -27,9 +27,10 @@ func (s *Store) FlushInventoryList(
 
 	var inventoryListSku *sku.Transacted
 
-	if inventoryListSku, err = s.GetInventoryListStore().Create(
-		s.inventoryList,
-		s.GetConfig().GetCLIConfig().Description,
+	store.inventoryList.Description = store.GetConfig().GetCLIConfig().Description
+
+	if inventoryListSku, err = store.GetInventoryListStore().Create(
+		store.inventoryList,
 	); err != nil {
 		if errors.Is(err, inventory_list_store.ErrEmpty) {
 			ui.Log().Printf("inventory list was empty")
@@ -41,7 +42,7 @@ func (s *Store) FlushInventoryList(
 	}
 
 	if inventoryListSku != nil {
-		if err = s.GetStreamIndex().Add(
+		if err = store.GetStreamIndex().Add(
 			inventoryListSku,
 			sku.CommitOptions{
 				StoreOptions: sku.StoreOptions{},
@@ -52,7 +53,7 @@ func (s *Store) FlushInventoryList(
 		}
 		defer sku.GetTransactedPool().Put(inventoryListSku)
 
-		if s.GetConfig().GetCLIConfig().PrintOptions.PrintInventoryLists {
+		if store.GetConfig().GetCLIConfig().PrintOptions.PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -60,9 +61,12 @@ func (s *Store) FlushInventoryList(
 		}
 	}
 
-	sku.ResetterList.Reset(s.inventoryList)
+	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err = s.GetInventoryListStore().Flush(); err != nil {
+	if err = store.GetInventoryListStore().Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

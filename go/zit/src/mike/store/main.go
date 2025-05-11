@@ -33,7 +33,7 @@ type Store struct {
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.AbbrStore
 
-	inventoryList          *sku.List
+	inventoryList          *sku.OpenList
 	persistentObjectFormat object_inventory_format.Format
 	configBlobFormat       interfaces.Format[config_mutable_blobs.Blob]
 	envLua                 env_lua.Env
@@ -49,7 +49,7 @@ type Store struct {
 	ui sku.UIStorePrinters
 }
 
-func (c *Store) Initialize(
+func (store *Store) Initialize(
 	config store_config.StoreMutable,
 	envRepo env_repo.Env,
 	envWorkspace env_workspace.Env,
@@ -62,59 +62,62 @@ func (c *Store) Initialize(
 	dormantIndex *dormant_index.Index,
 	abbrStore sku.AbbrStore,
 ) (err error) {
-	c.config = config
-	c.envRepo = envRepo
-	c.envWorkspace = envWorkspace
-	c.typedBlobStore = typedBlobStore
-	c.persistentObjectFormat = pmf
-	c.sunrise = sunrise
-	c.envLua = envLua
-	c.queryBuilder = queryBuilder
-	c.dormantIndex = dormantIndex
+	store.config = config
+	store.envRepo = envRepo
+	store.envWorkspace = envWorkspace
+	store.typedBlobStore = typedBlobStore
+	store.persistentObjectFormat = pmf
+	store.sunrise = sunrise
+	store.envLua = envLua
+	store.queryBuilder = queryBuilder
+	store.dormantIndex = dormantIndex
 
-	c.inventoryList = sku.MakeList()
+	store.Abbr = abbrStore
 
-	c.Abbr = abbrStore
-
-	if err = c.inventoryListStore.Initialize(
-		c.GetEnvRepo(),
-		c,
+	if err = store.inventoryListStore.Initialize(
+		store.GetEnvRepo(),
+		store,
 		typedBlobStore.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if c.zettelIdIndex, err = zettel_id_index.MakeIndex(
+	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if store.zettelIdIndex, err = zettel_id_index.MakeIndex(
 		// TODO
-		c.GetConfig(),
-		c.GetEnvRepo(),
-		c.GetEnvRepo(),
+		store.GetConfig(),
+		store.GetEnvRepo(),
+		store.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if c.streamIndex, err = stream_index.MakeIndex(
-		c.GetEnvRepo(),
-		c.applyDormantAndRealizeTags,
-		c.GetEnvRepo().DirCacheObjects(),
-		c.sunrise,
+	if store.streamIndex, err = stream_index.MakeIndex(
+		store.GetEnvRepo(),
+		store.applyDormantAndRealizeTags,
+		store.GetEnvRepo().DirCacheObjects(),
+		store.sunrise,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.protoZettel = sku.MakeProto(
-		c.envWorkspace.GetDefaults(),
+	store.protoZettel = sku.MakeProto(
+		store.envWorkspace.GetDefaults(),
 	)
 
-	c.configBlobFormat = typed_blob_store.MakeBlobFormat2(
+	store.configBlobFormat = typed_blob_store.MakeBlobFormat2(
 		typed_blob_store.MakeTextParserIgnoreTomlErrors2[config_mutable_blobs.Blob](
-			c.GetEnvRepo(),
+			store.GetEnvRepo(),
 		),
 		typed_blob_store.ParsedBlobTomlFormatter2[config_mutable_blobs.Blob]{},
-		c.GetEnvRepo(),
+		store.GetEnvRepo(),
 	)
 
 	return

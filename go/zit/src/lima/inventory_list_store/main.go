@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/env_dir"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -66,7 +65,7 @@ func (s *Store) Initialize(
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
-		blobStore:    envRepo,
+		blobStore:    envRepo.MakeBlobStore(),
 		clock:        clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
@@ -185,11 +184,36 @@ func (s *Store) GetInventoryListStore() sku.InventoryListStore {
 	return s
 }
 
+func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
+	// TODO type
+	openList = &sku.OpenList{}
+
+	if openList.Mover, err = store.blobStore.Mover(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (store *Store) AddObjectToOpenList(
+	openList *sku.OpenList,
+	object *sku.Transacted,
+) (err error) {
+	format := store.FormatForVersion(store.storeVersion)
+
+	if _, err = format.WriteObjectToOpenList(object, openList); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (store *Store) Create(
-	skus *sku.List,
-	description descriptions.Description,
-) (t *sku.Transacted, err error) {
-	if skus.Len() == 0 {
+	openList *sku.OpenList,
+) (object *sku.Transacted, err error) {
+	if openList.Len == 0 {
 		return
 	}
 
@@ -201,26 +225,40 @@ func (store *Store) Create(
 		return
 	}
 
-	t = sku.GetTransactedPool().Get()
+	object = sku.GetTransactedPool().Get()
 
-	t.Metadata.Type = store.getType()
-	t.Metadata.Description = description
+	object.Metadata.Type = store.getType()
+	object.Metadata.Description = openList.Description
 
 	tai := store.GetTai()
 
-	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
+	if err = object.ObjectId.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.SetTai(tai)
+	object.SetTai(tai)
 
-	if err = store.WriteInventoryListBlob(t, skus); err != nil {
+	if err = openList.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = store.WriteInventoryListObject(t); err != nil {
+	actual := openList.GetShaLike()
+	expected := sha.Make(object.GetBlobSha())
+
+	ui.Log().Print("expected", expected, "actual", actual)
+
+	if expected.IsNull() {
+		object.SetBlobSha(actual)
+	} else {
+		if err = expected.AssertEqualsShaLike(actual); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = store.WriteInventoryListObject(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -228,15 +266,16 @@ func (store *Store) Create(
 	return
 }
 
-func (s *Store) WriteInventoryListBlob(
-	t *sku.Transacted,
-	skus *sku.List,
+func (store *Store) WriteInventoryListBlob(
+	remoteBlobStore interfaces.BlobStore,
+	object *sku.Transacted,
+	list *sku.List,
 ) (err error) {
-	if skus.Len() == 0 {
-		if !t.GetBlobSha().IsNull() {
+	if list.Len() == 0 {
+		if !object.GetBlobSha().IsNull() {
 			err = errors.ErrorWithStackf(
 				"inventory list has non-empty blob but passed in list is empty. %q",
-				sku.String(t),
+				sku.String(object),
 			)
 
 			return
@@ -245,31 +284,31 @@ func (s *Store) WriteInventoryListBlob(
 		return
 	}
 
-	var wc interfaces.ShaWriteCloser
+	var writeCloser interfaces.ShaWriteCloser
 
-	if wc, err = s.envRepo.BlobWriter(); err != nil {
+	if writeCloser, err = store.envRepo.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, wc)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = s.getTypedBlobStore().WriteBlobToWriter(
-		t.GetType(),
-		skus,
-		wc,
+	if _, err = store.getTypedBlobStore().WriteBlobToWriter(
+		object.GetType(),
+		list,
+		writeCloser,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	actual := wc.GetShaLike()
-	expected := sha.Make(t.GetBlobSha())
+	actual := writeCloser.GetShaLike()
+	expected := sha.Make(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
-		t.SetBlobSha(actual)
+		object.SetBlobSha(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
 			err = errors.Wrap(err)
@@ -301,13 +340,13 @@ func (s *Store) WriteInventoryListBlob(
 // TODO split into public and private parts, where public includes writing the
 // skus AND the list, while private writes just the list
 func (store *Store) ImportInventoryList(
-	bs interfaces.BlobStore,
-	t *sku.Transacted,
+	remoteBlobStore interfaces.BlobStore,
+	object *sku.Transacted,
 ) (err error) {
-	var rc interfaces.ShaReadCloser
+	var blobReader interfaces.ShaReadCloser
 
-	if rc, err = bs.BlobReader(
-		t.GetBlobSha(),
+	if blobReader, err = remoteBlobStore.BlobReader(
+		object.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -317,7 +356,7 @@ func (store *Store) ImportInventoryList(
 
 	if err = inventory_list_blobs.ReadInventoryListBlob(
 		store.FormatForVersion(store.storeVersion),
-		rc,
+		blobReader,
 		list,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -332,8 +371,8 @@ func (store *Store) ImportInventoryList(
 
 		if _, err = blob_store.CopyBlobIfNecessary(
 			store.GetEnvRepo().GetEnv(),
-			store.GetEnvRepo(),
-			bs,
+			store.blobStore,
+			remoteBlobStore,
 			sk.GetBlobSha(),
 			nil,
 		); err != nil {
@@ -349,7 +388,8 @@ func (store *Store) ImportInventoryList(
 	}
 
 	if err = store.WriteInventoryListBlob(
-		t,
+		remoteBlobStore,
+		object,
 		list,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -357,7 +397,7 @@ func (store *Store) ImportInventoryList(
 	}
 
 	if err = store.WriteInventoryListObject(
-		t,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -479,7 +519,12 @@ func (store *Store) ReadAllSkus(
 
 		for object, iterErr := range iter {
 			if iterErr != nil {
-				err = errors.Wrapf(iterErr, "Sku: %s", sku.String(object))
+				if object == nil {
+					err = errors.Wrap(iterErr)
+				} else {
+					err = errors.Wrapf(iterErr, "Sku: %s", sku.String(object))
+				}
+
 				return
 			}
 

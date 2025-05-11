@@ -58,6 +58,7 @@ type OpenList struct {
 	Tipe ids.Type
 	*env_dir.Mover
 	Description descriptions.Description
+	LastTai     ids.Tai
 	Len         int
 }
 

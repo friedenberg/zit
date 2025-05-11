@@ -583,17 +583,22 @@ function show_inventory_lists { # @test
 	assert_output
 }
 
-function show_inventory_list_blob { # @test
+function show_inventory_list_blob_sort_correct { # @test
+	function assert_sorted_tais() {
+		echo -n "$1" | run sort -n -c -
+		assert_success
+	}
+
 	run_zit show -format tai :b
 	assert_success
+	assert_sorted_tais "$output"
 	mapfile -t tais <<<"$output"
 
 	for tai in "${tais[@]}"; do
 		run_zit show -format blob "$tai:b"
 		assert_success
-    listTais="$(echo -n "$output" | grep -o '[0-9]\+\.[0-9]\+')"
-    echo -n "$listTais" | run sort -n -c -
-    assert_success
+		listTais="$(echo -n "$output" | grep -o '[0-9]\+\.[0-9]\+')"
+		assert_sorted_tais "$listTais"
 	done
 }
 

@@ -244,8 +244,8 @@ function checkin_simple_etikett { # @test
 	run_zit last -format inventory-list-sans-tai
 	assert_success
 	assert_output - <<-EOM
-		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
 	run_zit show -format blob zz-archive?e

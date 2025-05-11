@@ -29,7 +29,28 @@ func (format V1) WriteObjectToOpenList(
 	object *sku.Transacted,
 	list *sku.OpenList,
 ) (n int64, err error) {
-	return format.writeObjectListItemToWriter(object, list.Mover)
+	if !list.LastTai.Less(object.GetTai()) {
+		err = errors.Errorf(
+			"object order incorrect. Last: %s, current: %s",
+			list.LastTai,
+			object.GetTai(),
+		)
+
+		return
+	}
+
+	if n, err = format.writeObjectListItemToWriter(
+		object,
+		list.Mover,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	list.LastTai = object.GetTai()
+	list.Len += 1
+
+	return
 }
 
 func (format V1) writeObjectListItemToWriter(
